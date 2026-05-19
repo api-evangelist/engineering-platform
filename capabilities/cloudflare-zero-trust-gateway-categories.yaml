@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Categories
+  description: 'APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Categories. 1 operations. Lead operation:
+    APIs.io Engineering Platform List categories. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Zero Trust Gateway Categories
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zero-trust-gateway-categories
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Categories business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-gateway-categories
+      path: /accounts/{account_id}/gateway/categories
+      operations:
+      - name: zerotrustgatewaycategorieslistcategories
+        method: GET
+        description: APIs.io Engineering Platform List categories
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zero-trust-gateway-categories-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Categories. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/gateway/categories
+      name: accounts-account-id-gateway-categories
+      description: REST surface for accounts-account_id-gateway-categories.
+      operations:
+      - method: GET
+        name: zerotrustgatewaycategorieslistcategories
+        description: APIs.io Engineering Platform List categories
+        call: cloudflare-zero-trust-gateway-categories.zerotrustgatewaycategorieslistcategories
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zero-trust-gateway-categories-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Categories. One tool per
+      consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-categories
+      description: APIs.io Engineering Platform List categories
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-gateway-categories.zerotrustgatewaycategorieslistcategories
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

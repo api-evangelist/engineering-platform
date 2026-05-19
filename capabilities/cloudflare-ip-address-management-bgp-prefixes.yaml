@@ -1,0 +1,193 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — IP Address Management BGP Prefixes
+  description: 'APIs.io Engineering Platform Cloudflare API — IP Address Management BGP Prefixes. 3 operations. Lead operation:
+    APIs.io Engineering Platform List BGP Prefixes. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - IP Address Management BGP Prefixes
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-ip-address-management-bgp-prefixes
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — IP Address Management BGP Prefixes business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-addressing-prefixes-prefix_id-bgp-prefixes
+      path: /accounts/{account_id}/addressing/prefixes/{prefix_id}/bgp/prefixes
+      operations:
+      - name: ipaddressmanagementprefixeslistbgpprefixes
+        method: GET
+        description: APIs.io Engineering Platform List BGP Prefixes
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: prefix_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-addressing-prefixes-prefix_id-bgp-prefixes-bgp_prefix_id
+      path: /accounts/{account_id}/addressing/prefixes/{prefix_id}/bgp/prefixes/{bgp_prefix_id}
+      operations:
+      - name: ipaddressmanagementprefixesfetchbgpprefix
+        method: GET
+        description: APIs.io Engineering Platform Fetch BGP Prefix
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: prefix_id
+          in: path
+          type: string
+          required: true
+        - name: bgp_prefix_id
+          in: path
+          type: string
+          required: true
+      - name: ipaddressmanagementprefixesupdatebgpprefix
+        method: PATCH
+        description: APIs.io Engineering Platform Update BGP Prefix
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: prefix_id
+          in: path
+          type: string
+          required: true
+        - name: bgp_prefix_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-ip-address-management-bgp-prefixes-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — IP Address Management BGP Prefixes. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/addressing/prefixes/{prefix-id}/bgp/prefixes
+      name: accounts-account-id-addressing-prefixes-prefix-id-bgp-prefixes
+      description: REST surface for accounts-account_id-addressing-prefixes-prefix_id-bgp-prefixes.
+      operations:
+      - method: GET
+        name: ipaddressmanagementprefixeslistbgpprefixes
+        description: APIs.io Engineering Platform List BGP Prefixes
+        call: cloudflare-ip-address-management-bgp-prefixes.ipaddressmanagementprefixeslistbgpprefixes
+        with:
+          account_id: rest.account_id
+          prefix_id: rest.prefix_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/addressing/prefixes/{prefix-id}/bgp/prefixes/{bgp-prefix-id}
+      name: accounts-account-id-addressing-prefixes-prefix-id-bgp-prefixes-bgp-prefix-id
+      description: REST surface for accounts-account_id-addressing-prefixes-prefix_id-bgp-prefixes-bgp_prefix_id.
+      operations:
+      - method: GET
+        name: ipaddressmanagementprefixesfetchbgpprefix
+        description: APIs.io Engineering Platform Fetch BGP Prefix
+        call: cloudflare-ip-address-management-bgp-prefixes.ipaddressmanagementprefixesfetchbgpprefix
+        with:
+          account_id: rest.account_id
+          prefix_id: rest.prefix_id
+          bgp_prefix_id: rest.bgp_prefix_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: ipaddressmanagementprefixesupdatebgpprefix
+        description: APIs.io Engineering Platform Update BGP Prefix
+        call: cloudflare-ip-address-management-bgp-prefixes.ipaddressmanagementprefixesupdatebgpprefix
+        with:
+          account_id: rest.account_id
+          prefix_id: rest.prefix_id
+          bgp_prefix_id: rest.bgp_prefix_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-ip-address-management-bgp-prefixes-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — IP Address Management BGP Prefixes. One tool
+      per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-bgp
+      description: APIs.io Engineering Platform List BGP Prefixes
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-address-management-bgp-prefixes.ipaddressmanagementprefixeslistbgpprefixes
+      with:
+        account_id: tools.account_id
+        prefix_id: tools.prefix_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-fetch-bgp
+      description: APIs.io Engineering Platform Fetch BGP Prefix
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-address-management-bgp-prefixes.ipaddressmanagementprefixesfetchbgpprefix
+      with:
+        account_id: tools.account_id
+        prefix_id: tools.prefix_id
+        bgp_prefix_id: tools.bgp_prefix_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-bgp
+      description: APIs.io Engineering Platform Update BGP Prefix
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-address-management-bgp-prefixes.ipaddressmanagementprefixesupdatebgpprefix
+      with:
+        account_id: tools.account_id
+        prefix_id: tools.prefix_id
+        bgp_prefix_id: tools.bgp_prefix_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

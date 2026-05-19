@@ -1,0 +1,415 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar Entities
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar Entities. 7 operations. Lead operation: APIs.io Engineering
+    Platform Get autonomous systems. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Radar Entities
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-entities
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar Entities business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: radar-entities-asns
+      path: /radar/entities/asns
+      operations:
+      - name: radargetentitiesasnlist
+        method: GET
+        description: APIs.io Engineering Platform Get autonomous systems
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: offset
+          in: query
+          type: integer
+          description: Number of objects to skip before grabbing results.
+        - name: asn
+          in: query
+          type: string
+          description: Comma separated list of ASNs.
+        - name: location
+          in: query
+          type: string
+          description: Location Alpha2 to filter results.
+        - name: orderBy
+          in: query
+          type: string
+          description: Order asn list.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-entities-asns-ip
+      path: /radar/entities/asns/ip
+      operations:
+      - name: radargetentitiesasnbyip
+        method: GET
+        description: APIs.io Engineering Platform Get autonomous system information by IP address
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: ip
+          in: query
+          type: string
+          description: IP address.
+          required: true
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-entities-asns-asn
+      path: /radar/entities/asns/{asn}
+      operations:
+      - name: radargetentitiesasnbyid
+        method: GET
+        description: APIs.io Engineering Platform Get autonomous system information by AS number
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: asn
+          in: path
+          type: integer
+          description: Autonomous System Number (ASN).
+          required: true
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-entities-asns-asn-rel
+      path: /radar/entities/asns/{asn}/rel
+      operations:
+      - name: radargetasnsrel
+        method: GET
+        description: APIs.io Engineering Platform Get AS-level relationships by AS number
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: asn
+          in: path
+          type: integer
+          description: Get all ASNs with provider-customer or peering relationships with the given ASN
+          required: true
+        - name: asn2
+          in: query
+          type: integer
+          description: Get the AS relationship of ASN2 with respect to the given ASN
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-entities-ip
+      path: /radar/entities/ip
+      operations:
+      - name: radargetentitiesip
+        method: GET
+        description: APIs.io Engineering Platform Get IP address
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: ip
+          in: query
+          type: string
+          description: IP address.
+          required: true
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-entities-locations
+      path: /radar/entities/locations
+      operations:
+      - name: radargetentitieslocations
+        method: GET
+        description: APIs.io Engineering Platform Get locations
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: offset
+          in: query
+          type: integer
+          description: Number of objects to skip before grabbing results.
+        - name: location
+          in: query
+          type: string
+          description: Comma separated list of locations.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-entities-locations-location
+      path: /radar/entities/locations/{location}
+      operations:
+      - name: radargetentitieslocationbyalpha2
+        method: GET
+        description: APIs.io Engineering Platform Get location
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: location
+          in: path
+          type: string
+          description: Alpha-2 country code.
+          required: true
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-entities-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar Entities. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/entities/asns
+      name: radar-entities-asns
+      description: REST surface for radar-entities-asns.
+      operations:
+      - method: GET
+        name: radargetentitiesasnlist
+        description: APIs.io Engineering Platform Get autonomous systems
+        call: cloudflare-radar-entities.radargetentitiesasnlist
+        with:
+          limit: rest.limit
+          offset: rest.offset
+          asn: rest.asn
+          location: rest.location
+          orderBy: rest.orderBy
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/entities/asns/ip
+      name: radar-entities-asns-ip
+      description: REST surface for radar-entities-asns-ip.
+      operations:
+      - method: GET
+        name: radargetentitiesasnbyip
+        description: APIs.io Engineering Platform Get autonomous system information by IP address
+        call: cloudflare-radar-entities.radargetentitiesasnbyip
+        with:
+          ip: rest.ip
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/entities/asns/{asn}
+      name: radar-entities-asns-asn
+      description: REST surface for radar-entities-asns-asn.
+      operations:
+      - method: GET
+        name: radargetentitiesasnbyid
+        description: APIs.io Engineering Platform Get autonomous system information by AS number
+        call: cloudflare-radar-entities.radargetentitiesasnbyid
+        with:
+          asn: rest.asn
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/entities/asns/{asn}/rel
+      name: radar-entities-asns-asn-rel
+      description: REST surface for radar-entities-asns-asn-rel.
+      operations:
+      - method: GET
+        name: radargetasnsrel
+        description: APIs.io Engineering Platform Get AS-level relationships by AS number
+        call: cloudflare-radar-entities.radargetasnsrel
+        with:
+          asn: rest.asn
+          asn2: rest.asn2
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/entities/ip
+      name: radar-entities-ip
+      description: REST surface for radar-entities-ip.
+      operations:
+      - method: GET
+        name: radargetentitiesip
+        description: APIs.io Engineering Platform Get IP address
+        call: cloudflare-radar-entities.radargetentitiesip
+        with:
+          ip: rest.ip
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/entities/locations
+      name: radar-entities-locations
+      description: REST surface for radar-entities-locations.
+      operations:
+      - method: GET
+        name: radargetentitieslocations
+        description: APIs.io Engineering Platform Get locations
+        call: cloudflare-radar-entities.radargetentitieslocations
+        with:
+          limit: rest.limit
+          offset: rest.offset
+          location: rest.location
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/entities/locations/{location}
+      name: radar-entities-locations-location
+      description: REST surface for radar-entities-locations-location.
+      operations:
+      - method: GET
+        name: radargetentitieslocationbyalpha2
+        description: APIs.io Engineering Platform Get location
+        call: cloudflare-radar-entities.radargetentitieslocationbyalpha2
+        with:
+          location: rest.location
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-entities-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar Entities. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-autonomous
+      description: APIs.io Engineering Platform Get autonomous systems
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-entities.radargetentitiesasnlist
+      with:
+        limit: tools.limit
+        offset: tools.offset
+        asn: tools.asn
+        location: tools.location
+        orderBy: tools.orderBy
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-autonomous-2
+      description: APIs.io Engineering Platform Get autonomous system information by IP address
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-entities.radargetentitiesasnbyip
+      with:
+        ip: tools.ip
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-autonomous-3
+      description: APIs.io Engineering Platform Get autonomous system information by AS number
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-entities.radargetentitiesasnbyid
+      with:
+        asn: tools.asn
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-level
+      description: APIs.io Engineering Platform Get AS-level relationships by AS number
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-entities.radargetasnsrel
+      with:
+        asn: tools.asn
+        asn2: tools.asn2
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-ip
+      description: APIs.io Engineering Platform Get IP address
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-entities.radargetentitiesip
+      with:
+        ip: tools.ip
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-locations
+      description: APIs.io Engineering Platform Get locations
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-entities.radargetentitieslocations
+      with:
+        limit: tools.limit
+        offset: tools.offset
+        location: tools.location
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-location
+      description: APIs.io Engineering Platform Get location
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-entities.radargetentitieslocationbyalpha2
+      with:
+        location: tools.location
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.

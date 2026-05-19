@@ -1,0 +1,255 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Calls TURN Keys
+  description: 'APIs.io Engineering Platform Cloudflare API — Calls TURN Keys. 5 operations. Lead operation: APIs.io Engineering
+    Platform List TURN Keys. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Calls TURN Keys
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-calls-turn-keys
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Calls TURN Keys business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-calls-turn_keys
+      path: /accounts/{account_id}/calls/turn_keys
+      operations:
+      - name: callsturnkeylist
+        method: GET
+        description: APIs.io Engineering Platform List TURN Keys
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: callsturnkeycreate
+        method: POST
+        description: APIs.io Engineering Platform Create a new TURN key
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-calls-turn_keys-key_id
+      path: /accounts/{account_id}/calls/turn_keys/{key_id}
+      operations:
+      - name: callsdeleteturnkey
+        method: DELETE
+        description: APIs.io Engineering Platform Delete TURN key
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: key_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: callsretrieveturnkeydetails
+        method: GET
+        description: APIs.io Engineering Platform Retrieve TURN key details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: key_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: callsupdateturnkey
+        method: PUT
+        description: APIs.io Engineering Platform Edit TURN key details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: key_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-calls-turn-keys-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Calls TURN Keys. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/calls/turn-keys
+      name: accounts-account-id-calls-turn-keys
+      description: REST surface for accounts-account_id-calls-turn_keys.
+      operations:
+      - method: GET
+        name: callsturnkeylist
+        description: APIs.io Engineering Platform List TURN Keys
+        call: cloudflare-calls-turn-keys.callsturnkeylist
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: callsturnkeycreate
+        description: APIs.io Engineering Platform Create a new TURN key
+        call: cloudflare-calls-turn-keys.callsturnkeycreate
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/calls/turn-keys/{key-id}
+      name: accounts-account-id-calls-turn-keys-key-id
+      description: REST surface for accounts-account_id-calls-turn_keys-key_id.
+      operations:
+      - method: DELETE
+        name: callsdeleteturnkey
+        description: APIs.io Engineering Platform Delete TURN key
+        call: cloudflare-calls-turn-keys.callsdeleteturnkey
+        with:
+          key_id: rest.key_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: callsretrieveturnkeydetails
+        description: APIs.io Engineering Platform Retrieve TURN key details
+        call: cloudflare-calls-turn-keys.callsretrieveturnkeydetails
+        with:
+          key_id: rest.key_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: callsupdateturnkey
+        description: APIs.io Engineering Platform Edit TURN key details
+        call: cloudflare-calls-turn-keys.callsupdateturnkey
+        with:
+          key_id: rest.key_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-calls-turn-keys-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Calls TURN Keys. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-turn
+      description: APIs.io Engineering Platform List TURN Keys
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-calls-turn-keys.callsturnkeylist
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-new
+      description: APIs.io Engineering Platform Create a new TURN key
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-calls-turn-keys.callsturnkeycreate
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-turn
+      description: APIs.io Engineering Platform Delete TURN key
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-calls-turn-keys.callsdeleteturnkey
+      with:
+        key_id: tools.key_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-retrieve-turn
+      description: APIs.io Engineering Platform Retrieve TURN key details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-calls-turn-keys.callsretrieveturnkeydetails
+      with:
+        key_id: tools.key_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-edit-turn
+      description: APIs.io Engineering Platform Edit TURN key details
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-calls-turn-keys.callsupdateturnkey
+      with:
+        key_id: tools.key_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

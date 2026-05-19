@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Access Key Configuration
+  description: 'APIs.io Engineering Platform Cloudflare API — Access Key Configuration. 3 operations. Lead operation: APIs.io
+    Engineering Platform Get the Access key configuration. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Access Key Configuration
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-access-key-configuration
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Access Key Configuration business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-access-keys
+      path: /accounts/{account_id}/access/keys
+      operations:
+      - name: accesskeyconfigurationgettheaccesskeyconfiguration
+        method: GET
+        description: APIs.io Engineering Platform Get the Access key configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accesskeyconfigurationupdatetheaccesskeyconfiguration
+        method: PUT
+        description: APIs.io Engineering Platform Update the Access key configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-access-keys-rotate
+      path: /accounts/{account_id}/access/keys/rotate
+      operations:
+      - name: accesskeyconfigurationrotateaccesskeys
+        method: POST
+        description: APIs.io Engineering Platform Rotate Access keys
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-access-key-configuration-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Access Key Configuration. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/access/keys
+      name: accounts-account-id-access-keys
+      description: REST surface for accounts-account_id-access-keys.
+      operations:
+      - method: GET
+        name: accesskeyconfigurationgettheaccesskeyconfiguration
+        description: APIs.io Engineering Platform Get the Access key configuration
+        call: cloudflare-access-key-configuration.accesskeyconfigurationgettheaccesskeyconfiguration
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: accesskeyconfigurationupdatetheaccesskeyconfiguration
+        description: APIs.io Engineering Platform Update the Access key configuration
+        call: cloudflare-access-key-configuration.accesskeyconfigurationupdatetheaccesskeyconfiguration
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/keys/rotate
+      name: accounts-account-id-access-keys-rotate
+      description: REST surface for accounts-account_id-access-keys-rotate.
+      operations:
+      - method: POST
+        name: accesskeyconfigurationrotateaccesskeys
+        description: APIs.io Engineering Platform Rotate Access keys
+        call: cloudflare-access-key-configuration.accesskeyconfigurationrotateaccesskeys
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-access-key-configuration-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Access Key Configuration. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-access
+      description: APIs.io Engineering Platform Get the Access key configuration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-key-configuration.accesskeyconfigurationgettheaccesskeyconfiguration
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-access
+      description: APIs.io Engineering Platform Update the Access key configuration
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-key-configuration.accesskeyconfigurationupdatetheaccesskeyconfiguration
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-rotate-access
+      description: APIs.io Engineering Platform Rotate Access keys
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-access-key-configuration.accesskeyconfigurationrotateaccesskeys
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

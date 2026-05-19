@@ -1,0 +1,157 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagRole'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagRole. 2 operations. Lead operation:
+    #Action=UntagRole. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=UntagRole'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-untagrole
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagRole business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=UntagRole'
+      path: /#Action=UntagRole
+      operations:
+      - name: getuntagrole
+        method: GET
+        description: Removes the specified tags from the role. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+          IAM resources</a> in the <i>IAM User Guide</i>.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: RoleName
+          in: query
+          type: string
+          description: <p>The name of the IAM role from which you want to remove tags.</p> <p>This parameter accepts (through
+            its <a href="http://wikipedia.org/wiki/regex">regex patte
+          required: true
+        - name: TagKeys
+          in: query
+          type: array
+          description: A list of key names as a simple array of strings. The tags with matching keys are removed from the
+            specified role.
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postuntagrole
+        method: POST
+        description: Removes the specified tags from the role. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+          IAM resources</a> in the <i>IAM User Guide</i>.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-untagrole-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagRole. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-untagrole
+      name: action-untagrole
+      description: 'REST surface for #Action=UntagRole.'
+      operations:
+      - method: GET
+        name: getuntagrole
+        description: Removes the specified tags from the role. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+          IAM resources</a> in the <i>IAM User Guide</i>.
+        call: aws-iam-action-untagrole.getuntagrole
+        with:
+          RoleName: rest.RoleName
+          TagKeys: rest.TagKeys
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postuntagrole
+        description: Removes the specified tags from the role. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+          IAM resources</a> in the <i>IAM User Guide</i>.
+        call: aws-iam-action-untagrole.postuntagrole
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-untagrole-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagRole. One
+      tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: removes-specified-tags-role-more
+      description: Removes the specified tags from the role. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+        IAM resources</a> in the <i>IAM User Guide</i>.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-untagrole.getuntagrole
+      with:
+        RoleName: tools.RoleName
+        TagKeys: tools.TagKeys
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: removes-specified-tags-role-more-2
+      description: Removes the specified tags from the role. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+        IAM resources</a> in the <i>IAM User Guide</i>.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-untagrole.postuntagrole
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

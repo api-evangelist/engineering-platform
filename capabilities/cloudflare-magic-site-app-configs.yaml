@@ -1,0 +1,239 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Magic Site App Configs
+  description: 'APIs.io Engineering Platform Cloudflare API — Magic Site App Configs. 4 operations. Lead operation: APIs.io
+    Engineering Platform List App Configs. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Magic Site App Configs
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-magic-site-app-configs
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Magic Site App Configs business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-magic-sites-site_id-app_configs
+      path: /accounts/{account_id}/magic/sites/{site_id}/app_configs
+      operations:
+      - name: magicsiteappconfigslistappconfigs
+        method: GET
+        description: APIs.io Engineering Platform List App Configs
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: site_id
+          in: path
+          type: string
+          required: true
+      - name: magicsiteappconfigsaddappconfig
+        method: POST
+        description: APIs.io Engineering Platform Create a new App Config
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: site_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-magic-sites-site_id-app_configs-app_config_id
+      path: /accounts/{account_id}/magic/sites/{site_id}/app_configs/{app_config_id}
+      operations:
+      - name: magicsiteappconfigsdeleteappconfig
+        method: DELETE
+        description: APIs.io Engineering Platform Delete App Config
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: site_id
+          in: path
+          type: string
+          required: true
+        - name: app_config_id
+          in: path
+          type: string
+          required: true
+      - name: magicsiteappconfigsupdateappconfig
+        method: PUT
+        description: APIs.io Engineering Platform Update an App Config
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: site_id
+          in: path
+          type: string
+          required: true
+        - name: app_config_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-magic-site-app-configs-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Magic Site App Configs. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/magic/sites/{site-id}/app-configs
+      name: accounts-account-id-magic-sites-site-id-app-configs
+      description: REST surface for accounts-account_id-magic-sites-site_id-app_configs.
+      operations:
+      - method: GET
+        name: magicsiteappconfigslistappconfigs
+        description: APIs.io Engineering Platform List App Configs
+        call: cloudflare-magic-site-app-configs.magicsiteappconfigslistappconfigs
+        with:
+          account_id: rest.account_id
+          site_id: rest.site_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: magicsiteappconfigsaddappconfig
+        description: APIs.io Engineering Platform Create a new App Config
+        call: cloudflare-magic-site-app-configs.magicsiteappconfigsaddappconfig
+        with:
+          account_id: rest.account_id
+          site_id: rest.site_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/magic/sites/{site-id}/app-configs/{app-config-id}
+      name: accounts-account-id-magic-sites-site-id-app-configs-app-config-id
+      description: REST surface for accounts-account_id-magic-sites-site_id-app_configs-app_config_id.
+      operations:
+      - method: DELETE
+        name: magicsiteappconfigsdeleteappconfig
+        description: APIs.io Engineering Platform Delete App Config
+        call: cloudflare-magic-site-app-configs.magicsiteappconfigsdeleteappconfig
+        with:
+          account_id: rest.account_id
+          site_id: rest.site_id
+          app_config_id: rest.app_config_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: magicsiteappconfigsupdateappconfig
+        description: APIs.io Engineering Platform Update an App Config
+        call: cloudflare-magic-site-app-configs.magicsiteappconfigsupdateappconfig
+        with:
+          account_id: rest.account_id
+          site_id: rest.site_id
+          app_config_id: rest.app_config_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-magic-site-app-configs-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Magic Site App Configs. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-app
+      description: APIs.io Engineering Platform List App Configs
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-magic-site-app-configs.magicsiteappconfigslistappconfigs
+      with:
+        account_id: tools.account_id
+        site_id: tools.site_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-new
+      description: APIs.io Engineering Platform Create a new App Config
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-magic-site-app-configs.magicsiteappconfigsaddappconfig
+      with:
+        account_id: tools.account_id
+        site_id: tools.site_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-app
+      description: APIs.io Engineering Platform Delete App Config
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-magic-site-app-configs.magicsiteappconfigsdeleteappconfig
+      with:
+        account_id: tools.account_id
+        site_id: tools.site_id
+        app_config_id: tools.app_config_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-app
+      description: APIs.io Engineering Platform Update an App Config
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-magic-site-app-configs.magicsiteappconfigsupdateappconfig
+      with:
+        account_id: tools.account_id
+        site_id: tools.site_id
+        app_config_id: tools.app_config_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

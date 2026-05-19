@@ -1,0 +1,93 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform AWS Lambda — 2014 11 13
+  description: 'APIs.io Engineering Platform AWS Lambda — 2014 11 13. 1 operations. Lead operation: 2014 11 13. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - 2014 11 13
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-lambda-2014-11-13
+    baseUri: http://lambda.{region}.amazonaws.com
+    description: APIs.io Engineering Platform AWS Lambda — 2014 11 13 business capability. Self-contained, no shared references.
+    resources:
+    - name: 2014-11-13-functions-FunctionName-invoke-async
+      path: /2014-11-13/functions/{FunctionName}/invoke-async/
+      operations:
+      - name: invokeasync
+        method: POST
+        description: <important> <p>For asynchronous function invocation, use <a>Invoke</a>.</p> </important> <p>Invokes a
+          function asynchronously.</p>
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: FunctionName
+          in: path
+          type: string
+          description: <p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function
+            name</b> â€“ <code>my-function</code>.</p> </li> <l
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-lambda-2014-11-13-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform AWS Lambda — 2014 11 13. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/2014-11-13/functions/{functionname}/invoke-async
+      name: 2014-11-13-functions-functionname-invoke-async
+      description: REST surface for 2014-11-13-functions-FunctionName-invoke-async.
+      operations:
+      - method: POST
+        name: invokeasync
+        description: <important> <p>For asynchronous function invocation, use <a>Invoke</a>.</p> </important> <p>Invokes a
+          function asynchronously.</p>
+        call: aws-lambda-2014-11-13.invokeasync
+        with:
+          FunctionName: rest.FunctionName
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-lambda-2014-11-13-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform AWS Lambda — 2014 11 13. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: important-p-for-asynchronous-function-invocation
+      description: <important> <p>For asynchronous function invocation, use <a>Invoke</a>.</p> </important> <p>Invokes a function
+        asynchronously.</p>
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-lambda-2014-11-13.invokeasync
+      with:
+        FunctionName: tools.FunctionName
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

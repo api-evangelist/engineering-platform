@@ -1,0 +1,104 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API — Billing
+  description: 'APIs.io Engineering Platform Postman API — Billing. 2 operations. Lead operation: APIs.io Engineering Platform
+    Get accounts. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Billing
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-billing
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API — Billing business capability. Self-contained, no shared references.
+    resources:
+    - name: accounts
+      path: /accounts
+      operations:
+      - name: getaccounts
+        method: GET
+        description: APIs.io Engineering Platform Get accounts
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: accounts-accountId-invoices
+      path: /accounts/{accountId}/invoices
+      operations:
+      - name: getaccountinvoices
+        method: GET
+        description: APIs.io Engineering Platform List account invoices
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-billing-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API — Billing. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts
+      name: accounts
+      description: REST surface for accounts.
+      operations:
+      - method: GET
+        name: getaccounts
+        description: APIs.io Engineering Platform Get accounts
+        call: postman-billing.getaccounts
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{accountid}/invoices
+      name: accounts-accountid-invoices
+      description: REST surface for accounts-accountId-invoices.
+      operations:
+      - method: GET
+        name: getaccountinvoices
+        description: APIs.io Engineering Platform List account invoices
+        call: postman-billing.getaccountinvoices
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-billing-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API — Billing. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-accounts
+      description: APIs.io Engineering Platform Get accounts
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-billing.getaccounts
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-list-account
+      description: APIs.io Engineering Platform List account invoices
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-billing.getaccountinvoices
+      outputParameters:
+      - type: object
+        mapping: $.

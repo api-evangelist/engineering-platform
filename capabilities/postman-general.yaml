@@ -1,0 +1,294 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API
+  description: 'APIs.io Engineering Platform Postman API. 8 operations. Lead operation: APIs.io Engineering Platform Get all
+    APIs. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-general
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API business capability. Self-contained, no shared references.
+    resources:
+    - name: apis
+      path: /apis
+      operations:
+      - name: getapis
+        method: GET
+        description: APIs.io Engineering Platform Get all APIs
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: createapi
+        method: POST
+        description: APIs.io Engineering Platform Create an API
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: apis-apiId
+      path: /apis/{apiId}
+      operations:
+      - name: getapi
+        method: GET
+        description: APIs.io Engineering Platform Get an API
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updateapi
+        method: PUT
+        description: APIs.io Engineering Platform Update an API
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+      - name: deleteapi
+        method: DELETE
+        description: APIs.io Engineering Platform Delete an API
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: apis-apiId-tasks-taskId
+      path: /apis/{apiId}/tasks/{taskId}
+      operations:
+      - name: getstatusofanasynctask
+        method: GET
+        description: APIs.io Engineering Platform Get status of an asynchronous task
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: apis-apiId-versions-versionId
+      path: /apis/{apiId}/versions/{versionId}
+      operations:
+      - name: getapiversion
+        method: GET
+        description: APIs.io Engineering Platform Get a version
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: tags-slug-entities
+      path: /tags/{slug}/entities
+      operations:
+      - name: gettaggedentities
+        method: GET
+        description: APIs.io Engineering Platform Get elements by tag
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-general-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/apis
+      name: apis
+      description: REST surface for apis.
+      operations:
+      - method: GET
+        name: getapis
+        description: APIs.io Engineering Platform Get all APIs
+        call: postman-general.getapis
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createapi
+        description: APIs.io Engineering Platform Create an API
+        call: postman-general.createapi
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/apis/{apiid}
+      name: apis-apiid
+      description: REST surface for apis-apiId.
+      operations:
+      - method: GET
+        name: getapi
+        description: APIs.io Engineering Platform Get an API
+        call: postman-general.getapi
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: updateapi
+        description: APIs.io Engineering Platform Update an API
+        call: postman-general.updateapi
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deleteapi
+        description: APIs.io Engineering Platform Delete an API
+        call: postman-general.deleteapi
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/apis/{apiid}/tasks/{taskid}
+      name: apis-apiid-tasks-taskid
+      description: REST surface for apis-apiId-tasks-taskId.
+      operations:
+      - method: GET
+        name: getstatusofanasynctask
+        description: APIs.io Engineering Platform Get status of an asynchronous task
+        call: postman-general.getstatusofanasynctask
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/apis/{apiid}/versions/{versionid}
+      name: apis-apiid-versions-versionid
+      description: REST surface for apis-apiId-versions-versionId.
+      operations:
+      - method: GET
+        name: getapiversion
+        description: APIs.io Engineering Platform Get a version
+        call: postman-general.getapiversion
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/tags/{slug}/entities
+      name: tags-slug-entities
+      description: REST surface for tags-slug-entities.
+      operations:
+      - method: GET
+        name: gettaggedentities
+        description: APIs.io Engineering Platform Get elements by tag
+        call: postman-general.gettaggedentities
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-general-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-all
+      description: APIs.io Engineering Platform Get all APIs
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-general.getapis
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-api
+      description: APIs.io Engineering Platform Create an API
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: postman-general.createapi
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-api
+      description: APIs.io Engineering Platform Get an API
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-general.getapi
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-api
+      description: APIs.io Engineering Platform Update an API
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: postman-general.updateapi
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-api
+      description: APIs.io Engineering Platform Delete an API
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: postman-general.deleteapi
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-status
+      description: APIs.io Engineering Platform Get status of an asynchronous task
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-general.getstatusofanasynctask
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-version
+      description: APIs.io Engineering Platform Get a version
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-general.getapiversion
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-elements
+      description: APIs.io Engineering Platform Get elements by tag
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-general.gettaggedentities
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,162 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zone Subscription
+  description: 'APIs.io Engineering Platform Cloudflare API — Zone Subscription. 3 operations. Lead operation: APIs.io Engineering
+    Platform Zone Subscription Details. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Zone Subscription
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zone-subscription
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zone Subscription business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: zones-identifier-subscription
+      path: /zones/{identifier}/subscription
+      operations:
+      - name: zonesubscriptionzonesubscriptiondetails
+        method: GET
+        description: APIs.io Engineering Platform Zone Subscription Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+      - name: zonesubscriptioncreatezonesubscription
+        method: POST
+        description: APIs.io Engineering Platform Create Zone Subscription
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: zonesubscriptionupdatezonesubscription
+        method: PUT
+        description: APIs.io Engineering Platform Update Zone Subscription
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zone-subscription-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zone Subscription. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/zones/{identifier}/subscription
+      name: zones-identifier-subscription
+      description: REST surface for zones-identifier-subscription.
+      operations:
+      - method: GET
+        name: zonesubscriptionzonesubscriptiondetails
+        description: APIs.io Engineering Platform Zone Subscription Details
+        call: cloudflare-zone-subscription.zonesubscriptionzonesubscriptiondetails
+        with:
+          identifier: rest.identifier
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: zonesubscriptioncreatezonesubscription
+        description: APIs.io Engineering Platform Create Zone Subscription
+        call: cloudflare-zone-subscription.zonesubscriptioncreatezonesubscription
+        with:
+          identifier: rest.identifier
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: zonesubscriptionupdatezonesubscription
+        description: APIs.io Engineering Platform Update Zone Subscription
+        call: cloudflare-zone-subscription.zonesubscriptionupdatezonesubscription
+        with:
+          identifier: rest.identifier
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zone-subscription-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zone Subscription. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-zone-subscription
+      description: APIs.io Engineering Platform Zone Subscription Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zone-subscription.zonesubscriptionzonesubscriptiondetails
+      with:
+        identifier: tools.identifier
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-zone
+      description: APIs.io Engineering Platform Create Zone Subscription
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-zone-subscription.zonesubscriptioncreatezonesubscription
+      with:
+        identifier: tools.identifier
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-zone
+      description: APIs.io Engineering Platform Update Zone Subscription
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-zone-subscription.zonesubscriptionupdatezonesubscription
+      with:
+        identifier: tools.identifier
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

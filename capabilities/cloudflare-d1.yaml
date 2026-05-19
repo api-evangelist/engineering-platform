@@ -1,0 +1,438 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — D1
+  description: 'APIs.io Engineering Platform Cloudflare API — D1. 8 operations. Lead operation: APIs.io Engineering Platform
+    List D1 Databases. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - D1
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-d1
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — D1 business capability. Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-d1-database
+      path: /accounts/{account_id}/d1/database
+      operations:
+      - name: cloudflared1listdatabases
+        method: GET
+        description: APIs.io Engineering Platform List D1 Databases
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: name
+          in: query
+          type: string
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+      - name: cloudflared1createdatabase
+        method: POST
+        description: APIs.io Engineering Platform Create D1 Database
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-d1-database-database_id
+      path: /accounts/{account_id}/d1/database/{database_id}
+      operations:
+      - name: cloudflared1deletedatabase
+        method: DELETE
+        description: APIs.io Engineering Platform Delete D1 Database
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: database_id
+          in: path
+          type: string
+          required: true
+      - name: cloudflared1getdatabase
+        method: GET
+        description: APIs.io Engineering Platform Get D1 Database
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: database_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-d1-database-database_id-export
+      path: /accounts/{account_id}/d1/database/{database_id}/export
+      operations:
+      - name: cloudflared1exportdatabase
+        method: POST
+        description: APIs.io Engineering Platform Export D1 Database as SQL
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: database_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-d1-database-database_id-import
+      path: /accounts/{account_id}/d1/database/{database_id}/import
+      operations:
+      - name: cloudflared1importdatabase
+        method: POST
+        description: APIs.io Engineering Platform Import SQL into your D1 Database
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: database_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-d1-database-database_id-query
+      path: /accounts/{account_id}/d1/database/{database_id}/query
+      operations:
+      - name: cloudflared1querydatabase
+        method: POST
+        description: APIs.io Engineering Platform Query D1 Database
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: database_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-d1-database-database_id-raw
+      path: /accounts/{account_id}/d1/database/{database_id}/raw
+      operations:
+      - name: cloudflared1rawdatabasequery
+        method: POST
+        description: APIs.io Engineering Platform Raw D1 Database query
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: database_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-d1-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — D1. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/d1/database
+      name: accounts-account-id-d1-database
+      description: REST surface for accounts-account_id-d1-database.
+      operations:
+      - method: GET
+        name: cloudflared1listdatabases
+        description: APIs.io Engineering Platform List D1 Databases
+        call: cloudflare-d1.cloudflared1listdatabases
+        with:
+          account_id: rest.account_id
+          name: rest.name
+          page: rest.page
+          per_page: rest.per_page
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: cloudflared1createdatabase
+        description: APIs.io Engineering Platform Create D1 Database
+        call: cloudflare-d1.cloudflared1createdatabase
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/d1/database/{database-id}
+      name: accounts-account-id-d1-database-database-id
+      description: REST surface for accounts-account_id-d1-database-database_id.
+      operations:
+      - method: DELETE
+        name: cloudflared1deletedatabase
+        description: APIs.io Engineering Platform Delete D1 Database
+        call: cloudflare-d1.cloudflared1deletedatabase
+        with:
+          account_id: rest.account_id
+          database_id: rest.database_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: cloudflared1getdatabase
+        description: APIs.io Engineering Platform Get D1 Database
+        call: cloudflare-d1.cloudflared1getdatabase
+        with:
+          account_id: rest.account_id
+          database_id: rest.database_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/d1/database/{database-id}/export
+      name: accounts-account-id-d1-database-database-id-export
+      description: REST surface for accounts-account_id-d1-database-database_id-export.
+      operations:
+      - method: POST
+        name: cloudflared1exportdatabase
+        description: APIs.io Engineering Platform Export D1 Database as SQL
+        call: cloudflare-d1.cloudflared1exportdatabase
+        with:
+          account_id: rest.account_id
+          database_id: rest.database_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/d1/database/{database-id}/import
+      name: accounts-account-id-d1-database-database-id-import
+      description: REST surface for accounts-account_id-d1-database-database_id-import.
+      operations:
+      - method: POST
+        name: cloudflared1importdatabase
+        description: APIs.io Engineering Platform Import SQL into your D1 Database
+        call: cloudflare-d1.cloudflared1importdatabase
+        with:
+          account_id: rest.account_id
+          database_id: rest.database_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/d1/database/{database-id}/query
+      name: accounts-account-id-d1-database-database-id-query
+      description: REST surface for accounts-account_id-d1-database-database_id-query.
+      operations:
+      - method: POST
+        name: cloudflared1querydatabase
+        description: APIs.io Engineering Platform Query D1 Database
+        call: cloudflare-d1.cloudflared1querydatabase
+        with:
+          account_id: rest.account_id
+          database_id: rest.database_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/d1/database/{database-id}/raw
+      name: accounts-account-id-d1-database-database-id-raw
+      description: REST surface for accounts-account_id-d1-database-database_id-raw.
+      operations:
+      - method: POST
+        name: cloudflared1rawdatabasequery
+        description: APIs.io Engineering Platform Raw D1 Database query
+        call: cloudflare-d1.cloudflared1rawdatabasequery
+        with:
+          account_id: rest.account_id
+          database_id: rest.database_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-d1-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — D1. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-d1
+      description: APIs.io Engineering Platform List D1 Databases
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-d1.cloudflared1listdatabases
+      with:
+        account_id: tools.account_id
+        name: tools.name
+        page: tools.page
+        per_page: tools.per_page
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-d1
+      description: APIs.io Engineering Platform Create D1 Database
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-d1.cloudflared1createdatabase
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-d1
+      description: APIs.io Engineering Platform Delete D1 Database
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-d1.cloudflared1deletedatabase
+      with:
+        account_id: tools.account_id
+        database_id: tools.database_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-d1
+      description: APIs.io Engineering Platform Get D1 Database
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-d1.cloudflared1getdatabase
+      with:
+        account_id: tools.account_id
+        database_id: tools.database_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-export-d1
+      description: APIs.io Engineering Platform Export D1 Database as SQL
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-d1.cloudflared1exportdatabase
+      with:
+        account_id: tools.account_id
+        database_id: tools.database_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-import-sql
+      description: APIs.io Engineering Platform Import SQL into your D1 Database
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-d1.cloudflared1importdatabase
+      with:
+        account_id: tools.account_id
+        database_id: tools.database_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-query-d1
+      description: APIs.io Engineering Platform Query D1 Database
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: cloudflare-d1.cloudflared1querydatabase
+      with:
+        account_id: tools.account_id
+        database_id: tools.database_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-raw-d1
+      description: APIs.io Engineering Platform Raw D1 Database query
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: cloudflare-d1.cloudflared1rawdatabasequery
+      with:
+        account_id: tools.account_id
+        database_id: tools.database_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

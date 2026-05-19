@@ -1,0 +1,85 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — WHOIS Record
+  description: 'APIs.io Engineering Platform Cloudflare API — WHOIS Record. 1 operations. Lead operation: APIs.io Engineering
+    Platform Get WHOIS Record. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - WHOIS Record
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-whois-record
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — WHOIS Record business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-intel-whois
+      path: /accounts/{account_id}/intel/whois
+      operations:
+      - name: whoisrecordgetwhoisrecord
+        method: GET
+        description: APIs.io Engineering Platform Get WHOIS Record
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: domain
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-whois-record-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — WHOIS Record. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/intel/whois
+      name: accounts-account-id-intel-whois
+      description: REST surface for accounts-account_id-intel-whois.
+      operations:
+      - method: GET
+        name: whoisrecordgetwhoisrecord
+        description: APIs.io Engineering Platform Get WHOIS Record
+        call: cloudflare-whois-record.whoisrecordgetwhoisrecord
+        with:
+          account_id: rest.account_id
+          domain: rest.domain
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-whois-record-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — WHOIS Record. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-whois
+      description: APIs.io Engineering Platform Get WHOIS Record
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-whois-record.whoisrecordgetwhoisrecord
+      with:
+        account_id: tools.account_id
+        domain: tools.domain
+      outputParameters:
+      - type: object
+        mapping: $.

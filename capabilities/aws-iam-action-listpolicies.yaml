@@ -1,0 +1,201 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicies'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicies. 2 operations. Lead
+    operation: #Action=ListPolicies. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=ListPolicies'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-listpolicies
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicies business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=ListPolicies'
+      path: /#Action=ListPolicies
+      operations:
+      - name: getlistpolicies
+        method: GET
+        description: '<p>Lists all the managed policies that are available in your Amazon Web Services account, including
+          your own customer-defined managed policies and all Amazon Web Services managed policies.</p> <p>You can filter the
+          list of policies that is '
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Scope
+          in: query
+          type: string
+          description: <p>The scope to use for filtering the results.</p> <p>To list only Amazon Web Services managed policies,
+            set <code>Scope</code> to <code>AWS</code>. To list onl
+        - name: OnlyAttached
+          in: query
+          type: boolean
+          description: <p>A flag to filter the results to only the attached policies.</p> <p>When <code>OnlyAttached</code>
+            is <code>true</code>, the returned list contains only the p
+        - name: PathPrefix
+          in: query
+          type: string
+          description: The path prefix for filtering the results. This parameter is optional. If it is not included, it defaults
+            to a slash (/), listing all policies. This parameter a
+        - name: PolicyUsageFilter
+          in: query
+          type: string
+          description: <p>The policy usage method to use for filtering the results.</p> <p>To list only permissions policies,
+            setÂ <code>PolicyUsageFilter</code>Â toÂ <code>Permission
+        - name: Marker
+          in: query
+          type: string
+          description: Use this parameter only when paginating results and only after you receive a response indicating that
+            the results are truncated. Set it to the value of the <cod
+        - name: MaxItems
+          in: query
+          type: integer
+          description: <p>Use this only when paginating results to indicate the maximum number of items you want in the response.
+            If additional items exist beyond the maximum you spec
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postlistpolicies
+        method: POST
+        description: '<p>Lists all the managed policies that are available in your Amazon Web Services account, including
+          your own customer-defined managed policies and all Amazon Web Services managed policies.</p> <p>You can filter the
+          list of policies that is '
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: MaxItems
+          in: query
+          type: string
+          description: Pagination limit
+        - name: Marker
+          in: query
+          type: string
+          description: Pagination token
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-listpolicies-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicies.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-listpolicies
+      name: action-listpolicies
+      description: 'REST surface for #Action=ListPolicies.'
+      operations:
+      - method: GET
+        name: getlistpolicies
+        description: '<p>Lists all the managed policies that are available in your Amazon Web Services account, including
+          your own customer-defined managed policies and all Amazon Web Services managed policies.</p> <p>You can filter the
+          list of policies that is '
+        call: aws-iam-action-listpolicies.getlistpolicies
+        with:
+          Scope: rest.Scope
+          OnlyAttached: rest.OnlyAttached
+          PathPrefix: rest.PathPrefix
+          PolicyUsageFilter: rest.PolicyUsageFilter
+          Marker: rest.Marker
+          MaxItems: rest.MaxItems
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postlistpolicies
+        description: '<p>Lists all the managed policies that are available in your Amazon Web Services account, including
+          your own customer-defined managed policies and all Amazon Web Services managed policies.</p> <p>You can filter the
+          list of policies that is '
+        call: aws-iam-action-listpolicies.postlistpolicies
+        with:
+          MaxItems: rest.MaxItems
+          Marker: rest.Marker
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-listpolicies-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicies.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-lists-all-managed-policies-that
+      description: '<p>Lists all the managed policies that are available in your Amazon Web Services account, including your
+        own customer-defined managed policies and all Amazon Web Services managed policies.</p> <p>You can filter the list
+        of policies that is '
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-listpolicies.getlistpolicies
+      with:
+        Scope: tools.Scope
+        OnlyAttached: tools.OnlyAttached
+        PathPrefix: tools.PathPrefix
+        PolicyUsageFilter: tools.PolicyUsageFilter
+        Marker: tools.Marker
+        MaxItems: tools.MaxItems
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-lists-all-managed-policies-that-2
+      description: '<p>Lists all the managed policies that are available in your Amazon Web Services account, including your
+        own customer-defined managed policies and all Amazon Web Services managed policies.</p> <p>You can filter the list
+        of policies that is '
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-listpolicies.postlistpolicies
+      with:
+        MaxItems: tools.MaxItems
+        Marker: tools.Marker
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

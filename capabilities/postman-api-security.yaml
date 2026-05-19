@@ -1,0 +1,83 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API — API Security
+  description: 'APIs.io Engineering Platform Postman API — API Security. 1 operations. Lead operation: APIs.io Engineering
+    Platform API definition security validation. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - API Security
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-api-security
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API — API Security business capability. Self-contained, no shared references.
+    resources:
+    - name: security-api-validation
+      path: /security/api-validation
+      operations:
+      - name: schemasecurityvalidation
+        method: POST
+        description: APIs.io Engineering Platform API definition security validation
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-api-security-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API — API Security. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/security/api-validation
+      name: security-api-validation
+      description: REST surface for security-api-validation.
+      operations:
+      - method: POST
+        name: schemasecurityvalidation
+        description: APIs.io Engineering Platform API definition security validation
+        call: postman-api-security.schemasecurityvalidation
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-api-security-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API — API Security. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-api-definition
+      description: APIs.io Engineering Platform API definition security validation
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: postman-api-security.schemasecurityvalidation
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

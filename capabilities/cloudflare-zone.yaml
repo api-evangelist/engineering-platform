@@ -1,0 +1,276 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zone
+  description: 'APIs.io Engineering Platform Cloudflare API — Zone. 5 operations. Lead operation: APIs.io Engineering Platform
+    List Zones. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Zone
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zone
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zone business capability. Self-contained, no shared references.
+    resources:
+    - name: zones
+      path: /zones
+      operations:
+      - name: zonesget
+        method: GET
+        description: APIs.io Engineering Platform List Zones
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: string
+        - name: status
+          in: query
+          type: string
+        - name: account.id
+          in: query
+          type: string
+        - name: account.name
+          in: query
+          type: string
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+        - name: order
+          in: query
+          type: string
+        - name: direction
+          in: query
+          type: string
+        - name: match
+          in: query
+          type: string
+      - name: zonespost
+        method: POST
+        description: APIs.io Engineering Platform Create Zone
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: zones-zone_id
+      path: /zones/{zone_id}
+      operations:
+      - name: zones0delete
+        method: DELETE
+        description: APIs.io Engineering Platform Delete Zone
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: zone_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+      - name: zones0get
+        method: GET
+        description: APIs.io Engineering Platform Zone Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: zone_id
+          in: path
+          type: string
+          required: true
+      - name: zones0patch
+        method: PATCH
+        description: APIs.io Engineering Platform Edit Zone
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: zone_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zone-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zone. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/zones
+      name: zones
+      description: REST surface for zones.
+      operations:
+      - method: GET
+        name: zonesget
+        description: APIs.io Engineering Platform List Zones
+        call: cloudflare-zone.zonesget
+        with:
+          name: rest.name
+          status: rest.status
+          account.id: rest.account.id
+          account.name: rest.account.name
+          page: rest.page
+          per_page: rest.per_page
+          order: rest.order
+          direction: rest.direction
+          match: rest.match
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: zonespost
+        description: APIs.io Engineering Platform Create Zone
+        call: cloudflare-zone.zonespost
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/zones/{zone-id}
+      name: zones-zone-id
+      description: REST surface for zones-zone_id.
+      operations:
+      - method: DELETE
+        name: zones0delete
+        description: APIs.io Engineering Platform Delete Zone
+        call: cloudflare-zone.zones0delete
+        with:
+          zone_id: rest.zone_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: zones0get
+        description: APIs.io Engineering Platform Zone Details
+        call: cloudflare-zone.zones0get
+        with:
+          zone_id: rest.zone_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: zones0patch
+        description: APIs.io Engineering Platform Edit Zone
+        call: cloudflare-zone.zones0patch
+        with:
+          zone_id: rest.zone_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zone-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zone. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-zones
+      description: APIs.io Engineering Platform List Zones
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zone.zonesget
+      with:
+        name: tools.name
+        status: tools.status
+        account.id: tools.account.id
+        account.name: tools.account.name
+        page: tools.page
+        per_page: tools.per_page
+        order: tools.order
+        direction: tools.direction
+        match: tools.match
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-zone
+      description: APIs.io Engineering Platform Create Zone
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-zone.zonespost
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-zone
+      description: APIs.io Engineering Platform Delete Zone
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-zone.zones0delete
+      with:
+        zone_id: tools.zone_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-zone-details
+      description: APIs.io Engineering Platform Zone Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zone.zones0get
+      with:
+        zone_id: tools.zone_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-edit-zone
+      description: APIs.io Engineering Platform Edit Zone
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-zone.zones0patch
+      with:
+        zone_id: tools.zone_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

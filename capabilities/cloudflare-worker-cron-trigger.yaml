@@ -1,0 +1,133 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Worker Cron Trigger
+  description: 'APIs.io Engineering Platform Cloudflare API — Worker Cron Trigger. 2 operations. Lead operation: APIs.io Engineering
+    Platform Get Cron Triggers. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Worker Cron Trigger
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-worker-cron-trigger
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Worker Cron Trigger business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-workers-scripts-script_name-schedules
+      path: /accounts/{account_id}/workers/scripts/{script_name}/schedules
+      operations:
+      - name: workercrontriggergetcrontriggers
+        method: GET
+        description: APIs.io Engineering Platform Get Cron Triggers
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: workercrontriggerupdatecrontriggers
+        method: PUT
+        description: APIs.io Engineering Platform Update Cron Triggers
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-worker-cron-trigger-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Worker Cron Trigger. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/workers/scripts/{script-name}/schedules
+      name: accounts-account-id-workers-scripts-script-name-schedules
+      description: REST surface for accounts-account_id-workers-scripts-script_name-schedules.
+      operations:
+      - method: GET
+        name: workercrontriggergetcrontriggers
+        description: APIs.io Engineering Platform Get Cron Triggers
+        call: cloudflare-worker-cron-trigger.workercrontriggergetcrontriggers
+        with:
+          script_name: rest.script_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: workercrontriggerupdatecrontriggers
+        description: APIs.io Engineering Platform Update Cron Triggers
+        call: cloudflare-worker-cron-trigger.workercrontriggerupdatecrontriggers
+        with:
+          script_name: rest.script_name
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-worker-cron-trigger-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Worker Cron Trigger. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-cron
+      description: APIs.io Engineering Platform Get Cron Triggers
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-cron-trigger.workercrontriggergetcrontriggers
+      with:
+        script_name: tools.script_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-cron
+      description: APIs.io Engineering Platform Update Cron Triggers
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-cron-trigger.workercrontriggerupdatecrontriggers
+      with:
+        script_name: tools.script_name
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

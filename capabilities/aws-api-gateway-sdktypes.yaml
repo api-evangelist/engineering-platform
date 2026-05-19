@@ -1,0 +1,130 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Amazon API Gateway — Sdktypes
+  description: 'APIs.io Engineering Platform Amazon API Gateway — Sdktypes. 2 operations. Lead operation: Sdktypes. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Sdktypes
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-api-gateway-sdktypes
+    baseUri: http://apigateway.{region}.amazonaws.com
+    description: APIs.io Engineering Platform Amazon API Gateway — Sdktypes business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: sdktypes
+      path: /sdktypes
+      operations:
+      - name: getsdktypes
+        method: GET
+        description: Gets SDK types
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: position
+          in: query
+          type: string
+          description: The current pagination position in the paged result set.
+        - name: limit
+          in: query
+          type: integer
+          description: The maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+    - name: sdktypes-sdktype_id
+      path: /sdktypes/{sdktype_id}
+      operations:
+      - name: getsdktype
+        method: GET
+        description: Gets an SDK type.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: sdktype_id
+          in: path
+          type: string
+          description: The identifier of the queried SdkType instance.
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-api-gateway-sdktypes-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Amazon API Gateway — Sdktypes. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/sdktypes
+      name: sdktypes
+      description: REST surface for sdktypes.
+      operations:
+      - method: GET
+        name: getsdktypes
+        description: Gets SDK types
+        call: aws-api-gateway-sdktypes.getsdktypes
+        with:
+          position: rest.position
+          limit: rest.limit
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/sdktypes/{sdktype-id}
+      name: sdktypes-sdktype-id
+      description: REST surface for sdktypes-sdktype_id.
+      operations:
+      - method: GET
+        name: getsdktype
+        description: Gets an SDK type.
+        call: aws-api-gateway-sdktypes.getsdktype
+        with:
+          sdktype_id: rest.sdktype_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-api-gateway-sdktypes-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Amazon API Gateway — Sdktypes. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: gets-sdk-types
+      description: Gets SDK types
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-sdktypes.getsdktypes
+      with:
+        position: tools.position
+        limit: tools.limit
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-sdk-type
+      description: Gets an SDK type.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-sdktypes.getsdktype
+      with:
+        sdktype_id: tools.sdktype_id
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,156 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetAccessKeyLastUsed'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetAccessKeyLastUsed. 2 operations.
+    Lead operation: #Action=GetAccessKeyLastUsed. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=GetAccessKeyLastUsed'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-getaccesskeylastused
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetAccessKeyLastUsed business
+      capability. Self-contained, no shared references.'
+    resources:
+    - name: '#Action=GetAccessKeyLastUsed'
+      path: /#Action=GetAccessKeyLastUsed
+      operations:
+      - name: getgetaccesskeylastused
+        method: GET
+        description: Retrieves information about when the specified access key was last used. The information includes the
+          date and time of last use, along with the Amazon Web Services service and Region that were specified in the last
+          request made with that ke
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: AccessKeyId
+          in: query
+          type: string
+          description: <p>The identifier of an access key.</p> <p>This parameter allows (through its <a href="http://wikipedia.org/wiki/regex">regex
+            pattern</a>) a string of character
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postgetaccesskeylastused
+        method: POST
+        description: Retrieves information about when the specified access key was last used. The information includes the
+          date and time of last use, along with the Amazon Web Services service and Region that were specified in the last
+          request made with that ke
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-getaccesskeylastused-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetAccessKeyLastUsed.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-getaccesskeylastused
+      name: action-getaccesskeylastused
+      description: 'REST surface for #Action=GetAccessKeyLastUsed.'
+      operations:
+      - method: GET
+        name: getgetaccesskeylastused
+        description: Retrieves information about when the specified access key was last used. The information includes the
+          date and time of last use, along with the Amazon Web Services service and Region that were specified in the last
+          request made with that ke
+        call: aws-iam-action-getaccesskeylastused.getgetaccesskeylastused
+        with:
+          AccessKeyId: rest.AccessKeyId
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postgetaccesskeylastused
+        description: Retrieves information about when the specified access key was last used. The information includes the
+          date and time of last use, along with the Amazon Web Services service and Region that were specified in the last
+          request made with that ke
+        call: aws-iam-action-getaccesskeylastused.postgetaccesskeylastused
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-getaccesskeylastused-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetAccessKeyLastUsed.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: retrieves-information-about-when-specified
+      description: Retrieves information about when the specified access key was last used. The information includes the date
+        and time of last use, along with the Amazon Web Services service and Region that were specified in the last request
+        made with that ke
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-getaccesskeylastused.getgetaccesskeylastused
+      with:
+        AccessKeyId: tools.AccessKeyId
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: retrieves-information-about-when-specified-2
+      description: Retrieves information about when the specified access key was last used. The information includes the date
+        and time of last use, along with the Amazon Web Services service and Region that were specified in the last request
+        made with that ke
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-getaccesskeylastused.postgetaccesskeylastused
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

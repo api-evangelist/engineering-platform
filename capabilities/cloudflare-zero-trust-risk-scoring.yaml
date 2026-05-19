@@ -1,0 +1,258 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zero Trust Risk Scoring
+  description: 'APIs.io Engineering Platform Cloudflare API — Zero Trust Risk Scoring. 5 operations. Lead operation: APIs.io
+    Engineering Platform Get all behaviors and associated configuration. Self-contained Naftiko capability covering one Engineering
+    Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Zero Trust Risk Scoring
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zero-trust-risk-scoring
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zero Trust Risk Scoring business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-zt_risk_scoring-behaviors
+      path: /accounts/{account_id}/zt_risk_scoring/behaviors
+      operations:
+      - name: dlpriskscorebehaviorsget
+        method: GET
+        description: APIs.io Engineering Platform Get all behaviors and associated configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: dlpriskscorebehaviorsput
+        method: PUT
+        description: APIs.io Engineering Platform Update configuration for risk behaviors
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          description: Account ID
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-zt_risk_scoring-summary
+      path: /accounts/{account_id}/zt_risk_scoring/summary
+      operations:
+      - name: dlpriskscoresummaryget
+        method: GET
+        description: APIs.io Engineering Platform Get risk score info for all users in the account
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-zt_risk_scoring-user_id
+      path: /accounts/{account_id}/zt_risk_scoring/{user_id}
+      operations:
+      - name: dlpriskscoresummarygetforuser
+        method: GET
+        description: APIs.io Engineering Platform Get risk event/score information for a specific user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: user_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-zt_risk_scoring-user_id-reset
+      path: /accounts/{account_id}/zt_risk_scoring/{user_id}/reset
+      operations:
+      - name: dlpriskscoreresetpost
+        method: POST
+        description: APIs.io Engineering Platform Clear the risk score for a particular user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: user_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zero-trust-risk-scoring-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Risk Scoring. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/zt-risk-scoring/behaviors
+      name: accounts-account-id-zt-risk-scoring-behaviors
+      description: REST surface for accounts-account_id-zt_risk_scoring-behaviors.
+      operations:
+      - method: GET
+        name: dlpriskscorebehaviorsget
+        description: APIs.io Engineering Platform Get all behaviors and associated configuration
+        call: cloudflare-zero-trust-risk-scoring.dlpriskscorebehaviorsget
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: dlpriskscorebehaviorsput
+        description: APIs.io Engineering Platform Update configuration for risk behaviors
+        call: cloudflare-zero-trust-risk-scoring.dlpriskscorebehaviorsput
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/zt-risk-scoring/summary
+      name: accounts-account-id-zt-risk-scoring-summary
+      description: REST surface for accounts-account_id-zt_risk_scoring-summary.
+      operations:
+      - method: GET
+        name: dlpriskscoresummaryget
+        description: APIs.io Engineering Platform Get risk score info for all users in the account
+        call: cloudflare-zero-trust-risk-scoring.dlpriskscoresummaryget
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/zt-risk-scoring/{user-id}
+      name: accounts-account-id-zt-risk-scoring-user-id
+      description: REST surface for accounts-account_id-zt_risk_scoring-user_id.
+      operations:
+      - method: GET
+        name: dlpriskscoresummarygetforuser
+        description: APIs.io Engineering Platform Get risk event/score information for a specific user
+        call: cloudflare-zero-trust-risk-scoring.dlpriskscoresummarygetforuser
+        with:
+          account_id: rest.account_id
+          user_id: rest.user_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/zt-risk-scoring/{user-id}/reset
+      name: accounts-account-id-zt-risk-scoring-user-id-reset
+      description: REST surface for accounts-account_id-zt_risk_scoring-user_id-reset.
+      operations:
+      - method: POST
+        name: dlpriskscoreresetpost
+        description: APIs.io Engineering Platform Clear the risk score for a particular user
+        call: cloudflare-zero-trust-risk-scoring.dlpriskscoreresetpost
+        with:
+          account_id: rest.account_id
+          user_id: rest.user_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zero-trust-risk-scoring-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Risk Scoring. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-all
+      description: APIs.io Engineering Platform Get all behaviors and associated configuration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-risk-scoring.dlpriskscorebehaviorsget
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-configuration
+      description: APIs.io Engineering Platform Update configuration for risk behaviors
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-risk-scoring.dlpriskscorebehaviorsput
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-risk
+      description: APIs.io Engineering Platform Get risk score info for all users in the account
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-risk-scoring.dlpriskscoresummaryget
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-risk-2
+      description: APIs.io Engineering Platform Get risk event/score information for a specific user
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-risk-scoring.dlpriskscoresummarygetforuser
+      with:
+        account_id: tools.account_id
+        user_id: tools.user_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-clear-risk
+      description: APIs.io Engineering Platform Clear the risk score for a particular user
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-zero-trust-risk-scoring.dlpriskscoreresetpost
+      with:
+        account_id: tools.account_id
+        user_id: tools.user_id
+      outputParameters:
+      - type: object
+        mapping: $.

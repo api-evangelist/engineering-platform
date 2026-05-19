@@ -1,0 +1,193 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Worker Tail Logs
+  description: 'APIs.io Engineering Platform Cloudflare API — Worker Tail Logs. 3 operations. Lead operation: APIs.io Engineering
+    Platform List Tails. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Worker Tail Logs
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-worker-tail-logs
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Worker Tail Logs business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-workers-scripts-script_name-tails
+      path: /accounts/{account_id}/workers/scripts/{script_name}/tails
+      operations:
+      - name: workertaillogslisttails
+        method: GET
+        description: APIs.io Engineering Platform List Tails
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: workertaillogsstarttail
+        method: POST
+        description: APIs.io Engineering Platform Start Tail
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-workers-scripts-script_name-tails-id
+      path: /accounts/{account_id}/workers/scripts/{script_name}/tails/{id}
+      operations:
+      - name: workertaillogsdeletetail
+        method: DELETE
+        description: APIs.io Engineering Platform Delete Tail
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-worker-tail-logs-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Worker Tail Logs. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/workers/scripts/{script-name}/tails
+      name: accounts-account-id-workers-scripts-script-name-tails
+      description: REST surface for accounts-account_id-workers-scripts-script_name-tails.
+      operations:
+      - method: GET
+        name: workertaillogslisttails
+        description: APIs.io Engineering Platform List Tails
+        call: cloudflare-worker-tail-logs.workertaillogslisttails
+        with:
+          script_name: rest.script_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: workertaillogsstarttail
+        description: APIs.io Engineering Platform Start Tail
+        call: cloudflare-worker-tail-logs.workertaillogsstarttail
+        with:
+          script_name: rest.script_name
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/workers/scripts/{script-name}/tails/{id}
+      name: accounts-account-id-workers-scripts-script-name-tails-id
+      description: REST surface for accounts-account_id-workers-scripts-script_name-tails-id.
+      operations:
+      - method: DELETE
+        name: workertaillogsdeletetail
+        description: APIs.io Engineering Platform Delete Tail
+        call: cloudflare-worker-tail-logs.workertaillogsdeletetail
+        with:
+          id: rest.id
+          script_name: rest.script_name
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-worker-tail-logs-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Worker Tail Logs. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-tails
+      description: APIs.io Engineering Platform List Tails
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-tail-logs.workertaillogslisttails
+      with:
+        script_name: tools.script_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-start-tail
+      description: APIs.io Engineering Platform Start Tail
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-worker-tail-logs.workertaillogsstarttail
+      with:
+        script_name: tools.script_name
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-tail
+      description: APIs.io Engineering Platform Delete Tail
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-worker-tail-logs.workertaillogsdeletetail
+      with:
+        id: tools.id
+        script_name: tools.script_name
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,262 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Secondary DNS (ACL)
+  description: 'APIs.io Engineering Platform Cloudflare API — Secondary DNS (ACL). 5 operations. Lead operation: APIs.io Engineering
+    Platform List ACLs. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Secondary DNS (ACL)
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-secondary-dns-acl
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Secondary DNS (ACL) business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-secondary_dns-acls
+      path: /accounts/{account_id}/secondary_dns/acls
+      operations:
+      - name: secondarydnsacllistacls
+        method: GET
+        description: APIs.io Engineering Platform List ACLs
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: secondarydnsaclcreateacl
+        method: POST
+        description: APIs.io Engineering Platform Create ACL
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-secondary_dns-acls-acl_id
+      path: /accounts/{account_id}/secondary_dns/acls/{acl_id}
+      operations:
+      - name: secondarydnsacldeleteacl
+        method: DELETE
+        description: APIs.io Engineering Platform Delete ACL
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: acl_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: secondarydnsaclacldetails
+        method: GET
+        description: APIs.io Engineering Platform ACL Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: acl_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: secondarydnsaclupdateacl
+        method: PUT
+        description: APIs.io Engineering Platform Update ACL
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: acl_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-secondary-dns-acl-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Secondary DNS (ACL). One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/secondary-dns/acls
+      name: accounts-account-id-secondary-dns-acls
+      description: REST surface for accounts-account_id-secondary_dns-acls.
+      operations:
+      - method: GET
+        name: secondarydnsacllistacls
+        description: APIs.io Engineering Platform List ACLs
+        call: cloudflare-secondary-dns-acl.secondarydnsacllistacls
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: secondarydnsaclcreateacl
+        description: APIs.io Engineering Platform Create ACL
+        call: cloudflare-secondary-dns-acl.secondarydnsaclcreateacl
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/secondary-dns/acls/{acl-id}
+      name: accounts-account-id-secondary-dns-acls-acl-id
+      description: REST surface for accounts-account_id-secondary_dns-acls-acl_id.
+      operations:
+      - method: DELETE
+        name: secondarydnsacldeleteacl
+        description: APIs.io Engineering Platform Delete ACL
+        call: cloudflare-secondary-dns-acl.secondarydnsacldeleteacl
+        with:
+          acl_id: rest.acl_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: secondarydnsaclacldetails
+        description: APIs.io Engineering Platform ACL Details
+        call: cloudflare-secondary-dns-acl.secondarydnsaclacldetails
+        with:
+          acl_id: rest.acl_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: secondarydnsaclupdateacl
+        description: APIs.io Engineering Platform Update ACL
+        call: cloudflare-secondary-dns-acl.secondarydnsaclupdateacl
+        with:
+          acl_id: rest.acl_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-secondary-dns-acl-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Secondary DNS (ACL). One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-acls
+      description: APIs.io Engineering Platform List ACLs
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-acl.secondarydnsacllistacls
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-acl
+      description: APIs.io Engineering Platform Create ACL
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-secondary-dns-acl.secondarydnsaclcreateacl
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-acl
+      description: APIs.io Engineering Platform Delete ACL
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-secondary-dns-acl.secondarydnsacldeleteacl
+      with:
+        acl_id: tools.acl_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-acl-details
+      description: APIs.io Engineering Platform ACL Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-acl.secondarydnsaclacldetails
+      with:
+        acl_id: tools.acl_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-acl
+      description: APIs.io Engineering Platform Update ACL
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-acl.secondarydnsaclupdateacl
+      with:
+        acl_id: tools.acl_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,109 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform GitHub v3 REST API — Gitignore
+  description: 'APIs.io Engineering Platform GitHub v3 REST API — Gitignore. 2 operations. Lead operation: APIs.io Engineering
+    Platform Get all gitignore templates. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Gitignore
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: github-gitignore
+    baseUri: ''
+    description: APIs.io Engineering Platform GitHub v3 REST API — Gitignore business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: gitignore-templates
+      path: /gitignore/templates
+      operations:
+      - name: gitignoregetalltemplates
+        method: GET
+        description: APIs.io Engineering Platform Get all gitignore templates
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: gitignore-templates-name
+      path: /gitignore/templates/{name}
+      operations:
+      - name: gitignoregettemplate
+        method: GET
+        description: APIs.io Engineering Platform Get a gitignore template
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: path
+          type: string
+          required: true
+  exposes:
+  - type: rest
+    namespace: github-gitignore-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform GitHub v3 REST API — Gitignore. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/gitignore/templates
+      name: gitignore-templates
+      description: REST surface for gitignore-templates.
+      operations:
+      - method: GET
+        name: gitignoregetalltemplates
+        description: APIs.io Engineering Platform Get all gitignore templates
+        call: github-gitignore.gitignoregetalltemplates
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/gitignore/templates/{name}
+      name: gitignore-templates-name
+      description: REST surface for gitignore-templates-name.
+      operations:
+      - method: GET
+        name: gitignoregettemplate
+        description: APIs.io Engineering Platform Get a gitignore template
+        call: github-gitignore.gitignoregettemplate
+        with:
+          name: rest.name
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: github-gitignore-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform GitHub v3 REST API — Gitignore. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-all
+      description: APIs.io Engineering Platform Get all gitignore templates
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-gitignore.gitignoregetalltemplates
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-gitignore
+      description: APIs.io Engineering Platform Get a gitignore template
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-gitignore.gitignoregettemplate
+      with:
+        name: tools.name
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,156 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateGroup'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateGroup. 2 operations. Lead
+    operation: #Action=CreateGroup. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=CreateGroup'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-creategroup
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateGroup business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=CreateGroup'
+      path: /#Action=CreateGroup
+      operations:
+      - name: getcreategroup
+        method: GET
+        description: <p>Creates a new group.</p> <p> For information about the number of groups you can create, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html">IAM
+          and STS quotas</a> in the <i>IAM User Guide</i>.</p>
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Path
+          in: query
+          type: string
+          description: <p> The path to the group. For more information about paths, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html">IAM
+            identifie
+        - name: GroupName
+          in: query
+          type: string
+          description: <p>The name of the group to create. Do not include the path in this value.</p> <p>IAM user, group,
+            role, and policy names must be unique within the account. Nam
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postcreategroup
+        method: POST
+        description: <p>Creates a new group.</p> <p> For information about the number of groups you can create, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html">IAM
+          and STS quotas</a> in the <i>IAM User Guide</i>.</p>
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-creategroup-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateGroup.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-creategroup
+      name: action-creategroup
+      description: 'REST surface for #Action=CreateGroup.'
+      operations:
+      - method: GET
+        name: getcreategroup
+        description: <p>Creates a new group.</p> <p> For information about the number of groups you can create, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html">IAM
+          and STS quotas</a> in the <i>IAM User Guide</i>.</p>
+        call: aws-iam-action-creategroup.getcreategroup
+        with:
+          Path: rest.Path
+          GroupName: rest.GroupName
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postcreategroup
+        description: <p>Creates a new group.</p> <p> For information about the number of groups you can create, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html">IAM
+          and STS quotas</a> in the <i>IAM User Guide</i>.</p>
+        call: aws-iam-action-creategroup.postcreategroup
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-creategroup-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateGroup. One
+      tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-creates-new-group-p-p
+      description: <p>Creates a new group.</p> <p> For information about the number of groups you can create, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html">IAM
+        and STS quotas</a> in the <i>IAM User Guide</i>.</p>
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-creategroup.getcreategroup
+      with:
+        Path: tools.Path
+        GroupName: tools.GroupName
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-creates-new-group-p-p-2
+      description: <p>Creates a new group.</p> <p> For information about the number of groups you can create, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html">IAM
+        and STS quotas</a> in the <i>IAM User Guide</i>.</p>
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-creategroup.postcreategroup
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

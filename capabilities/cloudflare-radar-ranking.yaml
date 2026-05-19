@@ -1,0 +1,271 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar Ranking
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar Ranking. 3 operations. Lead operation: APIs.io Engineering
+    Platform Get Domains Rank details. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Radar Ranking
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-ranking
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar Ranking business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: radar-ranking-domain-domain
+      path: /radar/ranking/domain/{domain}
+      operations:
+      - name: radargetrankingdomaindetails
+        method: GET
+        description: APIs.io Engineering Platform Get Domains Rank details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: domain
+          in: path
+          type: string
+          required: true
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: rankingType
+          in: query
+          type: string
+          description: The ranking type.
+        - name: name
+          in: query
+          type: array
+          description: Array of names that will be used to name the series in responses.
+        - name: date
+          in: query
+          type: array
+          description: Array of dates to filter the ranking.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-ranking-timeseries_groups
+      path: /radar/ranking/timeseries_groups
+      operations:
+      - name: radargetrankingdomaintimeseries
+        method: GET
+        description: APIs.io Engineering Platform Get Domains Rank time series
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: rankingType
+          in: query
+          type: string
+          description: The ranking type.
+        - name: name
+          in: query
+          type: array
+          description: Array of names that will be used to name the series in responses.
+        - name: location
+          in: query
+          type: array
+          description: Array of locations (alpha-2 country codes).
+        - name: domains
+          in: query
+          type: array
+          description: Array of comma separated list of domains names.
+        - name: dateRange
+          in: query
+          type: array
+          description: For example, use `7d` and `7dControl` to compare this week with the previous week. Use this parameter
+            or set specific start and end dates (`dateStart` and `date
+        - name: dateStart
+          in: query
+          type: array
+          description: Array of datetimes to filter the start of a series.
+        - name: dateEnd
+          in: query
+          type: array
+          description: End of the date range (inclusive).
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-ranking-top
+      path: /radar/ranking/top
+      operations:
+      - name: radargetrankingtopdomains
+        method: GET
+        description: APIs.io Engineering Platform Get Top or Trending Domains
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: name
+          in: query
+          type: array
+          description: Array of names that will be used to name the series in responses.
+        - name: location
+          in: query
+          type: array
+          description: Array of locations (alpha-2 country codes).
+        - name: date
+          in: query
+          type: array
+          description: Array of dates to filter the ranking.
+        - name: rankingType
+          in: query
+          type: string
+          description: The ranking type.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-ranking-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar Ranking. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/ranking/domain/{domain}
+      name: radar-ranking-domain-domain
+      description: REST surface for radar-ranking-domain-domain.
+      operations:
+      - method: GET
+        name: radargetrankingdomaindetails
+        description: APIs.io Engineering Platform Get Domains Rank details
+        call: cloudflare-radar-ranking.radargetrankingdomaindetails
+        with:
+          domain: rest.domain
+          limit: rest.limit
+          rankingType: rest.rankingType
+          name: rest.name
+          date: rest.date
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/ranking/timeseries-groups
+      name: radar-ranking-timeseries-groups
+      description: REST surface for radar-ranking-timeseries_groups.
+      operations:
+      - method: GET
+        name: radargetrankingdomaintimeseries
+        description: APIs.io Engineering Platform Get Domains Rank time series
+        call: cloudflare-radar-ranking.radargetrankingdomaintimeseries
+        with:
+          limit: rest.limit
+          rankingType: rest.rankingType
+          name: rest.name
+          location: rest.location
+          domains: rest.domains
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/ranking/top
+      name: radar-ranking-top
+      description: REST surface for radar-ranking-top.
+      operations:
+      - method: GET
+        name: radargetrankingtopdomains
+        description: APIs.io Engineering Platform Get Top or Trending Domains
+        call: cloudflare-radar-ranking.radargetrankingtopdomains
+        with:
+          limit: rest.limit
+          name: rest.name
+          location: rest.location
+          date: rest.date
+          rankingType: rest.rankingType
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-ranking-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar Ranking. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-domains
+      description: APIs.io Engineering Platform Get Domains Rank details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-ranking.radargetrankingdomaindetails
+      with:
+        domain: tools.domain
+        limit: tools.limit
+        rankingType: tools.rankingType
+        name: tools.name
+        date: tools.date
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-domains-2
+      description: APIs.io Engineering Platform Get Domains Rank time series
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-ranking.radargetrankingdomaintimeseries
+      with:
+        limit: tools.limit
+        rankingType: tools.rankingType
+        name: tools.name
+        location: tools.location
+        domains: tools.domains
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-top
+      description: APIs.io Engineering Platform Get Top or Trending Domains
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-ranking.radargetrankingtopdomains
+      with:
+        limit: tools.limit
+        name: tools.name
+        location: tools.location
+        date: tools.date
+        rankingType: tools.rankingType
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.

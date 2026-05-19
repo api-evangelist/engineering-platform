@@ -1,0 +1,176 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar Robots.txt
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar Robots.txt. 2 operations. Lead operation: APIs.io Engineering
+    Platform Get Top User-Agents by Domain. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Radar Robots.txt
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-robots-txt
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar Robots.txt business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: radar-robots_txt-domains
+      path: /radar/robots_txt/domains
+      operations:
+      - name: radargetrobotstxttopbydomain
+        method: GET
+        description: APIs.io Engineering Platform Get Top User-Agents by Domain
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: offset
+          in: query
+          type: integer
+          description: Number of objects to skip before grabbing results.
+        - name: domainCategory
+          in: query
+          type: string
+          description: Filter domains by category
+        - name: domainName
+          in: query
+          type: string
+          description: Filter domains by name
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-robots_txt-top-directive
+      path: /radar/robots_txt/top/{directive}
+      operations:
+      - name: radargetrobotstxttopbydirective
+        method: GET
+        description: APIs.io Engineering Platform Get Top User-Agents by Directive
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: directive
+          in: path
+          type: string
+          description: Robots.txt directive.
+          required: true
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: name
+          in: query
+          type: array
+          description: Array of names that will be used to name the series in responses.
+        - name: agentCategory
+          in: query
+          type: string
+          description: Filter by user agent category.
+        - name: date
+          in: query
+          type: string
+          description: Date to filter the ranking.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-robots-txt-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar Robots.txt. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/robots-txt/domains
+      name: radar-robots-txt-domains
+      description: REST surface for radar-robots_txt-domains.
+      operations:
+      - method: GET
+        name: radargetrobotstxttopbydomain
+        description: APIs.io Engineering Platform Get Top User-Agents by Domain
+        call: cloudflare-radar-robots-txt.radargetrobotstxttopbydomain
+        with:
+          limit: rest.limit
+          offset: rest.offset
+          domainCategory: rest.domainCategory
+          domainName: rest.domainName
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/robots-txt/top/{directive}
+      name: radar-robots-txt-top-directive
+      description: REST surface for radar-robots_txt-top-directive.
+      operations:
+      - method: GET
+        name: radargetrobotstxttopbydirective
+        description: APIs.io Engineering Platform Get Top User-Agents by Directive
+        call: cloudflare-radar-robots-txt.radargetrobotstxttopbydirective
+        with:
+          directive: rest.directive
+          limit: rest.limit
+          name: rest.name
+          agentCategory: rest.agentCategory
+          date: rest.date
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-robots-txt-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar Robots.txt. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-top
+      description: APIs.io Engineering Platform Get Top User-Agents by Domain
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-robots-txt.radargetrobotstxttopbydomain
+      with:
+        limit: tools.limit
+        offset: tools.offset
+        domainCategory: tools.domainCategory
+        domainName: tools.domainName
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-top-2
+      description: APIs.io Engineering Platform Get Top User-Agents by Directive
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-robots-txt.radargetrobotstxttopbydirective
+      with:
+        directive: tools.directive
+        limit: tools.limit
+        name: tools.name
+        agentCategory: tools.agentCategory
+        date: tools.date
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.

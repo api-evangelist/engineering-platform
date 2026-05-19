@@ -1,0 +1,231 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API — Monitors
+  description: 'APIs.io Engineering Platform Postman API — Monitors. 6 operations. Lead operation: APIs.io Engineering Platform
+    Get all monitors. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Monitors
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-monitors
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API — Monitors business capability. Self-contained, no shared references.
+    resources:
+    - name: monitors
+      path: /monitors
+      operations:
+      - name: getmonitors
+        method: GET
+        description: APIs.io Engineering Platform Get all monitors
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: createmonitor
+        method: POST
+        description: APIs.io Engineering Platform Create a monitor
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: monitors-monitorId
+      path: /monitors/{monitorId}
+      operations:
+      - name: getmonitor
+        method: GET
+        description: APIs.io Engineering Platform Get a monitor
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updatemonitor
+        method: PUT
+        description: APIs.io Engineering Platform Update a monitor
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+      - name: deletemonitor
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a monitor
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: monitors-monitorId-run
+      path: /monitors/{monitorId}/run
+      operations:
+      - name: runmonitor
+        method: POST
+        description: APIs.io Engineering Platform Run a monitor
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-monitors-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API — Monitors. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/monitors
+      name: monitors
+      description: REST surface for monitors.
+      operations:
+      - method: GET
+        name: getmonitors
+        description: APIs.io Engineering Platform Get all monitors
+        call: postman-monitors.getmonitors
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createmonitor
+        description: APIs.io Engineering Platform Create a monitor
+        call: postman-monitors.createmonitor
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/monitors/{monitorid}
+      name: monitors-monitorid
+      description: REST surface for monitors-monitorId.
+      operations:
+      - method: GET
+        name: getmonitor
+        description: APIs.io Engineering Platform Get a monitor
+        call: postman-monitors.getmonitor
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: updatemonitor
+        description: APIs.io Engineering Platform Update a monitor
+        call: postman-monitors.updatemonitor
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletemonitor
+        description: APIs.io Engineering Platform Delete a monitor
+        call: postman-monitors.deletemonitor
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/monitors/{monitorid}/run
+      name: monitors-monitorid-run
+      description: REST surface for monitors-monitorId-run.
+      operations:
+      - method: POST
+        name: runmonitor
+        description: APIs.io Engineering Platform Run a monitor
+        call: postman-monitors.runmonitor
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-monitors-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API — Monitors. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-all
+      description: APIs.io Engineering Platform Get all monitors
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-monitors.getmonitors
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-monitor
+      description: APIs.io Engineering Platform Create a monitor
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: postman-monitors.createmonitor
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-monitor
+      description: APIs.io Engineering Platform Get a monitor
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-monitors.getmonitor
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-monitor
+      description: APIs.io Engineering Platform Update a monitor
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: postman-monitors.updatemonitor
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-monitor
+      description: APIs.io Engineering Platform Delete a monitor
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: postman-monitors.deletemonitor
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-run-monitor
+      description: APIs.io Engineering Platform Run a monitor
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: postman-monitors.runmonitor
+      outputParameters:
+      - type: object
+        mapping: $.

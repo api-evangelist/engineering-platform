@@ -1,0 +1,149 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetRole'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetRole. 2 operations. Lead operation:
+    #Action=GetRole. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=GetRole'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-getrole
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetRole business capability. Self-contained,
+      no shared references.'
+    resources:
+    - name: '#Action=GetRole'
+      path: /#Action=GetRole
+      operations:
+      - name: getgetrole
+        method: GET
+        description: <p>Retrieves information about the specified role, including the role's path, GUID, ARN, and the role's
+          trust policy that grants permission to assume the role. For more information about roles, see <a href="https://docs.aws.amazon.com/IAM/l
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: RoleName
+          in: query
+          type: string
+          description: <p>The name of the IAM role to get information about.</p> <p>This parameter allows (through its <a
+            href="http://wikipedia.org/wiki/regex">regex pattern</a>) a s
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postgetrole
+        method: POST
+        description: <p>Retrieves information about the specified role, including the role's path, GUID, ARN, and the role's
+          trust policy that grants permission to assume the role. For more information about roles, see <a href="https://docs.aws.amazon.com/IAM/l
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-getrole-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetRole. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-getrole
+      name: action-getrole
+      description: 'REST surface for #Action=GetRole.'
+      operations:
+      - method: GET
+        name: getgetrole
+        description: <p>Retrieves information about the specified role, including the role's path, GUID, ARN, and the role's
+          trust policy that grants permission to assume the role. For more information about roles, see <a href="https://docs.aws.amazon.com/IAM/l
+        call: aws-iam-action-getrole.getgetrole
+        with:
+          RoleName: rest.RoleName
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postgetrole
+        description: <p>Retrieves information about the specified role, including the role's path, GUID, ARN, and the role's
+          trust policy that grants permission to assume the role. For more information about roles, see <a href="https://docs.aws.amazon.com/IAM/l
+        call: aws-iam-action-getrole.postgetrole
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-getrole-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetRole. One tool
+      per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-retrieves-information-about-specified-role
+      description: <p>Retrieves information about the specified role, including the role's path, GUID, ARN, and the role's
+        trust policy that grants permission to assume the role. For more information about roles, see <a href="https://docs.aws.amazon.com/IAM/l
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-getrole.getgetrole
+      with:
+        RoleName: tools.RoleName
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-retrieves-information-about-specified-role-2
+      description: <p>Retrieves information about the specified role, including the role's path, GUID, ARN, and the role's
+        trust policy that grants permission to assume the role. For more information about roles, see <a href="https://docs.aws.amazon.com/IAM/l
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-getrole.postgetrole
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

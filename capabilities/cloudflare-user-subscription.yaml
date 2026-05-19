@@ -1,0 +1,160 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — User Subscription
+  description: 'APIs.io Engineering Platform Cloudflare API — User Subscription. 3 operations. Lead operation: APIs.io Engineering
+    Platform Get User Subscriptions. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - User Subscription
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-user-subscription
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — User Subscription business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: user-subscriptions
+      path: /user/subscriptions
+      operations:
+      - name: usersubscriptiongetusersubscriptions
+        method: GET
+        description: APIs.io Engineering Platform Get User Subscriptions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: user-subscriptions-identifier
+      path: /user/subscriptions/{identifier}
+      operations:
+      - name: usersubscriptiondeleteusersubscription
+        method: DELETE
+        description: APIs.io Engineering Platform Delete User Subscription
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: usersubscriptionupdateusersubscription
+        method: PUT
+        description: APIs.io Engineering Platform Update User Subscription
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-user-subscription-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — User Subscription. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/user/subscriptions
+      name: user-subscriptions
+      description: REST surface for user-subscriptions.
+      operations:
+      - method: GET
+        name: usersubscriptiongetusersubscriptions
+        description: APIs.io Engineering Platform Get User Subscriptions
+        call: cloudflare-user-subscription.usersubscriptiongetusersubscriptions
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/subscriptions/{identifier}
+      name: user-subscriptions-identifier
+      description: REST surface for user-subscriptions-identifier.
+      operations:
+      - method: DELETE
+        name: usersubscriptiondeleteusersubscription
+        description: APIs.io Engineering Platform Delete User Subscription
+        call: cloudflare-user-subscription.usersubscriptiondeleteusersubscription
+        with:
+          identifier: rest.identifier
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: usersubscriptionupdateusersubscription
+        description: APIs.io Engineering Platform Update User Subscription
+        call: cloudflare-user-subscription.usersubscriptionupdateusersubscription
+        with:
+          identifier: rest.identifier
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-user-subscription-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — User Subscription. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-user
+      description: APIs.io Engineering Platform Get User Subscriptions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-subscription.usersubscriptiongetusersubscriptions
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-user
+      description: APIs.io Engineering Platform Delete User Subscription
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-user-subscription.usersubscriptiondeleteusersubscription
+      with:
+        identifier: tools.identifier
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-user
+      description: APIs.io Engineering Platform Update User Subscription
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-subscription.usersubscriptionupdateusersubscription
+      with:
+        identifier: tools.identifier
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

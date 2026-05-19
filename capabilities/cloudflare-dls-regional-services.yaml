@@ -1,0 +1,71 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — DLS Regional Services
+  description: 'APIs.io Engineering Platform Cloudflare API — DLS Regional Services. 1 operations. Lead operation: APIs.io
+    Engineering Platform List Regions. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - DLS Regional Services
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-dls-regional-services
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — DLS Regional Services business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-addressing-regional_hostnames-regions
+      path: /accounts/{account_id}/addressing/regional_hostnames/regions
+      operations:
+      - name: dlsaccountregionalhostnamesaccountlistregions
+        method: GET
+        description: APIs.io Engineering Platform List Regions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-dls-regional-services-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — DLS Regional Services. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/addressing/regional-hostnames/regions
+      name: accounts-account-id-addressing-regional-hostnames-regions
+      description: REST surface for accounts-account_id-addressing-regional_hostnames-regions.
+      operations:
+      - method: GET
+        name: dlsaccountregionalhostnamesaccountlistregions
+        description: APIs.io Engineering Platform List Regions
+        call: cloudflare-dls-regional-services.dlsaccountregionalhostnamesaccountlistregions
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-dls-regional-services-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — DLS Regional Services. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-regions
+      description: APIs.io Engineering Platform List Regions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-dls-regional-services.dlsaccountregionalhostnamesaccountlistregions
+      outputParameters:
+      - type: object
+        mapping: $.

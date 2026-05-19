@@ -1,0 +1,88 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Stream Video Clipping
+  description: 'APIs.io Engineering Platform Cloudflare API — Stream Video Clipping. 1 operations. Lead operation: APIs.io
+    Engineering Platform Clip videos given a start and end time. Self-contained Naftiko capability covering one Engineering
+    Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Stream Video Clipping
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-stream-video-clipping
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Stream Video Clipping business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-stream-clip
+      path: /accounts/{account_id}/stream/clip
+      operations:
+      - name: streamvideoclippingclipvideosgivenastartandendtime
+        method: POST
+        description: APIs.io Engineering Platform Clip videos given a start and end time
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-stream-video-clipping-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Stream Video Clipping. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/stream/clip
+      name: accounts-account-id-stream-clip
+      description: REST surface for accounts-account_id-stream-clip.
+      operations:
+      - method: POST
+        name: streamvideoclippingclipvideosgivenastartandendtime
+        description: APIs.io Engineering Platform Clip videos given a start and end time
+        call: cloudflare-stream-video-clipping.streamvideoclippingclipvideosgivenastartandendtime
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-stream-video-clipping-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Stream Video Clipping. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-clip-videos
+      description: APIs.io Engineering Platform Clip videos given a start and end time
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-stream-video-clipping.streamvideoclippingclipvideosgivenastartandendtime
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

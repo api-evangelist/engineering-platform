@@ -1,0 +1,239 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Turnstile
+  description: 'APIs.io Engineering Platform Cloudflare API — Turnstile. 6 operations. Lead operation: APIs.io Engineering
+    Platform List Turnstile Widgets. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Turnstile
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-turnstile
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Turnstile business capability. Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-challenges-widgets
+      path: /accounts/{account_id}/challenges/widgets
+      operations:
+      - name: accountsturnstilewidgetslist
+        method: GET
+        description: APIs.io Engineering Platform List Turnstile Widgets
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: accountsturnstilewidgetcreate
+        method: POST
+        description: APIs.io Engineering Platform Create a Turnstile Widget
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-challenges-widgets-sitekey
+      path: /accounts/{account_id}/challenges/widgets/{sitekey}
+      operations:
+      - name: accountsturnstilewidgetdelete
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a Turnstile Widget
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: accountsturnstilewidgetget
+        method: GET
+        description: APIs.io Engineering Platform Turnstile Widget Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: accountsturnstilewidgetupdate
+        method: PUT
+        description: APIs.io Engineering Platform Update a Turnstile Widget
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-challenges-widgets-sitekey-rotate_secret
+      path: /accounts/{account_id}/challenges/widgets/{sitekey}/rotate_secret
+      operations:
+      - name: accountsturnstilewidgetrotatesecret
+        method: POST
+        description: APIs.io Engineering Platform Rotate Secret for a Turnstile Widget
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-turnstile-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Turnstile. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/challenges/widgets
+      name: accounts-account-id-challenges-widgets
+      description: REST surface for accounts-account_id-challenges-widgets.
+      operations:
+      - method: GET
+        name: accountsturnstilewidgetslist
+        description: APIs.io Engineering Platform List Turnstile Widgets
+        call: cloudflare-turnstile.accountsturnstilewidgetslist
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: accountsturnstilewidgetcreate
+        description: APIs.io Engineering Platform Create a Turnstile Widget
+        call: cloudflare-turnstile.accountsturnstilewidgetcreate
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/challenges/widgets/{sitekey}
+      name: accounts-account-id-challenges-widgets-sitekey
+      description: REST surface for accounts-account_id-challenges-widgets-sitekey.
+      operations:
+      - method: DELETE
+        name: accountsturnstilewidgetdelete
+        description: APIs.io Engineering Platform Delete a Turnstile Widget
+        call: cloudflare-turnstile.accountsturnstilewidgetdelete
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: accountsturnstilewidgetget
+        description: APIs.io Engineering Platform Turnstile Widget Details
+        call: cloudflare-turnstile.accountsturnstilewidgetget
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: accountsturnstilewidgetupdate
+        description: APIs.io Engineering Platform Update a Turnstile Widget
+        call: cloudflare-turnstile.accountsturnstilewidgetupdate
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/challenges/widgets/{sitekey}/rotate-secret
+      name: accounts-account-id-challenges-widgets-sitekey-rotate-secret
+      description: REST surface for accounts-account_id-challenges-widgets-sitekey-rotate_secret.
+      operations:
+      - method: POST
+        name: accountsturnstilewidgetrotatesecret
+        description: APIs.io Engineering Platform Rotate Secret for a Turnstile Widget
+        call: cloudflare-turnstile.accountsturnstilewidgetrotatesecret
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-turnstile-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Turnstile. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-turnstile
+      description: APIs.io Engineering Platform List Turnstile Widgets
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-turnstile.accountsturnstilewidgetslist
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-turnstile
+      description: APIs.io Engineering Platform Create a Turnstile Widget
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-turnstile.accountsturnstilewidgetcreate
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-turnstile
+      description: APIs.io Engineering Platform Delete a Turnstile Widget
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-turnstile.accountsturnstilewidgetdelete
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-turnstile-widget
+      description: APIs.io Engineering Platform Turnstile Widget Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-turnstile.accountsturnstilewidgetget
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-turnstile
+      description: APIs.io Engineering Platform Update a Turnstile Widget
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-turnstile.accountsturnstilewidgetupdate
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-rotate-secret
+      description: APIs.io Engineering Platform Rotate Secret for a Turnstile Widget
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-turnstile.accountsturnstilewidgetrotatesecret
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

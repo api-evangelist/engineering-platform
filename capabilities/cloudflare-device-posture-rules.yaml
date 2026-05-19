@@ -1,0 +1,263 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Device Posture Rules
+  description: 'APIs.io Engineering Platform Cloudflare API — Device Posture Rules. 5 operations. Lead operation: APIs.io
+    Engineering Platform List device posture rules. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Device Posture Rules
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-device-posture-rules
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Device Posture Rules business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-devices-posture
+      path: /accounts/{account_id}/devices/posture
+      operations:
+      - name: devicepostureruleslistdeviceposturerules
+        method: GET
+        description: APIs.io Engineering Platform List device posture rules
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: deviceposturerulescreatedeviceposturerule
+        method: POST
+        description: APIs.io Engineering Platform Create a device posture rule
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-devices-posture-rule_id
+      path: /accounts/{account_id}/devices/posture/{rule_id}
+      operations:
+      - name: deviceposturerulesdeletedeviceposturerule
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a device posture rule
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: rule_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: deviceposturerulesdeviceposturerulesdetails
+        method: GET
+        description: APIs.io Engineering Platform Get device posture rule details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: rule_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: deviceposturerulesupdatedeviceposturerule
+        method: PUT
+        description: APIs.io Engineering Platform Update a device posture rule
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: rule_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-device-posture-rules-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Device Posture Rules. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/devices/posture
+      name: accounts-account-id-devices-posture
+      description: REST surface for accounts-account_id-devices-posture.
+      operations:
+      - method: GET
+        name: devicepostureruleslistdeviceposturerules
+        description: APIs.io Engineering Platform List device posture rules
+        call: cloudflare-device-posture-rules.devicepostureruleslistdeviceposturerules
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: deviceposturerulescreatedeviceposturerule
+        description: APIs.io Engineering Platform Create a device posture rule
+        call: cloudflare-device-posture-rules.deviceposturerulescreatedeviceposturerule
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/devices/posture/{rule-id}
+      name: accounts-account-id-devices-posture-rule-id
+      description: REST surface for accounts-account_id-devices-posture-rule_id.
+      operations:
+      - method: DELETE
+        name: deviceposturerulesdeletedeviceposturerule
+        description: APIs.io Engineering Platform Delete a device posture rule
+        call: cloudflare-device-posture-rules.deviceposturerulesdeletedeviceposturerule
+        with:
+          rule_id: rest.rule_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: deviceposturerulesdeviceposturerulesdetails
+        description: APIs.io Engineering Platform Get device posture rule details
+        call: cloudflare-device-posture-rules.deviceposturerulesdeviceposturerulesdetails
+        with:
+          rule_id: rest.rule_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: deviceposturerulesupdatedeviceposturerule
+        description: APIs.io Engineering Platform Update a device posture rule
+        call: cloudflare-device-posture-rules.deviceposturerulesupdatedeviceposturerule
+        with:
+          rule_id: rest.rule_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-device-posture-rules-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Device Posture Rules. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-device
+      description: APIs.io Engineering Platform List device posture rules
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-posture-rules.devicepostureruleslistdeviceposturerules
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-device
+      description: APIs.io Engineering Platform Create a device posture rule
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-device-posture-rules.deviceposturerulescreatedeviceposturerule
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-device
+      description: APIs.io Engineering Platform Delete a device posture rule
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-device-posture-rules.deviceposturerulesdeletedeviceposturerule
+      with:
+        rule_id: tools.rule_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-device
+      description: APIs.io Engineering Platform Get device posture rule details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-posture-rules.deviceposturerulesdeviceposturerulesdetails
+      with:
+        rule_id: tools.rule_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-device
+      description: APIs.io Engineering Platform Update a device posture rule
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-posture-rules.deviceposturerulesupdatedeviceposturerule
+      with:
+        rule_id: tools.rule_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

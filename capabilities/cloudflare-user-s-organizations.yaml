@@ -1,0 +1,192 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — User's Organizations
+  description: 'APIs.io Engineering Platform Cloudflare API — User''s Organizations. 3 operations. Lead operation: APIs.io
+    Engineering Platform List Organizations. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - User's Organizations
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-user-s-organizations
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — User's Organizations business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: user-organizations
+      path: /user/organizations
+      operations:
+      - name: usersorganizationslistorganizations
+        method: GET
+        description: APIs.io Engineering Platform List Organizations
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: string
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+        - name: order
+          in: query
+          type: string
+        - name: direction
+          in: query
+          type: string
+        - name: match
+          in: query
+          type: string
+        - name: status
+          in: query
+          type: string
+    - name: user-organizations-organization_id
+      path: /user/organizations/{organization_id}
+      operations:
+      - name: usersorganizationsleaveorganization
+        method: DELETE
+        description: APIs.io Engineering Platform Leave Organization
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: organization_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: usersorganizationsorganizationdetails
+        method: GET
+        description: APIs.io Engineering Platform Organization Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: organization_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-user-s-organizations-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — User's Organizations. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/user/organizations
+      name: user-organizations
+      description: REST surface for user-organizations.
+      operations:
+      - method: GET
+        name: usersorganizationslistorganizations
+        description: APIs.io Engineering Platform List Organizations
+        call: cloudflare-user-s-organizations.usersorganizationslistorganizations
+        with:
+          name: rest.name
+          page: rest.page
+          per_page: rest.per_page
+          order: rest.order
+          direction: rest.direction
+          match: rest.match
+          status: rest.status
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/organizations/{organization-id}
+      name: user-organizations-organization-id
+      description: REST surface for user-organizations-organization_id.
+      operations:
+      - method: DELETE
+        name: usersorganizationsleaveorganization
+        description: APIs.io Engineering Platform Leave Organization
+        call: cloudflare-user-s-organizations.usersorganizationsleaveorganization
+        with:
+          organization_id: rest.organization_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: usersorganizationsorganizationdetails
+        description: APIs.io Engineering Platform Organization Details
+        call: cloudflare-user-s-organizations.usersorganizationsorganizationdetails
+        with:
+          organization_id: rest.organization_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-user-s-organizations-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — User's Organizations. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-organizations
+      description: APIs.io Engineering Platform List Organizations
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-s-organizations.usersorganizationslistorganizations
+      with:
+        name: tools.name
+        page: tools.page
+        per_page: tools.per_page
+        order: tools.order
+        direction: tools.direction
+        match: tools.match
+        status: tools.status
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-leave-organization
+      description: APIs.io Engineering Platform Leave Organization
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-user-s-organizations.usersorganizationsleaveorganization
+      with:
+        organization_id: tools.organization_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-organization-details
+      description: APIs.io Engineering Platform Organization Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-s-organizations.usersorganizationsorganizationdetails
+      with:
+        organization_id: tools.organization_id
+      outputParameters:
+      - type: object
+        mapping: $.

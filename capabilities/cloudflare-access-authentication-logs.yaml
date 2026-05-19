@@ -1,0 +1,105 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Access Authentication Logs
+  description: 'APIs.io Engineering Platform Cloudflare API — Access Authentication Logs. 1 operations. Lead operation: APIs.io
+    Engineering Platform Get Access authentication logs. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Access Authentication Logs
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-access-authentication-logs
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Access Authentication Logs business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-access-logs-access_requests
+      path: /accounts/{account_id}/access/logs/access_requests
+      operations:
+      - name: accessauthenticationlogsgetaccessauthenticationlogs
+        method: GET
+        description: APIs.io Engineering Platform Get Access authentication logs
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: limit
+          in: query
+          type: integer
+          description: The maximum number of log entries to retrieve.
+        - name: direction
+          in: query
+          type: string
+          description: The chronological sorting order for the logs.
+        - name: since
+          in: query
+          type: string
+          description: The earliest event timestamp to query.
+        - name: until
+          in: query
+          type: string
+          description: The latest event timestamp to query.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-access-authentication-logs-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Access Authentication Logs. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/access/logs/access-requests
+      name: accounts-account-id-access-logs-access-requests
+      description: REST surface for accounts-account_id-access-logs-access_requests.
+      operations:
+      - method: GET
+        name: accessauthenticationlogsgetaccessauthenticationlogs
+        description: APIs.io Engineering Platform Get Access authentication logs
+        call: cloudflare-access-authentication-logs.accessauthenticationlogsgetaccessauthenticationlogs
+        with:
+          account_id: rest.account_id
+          limit: rest.limit
+          direction: rest.direction
+          since: rest.since
+          until: rest.until
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-access-authentication-logs-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Access Authentication Logs. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-access
+      description: APIs.io Engineering Platform Get Access authentication logs
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-authentication-logs.accessauthenticationlogsgetaccessauthenticationlogs
+      with:
+        account_id: tools.account_id
+        limit: tools.limit
+        direction: tools.direction
+        since: tools.since
+        until: tools.until
+      outputParameters:
+      - type: object
+        mapping: $.

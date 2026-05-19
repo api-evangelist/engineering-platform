@@ -1,0 +1,263 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Device Managed Networks
+  description: 'APIs.io Engineering Platform Cloudflare API — Device Managed Networks. 5 operations. Lead operation: APIs.io
+    Engineering Platform List your device managed networks. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Device Managed Networks
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-device-managed-networks
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Device Managed Networks business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-devices-networks
+      path: /accounts/{account_id}/devices/networks
+      operations:
+      - name: devicemanagednetworkslistdevicemanagednetworks
+        method: GET
+        description: APIs.io Engineering Platform List your device managed networks
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: devicemanagednetworkscreatedevicemanagednetwork
+        method: POST
+        description: APIs.io Engineering Platform Create a device managed network
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-devices-networks-network_id
+      path: /accounts/{account_id}/devices/networks/{network_id}
+      operations:
+      - name: devicemanagednetworksdeletedevicemanagednetwork
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a device managed network
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: network_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: devicemanagednetworksdevicemanagednetworkdetails
+        method: GET
+        description: APIs.io Engineering Platform Get device managed network details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: network_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: devicemanagednetworksupdatedevicemanagednetwork
+        method: PUT
+        description: APIs.io Engineering Platform Update a device managed network
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: network_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-device-managed-networks-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Device Managed Networks. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/devices/networks
+      name: accounts-account-id-devices-networks
+      description: REST surface for accounts-account_id-devices-networks.
+      operations:
+      - method: GET
+        name: devicemanagednetworkslistdevicemanagednetworks
+        description: APIs.io Engineering Platform List your device managed networks
+        call: cloudflare-device-managed-networks.devicemanagednetworkslistdevicemanagednetworks
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: devicemanagednetworkscreatedevicemanagednetwork
+        description: APIs.io Engineering Platform Create a device managed network
+        call: cloudflare-device-managed-networks.devicemanagednetworkscreatedevicemanagednetwork
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/devices/networks/{network-id}
+      name: accounts-account-id-devices-networks-network-id
+      description: REST surface for accounts-account_id-devices-networks-network_id.
+      operations:
+      - method: DELETE
+        name: devicemanagednetworksdeletedevicemanagednetwork
+        description: APIs.io Engineering Platform Delete a device managed network
+        call: cloudflare-device-managed-networks.devicemanagednetworksdeletedevicemanagednetwork
+        with:
+          network_id: rest.network_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: devicemanagednetworksdevicemanagednetworkdetails
+        description: APIs.io Engineering Platform Get device managed network details
+        call: cloudflare-device-managed-networks.devicemanagednetworksdevicemanagednetworkdetails
+        with:
+          network_id: rest.network_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: devicemanagednetworksupdatedevicemanagednetwork
+        description: APIs.io Engineering Platform Update a device managed network
+        call: cloudflare-device-managed-networks.devicemanagednetworksupdatedevicemanagednetwork
+        with:
+          network_id: rest.network_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-device-managed-networks-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Device Managed Networks. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-your
+      description: APIs.io Engineering Platform List your device managed networks
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-managed-networks.devicemanagednetworkslistdevicemanagednetworks
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-device
+      description: APIs.io Engineering Platform Create a device managed network
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-device-managed-networks.devicemanagednetworkscreatedevicemanagednetwork
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-device
+      description: APIs.io Engineering Platform Delete a device managed network
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-device-managed-networks.devicemanagednetworksdeletedevicemanagednetwork
+      with:
+        network_id: tools.network_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-device
+      description: APIs.io Engineering Platform Get device managed network details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-managed-networks.devicemanagednetworksdevicemanagednetworkdetails
+      with:
+        network_id: tools.network_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-device
+      description: APIs.io Engineering Platform Update a device managed network
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-managed-networks.devicemanagednetworksupdatedevicemanagednetwork
+      with:
+        network_id: tools.network_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,144 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetOpenIDConnectProvider'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetOpenIDConnectProvider. 2 operations.
+    Lead operation: #Action=GetOpenIDConnectProvider. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=GetOpenIDConnectProvider'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-getopenidconnectprovider
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetOpenIDConnectProvider business
+      capability. Self-contained, no shared references.'
+    resources:
+    - name: '#Action=GetOpenIDConnectProvider'
+      path: /#Action=GetOpenIDConnectProvider
+      operations:
+      - name: getgetopenidconnectprovider
+        method: GET
+        description: Returns information about the specified OpenID Connect (OIDC) provider resource object in IAM.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: OpenIDConnectProviderArn
+          in: query
+          type: string
+          description: <p>The Amazon Resource Name (ARN) of the OIDC provider resource object in IAM to get information for.
+            You can get a list of OIDC provider resource ARNs by using
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postgetopenidconnectprovider
+        method: POST
+        description: Returns information about the specified OpenID Connect (OIDC) provider resource object in IAM.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-getopenidconnectprovider-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetOpenIDConnectProvider.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-getopenidconnectprovider
+      name: action-getopenidconnectprovider
+      description: 'REST surface for #Action=GetOpenIDConnectProvider.'
+      operations:
+      - method: GET
+        name: getgetopenidconnectprovider
+        description: Returns information about the specified OpenID Connect (OIDC) provider resource object in IAM.
+        call: aws-iam-action-getopenidconnectprovider.getgetopenidconnectprovider
+        with:
+          OpenIDConnectProviderArn: rest.OpenIDConnectProviderArn
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postgetopenidconnectprovider
+        description: Returns information about the specified OpenID Connect (OIDC) provider resource object in IAM.
+        call: aws-iam-action-getopenidconnectprovider.postgetopenidconnectprovider
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-getopenidconnectprovider-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetOpenIDConnectProvider.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: returns-information-about-specified-openid
+      description: Returns information about the specified OpenID Connect (OIDC) provider resource object in IAM.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-getopenidconnectprovider.getgetopenidconnectprovider
+      with:
+        OpenIDConnectProviderArn: tools.OpenIDConnectProviderArn
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: returns-information-about-specified-openid-2
+      description: Returns information about the specified OpenID Connect (OIDC) provider resource object in IAM.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-getopenidconnectprovider.postgetopenidconnectprovider
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

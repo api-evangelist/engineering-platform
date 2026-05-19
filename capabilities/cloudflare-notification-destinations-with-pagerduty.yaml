@@ -1,0 +1,203 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Notification Destinations with PagerDuty
+  description: 'APIs.io Engineering Platform Cloudflare API — Notification Destinations with PagerDuty. 4 operations. Lead
+    operation: APIs.io Engineering Platform Delete PagerDuty Services. Self-contained Naftiko capability covering one Engineering
+    Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Notification Destinations with PagerDuty
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-notification-destinations-with-pagerduty
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Notification Destinations with PagerDuty business capability.
+      Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-alerting-v3-destinations-pagerduty
+      path: /accounts/{account_id}/alerting/v3/destinations/pagerduty
+      operations:
+      - name: notificationdestinationswithpagerdutydeletepagerdutyservices
+        method: DELETE
+        description: APIs.io Engineering Platform Delete PagerDuty Services
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: notificationdestinationswithpagerdutylistpagerdutyservices
+        method: GET
+        description: APIs.io Engineering Platform List PagerDuty services
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-alerting-v3-destinations-pagerduty-connect
+      path: /accounts/{account_id}/alerting/v3/destinations/pagerduty/connect
+      operations:
+      - name: notificationdestinationswithpagerdutyconnectpagerduty
+        method: POST
+        description: APIs.io Engineering Platform Create PagerDuty integration token
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-alerting-v3-destinations-pagerduty-connect-token_id
+      path: /accounts/{account_id}/alerting/v3/destinations/pagerduty/connect/{token_id}
+      operations:
+      - name: notificationdestinationswithpagerdutyconnectpagerdutytoken
+        method: GET
+        description: APIs.io Engineering Platform Connect PagerDuty
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: token_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-notification-destinations-with-pagerduty-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Notification Destinations with PagerDuty.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/alerting/v3/destinations/pagerduty
+      name: accounts-account-id-alerting-v3-destinations-pagerduty
+      description: REST surface for accounts-account_id-alerting-v3-destinations-pagerduty.
+      operations:
+      - method: DELETE
+        name: notificationdestinationswithpagerdutydeletepagerdutyservices
+        description: APIs.io Engineering Platform Delete PagerDuty Services
+        call: cloudflare-notification-destinations-with-pagerduty.notificationdestinationswithpagerdutydeletepagerdutyservices
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: notificationdestinationswithpagerdutylistpagerdutyservices
+        description: APIs.io Engineering Platform List PagerDuty services
+        call: cloudflare-notification-destinations-with-pagerduty.notificationdestinationswithpagerdutylistpagerdutyservices
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/alerting/v3/destinations/pagerduty/connect
+      name: accounts-account-id-alerting-v3-destinations-pagerduty-connect
+      description: REST surface for accounts-account_id-alerting-v3-destinations-pagerduty-connect.
+      operations:
+      - method: POST
+        name: notificationdestinationswithpagerdutyconnectpagerduty
+        description: APIs.io Engineering Platform Create PagerDuty integration token
+        call: cloudflare-notification-destinations-with-pagerduty.notificationdestinationswithpagerdutyconnectpagerduty
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/alerting/v3/destinations/pagerduty/connect/{token-id}
+      name: accounts-account-id-alerting-v3-destinations-pagerduty-connect-token-id
+      description: REST surface for accounts-account_id-alerting-v3-destinations-pagerduty-connect-token_id.
+      operations:
+      - method: GET
+        name: notificationdestinationswithpagerdutyconnectpagerdutytoken
+        description: APIs.io Engineering Platform Connect PagerDuty
+        call: cloudflare-notification-destinations-with-pagerduty.notificationdestinationswithpagerdutyconnectpagerdutytoken
+        with:
+          account_id: rest.account_id
+          token_id: rest.token_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-notification-destinations-with-pagerduty-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Notification Destinations with PagerDuty. One
+      tool per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-delete-pagerduty
+      description: APIs.io Engineering Platform Delete PagerDuty Services
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-notification-destinations-with-pagerduty.notificationdestinationswithpagerdutydeletepagerdutyservices
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-list-pagerduty
+      description: APIs.io Engineering Platform List PagerDuty services
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-destinations-with-pagerduty.notificationdestinationswithpagerdutylistpagerdutyservices
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-pagerduty
+      description: APIs.io Engineering Platform Create PagerDuty integration token
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-notification-destinations-with-pagerduty.notificationdestinationswithpagerdutyconnectpagerduty
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-connect-pagerduty
+      description: APIs.io Engineering Platform Connect PagerDuty
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-destinations-with-pagerduty.notificationdestinationswithpagerdutyconnectpagerdutytoken
+      with:
+        account_id: tools.account_id
+        token_id: tools.token_id
+      outputParameters:
+      - type: object
+        mapping: $.

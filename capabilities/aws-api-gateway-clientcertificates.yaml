@@ -1,0 +1,242 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Amazon API Gateway — Clientcertificates
+  description: 'APIs.io Engineering Platform Amazon API Gateway — Clientcertificates. 5 operations. Lead operation: Clientcertificates.
+    Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Clientcertificates
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-api-gateway-clientcertificates
+    baseUri: http://apigateway.{region}.amazonaws.com
+    description: APIs.io Engineering Platform Amazon API Gateway — Clientcertificates business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: clientcertificates
+      path: /clientcertificates
+      operations:
+      - name: generateclientcertificate
+        method: POST
+        description: Generates a ClientCertificate resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: getclientcertificates
+        method: GET
+        description: Gets a collection of ClientCertificate resources.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: position
+          in: query
+          type: string
+          description: The current pagination position in the paged result set.
+        - name: limit
+          in: query
+          type: integer
+          description: The maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+    - name: clientcertificates-clientcertificate_id
+      path: /clientcertificates/{clientcertificate_id}
+      operations:
+      - name: deleteclientcertificate
+        method: DELETE
+        description: Deletes the ClientCertificate resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: clientcertificate_id
+          in: path
+          type: string
+          description: The identifier of the ClientCertificate resource to be deleted.
+          required: true
+      - name: getclientcertificate
+        method: GET
+        description: Gets information about the current ClientCertificate resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: clientcertificate_id
+          in: path
+          type: string
+          description: The identifier of the ClientCertificate resource to be described.
+          required: true
+      - name: updateclientcertificate
+        method: PATCH
+        description: Changes information about an ClientCertificate resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: clientcertificate_id
+          in: path
+          type: string
+          description: The identifier of the ClientCertificate resource to be updated.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-api-gateway-clientcertificates-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Amazon API Gateway — Clientcertificates. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/clientcertificates
+      name: clientcertificates
+      description: REST surface for clientcertificates.
+      operations:
+      - method: POST
+        name: generateclientcertificate
+        description: Generates a ClientCertificate resource.
+        call: aws-api-gateway-clientcertificates.generateclientcertificate
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getclientcertificates
+        description: Gets a collection of ClientCertificate resources.
+        call: aws-api-gateway-clientcertificates.getclientcertificates
+        with:
+          position: rest.position
+          limit: rest.limit
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/clientcertificates/{clientcertificate-id}
+      name: clientcertificates-clientcertificate-id
+      description: REST surface for clientcertificates-clientcertificate_id.
+      operations:
+      - method: DELETE
+        name: deleteclientcertificate
+        description: Deletes the ClientCertificate resource.
+        call: aws-api-gateway-clientcertificates.deleteclientcertificate
+        with:
+          clientcertificate_id: rest.clientcertificate_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getclientcertificate
+        description: Gets information about the current ClientCertificate resource.
+        call: aws-api-gateway-clientcertificates.getclientcertificate
+        with:
+          clientcertificate_id: rest.clientcertificate_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateclientcertificate
+        description: Changes information about an ClientCertificate resource.
+        call: aws-api-gateway-clientcertificates.updateclientcertificate
+        with:
+          clientcertificate_id: rest.clientcertificate_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-api-gateway-clientcertificates-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Amazon API Gateway — Clientcertificates. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: generates-clientcertificate-resource
+      description: Generates a ClientCertificate resource.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-api-gateway-clientcertificates.generateclientcertificate
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-collection-clientcertificate-resources
+      description: Gets a collection of ClientCertificate resources.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-clientcertificates.getclientcertificates
+      with:
+        position: tools.position
+        limit: tools.limit
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: deletes-clientcertificate-resource
+      description: Deletes the ClientCertificate resource.
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: aws-api-gateway-clientcertificates.deleteclientcertificate
+      with:
+        clientcertificate_id: tools.clientcertificate_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-information-about-current-clientcertificate
+      description: Gets information about the current ClientCertificate resource.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-clientcertificates.getclientcertificate
+      with:
+        clientcertificate_id: tools.clientcertificate_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: changes-information-about-clientcertificate-resource
+      description: Changes information about an ClientCertificate resource.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-clientcertificates.updateclientcertificate
+      with:
+        clientcertificate_id: tools.clientcertificate_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

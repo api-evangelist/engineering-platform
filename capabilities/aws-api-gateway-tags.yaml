@@ -1,0 +1,186 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Amazon API Gateway — Tags
+  description: 'APIs.io Engineering Platform Amazon API Gateway — Tags. 3 operations. Lead operation: Tags. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Tags
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-api-gateway-tags
+    baseUri: http://apigateway.{region}.amazonaws.com
+    description: APIs.io Engineering Platform Amazon API Gateway — Tags business capability. Self-contained, no shared references.
+    resources:
+    - name: tags-resource_arn
+      path: /tags/{resource_arn}
+      operations:
+      - name: gettags
+        method: GET
+        description: Gets the Tags collection for a given resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: resource_arn
+          in: path
+          type: string
+          description: The ARN of a resource that can be tagged.
+          required: true
+        - name: position
+          in: query
+          type: string
+          description: (Not currently supported) The current pagination position in the paged result set.
+        - name: limit
+          in: query
+          type: integer
+          description: (Not currently supported) The maximum number of returned results per page. The default value is 25
+            and the maximum value is 500.
+      - name: tagresource
+        method: PUT
+        description: Adds or updates a tag on a given resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: resource_arn
+          in: path
+          type: string
+          description: The ARN of a resource that can be tagged.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: tags-resource_arn}#tagKeys
+      path: /tags/{resource_arn}#tagKeys
+      operations:
+      - name: untagresource
+        method: DELETE
+        description: Removes a tag from a given resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: resource_arn
+          in: path
+          type: string
+          description: The ARN of a resource that can be tagged.
+          required: true
+        - name: tagKeys
+          in: query
+          type: array
+          description: The Tag keys to delete.
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-api-gateway-tags-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Amazon API Gateway — Tags. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/tags/{resource-arn}
+      name: tags-resource-arn
+      description: REST surface for tags-resource_arn.
+      operations:
+      - method: GET
+        name: gettags
+        description: Gets the Tags collection for a given resource.
+        call: aws-api-gateway-tags.gettags
+        with:
+          resource_arn: rest.resource_arn
+          position: rest.position
+          limit: rest.limit
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: tagresource
+        description: Adds or updates a tag on a given resource.
+        call: aws-api-gateway-tags.tagresource
+        with:
+          resource_arn: rest.resource_arn
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/tags/resource-arn-tagkeys
+      name: tags-resource-arn-tagkeys
+      description: REST surface for tags-resource_arn}#tagKeys.
+      operations:
+      - method: DELETE
+        name: untagresource
+        description: Removes a tag from a given resource.
+        call: aws-api-gateway-tags.untagresource
+        with:
+          resource_arn: rest.resource_arn
+          tagKeys: rest.tagKeys
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-api-gateway-tags-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Amazon API Gateway — Tags. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: gets-tags-collection-given-resource
+      description: Gets the Tags collection for a given resource.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-tags.gettags
+      with:
+        resource_arn: tools.resource_arn
+        position: tools.position
+        limit: tools.limit
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: adds-updates-tag-given-resource
+      description: Adds or updates a tag on a given resource.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-tags.tagresource
+      with:
+        resource_arn: tools.resource_arn
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: removes-tag-given-resource
+      description: Removes a tag from a given resource.
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: aws-api-gateway-tags.untagresource
+      with:
+        resource_arn: tools.resource_arn
+        tagKeys: tools.tagKeys
+      outputParameters:
+      - type: object
+        mapping: $.

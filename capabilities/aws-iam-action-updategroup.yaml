@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateGroup'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateGroup. 2 operations. Lead
+    operation: #Action=UpdateGroup. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=UpdateGroup'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-updategroup
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateGroup business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=UpdateGroup'
+      path: /#Action=UpdateGroup
+      operations:
+      - name: getupdategroup
+        method: GET
+        description: <p>Updates the name and/or the path of the specified IAM group.</p> <important> <p> You should understand
+          the implications of changing a group's path or name. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGui
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: GroupName
+          in: query
+          type: string
+          description: <p>Name of the IAM group to update. If you're changing the name of the group, this is the original
+            name.</p> <p>This parameter allows (through its <a href="http
+          required: true
+        - name: NewPath
+          in: query
+          type: string
+          description: <p>New path for the IAM group. Only include this if changing the group's path.</p> <p>This parameter
+            allows (through its <a href="http://wikipedia.org/wiki/rege
+        - name: NewGroupName
+          in: query
+          type: string
+          description: <p>New name for the IAM group. Only include this if changing the group's name.</p> <p>IAM user, group,
+            role, and policy names must be unique within the account.
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postupdategroup
+        method: POST
+        description: <p>Updates the name and/or the path of the specified IAM group.</p> <important> <p> You should understand
+          the implications of changing a group's path or name. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGui
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-updategroup-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateGroup.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-updategroup
+      name: action-updategroup
+      description: 'REST surface for #Action=UpdateGroup.'
+      operations:
+      - method: GET
+        name: getupdategroup
+        description: <p>Updates the name and/or the path of the specified IAM group.</p> <important> <p> You should understand
+          the implications of changing a group's path or name. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGui
+        call: aws-iam-action-updategroup.getupdategroup
+        with:
+          GroupName: rest.GroupName
+          NewPath: rest.NewPath
+          NewGroupName: rest.NewGroupName
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postupdategroup
+        description: <p>Updates the name and/or the path of the specified IAM group.</p> <important> <p> You should understand
+          the implications of changing a group's path or name. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGui
+        call: aws-iam-action-updategroup.postupdategroup
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-updategroup-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateGroup. One
+      tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-updates-name-and-path-specified
+      description: <p>Updates the name and/or the path of the specified IAM group.</p> <important> <p> You should understand
+        the implications of changing a group's path or name. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGui
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-updategroup.getupdategroup
+      with:
+        GroupName: tools.GroupName
+        NewPath: tools.NewPath
+        NewGroupName: tools.NewGroupName
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-updates-name-and-path-specified-2
+      description: <p>Updates the name and/or the path of the specified IAM group.</p> <important> <p> You should understand
+        the implications of changing a group's path or name. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGui
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-updategroup.postupdategroup
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

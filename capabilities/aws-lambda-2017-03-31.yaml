@@ -1,0 +1,177 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform AWS Lambda — 2017 03 31
+  description: 'APIs.io Engineering Platform AWS Lambda — 2017 03 31. 3 operations. Lead operation: 2017 03 31. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - 2017 03 31
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-lambda-2017-03-31
+    baseUri: http://lambda.{region}.amazonaws.com
+    description: APIs.io Engineering Platform AWS Lambda — 2017 03 31 business capability. Self-contained, no shared references.
+    resources:
+    - name: 2017-03-31-tags-ARN
+      path: /2017-03-31/tags/{ARN}
+      operations:
+      - name: listtags
+        method: GET
+        description: Returns a function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a>. You
+          can also view tags with <a>GetFunction</a>.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: ARN
+          in: path
+          type: string
+          description: 'The function''s Amazon Resource Name (ARN). Note: Lambda does not support adding tags to aliases or
+            versions.'
+          required: true
+      - name: tagresource
+        method: POST
+        description: Adds <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a> to a function.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: ARN
+          in: path
+          type: string
+          description: The function's Amazon Resource Name (ARN).
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: 2017-03-31-tags-ARN}#tagKeys
+      path: /2017-03-31/tags/{ARN}#tagKeys
+      operations:
+      - name: untagresource
+        method: DELETE
+        description: Removes <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a> from a function.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: ARN
+          in: path
+          type: string
+          description: The function's Amazon Resource Name (ARN).
+          required: true
+        - name: tagKeys
+          in: query
+          type: array
+          description: A list of tag keys to remove from the function.
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-lambda-2017-03-31-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform AWS Lambda — 2017 03 31. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/2017-03-31/tags/{arn}
+      name: 2017-03-31-tags-arn
+      description: REST surface for 2017-03-31-tags-ARN.
+      operations:
+      - method: GET
+        name: listtags
+        description: Returns a function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a>. You
+          can also view tags with <a>GetFunction</a>.
+        call: aws-lambda-2017-03-31.listtags
+        with:
+          ARN: rest.ARN
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: tagresource
+        description: Adds <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a> to a function.
+        call: aws-lambda-2017-03-31.tagresource
+        with:
+          ARN: rest.ARN
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/2017-03-31/tags/arn-tagkeys
+      name: 2017-03-31-tags-arn-tagkeys
+      description: REST surface for 2017-03-31-tags-ARN}#tagKeys.
+      operations:
+      - method: DELETE
+        name: untagresource
+        description: Removes <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a> from a function.
+        call: aws-lambda-2017-03-31.untagresource
+        with:
+          ARN: rest.ARN
+          tagKeys: rest.tagKeys
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-lambda-2017-03-31-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform AWS Lambda — 2017 03 31. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: returns-function-s-href-https-docs-aws-amazon-com-lambda
+      description: Returns a function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a>. You
+        can also view tags with <a>GetFunction</a>.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-lambda-2017-03-31.listtags
+      with:
+        ARN: tools.ARN
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: adds-href-https-docs-aws-amazon-com-lambda-latest
+      description: Adds <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a> to a function.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-lambda-2017-03-31.tagresource
+      with:
+        ARN: tools.ARN
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: removes-href-https-docs-aws-amazon-com-lambda-latest
+      description: Removes <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a> from a function.
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: aws-lambda-2017-03-31.untagresource
+      with:
+        ARN: tools.ARN
+        tagKeys: tools.tagKeys
+      outputParameters:
+      - type: object
+        mapping: $.

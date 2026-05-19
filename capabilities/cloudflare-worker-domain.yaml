@@ -1,0 +1,240 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Worker Domain
+  description: 'APIs.io Engineering Platform Cloudflare API — Worker Domain. 4 operations. Lead operation: APIs.io Engineering
+    Platform List Domains. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Worker Domain
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-worker-domain
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Worker Domain business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-workers-domains
+      path: /accounts/{account_id}/workers/domains
+      operations:
+      - name: workerdomainlistdomains
+        method: GET
+        description: APIs.io Engineering Platform List Domains
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: zone_name
+          in: query
+          type: string
+        - name: service
+          in: query
+          type: string
+        - name: zone_id
+          in: query
+          type: string
+        - name: hostname
+          in: query
+          type: string
+        - name: environment
+          in: query
+          type: string
+      - name: workerdomainattachtodomain
+        method: PUT
+        description: APIs.io Engineering Platform Attach to Domain
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-workers-domains-domain_id
+      path: /accounts/{account_id}/workers/domains/{domain_id}
+      operations:
+      - name: workerdomaindetachfromdomain
+        method: DELETE
+        description: APIs.io Engineering Platform Detach from Domain
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: domain_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: workerdomaingetadomain
+        method: GET
+        description: APIs.io Engineering Platform Get a Domain
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: domain_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-worker-domain-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Worker Domain. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/workers/domains
+      name: accounts-account-id-workers-domains
+      description: REST surface for accounts-account_id-workers-domains.
+      operations:
+      - method: GET
+        name: workerdomainlistdomains
+        description: APIs.io Engineering Platform List Domains
+        call: cloudflare-worker-domain.workerdomainlistdomains
+        with:
+          account_id: rest.account_id
+          zone_name: rest.zone_name
+          service: rest.service
+          zone_id: rest.zone_id
+          hostname: rest.hostname
+          environment: rest.environment
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: workerdomainattachtodomain
+        description: APIs.io Engineering Platform Attach to Domain
+        call: cloudflare-worker-domain.workerdomainattachtodomain
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/workers/domains/{domain-id}
+      name: accounts-account-id-workers-domains-domain-id
+      description: REST surface for accounts-account_id-workers-domains-domain_id.
+      operations:
+      - method: DELETE
+        name: workerdomaindetachfromdomain
+        description: APIs.io Engineering Platform Detach from Domain
+        call: cloudflare-worker-domain.workerdomaindetachfromdomain
+        with:
+          domain_id: rest.domain_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: workerdomaingetadomain
+        description: APIs.io Engineering Platform Get a Domain
+        call: cloudflare-worker-domain.workerdomaingetadomain
+        with:
+          domain_id: rest.domain_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-worker-domain-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Worker Domain. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-domains
+      description: APIs.io Engineering Platform List Domains
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-domain.workerdomainlistdomains
+      with:
+        account_id: tools.account_id
+        zone_name: tools.zone_name
+        service: tools.service
+        zone_id: tools.zone_id
+        hostname: tools.hostname
+        environment: tools.environment
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-attach-domain
+      description: APIs.io Engineering Platform Attach to Domain
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-domain.workerdomainattachtodomain
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-detach-domain
+      description: APIs.io Engineering Platform Detach from Domain
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-worker-domain.workerdomaindetachfromdomain
+      with:
+        domain_id: tools.domain_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-domain
+      description: APIs.io Engineering Platform Get a Domain
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-domain.workerdomaingetadomain
+      with:
+        domain_id: tools.domain_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,100 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Passive DNS by IP
+  description: 'APIs.io Engineering Platform Cloudflare API — Passive DNS by IP. 1 operations. Lead operation: APIs.io Engineering
+    Platform Get Passive DNS by IP. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Passive DNS by IP
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-passive-dns-by-ip
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Passive DNS by IP business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-intel-dns
+      path: /accounts/{account_id}/intel/dns
+      operations:
+      - name: passivednsbyipgetpassivednsbyip
+        method: GET
+        description: APIs.io Engineering Platform Get Passive DNS by IP
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: start_end_params
+          in: query
+          type: string
+        - name: ipv4
+          in: query
+          type: string
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-passive-dns-by-ip-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Passive DNS by IP. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/intel/dns
+      name: accounts-account-id-intel-dns
+      description: REST surface for accounts-account_id-intel-dns.
+      operations:
+      - method: GET
+        name: passivednsbyipgetpassivednsbyip
+        description: APIs.io Engineering Platform Get Passive DNS by IP
+        call: cloudflare-passive-dns-by-ip.passivednsbyipgetpassivednsbyip
+        with:
+          account_id: rest.account_id
+          start_end_params: rest.start_end_params
+          ipv4: rest.ipv4
+          page: rest.page
+          per_page: rest.per_page
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-passive-dns-by-ip-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Passive DNS by IP. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-passive
+      description: APIs.io Engineering Platform Get Passive DNS by IP
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-passive-dns-by-ip.passivednsbyipgetpassivednsbyip
+      with:
+        account_id: tools.account_id
+        start_end_params: tools.start_end_params
+        ipv4: tools.ipv4
+        page: tools.page
+        per_page: tools.per_page
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,262 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Secondary DNS (TSIG)
+  description: 'APIs.io Engineering Platform Cloudflare API — Secondary DNS (TSIG). 5 operations. Lead operation: APIs.io
+    Engineering Platform List TSIGs. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Secondary DNS (TSIG)
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-secondary-dns-tsig
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Secondary DNS (TSIG) business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-secondary_dns-tsigs
+      path: /accounts/{account_id}/secondary_dns/tsigs
+      operations:
+      - name: secondarydnstsiglisttsigs
+        method: GET
+        description: APIs.io Engineering Platform List TSIGs
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: secondarydnstsigcreatetsig
+        method: POST
+        description: APIs.io Engineering Platform Create TSIG
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-secondary_dns-tsigs-tsig_id
+      path: /accounts/{account_id}/secondary_dns/tsigs/{tsig_id}
+      operations:
+      - name: secondarydnstsigdeletetsig
+        method: DELETE
+        description: APIs.io Engineering Platform Delete TSIG
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: tsig_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: secondarydnstsigtsigdetails
+        method: GET
+        description: APIs.io Engineering Platform TSIG Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: tsig_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: secondarydnstsigupdatetsig
+        method: PUT
+        description: APIs.io Engineering Platform Update TSIG
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: tsig_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-secondary-dns-tsig-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Secondary DNS (TSIG). One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/secondary-dns/tsigs
+      name: accounts-account-id-secondary-dns-tsigs
+      description: REST surface for accounts-account_id-secondary_dns-tsigs.
+      operations:
+      - method: GET
+        name: secondarydnstsiglisttsigs
+        description: APIs.io Engineering Platform List TSIGs
+        call: cloudflare-secondary-dns-tsig.secondarydnstsiglisttsigs
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: secondarydnstsigcreatetsig
+        description: APIs.io Engineering Platform Create TSIG
+        call: cloudflare-secondary-dns-tsig.secondarydnstsigcreatetsig
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/secondary-dns/tsigs/{tsig-id}
+      name: accounts-account-id-secondary-dns-tsigs-tsig-id
+      description: REST surface for accounts-account_id-secondary_dns-tsigs-tsig_id.
+      operations:
+      - method: DELETE
+        name: secondarydnstsigdeletetsig
+        description: APIs.io Engineering Platform Delete TSIG
+        call: cloudflare-secondary-dns-tsig.secondarydnstsigdeletetsig
+        with:
+          tsig_id: rest.tsig_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: secondarydnstsigtsigdetails
+        description: APIs.io Engineering Platform TSIG Details
+        call: cloudflare-secondary-dns-tsig.secondarydnstsigtsigdetails
+        with:
+          tsig_id: rest.tsig_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: secondarydnstsigupdatetsig
+        description: APIs.io Engineering Platform Update TSIG
+        call: cloudflare-secondary-dns-tsig.secondarydnstsigupdatetsig
+        with:
+          tsig_id: rest.tsig_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-secondary-dns-tsig-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Secondary DNS (TSIG). One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-tsigs
+      description: APIs.io Engineering Platform List TSIGs
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-tsig.secondarydnstsiglisttsigs
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-tsig
+      description: APIs.io Engineering Platform Create TSIG
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-secondary-dns-tsig.secondarydnstsigcreatetsig
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-tsig
+      description: APIs.io Engineering Platform Delete TSIG
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-secondary-dns-tsig.secondarydnstsigdeletetsig
+      with:
+        tsig_id: tools.tsig_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-tsig-details
+      description: APIs.io Engineering Platform TSIG Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-tsig.secondarydnstsigtsigdetails
+      with:
+        tsig_id: tools.tsig_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-tsig
+      description: APIs.io Engineering Platform Update TSIG
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-tsig.secondarydnstsigupdatetsig
+      with:
+        tsig_id: tools.tsig_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,164 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=AttachRolePolicy'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=AttachRolePolicy. 2 operations.
+    Lead operation: #Action=AttachRolePolicy. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=AttachRolePolicy'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-attachrolepolicy
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=AttachRolePolicy business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=AttachRolePolicy'
+      path: /#Action=AttachRolePolicy
+      operations:
+      - name: getattachrolepolicy
+        method: GET
+        description: <p>Attaches the specified managed policy to the specified IAM role. When you attach a managed policy
+          to a role, the managed policy becomes part of the role's permission (access) policy.</p> <note> <p>You cannot use
+          a managed policy as the r
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: RoleName
+          in: query
+          type: string
+          description: <p>The name (friendly name, not ARN) of the role to attach the policy to.</p> <p>This parameter allows
+            (through its <a href="http://wikipedia.org/wiki/regex">re
+          required: true
+        - name: PolicyArn
+          in: query
+          type: string
+          description: <p>The Amazon Resource Name (ARN) of the IAM policy you want to attach.</p> <p>For more information
+            about ARNs, see <a href="https://docs.aws.amazon.com/general
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postattachrolepolicy
+        method: POST
+        description: <p>Attaches the specified managed policy to the specified IAM role. When you attach a managed policy
+          to a role, the managed policy becomes part of the role's permission (access) policy.</p> <note> <p>You cannot use
+          a managed policy as the r
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-attachrolepolicy-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=AttachRolePolicy.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-attachrolepolicy
+      name: action-attachrolepolicy
+      description: 'REST surface for #Action=AttachRolePolicy.'
+      operations:
+      - method: GET
+        name: getattachrolepolicy
+        description: <p>Attaches the specified managed policy to the specified IAM role. When you attach a managed policy
+          to a role, the managed policy becomes part of the role's permission (access) policy.</p> <note> <p>You cannot use
+          a managed policy as the r
+        call: aws-iam-action-attachrolepolicy.getattachrolepolicy
+        with:
+          RoleName: rest.RoleName
+          PolicyArn: rest.PolicyArn
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postattachrolepolicy
+        description: <p>Attaches the specified managed policy to the specified IAM role. When you attach a managed policy
+          to a role, the managed policy becomes part of the role's permission (access) policy.</p> <note> <p>You cannot use
+          a managed policy as the r
+        call: aws-iam-action-attachrolepolicy.postattachrolepolicy
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-attachrolepolicy-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=AttachRolePolicy.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-attaches-specified-managed-policy-specified
+      description: <p>Attaches the specified managed policy to the specified IAM role. When you attach a managed policy to
+        a role, the managed policy becomes part of the role's permission (access) policy.</p> <note> <p>You cannot use a managed
+        policy as the r
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-attachrolepolicy.getattachrolepolicy
+      with:
+        RoleName: tools.RoleName
+        PolicyArn: tools.PolicyArn
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-attaches-specified-managed-policy-specified-2
+      description: <p>Attaches the specified managed policy to the specified IAM role. When you attach a managed policy to
+        a role, the managed policy becomes part of the role's permission (access) policy.</p> <note> <p>You cannot use a managed
+        policy as the r
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-attachrolepolicy.postattachrolepolicy
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

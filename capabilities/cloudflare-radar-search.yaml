@@ -1,0 +1,112 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar Search
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar Search. 1 operations. Lead operation: APIs.io Engineering
+    Platform Search for locations, autonomous systems (AS) and reports.. Self-contained Naftiko capability covering one Engineering
+    Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Radar Search
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-search
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar Search business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: radar-search-global
+      path: /radar/search/global
+      operations:
+      - name: radargetsearchglobal
+        method: GET
+        description: APIs.io Engineering Platform Search for locations, autonomous systems (AS) and reports.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: limitPerGroup
+          in: query
+          type: number
+          description: Limit the number of objects per search category.
+        - name: query
+          in: query
+          type: string
+          description: Search for locations, AS and reports.
+          required: true
+        - name: include
+          in: query
+          type: array
+          description: Search types to be included in results.
+        - name: exclude
+          in: query
+          type: array
+          description: Search types to be excluded from results.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-search-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar Search. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/search/global
+      name: radar-search-global
+      description: REST surface for radar-search-global.
+      operations:
+      - method: GET
+        name: radargetsearchglobal
+        description: APIs.io Engineering Platform Search for locations, autonomous systems (AS) and reports.
+        call: cloudflare-radar-search.radargetsearchglobal
+        with:
+          limit: rest.limit
+          limitPerGroup: rest.limitPerGroup
+          query: rest.query
+          include: rest.include
+          exclude: rest.exclude
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-search-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar Search. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-search-locations
+      description: APIs.io Engineering Platform Search for locations, autonomous systems (AS) and reports.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-search.radargetsearchglobal
+      with:
+        limit: tools.limit
+        limitPerGroup: tools.limitPerGroup
+        query: tools.query
+        include: tools.include
+        exclude: tools.exclude
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.

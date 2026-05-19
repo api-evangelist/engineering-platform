@@ -1,0 +1,274 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zero Trust Users
+  description: 'APIs.io Engineering Platform Cloudflare API — Zero Trust Users. 5 operations. Lead operation: APIs.io Engineering
+    Platform Get users. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Zero Trust Users
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zero-trust-users
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zero Trust Users business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-access-users
+      path: /accounts/{account_id}/access/users
+      operations:
+      - name: zerotrustusersgetusers
+        method: GET
+        description: APIs.io Engineering Platform Get users
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-access-users-user_id-active_sessions
+      path: /accounts/{account_id}/access/users/{user_id}/active_sessions
+      operations:
+      - name: zerotrustusersgetactivesessions
+        method: GET
+        description: APIs.io Engineering Platform Get active sessions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: user_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-access-users-user_id-active_sessions-nonce
+      path: /accounts/{account_id}/access/users/{user_id}/active_sessions/{nonce}
+      operations:
+      - name: zerotrustusersgetactivesession
+        method: GET
+        description: APIs.io Engineering Platform Get single active session
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: user_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: nonce
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-access-users-user_id-failed_logins
+      path: /accounts/{account_id}/access/users/{user_id}/failed_logins
+      operations:
+      - name: zerotrustusersgetfailedlogins
+        method: GET
+        description: APIs.io Engineering Platform Get failed logins
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: user_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-access-users-user_id-last_seen_identity
+      path: /accounts/{account_id}/access/users/{user_id}/last_seen_identity
+      operations:
+      - name: zerotrustusersgetlastseenidentity
+        method: GET
+        description: APIs.io Engineering Platform Get last seen identity
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: user_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zero-trust-users-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Users. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/access/users
+      name: accounts-account-id-access-users
+      description: REST surface for accounts-account_id-access-users.
+      operations:
+      - method: GET
+        name: zerotrustusersgetusers
+        description: APIs.io Engineering Platform Get users
+        call: cloudflare-zero-trust-users.zerotrustusersgetusers
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/users/{user-id}/active-sessions
+      name: accounts-account-id-access-users-user-id-active-sessions
+      description: REST surface for accounts-account_id-access-users-user_id-active_sessions.
+      operations:
+      - method: GET
+        name: zerotrustusersgetactivesessions
+        description: APIs.io Engineering Platform Get active sessions
+        call: cloudflare-zero-trust-users.zerotrustusersgetactivesessions
+        with:
+          user_id: rest.user_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/users/{user-id}/active-sessions/{nonce}
+      name: accounts-account-id-access-users-user-id-active-sessions-nonce
+      description: REST surface for accounts-account_id-access-users-user_id-active_sessions-nonce.
+      operations:
+      - method: GET
+        name: zerotrustusersgetactivesession
+        description: APIs.io Engineering Platform Get single active session
+        call: cloudflare-zero-trust-users.zerotrustusersgetactivesession
+        with:
+          user_id: rest.user_id
+          account_id: rest.account_id
+          nonce: rest.nonce
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/users/{user-id}/failed-logins
+      name: accounts-account-id-access-users-user-id-failed-logins
+      description: REST surface for accounts-account_id-access-users-user_id-failed_logins.
+      operations:
+      - method: GET
+        name: zerotrustusersgetfailedlogins
+        description: APIs.io Engineering Platform Get failed logins
+        call: cloudflare-zero-trust-users.zerotrustusersgetfailedlogins
+        with:
+          user_id: rest.user_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/users/{user-id}/last-seen-identity
+      name: accounts-account-id-access-users-user-id-last-seen-identity
+      description: REST surface for accounts-account_id-access-users-user_id-last_seen_identity.
+      operations:
+      - method: GET
+        name: zerotrustusersgetlastseenidentity
+        description: APIs.io Engineering Platform Get last seen identity
+        call: cloudflare-zero-trust-users.zerotrustusersgetlastseenidentity
+        with:
+          user_id: rest.user_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zero-trust-users-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Users. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-users
+      description: APIs.io Engineering Platform Get users
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-users.zerotrustusersgetusers
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-active
+      description: APIs.io Engineering Platform Get active sessions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-users.zerotrustusersgetactivesessions
+      with:
+        user_id: tools.user_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-single
+      description: APIs.io Engineering Platform Get single active session
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-users.zerotrustusersgetactivesession
+      with:
+        user_id: tools.user_id
+        account_id: tools.account_id
+        nonce: tools.nonce
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-failed
+      description: APIs.io Engineering Platform Get failed logins
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-users.zerotrustusersgetfailedlogins
+      with:
+        user_id: tools.user_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-last
+      description: APIs.io Engineering Platform Get last seen identity
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-users.zerotrustusersgetlastseenidentity
+      with:
+        user_id: tools.user_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

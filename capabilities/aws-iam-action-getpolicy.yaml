@@ -1,0 +1,155 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetPolicy'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetPolicy. 2 operations. Lead operation:
+    #Action=GetPolicy. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=GetPolicy'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-getpolicy
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetPolicy business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=GetPolicy'
+      path: /#Action=GetPolicy
+      operations:
+      - name: getgetpolicy
+        method: GET
+        description: <p>Retrieves information about the specified managed policy, including the policy's default version and
+          the total number of IAM users, groups, and roles to which the policy is attached. To retrieve the list of the specific
+          users, groups, an
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: PolicyArn
+          in: query
+          type: string
+          description: <p>The Amazon Resource Name (ARN) of the managed policy that you want information about.</p> <p>For
+            more information about ARNs, see <a href="https://docs.aws.a
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postgetpolicy
+        method: POST
+        description: <p>Retrieves information about the specified managed policy, including the policy's default version and
+          the total number of IAM users, groups, and roles to which the policy is attached. To retrieve the list of the specific
+          users, groups, an
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-getpolicy-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetPolicy. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-getpolicy
+      name: action-getpolicy
+      description: 'REST surface for #Action=GetPolicy.'
+      operations:
+      - method: GET
+        name: getgetpolicy
+        description: <p>Retrieves information about the specified managed policy, including the policy's default version and
+          the total number of IAM users, groups, and roles to which the policy is attached. To retrieve the list of the specific
+          users, groups, an
+        call: aws-iam-action-getpolicy.getgetpolicy
+        with:
+          PolicyArn: rest.PolicyArn
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postgetpolicy
+        description: <p>Retrieves information about the specified managed policy, including the policy's default version and
+          the total number of IAM users, groups, and roles to which the policy is attached. To retrieve the list of the specific
+          users, groups, an
+        call: aws-iam-action-getpolicy.postgetpolicy
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-getpolicy-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GetPolicy. One
+      tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-retrieves-information-about-specified-managed
+      description: <p>Retrieves information about the specified managed policy, including the policy's default version and
+        the total number of IAM users, groups, and roles to which the policy is attached. To retrieve the list of the specific
+        users, groups, an
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-getpolicy.getgetpolicy
+      with:
+        PolicyArn: tools.PolicyArn
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-retrieves-information-about-specified-managed-2
+      description: <p>Retrieves information about the specified managed policy, including the policy's default version and
+        the total number of IAM users, groups, and roles to which the policy is attached. To retrieve the list of the specific
+        users, groups, an
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-getpolicy.postgetpolicy
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

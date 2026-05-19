@@ -1,0 +1,182 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Access Policy Tester
+  description: 'APIs.io Engineering Platform Cloudflare API — Access Policy Tester. 3 operations. Lead operation: APIs.io
+    Engineering Platform Start Access policy test. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Access Policy Tester
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-access-policy-tester
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Access Policy Tester business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-access-policy-tests
+      path: /accounts/{account_id}/access/policy-tests
+      operations:
+      - name: accesspolicytests
+        method: POST
+        description: APIs.io Engineering Platform Start Access policy test
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-access-policy-tests-policy_test_id
+      path: /accounts/{account_id}/access/policy-tests/{policy_test_id}
+      operations:
+      - name: accesspolicytestsgetanupdate
+        method: GET
+        description: APIs.io Engineering Platform Get the current status of a given Access policy test
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: policy_test_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-access-policy-tests-policy_test_id-users
+      path: /accounts/{account_id}/access/policy-tests/{policy_test_id}/users
+      operations:
+      - name: accesspolicytestsgetauserpage
+        method: GET
+        description: APIs.io Engineering Platform Get an Access policy test users page
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: policy_test_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-access-policy-tester-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Access Policy Tester. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/access/policy-tests
+      name: accounts-account-id-access-policy-tests
+      description: REST surface for accounts-account_id-access-policy-tests.
+      operations:
+      - method: POST
+        name: accesspolicytests
+        description: APIs.io Engineering Platform Start Access policy test
+        call: cloudflare-access-policy-tester.accesspolicytests
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/policy-tests/{policy-test-id}
+      name: accounts-account-id-access-policy-tests-policy-test-id
+      description: REST surface for accounts-account_id-access-policy-tests-policy_test_id.
+      operations:
+      - method: GET
+        name: accesspolicytestsgetanupdate
+        description: APIs.io Engineering Platform Get the current status of a given Access policy test
+        call: cloudflare-access-policy-tester.accesspolicytestsgetanupdate
+        with:
+          account_id: rest.account_id
+          policy_test_id: rest.policy_test_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/policy-tests/{policy-test-id}/users
+      name: accounts-account-id-access-policy-tests-policy-test-id-users
+      description: REST surface for accounts-account_id-access-policy-tests-policy_test_id-users.
+      operations:
+      - method: GET
+        name: accesspolicytestsgetauserpage
+        description: APIs.io Engineering Platform Get an Access policy test users page
+        call: cloudflare-access-policy-tester.accesspolicytestsgetauserpage
+        with:
+          account_id: rest.account_id
+          policy_test_id: rest.policy_test_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-access-policy-tester-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Access Policy Tester. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-start-access
+      description: APIs.io Engineering Platform Start Access policy test
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-access-policy-tester.accesspolicytests
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-current
+      description: APIs.io Engineering Platform Get the current status of a given Access policy test
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-policy-tester.accesspolicytestsgetanupdate
+      with:
+        account_id: tools.account_id
+        policy_test_id: tools.policy_test_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-access
+      description: APIs.io Engineering Platform Get an Access policy test users page
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-policy-tester.accesspolicytestsgetauserpage
+      with:
+        account_id: tools.account_id
+        policy_test_id: tools.policy_test_id
+      outputParameters:
+      - type: object
+        mapping: $.

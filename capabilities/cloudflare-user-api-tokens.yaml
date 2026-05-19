@@ -1,0 +1,327 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — User API Tokens
+  description: 'APIs.io Engineering Platform Cloudflare API — User API Tokens. 7 operations. Lead operation: APIs.io Engineering
+    Platform List Tokens. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - User API Tokens
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-user-api-tokens
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — User API Tokens business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: user-tokens
+      path: /user/tokens
+      operations:
+      - name: userapitokenslisttokens
+        method: GET
+        description: APIs.io Engineering Platform List Tokens
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+        - name: direction
+          in: query
+          type: string
+      - name: userapitokenscreatetoken
+        method: POST
+        description: APIs.io Engineering Platform Create Token
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: user-tokens-verify
+      path: /user/tokens/verify
+      operations:
+      - name: userapitokensverifytoken
+        method: GET
+        description: APIs.io Engineering Platform Verify Token
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: user-tokens-token_id
+      path: /user/tokens/{token_id}
+      operations:
+      - name: userapitokensdeletetoken
+        method: DELETE
+        description: APIs.io Engineering Platform Delete Token
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: token_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: userapitokenstokendetails
+        method: GET
+        description: APIs.io Engineering Platform Token Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: token_id
+          in: path
+          type: string
+          required: true
+      - name: userapitokensupdatetoken
+        method: PUT
+        description: APIs.io Engineering Platform Update Token
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: token_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: user-tokens-token_id-value
+      path: /user/tokens/{token_id}/value
+      operations:
+      - name: userapitokensrolltoken
+        method: PUT
+        description: APIs.io Engineering Platform Roll Token
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: token_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-user-api-tokens-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — User API Tokens. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/user/tokens
+      name: user-tokens
+      description: REST surface for user-tokens.
+      operations:
+      - method: GET
+        name: userapitokenslisttokens
+        description: APIs.io Engineering Platform List Tokens
+        call: cloudflare-user-api-tokens.userapitokenslisttokens
+        with:
+          page: rest.page
+          per_page: rest.per_page
+          direction: rest.direction
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: userapitokenscreatetoken
+        description: APIs.io Engineering Platform Create Token
+        call: cloudflare-user-api-tokens.userapitokenscreatetoken
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/tokens/verify
+      name: user-tokens-verify
+      description: REST surface for user-tokens-verify.
+      operations:
+      - method: GET
+        name: userapitokensverifytoken
+        description: APIs.io Engineering Platform Verify Token
+        call: cloudflare-user-api-tokens.userapitokensverifytoken
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/tokens/{token-id}
+      name: user-tokens-token-id
+      description: REST surface for user-tokens-token_id.
+      operations:
+      - method: DELETE
+        name: userapitokensdeletetoken
+        description: APIs.io Engineering Platform Delete Token
+        call: cloudflare-user-api-tokens.userapitokensdeletetoken
+        with:
+          token_id: rest.token_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: userapitokenstokendetails
+        description: APIs.io Engineering Platform Token Details
+        call: cloudflare-user-api-tokens.userapitokenstokendetails
+        with:
+          token_id: rest.token_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: userapitokensupdatetoken
+        description: APIs.io Engineering Platform Update Token
+        call: cloudflare-user-api-tokens.userapitokensupdatetoken
+        with:
+          token_id: rest.token_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/tokens/{token-id}/value
+      name: user-tokens-token-id-value
+      description: REST surface for user-tokens-token_id-value.
+      operations:
+      - method: PUT
+        name: userapitokensrolltoken
+        description: APIs.io Engineering Platform Roll Token
+        call: cloudflare-user-api-tokens.userapitokensrolltoken
+        with:
+          token_id: rest.token_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-user-api-tokens-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — User API Tokens. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-tokens
+      description: APIs.io Engineering Platform List Tokens
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-api-tokens.userapitokenslisttokens
+      with:
+        page: tools.page
+        per_page: tools.per_page
+        direction: tools.direction
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-token
+      description: APIs.io Engineering Platform Create Token
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-user-api-tokens.userapitokenscreatetoken
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-verify-token
+      description: APIs.io Engineering Platform Verify Token
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-api-tokens.userapitokensverifytoken
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-token
+      description: APIs.io Engineering Platform Delete Token
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-user-api-tokens.userapitokensdeletetoken
+      with:
+        token_id: tools.token_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-token-details
+      description: APIs.io Engineering Platform Token Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-api-tokens.userapitokenstokendetails
+      with:
+        token_id: tools.token_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-token
+      description: APIs.io Engineering Platform Update Token
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-api-tokens.userapitokensupdatetoken
+      with:
+        token_id: tools.token_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-roll-token
+      description: APIs.io Engineering Platform Roll Token
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-api-tokens.userapitokensrolltoken
+      with:
+        token_id: tools.token_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicyTags'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicyTags. 2 operations. Lead
+    operation: #Action=ListPolicyTags. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=ListPolicyTags'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-listpolicytags
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicyTags business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=ListPolicyTags'
+      path: /#Action=ListPolicyTags
+      operations:
+      - name: getlistpolicytags
+        method: GET
+        description: Lists the tags that are attached to the specified IAM customer managed policy. The returned list of tags
+          is sorted by tag key. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">T
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: PolicyArn
+          in: query
+          type: string
+          description: <p>The ARN of the IAM customer managed policy whose tags you want to see.</p> <p>This parameter allows
+            (through its <a href="http://wikipedia.org/wiki/regex">re
+          required: true
+        - name: Marker
+          in: query
+          type: string
+          description: Use this parameter only when paginating results and only after you receive a response indicating that
+            the results are truncated. Set it to the value of the <cod
+        - name: MaxItems
+          in: query
+          type: integer
+          description: <p>Use this only when paginating results to indicate the maximum number of items you want in the response.
+            If additional items exist beyond the maximum you spec
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postlistpolicytags
+        method: POST
+        description: Lists the tags that are attached to the specified IAM customer managed policy. The returned list of tags
+          is sorted by tag key. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">T
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-listpolicytags-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicyTags.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-listpolicytags
+      name: action-listpolicytags
+      description: 'REST surface for #Action=ListPolicyTags.'
+      operations:
+      - method: GET
+        name: getlistpolicytags
+        description: Lists the tags that are attached to the specified IAM customer managed policy. The returned list of tags
+          is sorted by tag key. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">T
+        call: aws-iam-action-listpolicytags.getlistpolicytags
+        with:
+          PolicyArn: rest.PolicyArn
+          Marker: rest.Marker
+          MaxItems: rest.MaxItems
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postlistpolicytags
+        description: Lists the tags that are attached to the specified IAM customer managed policy. The returned list of tags
+          is sorted by tag key. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">T
+        call: aws-iam-action-listpolicytags.postlistpolicytags
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-listpolicytags-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListPolicyTags.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: lists-tags-that-are-attached
+      description: Lists the tags that are attached to the specified IAM customer managed policy. The returned list of tags
+        is sorted by tag key. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">T
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-listpolicytags.getlistpolicytags
+      with:
+        PolicyArn: tools.PolicyArn
+        Marker: tools.Marker
+        MaxItems: tools.MaxItems
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: lists-tags-that-are-attached-2
+      description: Lists the tags that are attached to the specified IAM customer managed policy. The returned list of tags
+        is sorted by tag key. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">T
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-listpolicytags.postlistpolicytags
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

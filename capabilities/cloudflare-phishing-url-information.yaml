@@ -1,0 +1,93 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Phishing URL Information
+  description: 'APIs.io Engineering Platform Cloudflare API — Phishing URL Information. 1 operations. Lead operation: APIs.io
+    Engineering Platform Get results for a URL scan. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Phishing URL Information
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-phishing-url-information
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Phishing URL Information business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-brand-protection-url-info
+      path: /accounts/{account_id}/brand-protection/url-info
+      operations:
+      - name: phishingurlinformationgetresultsforaurlscan
+        method: GET
+        description: APIs.io Engineering Platform Get results for a URL scan
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: url_id
+          in: query
+          type: array
+          description: Submission ID(s) to filter submission results by.
+        - name: url
+          in: query
+          type: array
+          description: Submission URL(s) to filter submission results by.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-phishing-url-information-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Phishing URL Information. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/brand-protection/url-info
+      name: accounts-account-id-brand-protection-url-info
+      description: REST surface for accounts-account_id-brand-protection-url-info.
+      operations:
+      - method: GET
+        name: phishingurlinformationgetresultsforaurlscan
+        description: APIs.io Engineering Platform Get results for a URL scan
+        call: cloudflare-phishing-url-information.phishingurlinformationgetresultsforaurlscan
+        with:
+          account_id: rest.account_id
+          url_id: rest.url_id
+          url: rest.url
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-phishing-url-information-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Phishing URL Information. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-results
+      description: APIs.io Engineering Platform Get results for a URL scan
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-phishing-url-information.phishingurlinformationgetresultsforaurlscan
+      with:
+        account_id: tools.account_id
+        url_id: tools.url_id
+        url: tools.url
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,87 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zero Trust Seats
+  description: 'APIs.io Engineering Platform Cloudflare API — Zero Trust Seats. 1 operations. Lead operation: APIs.io Engineering
+    Platform Update a user seat. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Zero Trust Seats
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zero-trust-seats
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zero Trust Seats business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-access-seats
+      path: /accounts/{account_id}/access/seats
+      operations:
+      - name: zerotrustseatsupdateauserseat
+        method: PATCH
+        description: APIs.io Engineering Platform Update a user seat
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zero-trust-seats-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Seats. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/access/seats
+      name: accounts-account-id-access-seats
+      description: REST surface for accounts-account_id-access-seats.
+      operations:
+      - method: PATCH
+        name: zerotrustseatsupdateauserseat
+        description: APIs.io Engineering Platform Update a user seat
+        call: cloudflare-zero-trust-seats.zerotrustseatsupdateauserseat
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zero-trust-seats-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Seats. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-update-user
+      description: APIs.io Engineering Platform Update a user seat
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-seats.zerotrustseatsupdateauserseat
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

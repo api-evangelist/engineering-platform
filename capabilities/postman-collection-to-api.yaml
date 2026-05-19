@@ -1,0 +1,74 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API — Collection to API
+  description: 'APIs.io Engineering Platform Postman API — Collection to API. 1 operations. Lead operation: APIs.io Engineering
+    Platform Transform collection to OpenAPI. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Collection to API
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-collection-to-api
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API — Collection to API business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: collections-collectionId-transformations
+      path: /collections/{collectionId}/transformations
+      operations:
+      - name: transformcollectiontoopenapi
+        method: GET
+        description: APIs.io Engineering Platform Transform collection to OpenAPI
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-collection-to-api-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API — Collection to API. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/collections/{collectionid}/transformations
+      name: collections-collectionid-transformations
+      description: REST surface for collections-collectionId-transformations.
+      operations:
+      - method: GET
+        name: transformcollectiontoopenapi
+        description: APIs.io Engineering Platform Transform collection to OpenAPI
+        call: postman-collection-to-api.transformcollectiontoopenapi
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-collection-to-api-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API — Collection to API. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-transform-collection
+      description: APIs.io Engineering Platform Transform collection to OpenAPI
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-collection-to-api.transformcollectiontoopenapi
+      outputParameters:
+      - type: object
+        mapping: $.

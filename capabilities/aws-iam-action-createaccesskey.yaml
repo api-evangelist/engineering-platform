@@ -1,0 +1,154 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateAccessKey'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateAccessKey. 2 operations. Lead
+    operation: #Action=CreateAccessKey. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=CreateAccessKey'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-createaccesskey
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateAccessKey business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=CreateAccessKey'
+      path: /#Action=CreateAccessKey
+      operations:
+      - name: getcreateaccesskey
+        method: GET
+        description: <p> Creates a new Amazon Web Services secret access key and corresponding Amazon Web Services access
+          key ID for the specified user. The default status for new keys is <code>Active</code>.</p> <p>If you do not specify
+          a user name, IAM determ
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: UserName
+          in: query
+          type: string
+          description: <p>The name of the IAM user that the new key will belong to.</p> <p>This parameter allows (through
+            its <a href="http://wikipedia.org/wiki/regex">regex pattern</
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postcreateaccesskey
+        method: POST
+        description: <p> Creates a new Amazon Web Services secret access key and corresponding Amazon Web Services access
+          key ID for the specified user. The default status for new keys is <code>Active</code>.</p> <p>If you do not specify
+          a user name, IAM determ
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-createaccesskey-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateAccessKey.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-createaccesskey
+      name: action-createaccesskey
+      description: 'REST surface for #Action=CreateAccessKey.'
+      operations:
+      - method: GET
+        name: getcreateaccesskey
+        description: <p> Creates a new Amazon Web Services secret access key and corresponding Amazon Web Services access
+          key ID for the specified user. The default status for new keys is <code>Active</code>.</p> <p>If you do not specify
+          a user name, IAM determ
+        call: aws-iam-action-createaccesskey.getcreateaccesskey
+        with:
+          UserName: rest.UserName
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postcreateaccesskey
+        description: <p> Creates a new Amazon Web Services secret access key and corresponding Amazon Web Services access
+          key ID for the specified user. The default status for new keys is <code>Active</code>.</p> <p>If you do not specify
+          a user name, IAM determ
+        call: aws-iam-action-createaccesskey.postcreateaccesskey
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-createaccesskey-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=CreateAccessKey.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-creates-new-amazon-web
+      description: <p> Creates a new Amazon Web Services secret access key and corresponding Amazon Web Services access key
+        ID for the specified user. The default status for new keys is <code>Active</code>.</p> <p>If you do not specify a
+        user name, IAM determ
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-createaccesskey.getcreateaccesskey
+      with:
+        UserName: tools.UserName
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-creates-new-amazon-web-2
+      description: <p> Creates a new Amazon Web Services secret access key and corresponding Amazon Web Services access key
+        ID for the specified user. The default status for new keys is <code>Active</code>.</p> <p>If you do not specify a
+        user name, IAM determ
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-createaccesskey.postcreateaccesskey
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

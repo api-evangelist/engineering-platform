@@ -1,0 +1,184 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar AI Gateway
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar AI Gateway. 2 operations. Lead operation: APIs.io Engineering
+    Platform Get Providers Summary. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Radar AI Gateway
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-ai-gateway
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar AI Gateway business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: radar-ai-gateway-summary-provider
+      path: /radar/ai/gateway/summary/provider
+      operations:
+      - name: radargetaigatewaysummarybyprovider
+        method: GET
+        description: APIs.io Engineering Platform Get Providers Summary
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: array
+          description: Array of names that will be used to name the series in responses.
+        - name: dateRange
+          in: query
+          type: array
+          description: For example, use `7d` and `7dControl` to compare this week with the previous week. Use this parameter
+            or set specific start and end dates (`dateStart` and `date
+        - name: dateStart
+          in: query
+          type: array
+          description: Array of datetimes to filter the start of a series.
+        - name: dateEnd
+          in: query
+          type: array
+          description: End of the date range (inclusive).
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-ai-gateway-timeseries_groups-provider
+      path: /radar/ai/gateway/timeseries_groups/provider
+      operations:
+      - name: radargetaigatewaytimeseriesgroupbyprovider
+        method: GET
+        description: APIs.io Engineering Platform Get Providers Time Series
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: aggInterval
+          in: query
+          type: string
+          description: Aggregation interval results should be returned in (for example, in 15 minutes or 1 hour intervals).
+            Refer to [Aggregation intervals](https://developers.cloudfl
+        - name: name
+          in: query
+          type: array
+          description: Array of names that will be used to name the series in responses.
+        - name: dateRange
+          in: query
+          type: array
+          description: For example, use `7d` and `7dControl` to compare this week with the previous week. Use this parameter
+            or set specific start and end dates (`dateStart` and `date
+        - name: dateStart
+          in: query
+          type: array
+          description: Array of datetimes to filter the start of a series.
+        - name: dateEnd
+          in: query
+          type: array
+          description: End of the date range (inclusive).
+        - name: limitPerGroup
+          in: query
+          type: integer
+          description: Limit the number of objects (eg browsers, verticals, etc) to the top items over the time range.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-ai-gateway-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar AI Gateway. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/ai/gateway/summary/provider
+      name: radar-ai-gateway-summary-provider
+      description: REST surface for radar-ai-gateway-summary-provider.
+      operations:
+      - method: GET
+        name: radargetaigatewaysummarybyprovider
+        description: APIs.io Engineering Platform Get Providers Summary
+        call: cloudflare-radar-ai-gateway.radargetaigatewaysummarybyprovider
+        with:
+          name: rest.name
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/ai/gateway/timeseries-groups/provider
+      name: radar-ai-gateway-timeseries-groups-provider
+      description: REST surface for radar-ai-gateway-timeseries_groups-provider.
+      operations:
+      - method: GET
+        name: radargetaigatewaytimeseriesgroupbyprovider
+        description: APIs.io Engineering Platform Get Providers Time Series
+        call: cloudflare-radar-ai-gateway.radargetaigatewaytimeseriesgroupbyprovider
+        with:
+          aggInterval: rest.aggInterval
+          name: rest.name
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          limitPerGroup: rest.limitPerGroup
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-ai-gateway-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar AI Gateway. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-providers
+      description: APIs.io Engineering Platform Get Providers Summary
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-ai-gateway.radargetaigatewaysummarybyprovider
+      with:
+        name: tools.name
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-providers-2
+      description: APIs.io Engineering Platform Get Providers Time Series
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-ai-gateway.radargetaigatewaytimeseriesgroupbyprovider
+      with:
+        aggInterval: tools.aggInterval
+        name: tools.name
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        limitPerGroup: tools.limitPerGroup
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,150 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform GitHub v3 REST API — Licenses
+  description: 'APIs.io Engineering Platform GitHub v3 REST API — Licenses. 3 operations. Lead operation: APIs.io Engineering
+    Platform Get all commonly used licenses. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Licenses
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: github-licenses
+    baseUri: ''
+    description: APIs.io Engineering Platform GitHub v3 REST API — Licenses business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: licenses
+      path: /licenses
+      operations:
+      - name: licensesgetallcommonlyused
+        method: GET
+        description: APIs.io Engineering Platform Get all commonly used licenses
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: featured
+          in: query
+          type: boolean
+    - name: licenses-license
+      path: /licenses/{license}
+      operations:
+      - name: licensesget
+        method: GET
+        description: APIs.io Engineering Platform Get a license
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: license
+          in: path
+          type: string
+          required: true
+    - name: repos-owner-repo-license
+      path: /repos/{owner}/{repo}/license
+      operations:
+      - name: licensesgetforrepo
+        method: GET
+        description: APIs.io Engineering Platform Get the license for a repository
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+  exposes:
+  - type: rest
+    namespace: github-licenses-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform GitHub v3 REST API — Licenses. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/licenses
+      name: licenses
+      description: REST surface for licenses.
+      operations:
+      - method: GET
+        name: licensesgetallcommonlyused
+        description: APIs.io Engineering Platform Get all commonly used licenses
+        call: github-licenses.licensesgetallcommonlyused
+        with:
+          featured: rest.featured
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/licenses/{license}
+      name: licenses-license
+      description: REST surface for licenses-license.
+      operations:
+      - method: GET
+        name: licensesget
+        description: APIs.io Engineering Platform Get a license
+        call: github-licenses.licensesget
+        with:
+          license: rest.license
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/repos/{owner}/{repo}/license
+      name: repos-owner-repo-license
+      description: REST surface for repos-owner-repo-license.
+      operations:
+      - method: GET
+        name: licensesgetforrepo
+        description: APIs.io Engineering Platform Get the license for a repository
+        call: github-licenses.licensesgetforrepo
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: github-licenses-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform GitHub v3 REST API — Licenses. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-all
+      description: APIs.io Engineering Platform Get all commonly used licenses
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-licenses.licensesgetallcommonlyused
+      with:
+        featured: tools.featured
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-license
+      description: APIs.io Engineering Platform Get a license
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-licenses.licensesget
+      with:
+        license: tools.license
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-license-2
+      description: APIs.io Engineering Platform Get the license for a repository
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-licenses.licensesgetforrepo
+      outputParameters:
+      - type: object
+        mapping: $.

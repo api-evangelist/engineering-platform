@@ -1,0 +1,268 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Amazon API Gateway — Apikeys
+  description: 'APIs.io Engineering Platform Amazon API Gateway — Apikeys. 5 operations. Lead operation: Apikeys. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Apikeys
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-api-gateway-apikeys
+    baseUri: http://apigateway.{region}.amazonaws.com
+    description: APIs.io Engineering Platform Amazon API Gateway — Apikeys business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: apikeys
+      path: /apikeys
+      operations:
+      - name: createapikey
+        method: POST
+        description: Create an ApiKey resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: getapikeys
+        method: GET
+        description: Gets information about the current ApiKeys resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: position
+          in: query
+          type: string
+          description: The current pagination position in the paged result set.
+        - name: limit
+          in: query
+          type: integer
+          description: The maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+        - name: name
+          in: query
+          type: string
+          description: The name of queried API keys.
+        - name: customerId
+          in: query
+          type: string
+          description: The identifier of a customer in AWS Marketplace or an external system, such as a developer portal.
+        - name: includeValues
+          in: query
+          type: boolean
+          description: A boolean flag to specify whether (<code>true</code>) or not (<code>false</code>) the result contains
+            key values.
+    - name: apikeys-api_Key
+      path: /apikeys/{api_Key}
+      operations:
+      - name: deleteapikey
+        method: DELETE
+        description: Deletes the ApiKey resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: api_Key
+          in: path
+          type: string
+          description: The identifier of the ApiKey resource to be deleted.
+          required: true
+      - name: getapikey
+        method: GET
+        description: Gets information about the current ApiKey resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: api_Key
+          in: path
+          type: string
+          description: The identifier of the ApiKey resource.
+          required: true
+        - name: includeValue
+          in: query
+          type: boolean
+          description: A boolean flag to specify whether (<code>true</code>) or not (<code>false</code>) the result contains
+            the key value.
+      - name: updateapikey
+        method: PATCH
+        description: Changes information about an ApiKey resource.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: api_Key
+          in: path
+          type: string
+          description: The identifier of the ApiKey resource to be updated.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-api-gateway-apikeys-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Amazon API Gateway — Apikeys. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/apikeys
+      name: apikeys
+      description: REST surface for apikeys.
+      operations:
+      - method: POST
+        name: createapikey
+        description: Create an ApiKey resource.
+        call: aws-api-gateway-apikeys.createapikey
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getapikeys
+        description: Gets information about the current ApiKeys resource.
+        call: aws-api-gateway-apikeys.getapikeys
+        with:
+          position: rest.position
+          limit: rest.limit
+          name: rest.name
+          customerId: rest.customerId
+          includeValues: rest.includeValues
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/apikeys/{api-key}
+      name: apikeys-api-key
+      description: REST surface for apikeys-api_Key.
+      operations:
+      - method: DELETE
+        name: deleteapikey
+        description: Deletes the ApiKey resource.
+        call: aws-api-gateway-apikeys.deleteapikey
+        with:
+          api_Key: rest.api_Key
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getapikey
+        description: Gets information about the current ApiKey resource.
+        call: aws-api-gateway-apikeys.getapikey
+        with:
+          api_Key: rest.api_Key
+          includeValue: rest.includeValue
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateapikey
+        description: Changes information about an ApiKey resource.
+        call: aws-api-gateway-apikeys.updateapikey
+        with:
+          api_Key: rest.api_Key
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-api-gateway-apikeys-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Amazon API Gateway — Apikeys. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: create-apikey-resource
+      description: Create an ApiKey resource.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-api-gateway-apikeys.createapikey
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-information-about-current-apikeys
+      description: Gets information about the current ApiKeys resource.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-apikeys.getapikeys
+      with:
+        position: tools.position
+        limit: tools.limit
+        name: tools.name
+        customerId: tools.customerId
+        includeValues: tools.includeValues
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: deletes-apikey-resource
+      description: Deletes the ApiKey resource.
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: aws-api-gateway-apikeys.deleteapikey
+      with:
+        api_Key: tools.api_Key
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-information-about-current-apikey
+      description: Gets information about the current ApiKey resource.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-apikeys.getapikey
+      with:
+        api_Key: tools.api_Key
+        includeValue: tools.includeValue
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: changes-information-about-apikey-resource
+      description: Changes information about an ApiKey resource.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-apikeys.updateapikey
+      with:
+        api_Key: tools.api_Key
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,140 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Worker Deployments
+  description: 'APIs.io Engineering Platform Cloudflare API — Worker Deployments. 2 operations. Lead operation: APIs.io Engineering
+    Platform List Deployments. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Worker Deployments
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-worker-deployments
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Worker Deployments business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-workers-scripts-script_name-deployments
+      path: /accounts/{account_id}/workers/scripts/{script_name}/deployments
+      operations:
+      - name: workerdeploymentslistdeployments
+        method: GET
+        description: APIs.io Engineering Platform List Deployments
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: workerdeploymentscreatedeployment
+        method: POST
+        description: APIs.io Engineering Platform Create Deployment
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: force
+          in: query
+          type: boolean
+          description: If set to true, the deployment will be created even if normally blocked by something such rolling back
+            to an older version when a secret has changed.
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-worker-deployments-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Worker Deployments. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/workers/scripts/{script-name}/deployments
+      name: accounts-account-id-workers-scripts-script-name-deployments
+      description: REST surface for accounts-account_id-workers-scripts-script_name-deployments.
+      operations:
+      - method: GET
+        name: workerdeploymentslistdeployments
+        description: APIs.io Engineering Platform List Deployments
+        call: cloudflare-worker-deployments.workerdeploymentslistdeployments
+        with:
+          script_name: rest.script_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: workerdeploymentscreatedeployment
+        description: APIs.io Engineering Platform Create Deployment
+        call: cloudflare-worker-deployments.workerdeploymentscreatedeployment
+        with:
+          script_name: rest.script_name
+          account_id: rest.account_id
+          force: rest.force
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-worker-deployments-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Worker Deployments. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-deployments
+      description: APIs.io Engineering Platform List Deployments
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-deployments.workerdeploymentslistdeployments
+      with:
+        script_name: tools.script_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-deployment
+      description: APIs.io Engineering Platform Create Deployment
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-worker-deployments.workerdeploymentscreatedeployment
+      with:
+        script_name: tools.script_name
+        account_id: tools.account_id
+        force: tools.force
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

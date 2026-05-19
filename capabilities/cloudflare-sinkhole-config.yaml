@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Sinkhole Config
+  description: 'APIs.io Engineering Platform Cloudflare API — Sinkhole Config. 1 operations. Lead operation: APIs.io Engineering
+    Platform List sinkholes owned by this account. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Sinkhole Config
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-sinkhole-config
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Sinkhole Config business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-intel-sinkholes
+      path: /accounts/{account_id}/intel/sinkholes
+      operations:
+      - name: sinkholeconfiggetsinkholes
+        method: GET
+        description: APIs.io Engineering Platform List sinkholes owned by this account
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-sinkhole-config-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Sinkhole Config. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/intel/sinkholes
+      name: accounts-account-id-intel-sinkholes
+      description: REST surface for accounts-account_id-intel-sinkholes.
+      operations:
+      - method: GET
+        name: sinkholeconfiggetsinkholes
+        description: APIs.io Engineering Platform List sinkholes owned by this account
+        call: cloudflare-sinkhole-config.sinkholeconfiggetsinkholes
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-sinkhole-config-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Sinkhole Config. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-sinkholes
+      description: APIs.io Engineering Platform List sinkholes owned by this account
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-sinkhole-config.sinkholeconfiggetsinkholes
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,121 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Worker Subdomain
+  description: 'APIs.io Engineering Platform Cloudflare API — Worker Subdomain. 2 operations. Lead operation: APIs.io Engineering
+    Platform Get Subdomain. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Worker Subdomain
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-worker-subdomain
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Worker Subdomain business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-workers-subdomain
+      path: /accounts/{account_id}/workers/subdomain
+      operations:
+      - name: workersubdomaingetsubdomain
+        method: GET
+        description: APIs.io Engineering Platform Get Subdomain
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: workersubdomaincreatesubdomain
+        method: PUT
+        description: APIs.io Engineering Platform Create Subdomain
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-worker-subdomain-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Worker Subdomain. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/workers/subdomain
+      name: accounts-account-id-workers-subdomain
+      description: REST surface for accounts-account_id-workers-subdomain.
+      operations:
+      - method: GET
+        name: workersubdomaingetsubdomain
+        description: APIs.io Engineering Platform Get Subdomain
+        call: cloudflare-worker-subdomain.workersubdomaingetsubdomain
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: workersubdomaincreatesubdomain
+        description: APIs.io Engineering Platform Create Subdomain
+        call: cloudflare-worker-subdomain.workersubdomaincreatesubdomain
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-worker-subdomain-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Worker Subdomain. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-subdomain
+      description: APIs.io Engineering Platform Get Subdomain
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-subdomain.workersubdomaingetsubdomain
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-subdomain
+      description: APIs.io Engineering Platform Create Subdomain
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-subdomain.workersubdomaincreatesubdomain
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,82 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API — Webhooks
+  description: 'APIs.io Engineering Platform Postman API — Webhooks. 1 operations. Lead operation: APIs.io Engineering Platform
+    Create a webhook. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Webhooks
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-webhooks
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API — Webhooks business capability. Self-contained, no shared references.
+    resources:
+    - name: webhooks
+      path: /webhooks
+      operations:
+      - name: createwebhook
+        method: POST
+        description: APIs.io Engineering Platform Create a webhook
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-webhooks-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API — Webhooks. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/webhooks
+      name: webhooks
+      description: REST surface for webhooks.
+      operations:
+      - method: POST
+        name: createwebhook
+        description: APIs.io Engineering Platform Create a webhook
+        call: postman-webhooks.createwebhook
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-webhooks-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API — Webhooks. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-create-webhook
+      description: APIs.io Engineering Platform Create a webhook
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: postman-webhooks.createwebhook
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

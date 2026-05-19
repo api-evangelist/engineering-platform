@@ -1,0 +1,255 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Access Custom Pages
+  description: 'APIs.io Engineering Platform Cloudflare API — Access Custom Pages. 5 operations. Lead operation: APIs.io Engineering
+    Platform List custom pages. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Access Custom Pages
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-access-custom-pages
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Access Custom Pages business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-access-custom_pages
+      path: /accounts/{account_id}/access/custom_pages
+      operations:
+      - name: accesscustompageslistcustompages
+        method: GET
+        description: APIs.io Engineering Platform List custom pages
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accesscustompagescreateacustompage
+        method: POST
+        description: APIs.io Engineering Platform Create a custom page
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: accounts-account_id-access-custom_pages-custom_page_id
+      path: /accounts/{account_id}/access/custom_pages/{custom_page_id}
+      operations:
+      - name: accesscustompagesdeleteacustompage
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a custom page
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: custom_page_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accesscustompagesgetacustompage
+        method: GET
+        description: APIs.io Engineering Platform Get a custom page
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: custom_page_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accesscustompagesupdateacustompage
+        method: PUT
+        description: APIs.io Engineering Platform Update a custom page
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: custom_page_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-access-custom-pages-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Access Custom Pages. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/access/custom-pages
+      name: accounts-account-id-access-custom-pages
+      description: REST surface for accounts-account_id-access-custom_pages.
+      operations:
+      - method: GET
+        name: accesscustompageslistcustompages
+        description: APIs.io Engineering Platform List custom pages
+        call: cloudflare-access-custom-pages.accesscustompageslistcustompages
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: accesscustompagescreateacustompage
+        description: APIs.io Engineering Platform Create a custom page
+        call: cloudflare-access-custom-pages.accesscustompagescreateacustompage
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/custom-pages/{custom-page-id}
+      name: accounts-account-id-access-custom-pages-custom-page-id
+      description: REST surface for accounts-account_id-access-custom_pages-custom_page_id.
+      operations:
+      - method: DELETE
+        name: accesscustompagesdeleteacustompage
+        description: APIs.io Engineering Platform Delete a custom page
+        call: cloudflare-access-custom-pages.accesscustompagesdeleteacustompage
+        with:
+          custom_page_id: rest.custom_page_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: accesscustompagesgetacustompage
+        description: APIs.io Engineering Platform Get a custom page
+        call: cloudflare-access-custom-pages.accesscustompagesgetacustompage
+        with:
+          custom_page_id: rest.custom_page_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: accesscustompagesupdateacustompage
+        description: APIs.io Engineering Platform Update a custom page
+        call: cloudflare-access-custom-pages.accesscustompagesupdateacustompage
+        with:
+          custom_page_id: rest.custom_page_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-access-custom-pages-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Access Custom Pages. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-custom
+      description: APIs.io Engineering Platform List custom pages
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-custom-pages.accesscustompageslistcustompages
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-custom
+      description: APIs.io Engineering Platform Create a custom page
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-access-custom-pages.accesscustompagescreateacustompage
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-custom
+      description: APIs.io Engineering Platform Delete a custom page
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-access-custom-pages.accesscustompagesdeleteacustompage
+      with:
+        custom_page_id: tools.custom_page_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-custom
+      description: APIs.io Engineering Platform Get a custom page
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-custom-pages.accesscustompagesgetacustompage
+      with:
+        custom_page_id: tools.custom_page_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-custom
+      description: APIs.io Engineering Platform Update a custom page
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-custom-pages.accesscustompagesupdateacustompage
+      with:
+        custom_page_id: tools.custom_page_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

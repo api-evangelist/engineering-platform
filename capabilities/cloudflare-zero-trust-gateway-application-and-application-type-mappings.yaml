@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Application and Application Type Mappings
+  description: 'APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Application and Application Type Mappings.
+    1 operations. Lead operation: APIs.io Engineering Platform List application and application type mappings. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Zero Trust Gateway Application and Application Type Mappings
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zero-trust-gateway-application-and-application-type-mappings
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Application and Application Type Mappings
+      business capability. Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-gateway-app_types
+      path: /accounts/{account_id}/gateway/app_types
+      operations:
+      - name: zerotrustgatewayapplicationandapplicationtypemappingslistapplicationandapplicationtypemappings
+        method: GET
+        description: APIs.io Engineering Platform List application and application type mappings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zero-trust-gateway-application-and-application-type-mappings-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Application and Application
+      Type Mappings. One Spectral-compliant resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/gateway/app-types
+      name: accounts-account-id-gateway-app-types
+      description: REST surface for accounts-account_id-gateway-app_types.
+      operations:
+      - method: GET
+        name: zerotrustgatewayapplicationandapplicationtypemappingslistapplicationandapplicationtypemappings
+        description: APIs.io Engineering Platform List application and application type mappings
+        call: cloudflare-zero-trust-gateway-application-and-application-type-mappings.zerotrustgatewayapplicationandapplicationtypemappingslistapplicationandapplicationtypemappings
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zero-trust-gateway-application-and-application-type-mappings-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Gateway Application and Application
+      Type Mappings. One tool per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-application
+      description: APIs.io Engineering Platform List application and application type mappings
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-gateway-application-and-application-type-mappings.zerotrustgatewayapplicationandapplicationtypemappingslistapplicationandapplicationtypemappings
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

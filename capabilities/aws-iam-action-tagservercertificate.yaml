@@ -1,0 +1,164 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagServerCertificate'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagServerCertificate. 2 operations.
+    Lead operation: #Action=TagServerCertificate. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=TagServerCertificate'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-tagservercertificate
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagServerCertificate business
+      capability. Self-contained, no shared references.'
+    resources:
+    - name: '#Action=TagServerCertificate'
+      path: /#Action=TagServerCertificate
+      operations:
+      - name: gettagservercertificate
+        method: GET
+        description: <p>Adds one or more tags to an IAM server certificate. If a tag with the same key name already exists,
+          then that tag is overwritten with the new value.</p> <note> <p>For certificates in a Region supported by Certificate
+          Manager (ACM), we re
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: ServerCertificateName
+          in: query
+          type: string
+          description: <p>The name of the IAM server certificate to which you want to add tags.</p> <p>This parameter allows
+            (through its <a href="http://wikipedia.org/wiki/regex">reg
+          required: true
+        - name: Tags
+          in: query
+          type: array
+          description: The list of tags that you want to attach to the IAM server certificate. Each tag consists of a key
+            name and an associated value.
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: posttagservercertificate
+        method: POST
+        description: <p>Adds one or more tags to an IAM server certificate. If a tag with the same key name already exists,
+          then that tag is overwritten with the new value.</p> <note> <p>For certificates in a Region supported by Certificate
+          Manager (ACM), we re
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-tagservercertificate-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagServerCertificate.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-tagservercertificate
+      name: action-tagservercertificate
+      description: 'REST surface for #Action=TagServerCertificate.'
+      operations:
+      - method: GET
+        name: gettagservercertificate
+        description: <p>Adds one or more tags to an IAM server certificate. If a tag with the same key name already exists,
+          then that tag is overwritten with the new value.</p> <note> <p>For certificates in a Region supported by Certificate
+          Manager (ACM), we re
+        call: aws-iam-action-tagservercertificate.gettagservercertificate
+        with:
+          ServerCertificateName: rest.ServerCertificateName
+          Tags: rest.Tags
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: posttagservercertificate
+        description: <p>Adds one or more tags to an IAM server certificate. If a tag with the same key name already exists,
+          then that tag is overwritten with the new value.</p> <note> <p>For certificates in a Region supported by Certificate
+          Manager (ACM), we re
+        call: aws-iam-action-tagservercertificate.posttagservercertificate
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-tagservercertificate-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagServerCertificate.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-adds-one-more-tags-iam
+      description: <p>Adds one or more tags to an IAM server certificate. If a tag with the same key name already exists,
+        then that tag is overwritten with the new value.</p> <note> <p>For certificates in a Region supported by Certificate
+        Manager (ACM), we re
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-tagservercertificate.gettagservercertificate
+      with:
+        ServerCertificateName: tools.ServerCertificateName
+        Tags: tools.Tags
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-adds-one-more-tags-iam-2
+      description: <p>Adds one or more tags to an IAM server certificate. If a tag with the same key name already exists,
+        then that tag is overwritten with the new value.</p> <note> <p>For certificates in a Region supported by Certificate
+        Manager (ACM), we re
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-tagservercertificate.posttagservercertificate
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

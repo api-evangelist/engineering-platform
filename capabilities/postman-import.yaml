@@ -1,0 +1,82 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API — Import
+  description: 'APIs.io Engineering Platform Postman API — Import. 1 operations. Lead operation: APIs.io Engineering Platform
+    Import an OpenAPI definition. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Import
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-import
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API — Import business capability. Self-contained, no shared references.
+    resources:
+    - name: import-openapi
+      path: /import/openapi
+      operations:
+      - name: importopenapidefinition
+        method: POST
+        description: APIs.io Engineering Platform Import an OpenAPI definition
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-import-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API — Import. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/import/openapi
+      name: import-openapi
+      description: REST surface for import-openapi.
+      operations:
+      - method: POST
+        name: importopenapidefinition
+        description: APIs.io Engineering Platform Import an OpenAPI definition
+        call: postman-import.importopenapidefinition
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-import-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API — Import. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-import-openapi
+      description: APIs.io Engineering Platform Import an OpenAPI definition
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: postman-import.importopenapidefinition
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

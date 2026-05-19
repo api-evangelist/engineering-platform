@@ -1,0 +1,151 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=AddUserToGroup'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=AddUserToGroup. 2 operations. Lead
+    operation: #Action=AddUserToGroup. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=AddUserToGroup'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-addusertogroup
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=AddUserToGroup business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=AddUserToGroup'
+      path: /#Action=AddUserToGroup
+      operations:
+      - name: getaddusertogroup
+        method: GET
+        description: Adds the specified user to the specified group.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: GroupName
+          in: query
+          type: string
+          description: <p>The name of the group to update.</p> <p>This parameter allows (through its <a href="http://wikipedia.org/wiki/regex">regex
+            pattern</a>) a string of character
+          required: true
+        - name: UserName
+          in: query
+          type: string
+          description: <p>The name of the user to add.</p> <p>This parameter allows (through its <a href="http://wikipedia.org/wiki/regex">regex
+            pattern</a>) a string of characters co
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postaddusertogroup
+        method: POST
+        description: Adds the specified user to the specified group.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-addusertogroup-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=AddUserToGroup.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-addusertogroup
+      name: action-addusertogroup
+      description: 'REST surface for #Action=AddUserToGroup.'
+      operations:
+      - method: GET
+        name: getaddusertogroup
+        description: Adds the specified user to the specified group.
+        call: aws-iam-action-addusertogroup.getaddusertogroup
+        with:
+          GroupName: rest.GroupName
+          UserName: rest.UserName
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postaddusertogroup
+        description: Adds the specified user to the specified group.
+        call: aws-iam-action-addusertogroup.postaddusertogroup
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-addusertogroup-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=AddUserToGroup.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: adds-specified-user-specified-group
+      description: Adds the specified user to the specified group.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-addusertogroup.getaddusertogroup
+      with:
+        GroupName: tools.GroupName
+        UserName: tools.UserName
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: adds-specified-user-specified-group-2
+      description: Adds the specified user to the specified group.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-addusertogroup.postaddusertogroup
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

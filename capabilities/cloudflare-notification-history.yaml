@@ -1,0 +1,100 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Notification History
+  description: 'APIs.io Engineering Platform Cloudflare API — Notification History. 1 operations. Lead operation: APIs.io
+    Engineering Platform List History. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Notification History
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-notification-history
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Notification History business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-alerting-v3-history
+      path: /accounts/{account_id}/alerting/v3/history
+      operations:
+      - name: notificationhistorylisthistory
+        method: GET
+        description: APIs.io Engineering Platform List History
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: per_page
+          in: query
+          type: string
+        - name: before
+          in: query
+          type: string
+        - name: page
+          in: query
+          type: number
+        - name: since
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-notification-history-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Notification History. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/alerting/v3/history
+      name: accounts-account-id-alerting-v3-history
+      description: REST surface for accounts-account_id-alerting-v3-history.
+      operations:
+      - method: GET
+        name: notificationhistorylisthistory
+        description: APIs.io Engineering Platform List History
+        call: cloudflare-notification-history.notificationhistorylisthistory
+        with:
+          account_id: rest.account_id
+          per_page: rest.per_page
+          before: rest.before
+          page: rest.page
+          since: rest.since
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-notification-history-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Notification History. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-history
+      description: APIs.io Engineering Platform List History
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-history.notificationhistorylisthistory
+      with:
+        account_id: tools.account_id
+        per_page: tools.per_page
+        before: tools.before
+        page: tools.page
+        since: tools.since
+      outputParameters:
+      - type: object
+        mapping: $.

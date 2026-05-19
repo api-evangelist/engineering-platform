@@ -1,0 +1,86 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zones
+  description: 'APIs.io Engineering Platform Cloudflare API — Zones. 1 operations. Lead operation: Zones. Self-contained Naftiko
+    capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Zones
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zones
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zones business capability. Self-contained, no shared references.
+    resources:
+    - name: zones-zone_id-access-certificates
+      path: /zones/{zone_id}/access/certificates
+      operations:
+      - name: zonelevelaccessmtlsauthenticationaddanmtlscertificate
+        method: POST
+        description: Adds a new mTLS root certificate to Access.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: zone_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zones-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zones. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/zones/{zone-id}/access/certificates
+      name: zones-zone-id-access-certificates
+      description: REST surface for zones-zone_id-access-certificates.
+      operations:
+      - method: POST
+        name: zonelevelaccessmtlsauthenticationaddanmtlscertificate
+        description: Adds a new mTLS root certificate to Access.
+        call: cloudflare-zones.zonelevelaccessmtlsauthenticationaddanmtlscertificate
+        with:
+          zone_id: rest.zone_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zones-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zones. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: adds-new-mtls-root-certificate
+      description: Adds a new mTLS root certificate to Access.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-zones.zonelevelaccessmtlsauthenticationaddanmtlscertificate
+      with:
+        zone_id: tools.zone_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

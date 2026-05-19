@@ -1,0 +1,80 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Notification Alert Types
+  description: 'APIs.io Engineering Platform Cloudflare API — Notification Alert Types. 1 operations. Lead operation: APIs.io
+    Engineering Platform Get Alert Types. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Notification Alert Types
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-notification-alert-types
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Notification Alert Types business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-alerting-v3-available_alerts
+      path: /accounts/{account_id}/alerting/v3/available_alerts
+      operations:
+      - name: notificationalerttypesgetalerttypes
+        method: GET
+        description: APIs.io Engineering Platform Get Alert Types
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-notification-alert-types-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Notification Alert Types. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/alerting/v3/available-alerts
+      name: accounts-account-id-alerting-v3-available-alerts
+      description: REST surface for accounts-account_id-alerting-v3-available_alerts.
+      operations:
+      - method: GET
+        name: notificationalerttypesgetalerttypes
+        description: APIs.io Engineering Platform Get Alert Types
+        call: cloudflare-notification-alert-types.notificationalerttypesgetalerttypes
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-notification-alert-types-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Notification Alert Types. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-alert
+      description: APIs.io Engineering Platform Get Alert Types
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-alert-types.notificationalerttypesgetalerttypes
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

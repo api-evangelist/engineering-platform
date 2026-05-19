@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagMFADevice'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagMFADevice. 2 operations. Lead
+    operation: #Action=UntagMFADevice. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=UntagMFADevice'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-untagmfadevice
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagMFADevice business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=UntagMFADevice'
+      path: /#Action=UntagMFADevice
+      operations:
+      - name: getuntagmfadevice
+        method: GET
+        description: Removes the specified tags from the IAM virtual multi-factor authentication (MFA) device. For more information
+          about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging IAM resources</a>
+          in the <i>IA
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: SerialNumber
+          in: query
+          type: string
+          description: <p>The unique identifier for the IAM virtual MFA device from which you want to remove tags. For virtual
+            MFA devices, the serial number is the same as the ARN.</
+          required: true
+        - name: TagKeys
+          in: query
+          type: array
+          description: A list of key names as a simple array of strings. The tags with matching keys are removed from the
+            specified instance profile.
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postuntagmfadevice
+        method: POST
+        description: Removes the specified tags from the IAM virtual multi-factor authentication (MFA) device. For more information
+          about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging IAM resources</a>
+          in the <i>IA
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-untagmfadevice-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagMFADevice.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-untagmfadevice
+      name: action-untagmfadevice
+      description: 'REST surface for #Action=UntagMFADevice.'
+      operations:
+      - method: GET
+        name: getuntagmfadevice
+        description: Removes the specified tags from the IAM virtual multi-factor authentication (MFA) device. For more information
+          about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging IAM resources</a>
+          in the <i>IA
+        call: aws-iam-action-untagmfadevice.getuntagmfadevice
+        with:
+          SerialNumber: rest.SerialNumber
+          TagKeys: rest.TagKeys
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postuntagmfadevice
+        description: Removes the specified tags from the IAM virtual multi-factor authentication (MFA) device. For more information
+          about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging IAM resources</a>
+          in the <i>IA
+        call: aws-iam-action-untagmfadevice.postuntagmfadevice
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-untagmfadevice-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagMFADevice.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: removes-specified-tags-iam-virtual
+      description: Removes the specified tags from the IAM virtual multi-factor authentication (MFA) device. For more information
+        about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging IAM resources</a>
+        in the <i>IA
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-untagmfadevice.getuntagmfadevice
+      with:
+        SerialNumber: tools.SerialNumber
+        TagKeys: tools.TagKeys
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: removes-specified-tags-iam-virtual-2
+      description: Removes the specified tags from the IAM virtual multi-factor authentication (MFA) device. For more information
+        about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging IAM resources</a>
+        in the <i>IA
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-untagmfadevice.postuntagmfadevice
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

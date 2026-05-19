@@ -1,0 +1,212 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — DLP Settings
+  description: 'APIs.io Engineering Platform Cloudflare API — DLP Settings. 4 operations. Lead operation: APIs.io Engineering
+    Platform Fetch limits associated with DLP for account. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - DLP Settings
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-dlp-settings
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — DLP Settings business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-dlp-limits
+      path: /accounts/{account_id}/dlp/limits
+      operations:
+      - name: dlplimitsget
+        method: GET
+        description: APIs.io Engineering Platform Fetch limits associated with DLP for account
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-dlp-patterns-validate
+      path: /accounts/{account_id}/dlp/patterns/validate
+      operations:
+      - name: dlppatternvalidate
+        method: POST
+        description: APIs.io Engineering Platform Validate a DLP regex pattern
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          description: Account ID
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-dlp-payload_log
+      path: /accounts/{account_id}/dlp/payload_log
+      operations:
+      - name: dlppayloadlogget
+        method: GET
+        description: APIs.io Engineering Platform Get payload log settings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: dlppayloadlogput
+        method: PUT
+        description: APIs.io Engineering Platform Set payload log settings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-dlp-settings-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — DLP Settings. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/dlp/limits
+      name: accounts-account-id-dlp-limits
+      description: REST surface for accounts-account_id-dlp-limits.
+      operations:
+      - method: GET
+        name: dlplimitsget
+        description: APIs.io Engineering Platform Fetch limits associated with DLP for account
+        call: cloudflare-dlp-settings.dlplimitsget
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/dlp/patterns/validate
+      name: accounts-account-id-dlp-patterns-validate
+      description: REST surface for accounts-account_id-dlp-patterns-validate.
+      operations:
+      - method: POST
+        name: dlppatternvalidate
+        description: APIs.io Engineering Platform Validate a DLP regex pattern
+        call: cloudflare-dlp-settings.dlppatternvalidate
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/dlp/payload-log
+      name: accounts-account-id-dlp-payload-log
+      description: REST surface for accounts-account_id-dlp-payload_log.
+      operations:
+      - method: GET
+        name: dlppayloadlogget
+        description: APIs.io Engineering Platform Get payload log settings
+        call: cloudflare-dlp-settings.dlppayloadlogget
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: dlppayloadlogput
+        description: APIs.io Engineering Platform Set payload log settings
+        call: cloudflare-dlp-settings.dlppayloadlogput
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-dlp-settings-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — DLP Settings. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-fetch-limits
+      description: APIs.io Engineering Platform Fetch limits associated with DLP for account
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-dlp-settings.dlplimitsget
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-validate-dlp
+      description: APIs.io Engineering Platform Validate a DLP regex pattern
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: cloudflare-dlp-settings.dlppatternvalidate
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-payload
+      description: APIs.io Engineering Platform Get payload log settings
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-dlp-settings.dlppayloadlogget
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-set-payload
+      description: APIs.io Engineering Platform Set payload log settings
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-dlp-settings.dlppayloadlogput
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

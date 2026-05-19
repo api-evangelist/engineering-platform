@@ -1,0 +1,110 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Load Balancer Healthcheck Events
+  description: 'APIs.io Engineering Platform Cloudflare API — Load Balancer Healthcheck Events. 1 operations. Lead operation:
+    APIs.io Engineering Platform List Healthcheck Events. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Load Balancer Healthcheck Events
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-load-balancer-healthcheck-events
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Load Balancer Healthcheck Events business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: user-load_balancing_analytics-events
+      path: /user/load_balancing_analytics/events
+      operations:
+      - name: loadbalancerhealthcheckeventslisthealthcheckevents
+        method: GET
+        description: APIs.io Engineering Platform List Healthcheck Events
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: until
+          in: query
+          type: string
+        - name: pool_name
+          in: query
+          type: string
+        - name: origin_healthy
+          in: query
+          type: string
+        - name: pool_id
+          in: query
+          type: string
+        - name: since
+          in: query
+          type: string
+        - name: origin_name
+          in: query
+          type: string
+        - name: pool_healthy
+          in: query
+          type: boolean
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-load-balancer-healthcheck-events-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Load Balancer Healthcheck Events. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/user/load-balancing-analytics/events
+      name: user-load-balancing-analytics-events
+      description: REST surface for user-load_balancing_analytics-events.
+      operations:
+      - method: GET
+        name: loadbalancerhealthcheckeventslisthealthcheckevents
+        description: APIs.io Engineering Platform List Healthcheck Events
+        call: cloudflare-load-balancer-healthcheck-events.loadbalancerhealthcheckeventslisthealthcheckevents
+        with:
+          until: rest.until
+          pool_name: rest.pool_name
+          origin_healthy: rest.origin_healthy
+          pool_id: rest.pool_id
+          since: rest.since
+          origin_name: rest.origin_name
+          pool_healthy: rest.pool_healthy
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-load-balancer-healthcheck-events-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Load Balancer Healthcheck Events. One tool
+      per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-healthcheck
+      description: APIs.io Engineering Platform List Healthcheck Events
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-load-balancer-healthcheck-events.loadbalancerhealthcheckeventslisthealthcheckevents
+      with:
+        until: tools.until
+        pool_name: tools.pool_name
+        origin_healthy: tools.origin_healthy
+        pool_id: tools.pool_id
+        since: tools.since
+        origin_name: tools.origin_name
+        pool_healthy: tools.pool_healthy
+      outputParameters:
+      - type: object
+        mapping: $.

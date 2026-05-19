@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagPolicy'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagPolicy. 2 operations. Lead operation:
+    #Action=TagPolicy. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=TagPolicy'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-tagpolicy
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagPolicy business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=TagPolicy'
+      path: /#Action=TagPolicy
+      operations:
+      - name: gettagpolicy
+        method: GET
+        description: <p>Adds one or more tags to an IAM customer managed policy. If a tag with the same key name already exists,
+          then that tag is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By
+          assigning tags to y
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: PolicyArn
+          in: query
+          type: string
+          description: <p>The ARN of the IAM customer managed policy to which you want to add tags.</p> <p>This parameter
+            allows (through its <a href="http://wikipedia.org/wiki/regex"
+          required: true
+        - name: Tags
+          in: query
+          type: array
+          description: The list of tags that you want to attach to the IAM customer managed policy. Each tag consists of a
+            key name and an associated value.
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: posttagpolicy
+        method: POST
+        description: <p>Adds one or more tags to an IAM customer managed policy. If a tag with the same key name already exists,
+          then that tag is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By
+          assigning tags to y
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-tagpolicy-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagPolicy. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-tagpolicy
+      name: action-tagpolicy
+      description: 'REST surface for #Action=TagPolicy.'
+      operations:
+      - method: GET
+        name: gettagpolicy
+        description: <p>Adds one or more tags to an IAM customer managed policy. If a tag with the same key name already exists,
+          then that tag is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By
+          assigning tags to y
+        call: aws-iam-action-tagpolicy.gettagpolicy
+        with:
+          PolicyArn: rest.PolicyArn
+          Tags: rest.Tags
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: posttagpolicy
+        description: <p>Adds one or more tags to an IAM customer managed policy. If a tag with the same key name already exists,
+          then that tag is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By
+          assigning tags to y
+        call: aws-iam-action-tagpolicy.posttagpolicy
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-tagpolicy-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagPolicy. One
+      tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-adds-one-more-tags-iam
+      description: <p>Adds one or more tags to an IAM customer managed policy. If a tag with the same key name already exists,
+        then that tag is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By assigning
+        tags to y
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-tagpolicy.gettagpolicy
+      with:
+        PolicyArn: tools.PolicyArn
+        Tags: tools.Tags
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-adds-one-more-tags-iam-2
+      description: <p>Adds one or more tags to an IAM customer managed policy. If a tag with the same key name already exists,
+        then that tag is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By assigning
+        tags to y
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-tagpolicy.posttagpolicy
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

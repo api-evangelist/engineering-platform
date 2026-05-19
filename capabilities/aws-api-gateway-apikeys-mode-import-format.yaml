@@ -1,0 +1,104 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Amazon API Gateway — Apikeys#mode=import&format
+  description: 'APIs.io Engineering Platform Amazon API Gateway — Apikeys#mode=import&format. 1 operations. Lead operation:
+    Apikeys#mode=import&format. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Apikeys#mode=import&format
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-api-gateway-apikeys-mode-import-format
+    baseUri: http://apigateway.{region}.amazonaws.com
+    description: APIs.io Engineering Platform Amazon API Gateway — Apikeys#mode=import&format business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: apikeys#mode=import&format
+      path: /apikeys#mode=import&format
+      operations:
+      - name: importapikeys
+        method: POST
+        description: Import API keys from an external source, such as a CSV-formatted file.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: format
+          in: query
+          type: string
+          description: A query parameter to specify the input format to imported API keys. Currently, only the <code>csv</code>
+            format is supported.
+          required: true
+        - name: failonwarnings
+          in: query
+          type: boolean
+          description: A query parameter to indicate whether to rollback ApiKey importation (<code>true</code>) or not (<code>false</code>)
+            when error is encountered.
+        - name: mode
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-api-gateway-apikeys-mode-import-format-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Amazon API Gateway — Apikeys#mode=import&format. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/apikeys-mode-import-format
+      name: apikeys-mode-import-format
+      description: REST surface for apikeys#mode=import&format.
+      operations:
+      - method: POST
+        name: importapikeys
+        description: Import API keys from an external source, such as a CSV-formatted file.
+        call: aws-api-gateway-apikeys-mode-import-format.importapikeys
+        with:
+          format: rest.format
+          failonwarnings: rest.failonwarnings
+          mode: rest.mode
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-api-gateway-apikeys-mode-import-format-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Amazon API Gateway — Apikeys#mode=import&format. One tool per
+      consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: import-api-keys-external-source
+      description: Import API keys from an external source, such as a CSV-formatted file.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-api-gateway-apikeys-mode-import-format.importapikeys
+      with:
+        format: tools.format
+        failonwarnings: tools.failonwarnings
+        mode: tools.mode
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

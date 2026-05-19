@@ -1,0 +1,72 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — API Token Permission Groups
+  description: 'APIs.io Engineering Platform Cloudflare API — API Token Permission Groups. 1 operations. Lead operation: APIs.io
+    Engineering Platform List Token Permission Groups. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - API Token Permission Groups
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-api-token-permission-groups
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — API Token Permission Groups business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: user-tokens-permission_groups
+      path: /user/tokens/permission_groups
+      operations:
+      - name: permissiongroupslistpermissiongroups
+        method: GET
+        description: APIs.io Engineering Platform List Token Permission Groups
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-api-token-permission-groups-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — API Token Permission Groups. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/user/tokens/permission-groups
+      name: user-tokens-permission-groups
+      description: REST surface for user-tokens-permission_groups.
+      operations:
+      - method: GET
+        name: permissiongroupslistpermissiongroups
+        description: APIs.io Engineering Platform List Token Permission Groups
+        call: cloudflare-api-token-permission-groups.permissiongroupslistpermissiongroups
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-api-token-permission-groups-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — API Token Permission Groups. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-token
+      description: APIs.io Engineering Platform List Token Permission Groups
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-api-token-permission-groups.permissiongroupslistpermissiongroups
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,204 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Worker Versions
+  description: 'APIs.io Engineering Platform Cloudflare API — Worker Versions. 3 operations. Lead operation: APIs.io Engineering
+    Platform List Versions. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Worker Versions
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-worker-versions
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Worker Versions business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-workers-scripts-script_name-versions
+      path: /accounts/{account_id}/workers/scripts/{script_name}/versions
+      operations:
+      - name: workerversionslistversions
+        method: GET
+        description: APIs.io Engineering Platform List Versions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: deployable
+          in: query
+          type: boolean
+          description: Only return versions that can be used in a deployment. Ignores pagination.
+        - name: page
+          in: query
+          type: integer
+          description: Current page.
+        - name: per_page
+          in: query
+          type: integer
+          description: Items per-page.
+      - name: workerversionsuploadversion
+        method: POST
+        description: APIs.io Engineering Platform Upload Version
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: accounts-account_id-workers-scripts-script_name-versions-version_id
+      path: /accounts/{account_id}/workers/scripts/{script_name}/versions/{version_id}
+      operations:
+      - name: workerversionsgetversiondetail
+        method: GET
+        description: APIs.io Engineering Platform Get Version Detail
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: version_id
+          in: path
+          type: string
+          required: true
+        - name: script_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-worker-versions-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Worker Versions. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/workers/scripts/{script-name}/versions
+      name: accounts-account-id-workers-scripts-script-name-versions
+      description: REST surface for accounts-account_id-workers-scripts-script_name-versions.
+      operations:
+      - method: GET
+        name: workerversionslistversions
+        description: APIs.io Engineering Platform List Versions
+        call: cloudflare-worker-versions.workerversionslistversions
+        with:
+          script_name: rest.script_name
+          account_id: rest.account_id
+          deployable: rest.deployable
+          page: rest.page
+          per_page: rest.per_page
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: workerversionsuploadversion
+        description: APIs.io Engineering Platform Upload Version
+        call: cloudflare-worker-versions.workerversionsuploadversion
+        with:
+          script_name: rest.script_name
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/workers/scripts/{script-name}/versions/{version-id}
+      name: accounts-account-id-workers-scripts-script-name-versions-version-id
+      description: REST surface for accounts-account_id-workers-scripts-script_name-versions-version_id.
+      operations:
+      - method: GET
+        name: workerversionsgetversiondetail
+        description: APIs.io Engineering Platform Get Version Detail
+        call: cloudflare-worker-versions.workerversionsgetversiondetail
+        with:
+          version_id: rest.version_id
+          script_name: rest.script_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-worker-versions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Worker Versions. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-versions
+      description: APIs.io Engineering Platform List Versions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-versions.workerversionslistversions
+      with:
+        script_name: tools.script_name
+        account_id: tools.account_id
+        deployable: tools.deployable
+        page: tools.page
+        per_page: tools.per_page
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-upload-version
+      description: APIs.io Engineering Platform Upload Version
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-worker-versions.workerversionsuploadversion
+      with:
+        script_name: tools.script_name
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-version
+      description: APIs.io Engineering Platform Get Version Detail
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-worker-versions.workerversionsgetversiondetail
+      with:
+        version_id: tools.version_id
+        script_name: tools.script_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

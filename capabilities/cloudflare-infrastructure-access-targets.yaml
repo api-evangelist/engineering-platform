@@ -1,0 +1,310 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Infrastructure Access Targets
+  description: 'APIs.io Engineering Platform Cloudflare API — Infrastructure Access Targets. 5 operations. Lead operation:
+    APIs.io Engineering Platform List all targets. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Infrastructure Access Targets
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-infrastructure-access-targets
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Infrastructure Access Targets business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-infrastructure-targets
+      path: /accounts/{account_id}/infrastructure/targets
+      operations:
+      - name: infratargetslist
+        method: GET
+        description: APIs.io Engineering Platform List all targets
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: hostname
+          in: query
+          type: string
+          description: Hostname of a target
+        - name: hostname_contains
+          in: query
+          type: string
+          description: Partial match to the hostname of a target
+        - name: virtual_network_id
+          in: query
+          type: string
+          description: Private virtual network identifier of the target
+        - name: ip_v4
+          in: query
+          type: string
+          description: IPv4 address of the target
+        - name: ip_v6
+          in: query
+          type: string
+          description: IPv6 address of the target
+        - name: created_after
+          in: query
+          type: string
+          description: Date and time at which the target was created
+        - name: modified_after
+          in: query
+          type: string
+          description: Date and time at which the target was modified
+        - name: page
+          in: query
+          type: integer
+          description: Current page in the response
+        - name: per_page
+          in: query
+          type: integer
+          description: Max amount of entries returned per page
+      - name: infratargetspost
+        method: POST
+        description: APIs.io Engineering Platform Create new target
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-infrastructure-targets-target_id
+      path: /accounts/{account_id}/infrastructure/targets/{target_id}
+      operations:
+      - name: infratargetsdelete
+        method: DELETE
+        description: APIs.io Engineering Platform Delete target
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: target_id
+          in: path
+          type: string
+          required: true
+      - name: infratargetsget
+        method: GET
+        description: APIs.io Engineering Platform Get target
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: target_id
+          in: path
+          type: string
+          required: true
+      - name: infratargetsput
+        method: PUT
+        description: APIs.io Engineering Platform Update target
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: target_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-infrastructure-access-targets-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Infrastructure Access Targets. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/infrastructure/targets
+      name: accounts-account-id-infrastructure-targets
+      description: REST surface for accounts-account_id-infrastructure-targets.
+      operations:
+      - method: GET
+        name: infratargetslist
+        description: APIs.io Engineering Platform List all targets
+        call: cloudflare-infrastructure-access-targets.infratargetslist
+        with:
+          account_id: rest.account_id
+          hostname: rest.hostname
+          hostname_contains: rest.hostname_contains
+          virtual_network_id: rest.virtual_network_id
+          ip_v4: rest.ip_v4
+          ip_v6: rest.ip_v6
+          created_after: rest.created_after
+          modified_after: rest.modified_after
+          page: rest.page
+          per_page: rest.per_page
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: infratargetspost
+        description: APIs.io Engineering Platform Create new target
+        call: cloudflare-infrastructure-access-targets.infratargetspost
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/infrastructure/targets/{target-id}
+      name: accounts-account-id-infrastructure-targets-target-id
+      description: REST surface for accounts-account_id-infrastructure-targets-target_id.
+      operations:
+      - method: DELETE
+        name: infratargetsdelete
+        description: APIs.io Engineering Platform Delete target
+        call: cloudflare-infrastructure-access-targets.infratargetsdelete
+        with:
+          account_id: rest.account_id
+          target_id: rest.target_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: infratargetsget
+        description: APIs.io Engineering Platform Get target
+        call: cloudflare-infrastructure-access-targets.infratargetsget
+        with:
+          account_id: rest.account_id
+          target_id: rest.target_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: infratargetsput
+        description: APIs.io Engineering Platform Update target
+        call: cloudflare-infrastructure-access-targets.infratargetsput
+        with:
+          account_id: rest.account_id
+          target_id: rest.target_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-infrastructure-access-targets-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Infrastructure Access Targets. One tool per
+      consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-all
+      description: APIs.io Engineering Platform List all targets
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-infrastructure-access-targets.infratargetslist
+      with:
+        account_id: tools.account_id
+        hostname: tools.hostname
+        hostname_contains: tools.hostname_contains
+        virtual_network_id: tools.virtual_network_id
+        ip_v4: tools.ip_v4
+        ip_v6: tools.ip_v6
+        created_after: tools.created_after
+        modified_after: tools.modified_after
+        page: tools.page
+        per_page: tools.per_page
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-new
+      description: APIs.io Engineering Platform Create new target
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-infrastructure-access-targets.infratargetspost
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-target
+      description: APIs.io Engineering Platform Delete target
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-infrastructure-access-targets.infratargetsdelete
+      with:
+        account_id: tools.account_id
+        target_id: tools.target_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-target
+      description: APIs.io Engineering Platform Get target
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-infrastructure-access-targets.infratargetsget
+      with:
+        account_id: tools.account_id
+        target_id: tools.target_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-target
+      description: APIs.io Engineering Platform Update target
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-infrastructure-access-targets.infratargetsput
+      with:
+        account_id: tools.account_id
+        target_id: tools.target_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

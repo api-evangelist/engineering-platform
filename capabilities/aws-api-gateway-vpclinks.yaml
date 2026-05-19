@@ -1,0 +1,248 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Amazon API Gateway — Vpclinks
+  description: 'APIs.io Engineering Platform Amazon API Gateway — Vpclinks. 5 operations. Lead operation: Vpclinks. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Vpclinks
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-api-gateway-vpclinks
+    baseUri: http://apigateway.{region}.amazonaws.com
+    description: APIs.io Engineering Platform Amazon API Gateway — Vpclinks business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: vpclinks
+      path: /vpclinks
+      operations:
+      - name: createvpclink
+        method: POST
+        description: Creates a VPC link, under the caller's account in a selected region, in an asynchronous operation that
+          typically takes 2-4 minutes to complete and become operational. The caller must have permissions to create and update
+          VPC Endpoint servic
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: getvpclinks
+        method: GET
+        description: Gets the VpcLinks collection under the caller's account in a selected region.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: position
+          in: query
+          type: string
+          description: The current pagination position in the paged result set.
+        - name: limit
+          in: query
+          type: integer
+          description: The maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+    - name: vpclinks-vpclink_id
+      path: /vpclinks/{vpclink_id}
+      operations:
+      - name: deletevpclink
+        method: DELETE
+        description: Deletes an existing VpcLink of a specified identifier.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: vpclink_id
+          in: path
+          type: string
+          description: The identifier of the VpcLink. It is used in an Integration to reference this VpcLink.
+          required: true
+      - name: getvpclink
+        method: GET
+        description: Gets a specified VPC link under the caller's account in a region.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: vpclink_id
+          in: path
+          type: string
+          description: The identifier of the VpcLink. It is used in an Integration to reference this VpcLink.
+          required: true
+      - name: updatevpclink
+        method: PATCH
+        description: Updates an existing VpcLink of a specified identifier.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: vpclink_id
+          in: path
+          type: string
+          description: The identifier of the VpcLink. It is used in an Integration to reference this VpcLink.
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-api-gateway-vpclinks-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Amazon API Gateway — Vpclinks. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/vpclinks
+      name: vpclinks
+      description: REST surface for vpclinks.
+      operations:
+      - method: POST
+        name: createvpclink
+        description: Creates a VPC link, under the caller's account in a selected region, in an asynchronous operation that
+          typically takes 2-4 minutes to complete and become operational. The caller must have permissions to create and update
+          VPC Endpoint servic
+        call: aws-api-gateway-vpclinks.createvpclink
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getvpclinks
+        description: Gets the VpcLinks collection under the caller's account in a selected region.
+        call: aws-api-gateway-vpclinks.getvpclinks
+        with:
+          position: rest.position
+          limit: rest.limit
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/vpclinks/{vpclink-id}
+      name: vpclinks-vpclink-id
+      description: REST surface for vpclinks-vpclink_id.
+      operations:
+      - method: DELETE
+        name: deletevpclink
+        description: Deletes an existing VpcLink of a specified identifier.
+        call: aws-api-gateway-vpclinks.deletevpclink
+        with:
+          vpclink_id: rest.vpclink_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getvpclink
+        description: Gets a specified VPC link under the caller's account in a region.
+        call: aws-api-gateway-vpclinks.getvpclink
+        with:
+          vpclink_id: rest.vpclink_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updatevpclink
+        description: Updates an existing VpcLink of a specified identifier.
+        call: aws-api-gateway-vpclinks.updatevpclink
+        with:
+          vpclink_id: rest.vpclink_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-api-gateway-vpclinks-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Amazon API Gateway — Vpclinks. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: creates-vpc-link-under-caller-s
+      description: Creates a VPC link, under the caller's account in a selected region, in an asynchronous operation that
+        typically takes 2-4 minutes to complete and become operational. The caller must have permissions to create and update
+        VPC Endpoint servic
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-api-gateway-vpclinks.createvpclink
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-vpclinks-collection-under-caller-s
+      description: Gets the VpcLinks collection under the caller's account in a selected region.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-vpclinks.getvpclinks
+      with:
+        position: tools.position
+        limit: tools.limit
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: deletes-existing-vpclink-specified-identifier
+      description: Deletes an existing VpcLink of a specified identifier.
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: aws-api-gateway-vpclinks.deletevpclink
+      with:
+        vpclink_id: tools.vpclink_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: gets-specified-vpc-link-under
+      description: Gets a specified VPC link under the caller's account in a region.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-vpclinks.getvpclink
+      with:
+        vpclink_id: tools.vpclink_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: updates-existing-vpclink-specified-identifier
+      description: Updates an existing VpcLink of a specified identifier.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: aws-api-gateway-vpclinks.updatevpclink
+      with:
+        vpclink_id: tools.vpclink_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

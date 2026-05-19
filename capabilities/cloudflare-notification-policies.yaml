@@ -1,0 +1,256 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Notification Policies
+  description: 'APIs.io Engineering Platform Cloudflare API — Notification Policies. 5 operations. Lead operation: APIs.io
+    Engineering Platform List Notification policies. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Notification Policies
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-notification-policies
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Notification Policies business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-alerting-v3-policies
+      path: /accounts/{account_id}/alerting/v3/policies
+      operations:
+      - name: notificationpolicieslistnotificationpolicies
+        method: GET
+        description: APIs.io Engineering Platform List Notification policies
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: notificationpoliciescreateanotificationpolicy
+        method: POST
+        description: APIs.io Engineering Platform Create a Notification policy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-alerting-v3-policies-policy_id
+      path: /accounts/{account_id}/alerting/v3/policies/{policy_id}
+      operations:
+      - name: notificationpoliciesdeleteanotificationpolicy
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a Notification policy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: policy_id
+          in: path
+          type: string
+          required: true
+      - name: notificationpoliciesgetanotificationpolicy
+        method: GET
+        description: APIs.io Engineering Platform Get a Notification policy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: policy_id
+          in: path
+          type: string
+          required: true
+      - name: notificationpoliciesupdateanotificationpolicy
+        method: PUT
+        description: APIs.io Engineering Platform Update a Notification policy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: policy_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-notification-policies-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Notification Policies. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/alerting/v3/policies
+      name: accounts-account-id-alerting-v3-policies
+      description: REST surface for accounts-account_id-alerting-v3-policies.
+      operations:
+      - method: GET
+        name: notificationpolicieslistnotificationpolicies
+        description: APIs.io Engineering Platform List Notification policies
+        call: cloudflare-notification-policies.notificationpolicieslistnotificationpolicies
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: notificationpoliciescreateanotificationpolicy
+        description: APIs.io Engineering Platform Create a Notification policy
+        call: cloudflare-notification-policies.notificationpoliciescreateanotificationpolicy
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/alerting/v3/policies/{policy-id}
+      name: accounts-account-id-alerting-v3-policies-policy-id
+      description: REST surface for accounts-account_id-alerting-v3-policies-policy_id.
+      operations:
+      - method: DELETE
+        name: notificationpoliciesdeleteanotificationpolicy
+        description: APIs.io Engineering Platform Delete a Notification policy
+        call: cloudflare-notification-policies.notificationpoliciesdeleteanotificationpolicy
+        with:
+          account_id: rest.account_id
+          policy_id: rest.policy_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: notificationpoliciesgetanotificationpolicy
+        description: APIs.io Engineering Platform Get a Notification policy
+        call: cloudflare-notification-policies.notificationpoliciesgetanotificationpolicy
+        with:
+          account_id: rest.account_id
+          policy_id: rest.policy_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: notificationpoliciesupdateanotificationpolicy
+        description: APIs.io Engineering Platform Update a Notification policy
+        call: cloudflare-notification-policies.notificationpoliciesupdateanotificationpolicy
+        with:
+          account_id: rest.account_id
+          policy_id: rest.policy_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-notification-policies-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Notification Policies. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-notification
+      description: APIs.io Engineering Platform List Notification policies
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-policies.notificationpolicieslistnotificationpolicies
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-notification
+      description: APIs.io Engineering Platform Create a Notification policy
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-notification-policies.notificationpoliciescreateanotificationpolicy
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-notification
+      description: APIs.io Engineering Platform Delete a Notification policy
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-notification-policies.notificationpoliciesdeleteanotificationpolicy
+      with:
+        account_id: tools.account_id
+        policy_id: tools.policy_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-notification
+      description: APIs.io Engineering Platform Get a Notification policy
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-policies.notificationpoliciesgetanotificationpolicy
+      with:
+        account_id: tools.account_id
+        policy_id: tools.policy_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-notification
+      description: APIs.io Engineering Platform Update a Notification policy
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-policies.notificationpoliciesupdateanotificationpolicy
+      with:
+        account_id: tools.account_id
+        policy_id: tools.policy_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

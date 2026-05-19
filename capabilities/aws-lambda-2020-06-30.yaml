@@ -1,0 +1,165 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform AWS Lambda — 2020 06 30
+  description: 'APIs.io Engineering Platform AWS Lambda — 2020 06 30. 3 operations. Lead operation: 2020 06 30. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - 2020 06 30
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-lambda-2020-06-30
+    baseUri: http://lambda.{region}.amazonaws.com
+    description: APIs.io Engineering Platform AWS Lambda — 2020 06 30 business capability. Self-contained, no shared references.
+    resources:
+    - name: 2020-06-30-functions-FunctionName-code-signing-config
+      path: /2020-06-30/functions/{FunctionName}/code-signing-config
+      operations:
+      - name: deletefunctioncodesigningconfig
+        method: DELETE
+        description: Removes the code signing configuration from the function.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: FunctionName
+          in: path
+          type: string
+          description: '<p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function
+            name</b> - <code>MyFunction</code>.</p> </li> <li> '
+          required: true
+      - name: getfunctioncodesigningconfig
+        method: GET
+        description: Returns the code signing configuration for the specified function.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: FunctionName
+          in: path
+          type: string
+          description: '<p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function
+            name</b> - <code>MyFunction</code>.</p> </li> <li> '
+          required: true
+      - name: putfunctioncodesigningconfig
+        method: PUT
+        description: Update the code signing configuration for the function. Changes to the code signing configuration take
+          effect the next time a user tries to deploy a code package to the function.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: FunctionName
+          in: path
+          type: string
+          description: '<p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function
+            name</b> - <code>MyFunction</code>.</p> </li> <li> '
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-lambda-2020-06-30-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform AWS Lambda — 2020 06 30. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/2020-06-30/functions/{functionname}/code-signing-config
+      name: 2020-06-30-functions-functionname-code-signing-config
+      description: REST surface for 2020-06-30-functions-FunctionName-code-signing-config.
+      operations:
+      - method: DELETE
+        name: deletefunctioncodesigningconfig
+        description: Removes the code signing configuration from the function.
+        call: aws-lambda-2020-06-30.deletefunctioncodesigningconfig
+        with:
+          FunctionName: rest.FunctionName
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: getfunctioncodesigningconfig
+        description: Returns the code signing configuration for the specified function.
+        call: aws-lambda-2020-06-30.getfunctioncodesigningconfig
+        with:
+          FunctionName: rest.FunctionName
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: putfunctioncodesigningconfig
+        description: Update the code signing configuration for the function. Changes to the code signing configuration take
+          effect the next time a user tries to deploy a code package to the function.
+        call: aws-lambda-2020-06-30.putfunctioncodesigningconfig
+        with:
+          FunctionName: rest.FunctionName
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-lambda-2020-06-30-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform AWS Lambda — 2020 06 30. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: removes-code-signing-configuration-function
+      description: Removes the code signing configuration from the function.
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: aws-lambda-2020-06-30.deletefunctioncodesigningconfig
+      with:
+        FunctionName: tools.FunctionName
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: returns-code-signing-configuration-specified
+      description: Returns the code signing configuration for the specified function.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-lambda-2020-06-30.getfunctioncodesigningconfig
+      with:
+        FunctionName: tools.FunctionName
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-code-signing-configuration-function
+      description: Update the code signing configuration for the function. Changes to the code signing configuration take
+        effect the next time a user tries to deploy a code package to the function.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: aws-lambda-2020-06-30.putfunctioncodesigningconfig
+      with:
+        FunctionName: tools.FunctionName
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

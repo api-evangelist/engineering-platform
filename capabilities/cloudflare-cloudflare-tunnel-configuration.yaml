@@ -1,0 +1,134 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Cloudflare Tunnel Configuration
+  description: 'APIs.io Engineering Platform Cloudflare API — Cloudflare Tunnel Configuration. 2 operations. Lead operation:
+    APIs.io Engineering Platform Get configuration. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Cloudflare Tunnel Configuration
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-cloudflare-tunnel-configuration
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Cloudflare Tunnel Configuration business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-cfd_tunnel-tunnel_id-configurations
+      path: /accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations
+      operations:
+      - name: cloudflaretunnelconfigurationgetconfiguration
+        method: GET
+        description: APIs.io Engineering Platform Get configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: tunnel_id
+          in: path
+          type: string
+          required: true
+      - name: cloudflaretunnelconfigurationputconfiguration
+        method: PUT
+        description: APIs.io Engineering Platform Put configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: tunnel_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-cloudflare-tunnel-configuration-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Cloudflare Tunnel Configuration. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/cfd-tunnel/{tunnel-id}/configurations
+      name: accounts-account-id-cfd-tunnel-tunnel-id-configurations
+      description: REST surface for accounts-account_id-cfd_tunnel-tunnel_id-configurations.
+      operations:
+      - method: GET
+        name: cloudflaretunnelconfigurationgetconfiguration
+        description: APIs.io Engineering Platform Get configuration
+        call: cloudflare-cloudflare-tunnel-configuration.cloudflaretunnelconfigurationgetconfiguration
+        with:
+          account_id: rest.account_id
+          tunnel_id: rest.tunnel_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: cloudflaretunnelconfigurationputconfiguration
+        description: APIs.io Engineering Platform Put configuration
+        call: cloudflare-cloudflare-tunnel-configuration.cloudflaretunnelconfigurationputconfiguration
+        with:
+          account_id: rest.account_id
+          tunnel_id: rest.tunnel_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-cloudflare-tunnel-configuration-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Cloudflare Tunnel Configuration. One tool per
+      consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-configuration
+      description: APIs.io Engineering Platform Get configuration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-cloudflare-tunnel-configuration.cloudflaretunnelconfigurationgetconfiguration
+      with:
+        account_id: tools.account_id
+        tunnel_id: tools.tunnel_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-put-configuration
+      description: APIs.io Engineering Platform Put configuration
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-cloudflare-tunnel-configuration.cloudflaretunnelconfigurationputconfiguration
+      with:
+        account_id: tools.account_id
+        tunnel_id: tools.tunnel_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,127 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Account Roles
+  description: 'APIs.io Engineering Platform Cloudflare API — Account Roles. 2 operations. Lead operation: APIs.io Engineering
+    Platform List Roles. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Account Roles
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-account-roles
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Account Roles business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-roles
+      path: /accounts/{account_id}/roles
+      operations:
+      - name: accountroleslistroles
+        method: GET
+        description: APIs.io Engineering Platform List Roles
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-roles-role_id
+      path: /accounts/{account_id}/roles/{role_id}
+      operations:
+      - name: accountrolesroledetails
+        method: GET
+        description: APIs.io Engineering Platform Role Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: role_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-account-roles-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Account Roles. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/roles
+      name: accounts-account-id-roles
+      description: REST surface for accounts-account_id-roles.
+      operations:
+      - method: GET
+        name: accountroleslistroles
+        description: APIs.io Engineering Platform List Roles
+        call: cloudflare-account-roles.accountroleslistroles
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/roles/{role-id}
+      name: accounts-account-id-roles-role-id
+      description: REST surface for accounts-account_id-roles-role_id.
+      operations:
+      - method: GET
+        name: accountrolesroledetails
+        description: APIs.io Engineering Platform Role Details
+        call: cloudflare-account-roles.accountrolesroledetails
+        with:
+          role_id: rest.role_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-account-roles-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Account Roles. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-roles
+      description: APIs.io Engineering Platform List Roles
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-account-roles.accountroleslistroles
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-role-details
+      description: APIs.io Engineering Platform Role Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-account-roles.accountrolesroledetails
+      with:
+        role_id: tools.role_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

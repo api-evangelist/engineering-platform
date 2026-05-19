@@ -1,0 +1,157 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagUser'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagUser. 2 operations. Lead operation:
+    #Action=UntagUser. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=UntagUser'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-untaguser
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagUser business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=UntagUser'
+      path: /#Action=UntagUser
+      operations:
+      - name: getuntaguser
+        method: GET
+        description: Removes the specified tags from the user. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+          IAM resources</a> in the <i>IAM User Guide</i>.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: UserName
+          in: query
+          type: string
+          description: <p>The name of the IAM user from which you want to remove tags.</p> <p>This parameter allows (through
+            its <a href="http://wikipedia.org/wiki/regex">regex patter
+          required: true
+        - name: TagKeys
+          in: query
+          type: array
+          description: A list of key names as a simple array of strings. The tags with matching keys are removed from the
+            specified user.
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postuntaguser
+        method: POST
+        description: Removes the specified tags from the user. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+          IAM resources</a> in the <i>IAM User Guide</i>.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-untaguser-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagUser. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-untaguser
+      name: action-untaguser
+      description: 'REST surface for #Action=UntagUser.'
+      operations:
+      - method: GET
+        name: getuntaguser
+        description: Removes the specified tags from the user. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+          IAM resources</a> in the <i>IAM User Guide</i>.
+        call: aws-iam-action-untaguser.getuntaguser
+        with:
+          UserName: rest.UserName
+          TagKeys: rest.TagKeys
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postuntaguser
+        description: Removes the specified tags from the user. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+          IAM resources</a> in the <i>IAM User Guide</i>.
+        call: aws-iam-action-untaguser.postuntaguser
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-untaguser-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UntagUser. One
+      tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: removes-specified-tags-user-more
+      description: Removes the specified tags from the user. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+        IAM resources</a> in the <i>IAM User Guide</i>.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-untaguser.getuntaguser
+      with:
+        UserName: tools.UserName
+        TagKeys: tools.TagKeys
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: removes-specified-tags-user-more-2
+      description: Removes the specified tags from the user. For more information about tagging, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html">Tagging
+        IAM resources</a> in the <i>IAM User Guide</i>.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-untaguser.postuntaguser
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

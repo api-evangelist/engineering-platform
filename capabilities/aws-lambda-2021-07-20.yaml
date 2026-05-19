@@ -1,0 +1,149 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform AWS Lambda — 2021 07 20
+  description: 'APIs.io Engineering Platform AWS Lambda — 2021 07 20. 2 operations. Lead operation: 2021 07 20. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - 2021 07 20
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-lambda-2021-07-20
+    baseUri: http://lambda.{region}.amazonaws.com
+    description: APIs.io Engineering Platform AWS Lambda — 2021 07 20 business capability. Self-contained, no shared references.
+    resources:
+    - name: 2021-07-20-functions-FunctionName-runtime-management-config
+      path: /2021-07-20/functions/{FunctionName}/runtime-management-config
+      operations:
+      - name: getruntimemanagementconfig
+        method: GET
+        description: Retrieves the runtime management configuration for a function's version. If the runtime update mode is
+          <b>Manual</b>, this includes the ARN of the runtime version and the runtime update mode. If the runtime update mode
+          is <b>Auto</b> or <b>
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: FunctionName
+          in: path
+          type: string
+          description: <p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function
+            name</b> â€“ <code>my-function</code>.</p> </li> <l
+          required: true
+        - name: Qualifier
+          in: query
+          type: string
+          description: Specify a version of the function. This can be <code>$LATEST</code> or a published version number.
+            If no value is specified, the configuration for the <code>$LA
+      - name: putruntimemanagementconfig
+        method: PUT
+        description: Sets the runtime management configuration for a function's version. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html">Runtime
+          updates</a>.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: FunctionName
+          in: path
+          type: string
+          description: <p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function
+            name</b> â€“ <code>my-function</code>.</p> </li> <l
+          required: true
+        - name: Qualifier
+          in: query
+          type: string
+          description: Specify a version of the function. This can be <code>$LATEST</code> or a published version number.
+            If no value is specified, the configuration for the <code>$LA
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-lambda-2021-07-20-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform AWS Lambda — 2021 07 20. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/2021-07-20/functions/{functionname}/runtime-management-config
+      name: 2021-07-20-functions-functionname-runtime-management-config
+      description: REST surface for 2021-07-20-functions-FunctionName-runtime-management-config.
+      operations:
+      - method: GET
+        name: getruntimemanagementconfig
+        description: Retrieves the runtime management configuration for a function's version. If the runtime update mode is
+          <b>Manual</b>, this includes the ARN of the runtime version and the runtime update mode. If the runtime update mode
+          is <b>Auto</b> or <b>
+        call: aws-lambda-2021-07-20.getruntimemanagementconfig
+        with:
+          FunctionName: rest.FunctionName
+          Qualifier: rest.Qualifier
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: putruntimemanagementconfig
+        description: Sets the runtime management configuration for a function's version. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html">Runtime
+          updates</a>.
+        call: aws-lambda-2021-07-20.putruntimemanagementconfig
+        with:
+          FunctionName: rest.FunctionName
+          Qualifier: rest.Qualifier
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-lambda-2021-07-20-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform AWS Lambda — 2021 07 20. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: retrieves-runtime-management-configuration-function-s
+      description: Retrieves the runtime management configuration for a function's version. If the runtime update mode is
+        <b>Manual</b>, this includes the ARN of the runtime version and the runtime update mode. If the runtime update mode
+        is <b>Auto</b> or <b>
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-lambda-2021-07-20.getruntimemanagementconfig
+      with:
+        FunctionName: tools.FunctionName
+        Qualifier: tools.Qualifier
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: sets-runtime-management-configuration-function-s
+      description: Sets the runtime management configuration for a function's version. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html">Runtime
+        updates</a>.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: aws-lambda-2021-07-20.putruntimemanagementconfig
+      with:
+        FunctionName: tools.FunctionName
+        Qualifier: tools.Qualifier
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

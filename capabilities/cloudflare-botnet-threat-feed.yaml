@@ -1,0 +1,226 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Botnet Threat Feed
+  description: 'APIs.io Engineering Platform Cloudflare API — Botnet Threat Feed. 4 operations. Lead operation: APIs.io Engineering
+    Platform Get daily report. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Botnet Threat Feed
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-botnet-threat-feed
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Botnet Threat Feed business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-botnet_feed-asn-asn_id-day_report
+      path: /accounts/{account_id}/botnet_feed/asn/{asn_id}/day_report
+      operations:
+      - name: botnetthreatfeedgetdayreport
+        method: GET
+        description: APIs.io Engineering Platform Get daily report
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: asn_id
+          in: path
+          type: string
+          required: true
+        - name: date
+          in: query
+          type: string
+    - name: accounts-account_id-botnet_feed-asn-asn_id-full_report
+      path: /accounts/{account_id}/botnet_feed/asn/{asn_id}/full_report
+      operations:
+      - name: botnetthreatfeedgetfullreport
+        method: GET
+        description: APIs.io Engineering Platform Get full report
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: asn_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-botnet_feed-configs-asn
+      path: /accounts/{account_id}/botnet_feed/configs/asn
+      operations:
+      - name: botnetthreatfeedlistasn
+        method: GET
+        description: APIs.io Engineering Platform Get list of ASNs
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-botnet_feed-configs-asn-asn_id
+      path: /accounts/{account_id}/botnet_feed/configs/asn/{asn_id}
+      operations:
+      - name: botnetthreatfeeddeleteasn
+        method: DELETE
+        description: APIs.io Engineering Platform Delete an ASN
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: asn_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-botnet-threat-feed-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Botnet Threat Feed. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/botnet-feed/asn/{asn-id}/day-report
+      name: accounts-account-id-botnet-feed-asn-asn-id-day-report
+      description: REST surface for accounts-account_id-botnet_feed-asn-asn_id-day_report.
+      operations:
+      - method: GET
+        name: botnetthreatfeedgetdayreport
+        description: APIs.io Engineering Platform Get daily report
+        call: cloudflare-botnet-threat-feed.botnetthreatfeedgetdayreport
+        with:
+          account_id: rest.account_id
+          asn_id: rest.asn_id
+          date: rest.date
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/botnet-feed/asn/{asn-id}/full-report
+      name: accounts-account-id-botnet-feed-asn-asn-id-full-report
+      description: REST surface for accounts-account_id-botnet_feed-asn-asn_id-full_report.
+      operations:
+      - method: GET
+        name: botnetthreatfeedgetfullreport
+        description: APIs.io Engineering Platform Get full report
+        call: cloudflare-botnet-threat-feed.botnetthreatfeedgetfullreport
+        with:
+          account_id: rest.account_id
+          asn_id: rest.asn_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/botnet-feed/configs/asn
+      name: accounts-account-id-botnet-feed-configs-asn
+      description: REST surface for accounts-account_id-botnet_feed-configs-asn.
+      operations:
+      - method: GET
+        name: botnetthreatfeedlistasn
+        description: APIs.io Engineering Platform Get list of ASNs
+        call: cloudflare-botnet-threat-feed.botnetthreatfeedlistasn
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/botnet-feed/configs/asn/{asn-id}
+      name: accounts-account-id-botnet-feed-configs-asn-asn-id
+      description: REST surface for accounts-account_id-botnet_feed-configs-asn-asn_id.
+      operations:
+      - method: DELETE
+        name: botnetthreatfeeddeleteasn
+        description: APIs.io Engineering Platform Delete an ASN
+        call: cloudflare-botnet-threat-feed.botnetthreatfeeddeleteasn
+        with:
+          account_id: rest.account_id
+          asn_id: rest.asn_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-botnet-threat-feed-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Botnet Threat Feed. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-daily
+      description: APIs.io Engineering Platform Get daily report
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-botnet-threat-feed.botnetthreatfeedgetdayreport
+      with:
+        account_id: tools.account_id
+        asn_id: tools.asn_id
+        date: tools.date
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-full
+      description: APIs.io Engineering Platform Get full report
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-botnet-threat-feed.botnetthreatfeedgetfullreport
+      with:
+        account_id: tools.account_id
+        asn_id: tools.asn_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-list
+      description: APIs.io Engineering Platform Get list of ASNs
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-botnet-threat-feed.botnetthreatfeedlistasn
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-asn
+      description: APIs.io Engineering Platform Delete an ASN
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-botnet-threat-feed.botnetthreatfeeddeleteasn
+      with:
+        account_id: tools.account_id
+        asn_id: tools.asn_id
+      outputParameters:
+      - type: object
+        mapping: $.

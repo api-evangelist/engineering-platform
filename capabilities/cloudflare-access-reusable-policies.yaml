@@ -1,0 +1,256 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Access Reusable Policies
+  description: 'APIs.io Engineering Platform Cloudflare API — Access Reusable Policies. 5 operations. Lead operation: APIs.io
+    Engineering Platform List Access reusable policies. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Access Reusable Policies
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-access-reusable-policies
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Access Reusable Policies business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-access-policies
+      path: /accounts/{account_id}/access/policies
+      operations:
+      - name: accesspolicieslistaccessreusablepolicies
+        method: GET
+        description: APIs.io Engineering Platform List Access reusable policies
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accesspoliciescreateanaccessreusablepolicy
+        method: POST
+        description: APIs.io Engineering Platform Create an Access reusable policy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-access-policies-policy_id
+      path: /accounts/{account_id}/access/policies/{policy_id}
+      operations:
+      - name: accesspoliciesdeleteanaccessreusablepolicy
+        method: DELETE
+        description: APIs.io Engineering Platform Delete an Access reusable policy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: policy_id
+          in: path
+          type: string
+          required: true
+      - name: accesspoliciesgetanaccessreusablepolicy
+        method: GET
+        description: APIs.io Engineering Platform Get an Access reusable policy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: policy_id
+          in: path
+          type: string
+          required: true
+      - name: accesspoliciesupdateanaccessreusablepolicy
+        method: PUT
+        description: APIs.io Engineering Platform Update an Access reusable policy
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: policy_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-access-reusable-policies-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Access Reusable Policies. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/access/policies
+      name: accounts-account-id-access-policies
+      description: REST surface for accounts-account_id-access-policies.
+      operations:
+      - method: GET
+        name: accesspolicieslistaccessreusablepolicies
+        description: APIs.io Engineering Platform List Access reusable policies
+        call: cloudflare-access-reusable-policies.accesspolicieslistaccessreusablepolicies
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: accesspoliciescreateanaccessreusablepolicy
+        description: APIs.io Engineering Platform Create an Access reusable policy
+        call: cloudflare-access-reusable-policies.accesspoliciescreateanaccessreusablepolicy
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/policies/{policy-id}
+      name: accounts-account-id-access-policies-policy-id
+      description: REST surface for accounts-account_id-access-policies-policy_id.
+      operations:
+      - method: DELETE
+        name: accesspoliciesdeleteanaccessreusablepolicy
+        description: APIs.io Engineering Platform Delete an Access reusable policy
+        call: cloudflare-access-reusable-policies.accesspoliciesdeleteanaccessreusablepolicy
+        with:
+          account_id: rest.account_id
+          policy_id: rest.policy_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: accesspoliciesgetanaccessreusablepolicy
+        description: APIs.io Engineering Platform Get an Access reusable policy
+        call: cloudflare-access-reusable-policies.accesspoliciesgetanaccessreusablepolicy
+        with:
+          account_id: rest.account_id
+          policy_id: rest.policy_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: accesspoliciesupdateanaccessreusablepolicy
+        description: APIs.io Engineering Platform Update an Access reusable policy
+        call: cloudflare-access-reusable-policies.accesspoliciesupdateanaccessreusablepolicy
+        with:
+          account_id: rest.account_id
+          policy_id: rest.policy_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-access-reusable-policies-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Access Reusable Policies. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-access
+      description: APIs.io Engineering Platform List Access reusable policies
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-reusable-policies.accesspolicieslistaccessreusablepolicies
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-access
+      description: APIs.io Engineering Platform Create an Access reusable policy
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-access-reusable-policies.accesspoliciescreateanaccessreusablepolicy
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-access
+      description: APIs.io Engineering Platform Delete an Access reusable policy
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-access-reusable-policies.accesspoliciesdeleteanaccessreusablepolicy
+      with:
+        account_id: tools.account_id
+        policy_id: tools.policy_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-access
+      description: APIs.io Engineering Platform Get an Access reusable policy
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-reusable-policies.accesspoliciesgetanaccessreusablepolicy
+      with:
+        account_id: tools.account_id
+        policy_id: tools.policy_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-access
+      description: APIs.io Engineering Platform Update an Access reusable policy
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-reusable-policies.accesspoliciesupdateanaccessreusablepolicy
+      with:
+        account_id: tools.account_id
+        policy_id: tools.policy_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

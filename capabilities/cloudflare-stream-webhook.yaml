@@ -1,0 +1,162 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Stream Webhook
+  description: 'APIs.io Engineering Platform Cloudflare API — Stream Webhook. 3 operations. Lead operation: APIs.io Engineering
+    Platform Delete webhooks. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Stream Webhook
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-stream-webhook
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Stream Webhook business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-stream-webhook
+      path: /accounts/{account_id}/stream/webhook
+      operations:
+      - name: streamwebhookdeletewebhooks
+        method: DELETE
+        description: APIs.io Engineering Platform Delete webhooks
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: streamwebhookviewwebhooks
+        method: GET
+        description: APIs.io Engineering Platform View webhooks
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: streamwebhookcreatewebhooks
+        method: PUT
+        description: APIs.io Engineering Platform Create webhooks
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-stream-webhook-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Stream Webhook. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/stream/webhook
+      name: accounts-account-id-stream-webhook
+      description: REST surface for accounts-account_id-stream-webhook.
+      operations:
+      - method: DELETE
+        name: streamwebhookdeletewebhooks
+        description: APIs.io Engineering Platform Delete webhooks
+        call: cloudflare-stream-webhook.streamwebhookdeletewebhooks
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: streamwebhookviewwebhooks
+        description: APIs.io Engineering Platform View webhooks
+        call: cloudflare-stream-webhook.streamwebhookviewwebhooks
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: streamwebhookcreatewebhooks
+        description: APIs.io Engineering Platform Create webhooks
+        call: cloudflare-stream-webhook.streamwebhookcreatewebhooks
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-stream-webhook-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Stream Webhook. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-delete-webhooks
+      description: APIs.io Engineering Platform Delete webhooks
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-stream-webhook.streamwebhookdeletewebhooks
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-view-webhooks
+      description: APIs.io Engineering Platform View webhooks
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-stream-webhook.streamwebhookviewwebhooks
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-webhooks
+      description: APIs.io Engineering Platform Create webhooks
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-stream-webhook.streamwebhookcreatewebhooks
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

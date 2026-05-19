@@ -1,0 +1,78 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform GitHub v3 REST API — Scim
+  description: 'APIs.io Engineering Platform GitHub v3 REST API — Scim. 1 operations. Lead operation: APIs.io Engineering
+    Platform List provisioned SCIM groups for an enterprise. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Scim
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: github-scim
+    baseUri: ''
+    description: APIs.io Engineering Platform GitHub v3 REST API — Scim business capability. Self-contained, no shared references.
+    resources:
+    - name: scim-v2-enterprises-enterprise-Groups
+      path: /scim/v2/enterprises/{enterprise}/Groups
+      operations:
+      - name: enterpriseadminlistprovisionedgroupsenterprise
+        method: GET
+        description: APIs.io Engineering Platform List provisioned SCIM groups for an enterprise
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: filter
+          in: query
+          type: string
+          description: If specified, only results that match the specified filter will be returned. Multiple filters are not
+            supported. Possible filters are `externalId`, `id`, and `d
+  exposes:
+  - type: rest
+    namespace: github-scim-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform GitHub v3 REST API — Scim. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/scim/v2/enterprises/{enterprise}/groups
+      name: scim-v2-enterprises-enterprise-groups
+      description: REST surface for scim-v2-enterprises-enterprise-Groups.
+      operations:
+      - method: GET
+        name: enterpriseadminlistprovisionedgroupsenterprise
+        description: APIs.io Engineering Platform List provisioned SCIM groups for an enterprise
+        call: github-scim.enterpriseadminlistprovisionedgroupsenterprise
+        with:
+          filter: rest.filter
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: github-scim-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform GitHub v3 REST API — Scim. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-provisioned
+      description: APIs.io Engineering Platform List provisioned SCIM groups for an enterprise
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-scim.enterpriseadminlistprovisionedgroupsenterprise
+      with:
+        filter: tools.filter
+      outputParameters:
+      - type: object
+        mapping: $.

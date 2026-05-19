@@ -1,0 +1,86 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Pages Build Cache
+  description: 'APIs.io Engineering Platform Cloudflare API — Pages Build Cache. 1 operations. Lead operation: APIs.io Engineering
+    Platform Purge build cache. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Pages Build Cache
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-pages-build-cache
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Pages Build Cache business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-pages-projects-project_name-purge_build_cache
+      path: /accounts/{account_id}/pages/projects/{project_name}/purge_build_cache
+      operations:
+      - name: pagespurgebuildcache
+        method: POST
+        description: APIs.io Engineering Platform Purge build cache
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: project_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-pages-build-cache-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Pages Build Cache. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/pages/projects/{project-name}/purge-build-cache
+      name: accounts-account-id-pages-projects-project-name-purge-build-cache
+      description: REST surface for accounts-account_id-pages-projects-project_name-purge_build_cache.
+      operations:
+      - method: POST
+        name: pagespurgebuildcache
+        description: APIs.io Engineering Platform Purge build cache
+        call: cloudflare-pages-build-cache.pagespurgebuildcache
+        with:
+          project_name: rest.project_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-pages-build-cache-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Pages Build Cache. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-purge-build
+      description: APIs.io Engineering Platform Purge build cache
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-pages-build-cache.pagespurgebuildcache
+      with:
+        project_name: tools.project_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

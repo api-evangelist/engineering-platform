@@ -1,0 +1,122 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zero Trust Connectivity Settings
+  description: 'APIs.io Engineering Platform Cloudflare API — Zero Trust Connectivity Settings. 2 operations. Lead operation:
+    APIs.io Engineering Platform Get Zero Trust Connectivity Settings. Self-contained Naftiko capability covering one Engineering
+    Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Zero Trust Connectivity Settings
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zero-trust-connectivity-settings
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zero Trust Connectivity Settings business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-zerotrust-connectivity_settings
+      path: /accounts/{account_id}/zerotrust/connectivity_settings
+      operations:
+      - name: zerotrustaccountsgetconnectivitysettings
+        method: GET
+        description: APIs.io Engineering Platform Get Zero Trust Connectivity Settings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: zerotrustaccountspatchconnectivitysettings
+        method: PATCH
+        description: APIs.io Engineering Platform Updates the Zero Trust Connectivity Settings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zero-trust-connectivity-settings-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Connectivity Settings. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/zerotrust/connectivity-settings
+      name: accounts-account-id-zerotrust-connectivity-settings
+      description: REST surface for accounts-account_id-zerotrust-connectivity_settings.
+      operations:
+      - method: GET
+        name: zerotrustaccountsgetconnectivitysettings
+        description: APIs.io Engineering Platform Get Zero Trust Connectivity Settings
+        call: cloudflare-zero-trust-connectivity-settings.zerotrustaccountsgetconnectivitysettings
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: zerotrustaccountspatchconnectivitysettings
+        description: APIs.io Engineering Platform Updates the Zero Trust Connectivity Settings
+        call: cloudflare-zero-trust-connectivity-settings.zerotrustaccountspatchconnectivitysettings
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zero-trust-connectivity-settings-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zero Trust Connectivity Settings. One tool
+      per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-zero
+      description: APIs.io Engineering Platform Get Zero Trust Connectivity Settings
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-connectivity-settings.zerotrustaccountsgetconnectivitysettings
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-updates-zero
+      description: APIs.io Engineering Platform Updates the Zero Trust Connectivity Settings
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-zero-trust-connectivity-settings.zerotrustaccountspatchconnectivitysettings
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

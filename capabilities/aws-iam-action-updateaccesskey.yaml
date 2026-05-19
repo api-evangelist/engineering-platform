@@ -1,0 +1,170 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateAccessKey'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateAccessKey. 2 operations. Lead
+    operation: #Action=UpdateAccessKey. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=UpdateAccessKey'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-updateaccesskey
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateAccessKey business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=UpdateAccessKey'
+      path: /#Action=UpdateAccessKey
+      operations:
+      - name: getupdateaccesskey
+        method: GET
+        description: '<p>Changes the status of the specified access key from Active to Inactive, or vice versa. This operation
+          can be used to disable a user''s key as part of a key rotation workflow.</p> <p>If the <code>UserName</code> is
+          not specified, the user '
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: UserName
+          in: query
+          type: string
+          description: <p>The name of the user whose key you want to update.</p> <p>This parameter allows (through its <a
+            href="http://wikipedia.org/wiki/regex">regex pattern</a>) a s
+        - name: AccessKeyId
+          in: query
+          type: string
+          description: <p>The access key ID of the secret access key you want to update.</p> <p>This parameter allows (through
+            its <a href="http://wikipedia.org/wiki/regex">regex patt
+          required: true
+        - name: Status
+          in: query
+          type: string
+          description: 'The status you want to assign to the secret access key. <code>Active</code> means that the key can
+            be used for programmatic calls to Amazon Web Services, while '
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postupdateaccesskey
+        method: POST
+        description: '<p>Changes the status of the specified access key from Active to Inactive, or vice versa. This operation
+          can be used to disable a user''s key as part of a key rotation workflow.</p> <p>If the <code>UserName</code> is
+          not specified, the user '
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-updateaccesskey-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateAccessKey.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-updateaccesskey
+      name: action-updateaccesskey
+      description: 'REST surface for #Action=UpdateAccessKey.'
+      operations:
+      - method: GET
+        name: getupdateaccesskey
+        description: '<p>Changes the status of the specified access key from Active to Inactive, or vice versa. This operation
+          can be used to disable a user''s key as part of a key rotation workflow.</p> <p>If the <code>UserName</code> is
+          not specified, the user '
+        call: aws-iam-action-updateaccesskey.getupdateaccesskey
+        with:
+          UserName: rest.UserName
+          AccessKeyId: rest.AccessKeyId
+          Status: rest.Status
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postupdateaccesskey
+        description: '<p>Changes the status of the specified access key from Active to Inactive, or vice versa. This operation
+          can be used to disable a user''s key as part of a key rotation workflow.</p> <p>If the <code>UserName</code> is
+          not specified, the user '
+        call: aws-iam-action-updateaccesskey.postupdateaccesskey
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-updateaccesskey-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=UpdateAccessKey.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-changes-status-specified-access-key
+      description: '<p>Changes the status of the specified access key from Active to Inactive, or vice versa. This operation
+        can be used to disable a user''s key as part of a key rotation workflow.</p> <p>If the <code>UserName</code> is not
+        specified, the user '
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-updateaccesskey.getupdateaccesskey
+      with:
+        UserName: tools.UserName
+        AccessKeyId: tools.AccessKeyId
+        Status: tools.Status
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-changes-status-specified-access-key-2
+      description: '<p>Changes the status of the specified access key from Active to Inactive, or vice versa. This operation
+        can be used to disable a user''s key as part of a key rotation workflow.</p> <p>If the <code>UserName</code> is not
+        specified, the user '
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-updateaccesskey.postupdateaccesskey
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,75 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform AWS Lambda — 2016 08 19
+  description: 'APIs.io Engineering Platform AWS Lambda — 2016 08 19. 1 operations. Lead operation: 2016 08 19. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - 2016 08 19
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-lambda-2016-08-19
+    baseUri: http://lambda.{region}.amazonaws.com
+    description: APIs.io Engineering Platform AWS Lambda — 2016 08 19 business capability. Self-contained, no shared references.
+    resources:
+    - name: 2016-08-19-account-settings
+      path: /2016-08-19/account-settings/
+      operations:
+      - name: getaccountsettings
+        method: GET
+        description: Retrieves details about your account's <a href="https://docs.aws.amazon.com/lambda/latest/dg/limits.html">limits</a>
+          and usage in an Amazon Web Services Region.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-lambda-2016-08-19-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform AWS Lambda — 2016 08 19. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/2016-08-19/account-settings
+      name: 2016-08-19-account-settings
+      description: REST surface for 2016-08-19-account-settings.
+      operations:
+      - method: GET
+        name: getaccountsettings
+        description: Retrieves details about your account's <a href="https://docs.aws.amazon.com/lambda/latest/dg/limits.html">limits</a>
+          and usage in an Amazon Web Services Region.
+        call: aws-lambda-2016-08-19.getaccountsettings
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-lambda-2016-08-19-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform AWS Lambda — 2016 08 19. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: retrieves-details-about-your-account-s
+      description: Retrieves details about your account's <a href="https://docs.aws.amazon.com/lambda/latest/dg/limits.html">limits</a>
+        and usage in an Amazon Web Services Region.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-lambda-2016-08-19.getaccountsettings
+      outputParameters:
+      - type: object
+        mapping: $.

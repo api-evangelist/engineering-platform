@@ -1,0 +1,223 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Account Subscriptions
+  description: 'APIs.io Engineering Platform Cloudflare API — Account Subscriptions. 4 operations. Lead operation: APIs.io
+    Engineering Platform List Subscriptions. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Account Subscriptions
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-account-subscriptions
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Account Subscriptions business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-subscriptions
+      path: /accounts/{account_id}/subscriptions
+      operations:
+      - name: accountsubscriptionslistsubscriptions
+        method: GET
+        description: APIs.io Engineering Platform List Subscriptions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accountsubscriptionscreatesubscription
+        method: POST
+        description: APIs.io Engineering Platform Create Subscription
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-subscriptions-subscription_identifier
+      path: /accounts/{account_id}/subscriptions/{subscription_identifier}
+      operations:
+      - name: accountsubscriptionsdeletesubscription
+        method: DELETE
+        description: APIs.io Engineering Platform Delete Subscription
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: subscription_identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: accountsubscriptionsupdatesubscription
+        method: PUT
+        description: APIs.io Engineering Platform Update Subscription
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: subscription_identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-account-subscriptions-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Account Subscriptions. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/subscriptions
+      name: accounts-account-id-subscriptions
+      description: REST surface for accounts-account_id-subscriptions.
+      operations:
+      - method: GET
+        name: accountsubscriptionslistsubscriptions
+        description: APIs.io Engineering Platform List Subscriptions
+        call: cloudflare-account-subscriptions.accountsubscriptionslistsubscriptions
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: accountsubscriptionscreatesubscription
+        description: APIs.io Engineering Platform Create Subscription
+        call: cloudflare-account-subscriptions.accountsubscriptionscreatesubscription
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/subscriptions/{subscription-identifier}
+      name: accounts-account-id-subscriptions-subscription-identifier
+      description: REST surface for accounts-account_id-subscriptions-subscription_identifier.
+      operations:
+      - method: DELETE
+        name: accountsubscriptionsdeletesubscription
+        description: APIs.io Engineering Platform Delete Subscription
+        call: cloudflare-account-subscriptions.accountsubscriptionsdeletesubscription
+        with:
+          subscription_identifier: rest.subscription_identifier
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: accountsubscriptionsupdatesubscription
+        description: APIs.io Engineering Platform Update Subscription
+        call: cloudflare-account-subscriptions.accountsubscriptionsupdatesubscription
+        with:
+          subscription_identifier: rest.subscription_identifier
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-account-subscriptions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Account Subscriptions. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-subscriptions
+      description: APIs.io Engineering Platform List Subscriptions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-account-subscriptions.accountsubscriptionslistsubscriptions
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-subscription
+      description: APIs.io Engineering Platform Create Subscription
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-account-subscriptions.accountsubscriptionscreatesubscription
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-subscription
+      description: APIs.io Engineering Platform Delete Subscription
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-account-subscriptions.accountsubscriptionsdeletesubscription
+      with:
+        subscription_identifier: tools.subscription_identifier
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-subscription
+      description: APIs.io Engineering Platform Update Subscription
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-account-subscriptions.accountsubscriptionsupdatesubscription
+      with:
+        subscription_identifier: tools.subscription_identifier
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

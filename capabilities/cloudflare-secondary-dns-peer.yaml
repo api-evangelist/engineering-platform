@@ -1,0 +1,262 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Secondary DNS (Peer)
+  description: 'APIs.io Engineering Platform Cloudflare API — Secondary DNS (Peer). 5 operations. Lead operation: APIs.io
+    Engineering Platform List Peers. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Secondary DNS (Peer)
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-secondary-dns-peer
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Secondary DNS (Peer) business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-secondary_dns-peers
+      path: /accounts/{account_id}/secondary_dns/peers
+      operations:
+      - name: secondarydnspeerlistpeers
+        method: GET
+        description: APIs.io Engineering Platform List Peers
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: secondarydnspeercreatepeer
+        method: POST
+        description: APIs.io Engineering Platform Create Peer
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-secondary_dns-peers-peer_id
+      path: /accounts/{account_id}/secondary_dns/peers/{peer_id}
+      operations:
+      - name: secondarydnspeerdeletepeer
+        method: DELETE
+        description: APIs.io Engineering Platform Delete Peer
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: peer_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: secondarydnspeerpeerdetails
+        method: GET
+        description: APIs.io Engineering Platform Peer Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: peer_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: secondarydnspeerupdatepeer
+        method: PUT
+        description: APIs.io Engineering Platform Update Peer
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: peer_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-secondary-dns-peer-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Secondary DNS (Peer). One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/secondary-dns/peers
+      name: accounts-account-id-secondary-dns-peers
+      description: REST surface for accounts-account_id-secondary_dns-peers.
+      operations:
+      - method: GET
+        name: secondarydnspeerlistpeers
+        description: APIs.io Engineering Platform List Peers
+        call: cloudflare-secondary-dns-peer.secondarydnspeerlistpeers
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: secondarydnspeercreatepeer
+        description: APIs.io Engineering Platform Create Peer
+        call: cloudflare-secondary-dns-peer.secondarydnspeercreatepeer
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/secondary-dns/peers/{peer-id}
+      name: accounts-account-id-secondary-dns-peers-peer-id
+      description: REST surface for accounts-account_id-secondary_dns-peers-peer_id.
+      operations:
+      - method: DELETE
+        name: secondarydnspeerdeletepeer
+        description: APIs.io Engineering Platform Delete Peer
+        call: cloudflare-secondary-dns-peer.secondarydnspeerdeletepeer
+        with:
+          peer_id: rest.peer_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: secondarydnspeerpeerdetails
+        description: APIs.io Engineering Platform Peer Details
+        call: cloudflare-secondary-dns-peer.secondarydnspeerpeerdetails
+        with:
+          peer_id: rest.peer_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: secondarydnspeerupdatepeer
+        description: APIs.io Engineering Platform Update Peer
+        call: cloudflare-secondary-dns-peer.secondarydnspeerupdatepeer
+        with:
+          peer_id: rest.peer_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-secondary-dns-peer-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Secondary DNS (Peer). One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-peers
+      description: APIs.io Engineering Platform List Peers
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-peer.secondarydnspeerlistpeers
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-peer
+      description: APIs.io Engineering Platform Create Peer
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-secondary-dns-peer.secondarydnspeercreatepeer
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-peer
+      description: APIs.io Engineering Platform Delete Peer
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-secondary-dns-peer.secondarydnspeerdeletepeer
+      with:
+        peer_id: tools.peer_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-peer-details
+      description: APIs.io Engineering Platform Peer Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-peer.secondarydnspeerpeerdetails
+      with:
+        peer_id: tools.peer_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-peer
+      description: APIs.io Engineering Platform Update Peer
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-secondary-dns-peer.secondarydnspeerupdatepeer
+      with:
+        peer_id: tools.peer_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

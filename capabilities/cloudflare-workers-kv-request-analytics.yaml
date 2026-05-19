@@ -1,0 +1,86 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Workers KV Request Analytics
+  description: 'APIs.io Engineering Platform Cloudflare API — Workers KV Request Analytics. 1 operations. Lead operation:
+    APIs.io Engineering Platform Query Request Analytics. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Workers KV Request Analytics
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-workers-kv-request-analytics
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Workers KV Request Analytics business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-storage-analytics
+      path: /accounts/{account_id}/storage/analytics
+      operations:
+      - name: workerskvrequestanalyticsqueryrequestanalytics
+        method: GET
+        description: APIs.io Engineering Platform Query Request Analytics
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: query
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-workers-kv-request-analytics-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Workers KV Request Analytics. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/storage/analytics
+      name: accounts-account-id-storage-analytics
+      description: REST surface for accounts-account_id-storage-analytics.
+      operations:
+      - method: GET
+        name: workerskvrequestanalyticsqueryrequestanalytics
+        description: APIs.io Engineering Platform Query Request Analytics
+        call: cloudflare-workers-kv-request-analytics.workerskvrequestanalyticsqueryrequestanalytics
+        with:
+          account_id: rest.account_id
+          query: rest.query
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-workers-kv-request-analytics-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Workers KV Request Analytics. One tool per
+      consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-query-request
+      description: APIs.io Engineering Platform Query Request Analytics
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-workers-kv-request-analytics.workerskvrequestanalyticsqueryrequestanalytics
+      with:
+        account_id: tools.account_id
+        query: tools.query
+      outputParameters:
+      - type: object
+        mapping: $.

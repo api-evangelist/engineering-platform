@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Cloudflare IPs
+  description: 'APIs.io Engineering Platform Cloudflare API — Cloudflare IPs. 1 operations. Lead operation: APIs.io Engineering
+    Platform Cloudflare/JD Cloud IP Details. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Cloudflare IPs
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-cloudflare-ips
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Cloudflare IPs business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: ips
+      path: /ips
+      operations:
+      - name: cloudflareipscloudflareipdetails
+        method: GET
+        description: APIs.io Engineering Platform Cloudflare/JD Cloud IP Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: networks
+          in: query
+          type: string
+          description: Specified as `jdcloud` to list IPs used by JD Cloud data centers.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-cloudflare-ips-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Cloudflare IPs. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/ips
+      name: ips
+      description: REST surface for ips.
+      operations:
+      - method: GET
+        name: cloudflareipscloudflareipdetails
+        description: APIs.io Engineering Platform Cloudflare/JD Cloud IP Details
+        call: cloudflare-cloudflare-ips.cloudflareipscloudflareipdetails
+        with:
+          networks: rest.networks
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-cloudflare-ips-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Cloudflare IPs. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-cloudflare-jd
+      description: APIs.io Engineering Platform Cloudflare/JD Cloud IP Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-cloudflare-ips.cloudflareipscloudflareipdetails
+      with:
+        networks: tools.networks
+      outputParameters:
+      - type: object
+        mapping: $.

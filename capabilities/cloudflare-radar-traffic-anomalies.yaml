@@ -1,0 +1,198 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar Traffic Anomalies
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar Traffic Anomalies. 2 operations. Lead operation: APIs.io
+    Engineering Platform Get latest Internet traffic anomalies.. Self-contained Naftiko capability covering one Engineering
+    Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Radar Traffic Anomalies
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-traffic-anomalies
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar Traffic Anomalies business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: radar-traffic_anomalies
+      path: /radar/traffic_anomalies
+      operations:
+      - name: radargettrafficanomalies
+        method: GET
+        description: APIs.io Engineering Platform Get latest Internet traffic anomalies.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: offset
+          in: query
+          type: integer
+          description: Number of objects to skip before grabbing results.
+        - name: dateRange
+          in: query
+          type: string
+          description: Shorthand date ranges for the last X days - use when you don't need specific start and end dates.
+        - name: dateStart
+          in: query
+          type: string
+          description: Start of the date range (inclusive).
+        - name: dateEnd
+          in: query
+          type: string
+          description: End of the date range (inclusive).
+        - name: status
+          in: query
+          type: string
+        - name: asn
+          in: query
+          type: integer
+          description: Single ASN as integer.
+        - name: location
+          in: query
+          type: string
+          description: Location Alpha2 code.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-traffic_anomalies-locations
+      path: /radar/traffic_anomalies/locations
+      operations:
+      - name: radargettrafficanomaliestop
+        method: GET
+        description: APIs.io Engineering Platform Get top locations by total traffic anomalies generated.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: dateRange
+          in: query
+          type: string
+          description: Shorthand date ranges for the last X days - use when you don't need specific start and end dates.
+        - name: dateStart
+          in: query
+          type: string
+          description: Start of the date range (inclusive).
+        - name: dateEnd
+          in: query
+          type: string
+          description: End of the date range (inclusive).
+        - name: status
+          in: query
+          type: string
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-traffic-anomalies-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar Traffic Anomalies. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/traffic-anomalies
+      name: radar-traffic-anomalies
+      description: REST surface for radar-traffic_anomalies.
+      operations:
+      - method: GET
+        name: radargettrafficanomalies
+        description: APIs.io Engineering Platform Get latest Internet traffic anomalies.
+        call: cloudflare-radar-traffic-anomalies.radargettrafficanomalies
+        with:
+          limit: rest.limit
+          offset: rest.offset
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          status: rest.status
+          asn: rest.asn
+          location: rest.location
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/traffic-anomalies/locations
+      name: radar-traffic-anomalies-locations
+      description: REST surface for radar-traffic_anomalies-locations.
+      operations:
+      - method: GET
+        name: radargettrafficanomaliestop
+        description: APIs.io Engineering Platform Get top locations by total traffic anomalies generated.
+        call: cloudflare-radar-traffic-anomalies.radargettrafficanomaliestop
+        with:
+          limit: rest.limit
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          status: rest.status
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-traffic-anomalies-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar Traffic Anomalies. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-latest
+      description: APIs.io Engineering Platform Get latest Internet traffic anomalies.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-traffic-anomalies.radargettrafficanomalies
+      with:
+        limit: tools.limit
+        offset: tools.offset
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        status: tools.status
+        asn: tools.asn
+        location: tools.location
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-top
+      description: APIs.io Engineering Platform Get top locations by total traffic anomalies generated.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-traffic-anomalies.radargettrafficanomaliestop
+      with:
+        limit: tools.limit
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        status: tools.status
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.

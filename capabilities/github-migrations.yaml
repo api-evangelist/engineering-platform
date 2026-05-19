@@ -1,0 +1,405 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform GitHub v3 REST API — Migrations
+  description: 'APIs.io Engineering Platform GitHub v3 REST API — Migrations. 11 operations. Lead operation: APIs.io Engineering
+    Platform List organization migrations. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Migrations
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: github-migrations
+    baseUri: ''
+    description: APIs.io Engineering Platform GitHub v3 REST API — Migrations business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: orgs-org-migrations
+      path: /orgs/{org}/migrations
+      operations:
+      - name: migrationslistfororg
+        method: GET
+        description: APIs.io Engineering Platform List organization migrations
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: exclude
+          in: query
+          type: array
+          description: Exclude attributes from the API response to improve performance
+      - name: migrationsstartfororg
+        method: POST
+        description: APIs.io Engineering Platform Start an organization migration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: orgs-org-migrations-migration_id
+      path: /orgs/{org}/migrations/{migration_id}
+      operations:
+      - name: migrationsgetstatusfororg
+        method: GET
+        description: APIs.io Engineering Platform Get an organization migration status
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: exclude
+          in: query
+          type: array
+          description: Exclude attributes from the API response to improve performance
+    - name: orgs-org-migrations-migration_id-archive
+      path: /orgs/{org}/migrations/{migration_id}/archive
+      operations:
+      - name: migrationsdownloadarchivefororg
+        method: GET
+        description: APIs.io Engineering Platform Download an organization migration archive
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: migrationsdeletearchivefororg
+        method: DELETE
+        description: APIs.io Engineering Platform Delete an organization migration archive
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: orgs-org-migrations-migration_id-repos-repo_name-lock
+      path: /orgs/{org}/migrations/{migration_id}/repos/{repo_name}/lock
+      operations:
+      - name: migrationsunlockrepofororg
+        method: DELETE
+        description: APIs.io Engineering Platform Unlock an organization repository
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: orgs-org-migrations-migration_id-repositories
+      path: /orgs/{org}/migrations/{migration_id}/repositories
+      operations:
+      - name: migrationslistreposfororg
+        method: GET
+        description: APIs.io Engineering Platform List repositories in an organization migration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: user-migrations
+      path: /user/migrations
+      operations:
+      - name: migrationslistforauthenticateduser
+        method: GET
+        description: APIs.io Engineering Platform List user migrations
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: migrationsstartforauthenticateduser
+        method: POST
+        description: APIs.io Engineering Platform Start a user migration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: user-migrations-migration_id-archive
+      path: /user/migrations/{migration_id}/archive
+      operations:
+      - name: migrationsgetarchiveforauthenticateduser
+        method: GET
+        description: APIs.io Engineering Platform Download a user migration archive
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: user-migrations-migration_id-repositories
+      path: /user/migrations/{migration_id}/repositories
+      operations:
+      - name: migrationslistreposforauthenticateduser
+        method: GET
+        description: APIs.io Engineering Platform List repositories for a user migration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+  exposes:
+  - type: rest
+    namespace: github-migrations-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform GitHub v3 REST API — Migrations. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/orgs/{org}/migrations
+      name: orgs-org-migrations
+      description: REST surface for orgs-org-migrations.
+      operations:
+      - method: GET
+        name: migrationslistfororg
+        description: APIs.io Engineering Platform List organization migrations
+        call: github-migrations.migrationslistfororg
+        with:
+          exclude: rest.exclude
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: migrationsstartfororg
+        description: APIs.io Engineering Platform Start an organization migration
+        call: github-migrations.migrationsstartfororg
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/orgs/{org}/migrations/{migration-id}
+      name: orgs-org-migrations-migration-id
+      description: REST surface for orgs-org-migrations-migration_id.
+      operations:
+      - method: GET
+        name: migrationsgetstatusfororg
+        description: APIs.io Engineering Platform Get an organization migration status
+        call: github-migrations.migrationsgetstatusfororg
+        with:
+          exclude: rest.exclude
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/orgs/{org}/migrations/{migration-id}/archive
+      name: orgs-org-migrations-migration-id-archive
+      description: REST surface for orgs-org-migrations-migration_id-archive.
+      operations:
+      - method: GET
+        name: migrationsdownloadarchivefororg
+        description: APIs.io Engineering Platform Download an organization migration archive
+        call: github-migrations.migrationsdownloadarchivefororg
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: migrationsdeletearchivefororg
+        description: APIs.io Engineering Platform Delete an organization migration archive
+        call: github-migrations.migrationsdeletearchivefororg
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/orgs/{org}/migrations/{migration-id}/repos/{repo-name}/lock
+      name: orgs-org-migrations-migration-id-repos-repo-name-lock
+      description: REST surface for orgs-org-migrations-migration_id-repos-repo_name-lock.
+      operations:
+      - method: DELETE
+        name: migrationsunlockrepofororg
+        description: APIs.io Engineering Platform Unlock an organization repository
+        call: github-migrations.migrationsunlockrepofororg
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/orgs/{org}/migrations/{migration-id}/repositories
+      name: orgs-org-migrations-migration-id-repositories
+      description: REST surface for orgs-org-migrations-migration_id-repositories.
+      operations:
+      - method: GET
+        name: migrationslistreposfororg
+        description: APIs.io Engineering Platform List repositories in an organization migration
+        call: github-migrations.migrationslistreposfororg
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/migrations
+      name: user-migrations
+      description: REST surface for user-migrations.
+      operations:
+      - method: GET
+        name: migrationslistforauthenticateduser
+        description: APIs.io Engineering Platform List user migrations
+        call: github-migrations.migrationslistforauthenticateduser
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: migrationsstartforauthenticateduser
+        description: APIs.io Engineering Platform Start a user migration
+        call: github-migrations.migrationsstartforauthenticateduser
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/migrations/{migration-id}/archive
+      name: user-migrations-migration-id-archive
+      description: REST surface for user-migrations-migration_id-archive.
+      operations:
+      - method: GET
+        name: migrationsgetarchiveforauthenticateduser
+        description: APIs.io Engineering Platform Download a user migration archive
+        call: github-migrations.migrationsgetarchiveforauthenticateduser
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/migrations/{migration-id}/repositories
+      name: user-migrations-migration-id-repositories
+      description: REST surface for user-migrations-migration_id-repositories.
+      operations:
+      - method: GET
+        name: migrationslistreposforauthenticateduser
+        description: APIs.io Engineering Platform List repositories for a user migration
+        call: github-migrations.migrationslistreposforauthenticateduser
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: github-migrations-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform GitHub v3 REST API — Migrations. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-organization
+      description: APIs.io Engineering Platform List organization migrations
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-migrations.migrationslistfororg
+      with:
+        exclude: tools.exclude
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-start-organization
+      description: APIs.io Engineering Platform Start an organization migration
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: github-migrations.migrationsstartfororg
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-organization
+      description: APIs.io Engineering Platform Get an organization migration status
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-migrations.migrationsgetstatusfororg
+      with:
+        exclude: tools.exclude
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-download-organization
+      description: APIs.io Engineering Platform Download an organization migration archive
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-migrations.migrationsdownloadarchivefororg
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-organization
+      description: APIs.io Engineering Platform Delete an organization migration archive
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: github-migrations.migrationsdeletearchivefororg
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-unlock-organization
+      description: APIs.io Engineering Platform Unlock an organization repository
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: github-migrations.migrationsunlockrepofororg
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-list-repositories
+      description: APIs.io Engineering Platform List repositories in an organization migration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-migrations.migrationslistreposfororg
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-list-user
+      description: APIs.io Engineering Platform List user migrations
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-migrations.migrationslistforauthenticateduser
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-start-user
+      description: APIs.io Engineering Platform Start a user migration
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: github-migrations.migrationsstartforauthenticateduser
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-download-user
+      description: APIs.io Engineering Platform Download a user migration archive
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-migrations.migrationsgetarchiveforauthenticateduser
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-list-repositories-2
+      description: APIs.io Engineering Platform List repositories for a user migration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-migrations.migrationslistreposforauthenticateduser
+      outputParameters:
+      - type: object
+        mapping: $.

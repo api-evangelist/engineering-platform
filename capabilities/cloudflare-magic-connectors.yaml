@@ -1,0 +1,221 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Magic Connectors
+  description: 'APIs.io Engineering Platform Cloudflare API — Magic Connectors. 4 operations. Lead operation: APIs.io Engineering
+    Platform List Connectors. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Magic Connectors
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-magic-connectors
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Magic Connectors business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-magic-connectors
+      path: /accounts/{account_id}/magic/connectors
+      operations:
+      - name: mconnconnectorlist
+        method: GET
+        description: APIs.io Engineering Platform List Connectors
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-magic-connectors-connector_id
+      path: /accounts/{account_id}/magic/connectors/{connector_id}
+      operations:
+      - name: mconnconnectorfetch
+        method: GET
+        description: APIs.io Engineering Platform Fetch Connector
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: connector_id
+          in: path
+          type: string
+          required: true
+      - name: mconnconnectorupdate
+        method: PATCH
+        description: APIs.io Engineering Platform Update Connector
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: connector_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: mconnconnectorreplace
+        method: PUT
+        description: APIs.io Engineering Platform Replace Connector
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: connector_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-magic-connectors-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Magic Connectors. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/magic/connectors
+      name: accounts-account-id-magic-connectors
+      description: REST surface for accounts-account_id-magic-connectors.
+      operations:
+      - method: GET
+        name: mconnconnectorlist
+        description: APIs.io Engineering Platform List Connectors
+        call: cloudflare-magic-connectors.mconnconnectorlist
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/magic/connectors/{connector-id}
+      name: accounts-account-id-magic-connectors-connector-id
+      description: REST surface for accounts-account_id-magic-connectors-connector_id.
+      operations:
+      - method: GET
+        name: mconnconnectorfetch
+        description: APIs.io Engineering Platform Fetch Connector
+        call: cloudflare-magic-connectors.mconnconnectorfetch
+        with:
+          account_id: rest.account_id
+          connector_id: rest.connector_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: mconnconnectorupdate
+        description: APIs.io Engineering Platform Update Connector
+        call: cloudflare-magic-connectors.mconnconnectorupdate
+        with:
+          account_id: rest.account_id
+          connector_id: rest.connector_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: mconnconnectorreplace
+        description: APIs.io Engineering Platform Replace Connector
+        call: cloudflare-magic-connectors.mconnconnectorreplace
+        with:
+          account_id: rest.account_id
+          connector_id: rest.connector_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-magic-connectors-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Magic Connectors. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-connectors
+      description: APIs.io Engineering Platform List Connectors
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-magic-connectors.mconnconnectorlist
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-fetch-connector
+      description: APIs.io Engineering Platform Fetch Connector
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-magic-connectors.mconnconnectorfetch
+      with:
+        account_id: tools.account_id
+        connector_id: tools.connector_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-connector
+      description: APIs.io Engineering Platform Update Connector
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-magic-connectors.mconnconnectorupdate
+      with:
+        account_id: tools.account_id
+        connector_id: tools.connector_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-replace-connector
+      description: APIs.io Engineering Platform Replace Connector
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-magic-connectors.mconnconnectorreplace
+      with:
+        account_id: tools.account_id
+        connector_id: tools.connector_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

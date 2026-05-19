@@ -1,0 +1,67 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform GitHub v3 REST API — Emojis
+  description: 'APIs.io Engineering Platform GitHub v3 REST API — Emojis. 1 operations. Lead operation: APIs.io Engineering
+    Platform Get emojis. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Emojis
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: github-emojis
+    baseUri: ''
+    description: APIs.io Engineering Platform GitHub v3 REST API — Emojis business capability. Self-contained, no shared references.
+    resources:
+    - name: emojis
+      path: /emojis
+      operations:
+      - name: emojisget
+        method: GET
+        description: APIs.io Engineering Platform Get emojis
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+  exposes:
+  - type: rest
+    namespace: github-emojis-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform GitHub v3 REST API — Emojis. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/emojis
+      name: emojis
+      description: REST surface for emojis.
+      operations:
+      - method: GET
+        name: emojisget
+        description: APIs.io Engineering Platform Get emojis
+        call: github-emojis.emojisget
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: github-emojis-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform GitHub v3 REST API — Emojis. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-emojis
+      description: APIs.io Engineering Platform Get emojis
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: github-emojis.emojisget
+      outputParameters:
+      - type: object
+        mapping: $.

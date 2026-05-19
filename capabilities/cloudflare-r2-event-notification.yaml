@@ -1,0 +1,193 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — R2 Event Notification
+  description: 'APIs.io Engineering Platform Cloudflare API — R2 Event Notification. 3 operations. Lead operation: APIs.io
+    Engineering Platform Read Configuration. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - R2 Event Notification
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-r2-event-notification
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — R2 Event Notification business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-event_notifications-r2-bucket_name-configuration
+      path: /accounts/{account_id}/event_notifications/r2/{bucket_name}/configuration
+      operations:
+      - name: eventnotificationgetr2bucketconfigs
+        method: GET
+        description: APIs.io Engineering Platform Read Configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: bucket_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-event_notifications-r2-bucket_name-configuration-queues-queu
+      path: /accounts/{account_id}/event_notifications/r2/{bucket_name}/configuration/queues/{queue_id}
+      operations:
+      - name: eventnotificationdeletequeueconfig
+        method: DELETE
+        description: APIs.io Engineering Platform Delete Configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: queue_id
+          in: path
+          type: string
+          required: true
+        - name: bucket_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: eventnotificationcreatequeueconfig
+        method: PUT
+        description: APIs.io Engineering Platform Create Configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: queue_id
+          in: path
+          type: string
+          required: true
+        - name: bucket_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-r2-event-notification-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — R2 Event Notification. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/event-notifications/r2/{bucket-name}/configuration
+      name: accounts-account-id-event-notifications-r2-bucket-name-configuration
+      description: REST surface for accounts-account_id-event_notifications-r2-bucket_name-configuration.
+      operations:
+      - method: GET
+        name: eventnotificationgetr2bucketconfigs
+        description: APIs.io Engineering Platform Read Configuration
+        call: cloudflare-r2-event-notification.eventnotificationgetr2bucketconfigs
+        with:
+          bucket_name: rest.bucket_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/event-notifications/r2/{bucket-name}/configuration/queues/{queue-id}
+      name: accounts-account-id-event-notifications-r2-bucket-name-configuration-queues-queu
+      description: REST surface for accounts-account_id-event_notifications-r2-bucket_name-configuration-queues-queu.
+      operations:
+      - method: DELETE
+        name: eventnotificationdeletequeueconfig
+        description: APIs.io Engineering Platform Delete Configuration
+        call: cloudflare-r2-event-notification.eventnotificationdeletequeueconfig
+        with:
+          queue_id: rest.queue_id
+          bucket_name: rest.bucket_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: eventnotificationcreatequeueconfig
+        description: APIs.io Engineering Platform Create Configuration
+        call: cloudflare-r2-event-notification.eventnotificationcreatequeueconfig
+        with:
+          queue_id: rest.queue_id
+          bucket_name: rest.bucket_name
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-r2-event-notification-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — R2 Event Notification. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-read-configuration
+      description: APIs.io Engineering Platform Read Configuration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-r2-event-notification.eventnotificationgetr2bucketconfigs
+      with:
+        bucket_name: tools.bucket_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-configuration
+      description: APIs.io Engineering Platform Delete Configuration
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-r2-event-notification.eventnotificationdeletequeueconfig
+      with:
+        queue_id: tools.queue_id
+        bucket_name: tools.bucket_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-configuration
+      description: APIs.io Engineering Platform Create Configuration
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-r2-event-notification.eventnotificationcreatequeueconfig
+      with:
+        queue_id: tools.queue_id
+        bucket_name: tools.bucket_name
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

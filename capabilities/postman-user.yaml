@@ -1,0 +1,72 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API — User
+  description: 'APIs.io Engineering Platform Postman API — User. 1 operations. Lead operation: APIs.io Engineering Platform
+    Get authenticated user. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - User
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-user
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API — User business capability. Self-contained, no shared references.
+    resources:
+    - name: me
+      path: /me
+      operations:
+      - name: getauthenticateduser
+        method: GET
+        description: APIs.io Engineering Platform Get authenticated user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-user-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API — User. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/me
+      name: me
+      description: REST surface for me.
+      operations:
+      - method: GET
+        name: getauthenticateduser
+        description: APIs.io Engineering Platform Get authenticated user
+        call: postman-user.getauthenticateduser
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-user-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API — User. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-authenticated
+      description: APIs.io Engineering Platform Get authenticated user
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-user.getauthenticateduser
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,290 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Tunnel Virtual Network
+  description: 'APIs.io Engineering Platform Cloudflare API — Tunnel Virtual Network. 5 operations. Lead operation: APIs.io
+    Engineering Platform List virtual networks. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Tunnel Virtual Network
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-tunnel-virtual-network
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Tunnel Virtual Network business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-teamnet-virtual_networks
+      path: /accounts/{account_id}/teamnet/virtual_networks
+      operations:
+      - name: tunnelvirtualnetworklistvirtualnetworks
+        method: GET
+        description: APIs.io Engineering Platform List virtual networks
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: id
+          in: query
+          type: string
+        - name: name
+          in: query
+          type: string
+        - name: is_default
+          in: query
+          type: boolean
+        - name: is_deleted
+          in: query
+          type: boolean
+      - name: tunnelvirtualnetworkcreateavirtualnetwork
+        method: POST
+        description: APIs.io Engineering Platform Create a virtual network
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-teamnet-virtual_networks-virtual_network_id
+      path: /accounts/{account_id}/teamnet/virtual_networks/{virtual_network_id}
+      operations:
+      - name: tunnelvirtualnetworkdelete
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a virtual network
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: virtual_network_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: tunnelvirtualnetworkget
+        method: GET
+        description: APIs.io Engineering Platform Get a virtual network
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: virtual_network_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: tunnelvirtualnetworkupdate
+        method: PATCH
+        description: APIs.io Engineering Platform Update a virtual network
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: virtual_network_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-tunnel-virtual-network-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Tunnel Virtual Network. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/teamnet/virtual-networks
+      name: accounts-account-id-teamnet-virtual-networks
+      description: REST surface for accounts-account_id-teamnet-virtual_networks.
+      operations:
+      - method: GET
+        name: tunnelvirtualnetworklistvirtualnetworks
+        description: APIs.io Engineering Platform List virtual networks
+        call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworklistvirtualnetworks
+        with:
+          account_id: rest.account_id
+          id: rest.id
+          name: rest.name
+          is_default: rest.is_default
+          is_deleted: rest.is_deleted
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: tunnelvirtualnetworkcreateavirtualnetwork
+        description: APIs.io Engineering Platform Create a virtual network
+        call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworkcreateavirtualnetwork
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/teamnet/virtual-networks/{virtual-network-id}
+      name: accounts-account-id-teamnet-virtual-networks-virtual-network-id
+      description: REST surface for accounts-account_id-teamnet-virtual_networks-virtual_network_id.
+      operations:
+      - method: DELETE
+        name: tunnelvirtualnetworkdelete
+        description: APIs.io Engineering Platform Delete a virtual network
+        call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworkdelete
+        with:
+          virtual_network_id: rest.virtual_network_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: tunnelvirtualnetworkget
+        description: APIs.io Engineering Platform Get a virtual network
+        call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworkget
+        with:
+          account_id: rest.account_id
+          virtual_network_id: rest.virtual_network_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: tunnelvirtualnetworkupdate
+        description: APIs.io Engineering Platform Update a virtual network
+        call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworkupdate
+        with:
+          account_id: rest.account_id
+          virtual_network_id: rest.virtual_network_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-tunnel-virtual-network-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Tunnel Virtual Network. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-virtual
+      description: APIs.io Engineering Platform List virtual networks
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworklistvirtualnetworks
+      with:
+        account_id: tools.account_id
+        id: tools.id
+        name: tools.name
+        is_default: tools.is_default
+        is_deleted: tools.is_deleted
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-virtual
+      description: APIs.io Engineering Platform Create a virtual network
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworkcreateavirtualnetwork
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-virtual
+      description: APIs.io Engineering Platform Delete a virtual network
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworkdelete
+      with:
+        virtual_network_id: tools.virtual_network_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-virtual
+      description: APIs.io Engineering Platform Get a virtual network
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworkget
+      with:
+        account_id: tools.account_id
+        virtual_network_id: tools.virtual_network_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-virtual
+      description: APIs.io Engineering Platform Update a virtual network
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-tunnel-virtual-network.tunnelvirtualnetworkupdate
+      with:
+        account_id: tools.account_id
+        virtual_network_id: tools.virtual_network_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

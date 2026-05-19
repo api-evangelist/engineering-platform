@@ -1,0 +1,244 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — IP Access Rules for a User
+  description: 'APIs.io Engineering Platform Cloudflare API — IP Access Rules for a User. 4 operations. Lead operation: APIs.io
+    Engineering Platform List IP Access rules. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - IP Access Rules for a User
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-ip-access-rules-for-a-user
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — IP Access Rules for a User business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: user-firewall-access_rules-rules
+      path: /user/firewall/access_rules/rules
+      operations:
+      - name: ipaccessrulesforauserlistipaccessrules
+        method: GET
+        description: APIs.io Engineering Platform List IP Access rules
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: mode
+          in: query
+          type: string
+        - name: configuration.target
+          in: query
+          type: string
+        - name: configuration.value
+          in: query
+          type: string
+        - name: notes
+          in: query
+          type: string
+        - name: match
+          in: query
+          type: string
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+        - name: order
+          in: query
+          type: string
+        - name: direction
+          in: query
+          type: string
+      - name: ipaccessrulesforausercreateanipaccessrule
+        method: POST
+        description: APIs.io Engineering Platform Create an IP Access rule
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: user-firewall-access_rules-rules-identifier
+      path: /user/firewall/access_rules/rules/{identifier}
+      operations:
+      - name: ipaccessrulesforauserdeleteanipaccessrule
+        method: DELETE
+        description: APIs.io Engineering Platform Delete an IP Access rule
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: ipaccessrulesforauserupdateanipaccessrule
+        method: PATCH
+        description: APIs.io Engineering Platform Update an IP Access rule
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-ip-access-rules-for-a-user-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — IP Access Rules for a User. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/user/firewall/access-rules/rules
+      name: user-firewall-access-rules-rules
+      description: REST surface for user-firewall-access_rules-rules.
+      operations:
+      - method: GET
+        name: ipaccessrulesforauserlistipaccessrules
+        description: APIs.io Engineering Platform List IP Access rules
+        call: cloudflare-ip-access-rules-for-a-user.ipaccessrulesforauserlistipaccessrules
+        with:
+          mode: rest.mode
+          configuration.target: rest.configuration.target
+          configuration.value: rest.configuration.value
+          notes: rest.notes
+          match: rest.match
+          page: rest.page
+          per_page: rest.per_page
+          order: rest.order
+          direction: rest.direction
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: ipaccessrulesforausercreateanipaccessrule
+        description: APIs.io Engineering Platform Create an IP Access rule
+        call: cloudflare-ip-access-rules-for-a-user.ipaccessrulesforausercreateanipaccessrule
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/firewall/access-rules/rules/{identifier}
+      name: user-firewall-access-rules-rules-identifier
+      description: REST surface for user-firewall-access_rules-rules-identifier.
+      operations:
+      - method: DELETE
+        name: ipaccessrulesforauserdeleteanipaccessrule
+        description: APIs.io Engineering Platform Delete an IP Access rule
+        call: cloudflare-ip-access-rules-for-a-user.ipaccessrulesforauserdeleteanipaccessrule
+        with:
+          identifier: rest.identifier
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: ipaccessrulesforauserupdateanipaccessrule
+        description: APIs.io Engineering Platform Update an IP Access rule
+        call: cloudflare-ip-access-rules-for-a-user.ipaccessrulesforauserupdateanipaccessrule
+        with:
+          identifier: rest.identifier
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-ip-access-rules-for-a-user-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — IP Access Rules for a User. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-ip
+      description: APIs.io Engineering Platform List IP Access rules
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-access-rules-for-a-user.ipaccessrulesforauserlistipaccessrules
+      with:
+        mode: tools.mode
+        configuration.target: tools.configuration.target
+        configuration.value: tools.configuration.value
+        notes: tools.notes
+        match: tools.match
+        page: tools.page
+        per_page: tools.per_page
+        order: tools.order
+        direction: tools.direction
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-ip
+      description: APIs.io Engineering Platform Create an IP Access rule
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-ip-access-rules-for-a-user.ipaccessrulesforausercreateanipaccessrule
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-ip
+      description: APIs.io Engineering Platform Delete an IP Access rule
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-ip-access-rules-for-a-user.ipaccessrulesforauserdeleteanipaccessrule
+      with:
+        identifier: tools.identifier
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-ip
+      description: APIs.io Engineering Platform Update an IP Access rule
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-access-rules-for-a-user.ipaccessrulesforauserupdateanipaccessrule
+      with:
+        identifier: tools.identifier
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

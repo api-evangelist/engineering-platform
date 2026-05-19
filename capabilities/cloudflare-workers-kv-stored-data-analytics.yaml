@@ -1,0 +1,86 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Workers KV Stored Data Analytics
+  description: 'APIs.io Engineering Platform Cloudflare API — Workers KV Stored Data Analytics. 1 operations. Lead operation:
+    APIs.io Engineering Platform Query Stored Data Analytics. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Workers KV Stored Data Analytics
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-workers-kv-stored-data-analytics
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Workers KV Stored Data Analytics business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-storage-analytics-stored
+      path: /accounts/{account_id}/storage/analytics/stored
+      operations:
+      - name: workerskvstoreddataanalyticsquerystoreddataanalytics
+        method: GET
+        description: APIs.io Engineering Platform Query Stored Data Analytics
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: query
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-workers-kv-stored-data-analytics-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Workers KV Stored Data Analytics. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/storage/analytics/stored
+      name: accounts-account-id-storage-analytics-stored
+      description: REST surface for accounts-account_id-storage-analytics-stored.
+      operations:
+      - method: GET
+        name: workerskvstoreddataanalyticsquerystoreddataanalytics
+        description: APIs.io Engineering Platform Query Stored Data Analytics
+        call: cloudflare-workers-kv-stored-data-analytics.workerskvstoreddataanalyticsquerystoreddataanalytics
+        with:
+          account_id: rest.account_id
+          query: rest.query
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-workers-kv-stored-data-analytics-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Workers KV Stored Data Analytics. One tool
+      per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-query-stored
+      description: APIs.io Engineering Platform Query Stored Data Analytics
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-workers-kv-stored-data-analytics.workerskvstoreddataanalyticsquerystoreddataanalytics
+      with:
+        account_id: tools.account_id
+        query: tools.query
+      outputParameters:
+      - type: object
+        mapping: $.

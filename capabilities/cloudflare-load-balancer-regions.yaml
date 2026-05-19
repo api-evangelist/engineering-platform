@@ -1,0 +1,142 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Load Balancer Regions
+  description: 'APIs.io Engineering Platform Cloudflare API — Load Balancer Regions. 2 operations. Lead operation: APIs.io
+    Engineering Platform List Regions. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Load Balancer Regions
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-load-balancer-regions
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Load Balancer Regions business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-load_balancers-regions
+      path: /accounts/{account_id}/load_balancers/regions
+      operations:
+      - name: loadbalancerregionslistregions
+        method: GET
+        description: APIs.io Engineering Platform List Regions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: subdivision_code
+          in: query
+          type: string
+        - name: subdivision_code_a2
+          in: query
+          type: string
+        - name: country_code_a2
+          in: query
+          type: string
+    - name: accounts-account_id-load_balancers-regions-region_id
+      path: /accounts/{account_id}/load_balancers/regions/{region_id}
+      operations:
+      - name: loadbalancerregionsgetregion
+        method: GET
+        description: APIs.io Engineering Platform Get Region
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: region_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-load-balancer-regions-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Load Balancer Regions. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/load-balancers/regions
+      name: accounts-account-id-load-balancers-regions
+      description: REST surface for accounts-account_id-load_balancers-regions.
+      operations:
+      - method: GET
+        name: loadbalancerregionslistregions
+        description: APIs.io Engineering Platform List Regions
+        call: cloudflare-load-balancer-regions.loadbalancerregionslistregions
+        with:
+          account_id: rest.account_id
+          subdivision_code: rest.subdivision_code
+          subdivision_code_a2: rest.subdivision_code_a2
+          country_code_a2: rest.country_code_a2
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/load-balancers/regions/{region-id}
+      name: accounts-account-id-load-balancers-regions-region-id
+      description: REST surface for accounts-account_id-load_balancers-regions-region_id.
+      operations:
+      - method: GET
+        name: loadbalancerregionsgetregion
+        description: APIs.io Engineering Platform Get Region
+        call: cloudflare-load-balancer-regions.loadbalancerregionsgetregion
+        with:
+          region_id: rest.region_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-load-balancer-regions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Load Balancer Regions. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-regions
+      description: APIs.io Engineering Platform List Regions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-load-balancer-regions.loadbalancerregionslistregions
+      with:
+        account_id: tools.account_id
+        subdivision_code: tools.subdivision_code
+        subdivision_code_a2: tools.subdivision_code_a2
+        country_code_a2: tools.country_code_a2
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-region
+      description: APIs.io Engineering Platform Get Region
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-load-balancer-regions.loadbalancerregionsgetregion
+      with:
+        region_id: tools.region_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

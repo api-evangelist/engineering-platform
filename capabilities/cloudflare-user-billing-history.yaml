@@ -1,0 +1,105 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — User Billing History
+  description: 'APIs.io Engineering Platform Cloudflare API — User Billing History. 1 operations. Lead operation: APIs.io
+    Engineering Platform Billing History Details. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - User Billing History
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-user-billing-history
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — User Billing History business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: user-billing-history
+      path: /user/billing/history
+      operations:
+      - name: userbillinghistorydeprecatedbillinghistorydetails
+        method: GET
+        description: APIs.io Engineering Platform Billing History Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+        - name: order
+          in: query
+          type: string
+        - name: occurred_at
+          in: query
+          type: string
+        - name: type
+          in: query
+          type: string
+        - name: action
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-user-billing-history-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — User Billing History. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/user/billing/history
+      name: user-billing-history
+      description: REST surface for user-billing-history.
+      operations:
+      - method: GET
+        name: userbillinghistorydeprecatedbillinghistorydetails
+        description: APIs.io Engineering Platform Billing History Details
+        call: cloudflare-user-billing-history.userbillinghistorydeprecatedbillinghistorydetails
+        with:
+          page: rest.page
+          per_page: rest.per_page
+          order: rest.order
+          occurred_at: rest.occurred_at
+          type: rest.type
+          action: rest.action
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-user-billing-history-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — User Billing History. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-billing-history
+      description: APIs.io Engineering Platform Billing History Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-user-billing-history.userbillinghistorydeprecatedbillinghistorydetails
+      with:
+        page: tools.page
+        per_page: tools.per_page
+        order: tools.order
+        occurred_at: tools.occurred_at
+        type: tools.type
+        action: tools.action
+      outputParameters:
+      - type: object
+        mapping: $.

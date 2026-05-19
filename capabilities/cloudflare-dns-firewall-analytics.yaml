@@ -1,0 +1,208 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — DNS Firewall Analytics
+  description: 'APIs.io Engineering Platform Cloudflare API — DNS Firewall Analytics. 2 operations. Lead operation: APIs.io
+    Engineering Platform Table. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - DNS Firewall Analytics
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-dns-firewall-analytics
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — DNS Firewall Analytics business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-dns_firewall-dns_firewall_id-dns_analytics-report
+      path: /accounts/{account_id}/dns_firewall/{dns_firewall_id}/dns_analytics/report
+      operations:
+      - name: dnsfirewallanalyticstable
+        method: GET
+        description: APIs.io Engineering Platform Table
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: dns_firewall_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: metrics
+          in: query
+          type: string
+        - name: dimensions
+          in: query
+          type: string
+        - name: since
+          in: query
+          type: string
+        - name: until
+          in: query
+          type: string
+        - name: limit
+          in: query
+          type: string
+        - name: sort
+          in: query
+          type: string
+        - name: filters
+          in: query
+          type: string
+    - name: accounts-account_id-dns_firewall-dns_firewall_id-dns_analytics-report-bytime
+      path: /accounts/{account_id}/dns_firewall/{dns_firewall_id}/dns_analytics/report/bytime
+      operations:
+      - name: dnsfirewallanalyticsbytime
+        method: GET
+        description: APIs.io Engineering Platform By Time
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: dns_firewall_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: metrics
+          in: query
+          type: string
+        - name: dimensions
+          in: query
+          type: string
+        - name: since
+          in: query
+          type: string
+        - name: until
+          in: query
+          type: string
+        - name: limit
+          in: query
+          type: string
+        - name: sort
+          in: query
+          type: string
+        - name: filters
+          in: query
+          type: string
+        - name: time_delta
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-dns-firewall-analytics-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — DNS Firewall Analytics. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/dns-firewall/{dns-firewall-id}/dns-analytics/report
+      name: accounts-account-id-dns-firewall-dns-firewall-id-dns-analytics-report
+      description: REST surface for accounts-account_id-dns_firewall-dns_firewall_id-dns_analytics-report.
+      operations:
+      - method: GET
+        name: dnsfirewallanalyticstable
+        description: APIs.io Engineering Platform Table
+        call: cloudflare-dns-firewall-analytics.dnsfirewallanalyticstable
+        with:
+          dns_firewall_id: rest.dns_firewall_id
+          account_id: rest.account_id
+          metrics: rest.metrics
+          dimensions: rest.dimensions
+          since: rest.since
+          until: rest.until
+          limit: rest.limit
+          sort: rest.sort
+          filters: rest.filters
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/dns-firewall/{dns-firewall-id}/dns-analytics/report/bytime
+      name: accounts-account-id-dns-firewall-dns-firewall-id-dns-analytics-report-bytime
+      description: REST surface for accounts-account_id-dns_firewall-dns_firewall_id-dns_analytics-report-bytime.
+      operations:
+      - method: GET
+        name: dnsfirewallanalyticsbytime
+        description: APIs.io Engineering Platform By Time
+        call: cloudflare-dns-firewall-analytics.dnsfirewallanalyticsbytime
+        with:
+          dns_firewall_id: rest.dns_firewall_id
+          account_id: rest.account_id
+          metrics: rest.metrics
+          dimensions: rest.dimensions
+          since: rest.since
+          until: rest.until
+          limit: rest.limit
+          sort: rest.sort
+          filters: rest.filters
+          time_delta: rest.time_delta
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-dns-firewall-analytics-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — DNS Firewall Analytics. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-table
+      description: APIs.io Engineering Platform Table
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-dns-firewall-analytics.dnsfirewallanalyticstable
+      with:
+        dns_firewall_id: tools.dns_firewall_id
+        account_id: tools.account_id
+        metrics: tools.metrics
+        dimensions: tools.dimensions
+        since: tools.since
+        until: tools.until
+        limit: tools.limit
+        sort: tools.sort
+        filters: tools.filters
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-time
+      description: APIs.io Engineering Platform By Time
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-dns-firewall-analytics.dnsfirewallanalyticsbytime
+      with:
+        dns_firewall_id: tools.dns_firewall_id
+        account_id: tools.account_id
+        metrics: tools.metrics
+        dimensions: tools.dimensions
+        since: tools.since
+        until: tools.until
+        limit: tools.limit
+        sort: tools.sort
+        filters: tools.filters
+        time_delta: tools.time_delta
+      outputParameters:
+      - type: object
+        mapping: $.

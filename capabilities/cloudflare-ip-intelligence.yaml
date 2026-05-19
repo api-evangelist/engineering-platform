@@ -1,0 +1,90 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — IP Intelligence
+  description: 'APIs.io Engineering Platform Cloudflare API — IP Intelligence. 1 operations. Lead operation: APIs.io Engineering
+    Platform Get IP Overview. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - IP Intelligence
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-ip-intelligence
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — IP Intelligence business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-intel-ip
+      path: /accounts/{account_id}/intel/ip
+      operations:
+      - name: ipintelligencegetipoverview
+        method: GET
+        description: APIs.io Engineering Platform Get IP Overview
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: ipv4
+          in: query
+          type: string
+        - name: ipv6
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-ip-intelligence-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — IP Intelligence. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/intel/ip
+      name: accounts-account-id-intel-ip
+      description: REST surface for accounts-account_id-intel-ip.
+      operations:
+      - method: GET
+        name: ipintelligencegetipoverview
+        description: APIs.io Engineering Platform Get IP Overview
+        call: cloudflare-ip-intelligence.ipintelligencegetipoverview
+        with:
+          account_id: rest.account_id
+          ipv4: rest.ipv4
+          ipv6: rest.ipv6
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-ip-intelligence-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — IP Intelligence. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-ip
+      description: APIs.io Engineering Platform Get IP Overview
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-intelligence.ipintelligencegetipoverview
+      with:
+        account_id: tools.account_id
+        ipv4: tools.ipv4
+        ipv6: tools.ipv6
+      outputParameters:
+      - type: object
+        mapping: $.

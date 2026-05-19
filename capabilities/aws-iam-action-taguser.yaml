@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagUser'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagUser. 2 operations. Lead operation:
+    #Action=TagUser. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=TagUser'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-taguser
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagUser business capability. Self-contained,
+      no shared references.'
+    resources:
+    - name: '#Action=TagUser'
+      path: /#Action=TagUser
+      operations:
+      - name: gettaguser
+        method: GET
+        description: '<p>Adds one or more tags to an IAM user. If a tag with the same key name already exists, then that tag
+          is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By assigning tags
+          to your resources, you '
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: UserName
+          in: query
+          type: string
+          description: <p>The name of the IAM user to which you want to add tags.</p> <p>This parameter allows (through its
+            <a href="http://wikipedia.org/wiki/regex">regex pattern</a>
+          required: true
+        - name: Tags
+          in: query
+          type: array
+          description: The list of tags that you want to attach to the IAM user. Each tag consists of a key name and an associated
+            value.
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: posttaguser
+        method: POST
+        description: '<p>Adds one or more tags to an IAM user. If a tag with the same key name already exists, then that tag
+          is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By assigning tags
+          to your resources, you '
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-taguser-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagUser. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-taguser
+      name: action-taguser
+      description: 'REST surface for #Action=TagUser.'
+      operations:
+      - method: GET
+        name: gettaguser
+        description: '<p>Adds one or more tags to an IAM user. If a tag with the same key name already exists, then that tag
+          is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By assigning tags
+          to your resources, you '
+        call: aws-iam-action-taguser.gettaguser
+        with:
+          UserName: rest.UserName
+          Tags: rest.Tags
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: posttaguser
+        description: '<p>Adds one or more tags to an IAM user. If a tag with the same key name already exists, then that tag
+          is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By assigning tags
+          to your resources, you '
+        call: aws-iam-action-taguser.posttaguser
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-taguser-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagUser. One tool
+      per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-adds-one-more-tags-iam
+      description: '<p>Adds one or more tags to an IAM user. If a tag with the same key name already exists, then that tag
+        is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By assigning tags
+        to your resources, you '
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-taguser.gettaguser
+      with:
+        UserName: tools.UserName
+        Tags: tools.Tags
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-adds-one-more-tags-iam-2
+      description: '<p>Adds one or more tags to an IAM user. If a tag with the same key name already exists, then that tag
+        is overwritten with the new value.</p> <p>A tag consists of a key name and an associated value. By assigning tags
+        to your resources, you '
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-taguser.posttaguser
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

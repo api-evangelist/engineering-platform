@@ -1,0 +1,85 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Domain History
+  description: 'APIs.io Engineering Platform Cloudflare API — Domain History. 1 operations. Lead operation: APIs.io Engineering
+    Platform Get Domain History. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Domain History
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-domain-history
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Domain History business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-intel-domain-history
+      path: /accounts/{account_id}/intel/domain-history
+      operations:
+      - name: domainhistorygetdomainhistory
+        method: GET
+        description: APIs.io Engineering Platform Get Domain History
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: domain
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-domain-history-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Domain History. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/intel/domain-history
+      name: accounts-account-id-intel-domain-history
+      description: REST surface for accounts-account_id-intel-domain-history.
+      operations:
+      - method: GET
+        name: domainhistorygetdomainhistory
+        description: APIs.io Engineering Platform Get Domain History
+        call: cloudflare-domain-history.domainhistorygetdomainhistory
+        with:
+          account_id: rest.account_id
+          domain: rest.domain
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-domain-history-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Domain History. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-domain
+      description: APIs.io Engineering Platform Get Domain History
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-domain-history.domainhistorygetdomainhistory
+      with:
+        account_id: tools.account_id
+        domain: tools.domain
+      outputParameters:
+      - type: object
+        mapping: $.

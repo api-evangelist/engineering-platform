@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Zone-Level Access mTLS Authentication
+  description: 'APIs.io Engineering Platform Cloudflare API — Zone-Level Access mTLS Authentication. 1 operations. Lead operation:
+    APIs.io Engineering Platform List mTLS certificates. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Zone-Level Access mTLS Authentication
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-zone-level-access-mtls-authentication
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Zone-Level Access mTLS Authentication business capability.
+      Self-contained, no shared references.
+    resources:
+    - name: zones-zone_id-access-certificates
+      path: /zones/{zone_id}/access/certificates
+      operations:
+      - name: zonelevelaccessmtlsauthenticationlistmtlscertificates
+        method: GET
+        description: APIs.io Engineering Platform List mTLS certificates
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: zone_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-zone-level-access-mtls-authentication-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Zone-Level Access mTLS Authentication. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/zones/{zone-id}/access/certificates
+      name: zones-zone-id-access-certificates
+      description: REST surface for zones-zone_id-access-certificates.
+      operations:
+      - method: GET
+        name: zonelevelaccessmtlsauthenticationlistmtlscertificates
+        description: APIs.io Engineering Platform List mTLS certificates
+        call: cloudflare-zone-level-access-mtls-authentication.zonelevelaccessmtlsauthenticationlistmtlscertificates
+        with:
+          zone_id: rest.zone_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-zone-level-access-mtls-authentication-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Zone-Level Access mTLS Authentication. One
+      tool per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-mtls
+      description: APIs.io Engineering Platform List mTLS certificates
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-zone-level-access-mtls-authentication.zonelevelaccessmtlsauthenticationlistmtlscertificates
+      with:
+        zone_id: tools.zone_id
+      outputParameters:
+      - type: object
+        mapping: $.

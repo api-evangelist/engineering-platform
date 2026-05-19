@@ -1,0 +1,216 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Stream Watermark Profile
+  description: 'APIs.io Engineering Platform Cloudflare API — Stream Watermark Profile. 4 operations. Lead operation: APIs.io
+    Engineering Platform List watermark profiles. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Stream Watermark Profile
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-stream-watermark-profile
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Stream Watermark Profile business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-stream-watermarks
+      path: /accounts/{account_id}/stream/watermarks
+      operations:
+      - name: streamwatermarkprofilelistwatermarkprofiles
+        method: GET
+        description: APIs.io Engineering Platform List watermark profiles
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: streamwatermarkprofilecreatewatermarkprofilesviabasicupload
+        method: POST
+        description: APIs.io Engineering Platform Create watermark profiles via basic upload
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-stream-watermarks-identifier
+      path: /accounts/{account_id}/stream/watermarks/{identifier}
+      operations:
+      - name: streamwatermarkprofiledeletewatermarkprofiles
+        method: DELETE
+        description: APIs.io Engineering Platform Delete watermark profiles
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: streamwatermarkprofilewatermarkprofiledetails
+        method: GET
+        description: APIs.io Engineering Platform Watermark profile details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-stream-watermark-profile-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Stream Watermark Profile. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/stream/watermarks
+      name: accounts-account-id-stream-watermarks
+      description: REST surface for accounts-account_id-stream-watermarks.
+      operations:
+      - method: GET
+        name: streamwatermarkprofilelistwatermarkprofiles
+        description: APIs.io Engineering Platform List watermark profiles
+        call: cloudflare-stream-watermark-profile.streamwatermarkprofilelistwatermarkprofiles
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: streamwatermarkprofilecreatewatermarkprofilesviabasicupload
+        description: APIs.io Engineering Platform Create watermark profiles via basic upload
+        call: cloudflare-stream-watermark-profile.streamwatermarkprofilecreatewatermarkprofilesviabasicupload
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/stream/watermarks/{identifier}
+      name: accounts-account-id-stream-watermarks-identifier
+      description: REST surface for accounts-account_id-stream-watermarks-identifier.
+      operations:
+      - method: DELETE
+        name: streamwatermarkprofiledeletewatermarkprofiles
+        description: APIs.io Engineering Platform Delete watermark profiles
+        call: cloudflare-stream-watermark-profile.streamwatermarkprofiledeletewatermarkprofiles
+        with:
+          identifier: rest.identifier
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: streamwatermarkprofilewatermarkprofiledetails
+        description: APIs.io Engineering Platform Watermark profile details
+        call: cloudflare-stream-watermark-profile.streamwatermarkprofilewatermarkprofiledetails
+        with:
+          identifier: rest.identifier
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-stream-watermark-profile-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Stream Watermark Profile. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-watermark
+      description: APIs.io Engineering Platform List watermark profiles
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-stream-watermark-profile.streamwatermarkprofilelistwatermarkprofiles
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-watermark
+      description: APIs.io Engineering Platform Create watermark profiles via basic upload
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-stream-watermark-profile.streamwatermarkprofilecreatewatermarkprofilesviabasicupload
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-watermark
+      description: APIs.io Engineering Platform Delete watermark profiles
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-stream-watermark-profile.streamwatermarkprofiledeletewatermarkprofiles
+      with:
+        identifier: tools.identifier
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-watermark-profile
+      description: APIs.io Engineering Platform Watermark profile details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-stream-watermark-profile.streamwatermarkprofilewatermarkprofiledetails
+      with:
+        identifier: tools.identifier
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

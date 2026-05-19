@@ -1,0 +1,194 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — IP Address Management Prefix Delegation
+  description: 'APIs.io Engineering Platform Cloudflare API — IP Address Management Prefix Delegation. 3 operations. Lead
+    operation: APIs.io Engineering Platform List Prefix Delegations. Self-contained Naftiko capability covering one Engineering
+    Platform business surface.'
+  tags:
+  - Engineering Platform
+  - IP Address Management Prefix Delegation
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-ip-address-management-prefix-delegation
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — IP Address Management Prefix Delegation business capability.
+      Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-addressing-prefixes-prefix_id-delegations
+      path: /accounts/{account_id}/addressing/prefixes/{prefix_id}/delegations
+      operations:
+      - name: ipaddressmanagementprefixdelegationlistprefixdelegations
+        method: GET
+        description: APIs.io Engineering Platform List Prefix Delegations
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: prefix_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: ipaddressmanagementprefixdelegationcreateprefixdelegation
+        method: POST
+        description: APIs.io Engineering Platform Create Prefix Delegation
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: prefix_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-addressing-prefixes-prefix_id-delegations-delegation_id
+      path: /accounts/{account_id}/addressing/prefixes/{prefix_id}/delegations/{delegation_id}
+      operations:
+      - name: ipaddressmanagementprefixdelegationdeleteprefixdelegation
+        method: DELETE
+        description: APIs.io Engineering Platform Delete Prefix Delegation
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: delegation_id
+          in: path
+          type: string
+          required: true
+        - name: prefix_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-ip-address-management-prefix-delegation-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — IP Address Management Prefix Delegation. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/addressing/prefixes/{prefix-id}/delegations
+      name: accounts-account-id-addressing-prefixes-prefix-id-delegations
+      description: REST surface for accounts-account_id-addressing-prefixes-prefix_id-delegations.
+      operations:
+      - method: GET
+        name: ipaddressmanagementprefixdelegationlistprefixdelegations
+        description: APIs.io Engineering Platform List Prefix Delegations
+        call: cloudflare-ip-address-management-prefix-delegation.ipaddressmanagementprefixdelegationlistprefixdelegations
+        with:
+          prefix_id: rest.prefix_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: ipaddressmanagementprefixdelegationcreateprefixdelegation
+        description: APIs.io Engineering Platform Create Prefix Delegation
+        call: cloudflare-ip-address-management-prefix-delegation.ipaddressmanagementprefixdelegationcreateprefixdelegation
+        with:
+          prefix_id: rest.prefix_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/addressing/prefixes/{prefix-id}/delegations/{delegation-id}
+      name: accounts-account-id-addressing-prefixes-prefix-id-delegations-delegation-id
+      description: REST surface for accounts-account_id-addressing-prefixes-prefix_id-delegations-delegation_id.
+      operations:
+      - method: DELETE
+        name: ipaddressmanagementprefixdelegationdeleteprefixdelegation
+        description: APIs.io Engineering Platform Delete Prefix Delegation
+        call: cloudflare-ip-address-management-prefix-delegation.ipaddressmanagementprefixdelegationdeleteprefixdelegation
+        with:
+          delegation_id: rest.delegation_id
+          prefix_id: rest.prefix_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-ip-address-management-prefix-delegation-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — IP Address Management Prefix Delegation. One
+      tool per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-prefix
+      description: APIs.io Engineering Platform List Prefix Delegations
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-address-management-prefix-delegation.ipaddressmanagementprefixdelegationlistprefixdelegations
+      with:
+        prefix_id: tools.prefix_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-prefix
+      description: APIs.io Engineering Platform Create Prefix Delegation
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-ip-address-management-prefix-delegation.ipaddressmanagementprefixdelegationcreateprefixdelegation
+      with:
+        prefix_id: tools.prefix_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-prefix
+      description: APIs.io Engineering Platform Delete Prefix Delegation
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-ip-address-management-prefix-delegation.ipaddressmanagementprefixdelegationdeleteprefixdelegation
+      with:
+        delegation_id: tools.delegation_id
+        prefix_id: tools.prefix_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

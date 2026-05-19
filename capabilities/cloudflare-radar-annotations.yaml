@@ -1,0 +1,270 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar Annotations
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar Annotations. 3 operations. Lead operation: APIs.io Engineering
+    Platform Get latest annotations.. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Radar Annotations
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-annotations
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar Annotations business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: radar-annotations
+      path: /radar/annotations
+      operations:
+      - name: radargetannotations
+        method: GET
+        description: APIs.io Engineering Platform Get latest annotations.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: offset
+          in: query
+          type: integer
+          description: Number of objects to skip before grabbing results.
+        - name: dateRange
+          in: query
+          type: string
+          description: Shorthand date ranges for the last X days - use when you don't need specific start and end dates.
+        - name: dateStart
+          in: query
+          type: string
+          description: Start of the date range (inclusive).
+        - name: dateEnd
+          in: query
+          type: string
+          description: End of the date range (inclusive).
+        - name: asn
+          in: query
+          type: integer
+          description: Single ASN as integer.
+        - name: location
+          in: query
+          type: string
+          description: Location Alpha2 code.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-annotations-outages
+      path: /radar/annotations/outages
+      operations:
+      - name: radargetannotationsoutages
+        method: GET
+        description: APIs.io Engineering Platform Get latest Internet outages and anomalies.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: offset
+          in: query
+          type: integer
+          description: Number of objects to skip before grabbing results.
+        - name: dateRange
+          in: query
+          type: string
+          description: Shorthand date ranges for the last X days - use when you don't need specific start and end dates.
+        - name: dateStart
+          in: query
+          type: string
+          description: Start of the date range (inclusive).
+        - name: dateEnd
+          in: query
+          type: string
+          description: End of the date range (inclusive).
+        - name: asn
+          in: query
+          type: integer
+          description: Single ASN as integer.
+        - name: location
+          in: query
+          type: string
+          description: Location Alpha2 code.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-annotations-outages-locations
+      path: /radar/annotations/outages/locations
+      operations:
+      - name: radargetannotationsoutagestop
+        method: GET
+        description: APIs.io Engineering Platform Get the number of outages for locations.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: dateRange
+          in: query
+          type: string
+          description: Shorthand date ranges for the last X days - use when you don't need specific start and end dates.
+        - name: dateStart
+          in: query
+          type: string
+          description: Start of the date range (inclusive).
+        - name: dateEnd
+          in: query
+          type: string
+          description: End of the date range (inclusive).
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-annotations-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar Annotations. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/annotations
+      name: radar-annotations
+      description: REST surface for radar-annotations.
+      operations:
+      - method: GET
+        name: radargetannotations
+        description: APIs.io Engineering Platform Get latest annotations.
+        call: cloudflare-radar-annotations.radargetannotations
+        with:
+          limit: rest.limit
+          offset: rest.offset
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          asn: rest.asn
+          location: rest.location
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/annotations/outages
+      name: radar-annotations-outages
+      description: REST surface for radar-annotations-outages.
+      operations:
+      - method: GET
+        name: radargetannotationsoutages
+        description: APIs.io Engineering Platform Get latest Internet outages and anomalies.
+        call: cloudflare-radar-annotations.radargetannotationsoutages
+        with:
+          limit: rest.limit
+          offset: rest.offset
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          asn: rest.asn
+          location: rest.location
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/annotations/outages/locations
+      name: radar-annotations-outages-locations
+      description: REST surface for radar-annotations-outages-locations.
+      operations:
+      - method: GET
+        name: radargetannotationsoutagestop
+        description: APIs.io Engineering Platform Get the number of outages for locations.
+        call: cloudflare-radar-annotations.radargetannotationsoutagestop
+        with:
+          limit: rest.limit
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-annotations-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar Annotations. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-latest
+      description: APIs.io Engineering Platform Get latest annotations.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-annotations.radargetannotations
+      with:
+        limit: tools.limit
+        offset: tools.offset
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        asn: tools.asn
+        location: tools.location
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-latest-2
+      description: APIs.io Engineering Platform Get latest Internet outages and anomalies.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-annotations.radargetannotationsoutages
+      with:
+        limit: tools.limit
+        offset: tools.offset
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        asn: tools.asn
+        location: tools.location
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-number
+      description: APIs.io Engineering Platform Get the number of outages for locations.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-annotations.radargetannotationsoutagestop
+      with:
+        limit: tools.limit
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.

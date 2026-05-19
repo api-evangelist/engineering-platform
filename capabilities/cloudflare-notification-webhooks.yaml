@@ -1,0 +1,255 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Notification Webhooks
+  description: 'APIs.io Engineering Platform Cloudflare API — Notification Webhooks. 5 operations. Lead operation: APIs.io
+    Engineering Platform List webhooks. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Notification Webhooks
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-notification-webhooks
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Notification Webhooks business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-alerting-v3-destinations-webhooks
+      path: /accounts/{account_id}/alerting/v3/destinations/webhooks
+      operations:
+      - name: notificationwebhookslistwebhooks
+        method: GET
+        description: APIs.io Engineering Platform List webhooks
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: notificationwebhookscreateawebhook
+        method: POST
+        description: APIs.io Engineering Platform Create a webhook
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-alerting-v3-destinations-webhooks-webhook_id
+      path: /accounts/{account_id}/alerting/v3/destinations/webhooks/{webhook_id}
+      operations:
+      - name: notificationwebhooksdeleteawebhook
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a webhook
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: webhook_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: notificationwebhooksgetawebhook
+        method: GET
+        description: APIs.io Engineering Platform Get a webhook
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: webhook_id
+          in: path
+          type: string
+          required: true
+      - name: notificationwebhooksupdateawebhook
+        method: PUT
+        description: APIs.io Engineering Platform Update a webhook
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: webhook_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-notification-webhooks-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Notification Webhooks. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/alerting/v3/destinations/webhooks
+      name: accounts-account-id-alerting-v3-destinations-webhooks
+      description: REST surface for accounts-account_id-alerting-v3-destinations-webhooks.
+      operations:
+      - method: GET
+        name: notificationwebhookslistwebhooks
+        description: APIs.io Engineering Platform List webhooks
+        call: cloudflare-notification-webhooks.notificationwebhookslistwebhooks
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: notificationwebhookscreateawebhook
+        description: APIs.io Engineering Platform Create a webhook
+        call: cloudflare-notification-webhooks.notificationwebhookscreateawebhook
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/alerting/v3/destinations/webhooks/{webhook-id}
+      name: accounts-account-id-alerting-v3-destinations-webhooks-webhook-id
+      description: REST surface for accounts-account_id-alerting-v3-destinations-webhooks-webhook_id.
+      operations:
+      - method: DELETE
+        name: notificationwebhooksdeleteawebhook
+        description: APIs.io Engineering Platform Delete a webhook
+        call: cloudflare-notification-webhooks.notificationwebhooksdeleteawebhook
+        with:
+          webhook_id: rest.webhook_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: notificationwebhooksgetawebhook
+        description: APIs.io Engineering Platform Get a webhook
+        call: cloudflare-notification-webhooks.notificationwebhooksgetawebhook
+        with:
+          account_id: rest.account_id
+          webhook_id: rest.webhook_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: notificationwebhooksupdateawebhook
+        description: APIs.io Engineering Platform Update a webhook
+        call: cloudflare-notification-webhooks.notificationwebhooksupdateawebhook
+        with:
+          webhook_id: rest.webhook_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-notification-webhooks-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Notification Webhooks. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-webhooks
+      description: APIs.io Engineering Platform List webhooks
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-webhooks.notificationwebhookslistwebhooks
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-webhook
+      description: APIs.io Engineering Platform Create a webhook
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-notification-webhooks.notificationwebhookscreateawebhook
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-webhook
+      description: APIs.io Engineering Platform Delete a webhook
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-notification-webhooks.notificationwebhooksdeleteawebhook
+      with:
+        webhook_id: tools.webhook_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-webhook
+      description: APIs.io Engineering Platform Get a webhook
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-webhooks.notificationwebhooksgetawebhook
+      with:
+        account_id: tools.account_id
+        webhook_id: tools.webhook_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-webhook
+      description: APIs.io Engineering Platform Update a webhook
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-notification-webhooks.notificationwebhooksupdateawebhook
+      with:
+        webhook_id: tools.webhook_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

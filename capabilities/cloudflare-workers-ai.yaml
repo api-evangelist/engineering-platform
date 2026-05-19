@@ -1,0 +1,303 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Workers AI
+  description: 'APIs.io Engineering Platform Cloudflare API — Workers AI. 5 operations. Lead operation: APIs.io Engineering
+    Platform Author Search. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Workers AI
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-workers-ai
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Workers AI business capability. Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-ai-authors-search
+      path: /accounts/{account_id}/ai/authors/search
+      operations:
+      - name: workersaisearchauthor
+        method: GET
+        description: APIs.io Engineering Platform Author Search
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-ai-models-schema
+      path: /accounts/{account_id}/ai/models/schema
+      operations:
+      - name: workersaigetmodelschema
+        method: GET
+        description: APIs.io Engineering Platform Get Model Schema
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: model
+          in: query
+          type: string
+          description: Model Name
+          required: true
+    - name: accounts-account_id-ai-models-search
+      path: /accounts/{account_id}/ai/models/search
+      operations:
+      - name: workersaisearchmodel
+        method: GET
+        description: APIs.io Engineering Platform Model Search
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: per_page
+          in: query
+          type: integer
+        - name: page
+          in: query
+          type: integer
+        - name: task
+          in: query
+          type: string
+          description: Filter by Task Name
+        - name: author
+          in: query
+          type: string
+          description: Filter by Author
+        - name: source
+          in: query
+          type: number
+          description: Filter by Source Id
+        - name: hide_experimental
+          in: query
+          type: boolean
+          description: Filter to hide experimental models
+        - name: search
+          in: query
+          type: string
+          description: Search
+    - name: accounts-account_id-ai-run-model_name
+      path: /accounts/{account_id}/ai/run/{model_name}
+      operations:
+      - name: workersaipostrunmodel
+        method: POST
+        description: APIs.io Engineering Platform Execute AI model
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: model_name
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: accounts-account_id-ai-tasks-search
+      path: /accounts/{account_id}/ai/tasks/search
+      operations:
+      - name: workersaisearchtask
+        method: GET
+        description: APIs.io Engineering Platform Task Search
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-workers-ai-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Workers AI. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/ai/authors/search
+      name: accounts-account-id-ai-authors-search
+      description: REST surface for accounts-account_id-ai-authors-search.
+      operations:
+      - method: GET
+        name: workersaisearchauthor
+        description: APIs.io Engineering Platform Author Search
+        call: cloudflare-workers-ai.workersaisearchauthor
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/ai/models/schema
+      name: accounts-account-id-ai-models-schema
+      description: REST surface for accounts-account_id-ai-models-schema.
+      operations:
+      - method: GET
+        name: workersaigetmodelschema
+        description: APIs.io Engineering Platform Get Model Schema
+        call: cloudflare-workers-ai.workersaigetmodelschema
+        with:
+          account_id: rest.account_id
+          model: rest.model
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/ai/models/search
+      name: accounts-account-id-ai-models-search
+      description: REST surface for accounts-account_id-ai-models-search.
+      operations:
+      - method: GET
+        name: workersaisearchmodel
+        description: APIs.io Engineering Platform Model Search
+        call: cloudflare-workers-ai.workersaisearchmodel
+        with:
+          account_id: rest.account_id
+          per_page: rest.per_page
+          page: rest.page
+          task: rest.task
+          author: rest.author
+          source: rest.source
+          hide_experimental: rest.hide_experimental
+          search: rest.search
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/ai/run/{model-name}
+      name: accounts-account-id-ai-run-model-name
+      description: REST surface for accounts-account_id-ai-run-model_name.
+      operations:
+      - method: POST
+        name: workersaipostrunmodel
+        description: APIs.io Engineering Platform Execute AI model
+        call: cloudflare-workers-ai.workersaipostrunmodel
+        with:
+          account_id: rest.account_id
+          model_name: rest.model_name
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/ai/tasks/search
+      name: accounts-account-id-ai-tasks-search
+      description: REST surface for accounts-account_id-ai-tasks-search.
+      operations:
+      - method: GET
+        name: workersaisearchtask
+        description: APIs.io Engineering Platform Task Search
+        call: cloudflare-workers-ai.workersaisearchtask
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-workers-ai-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Workers AI. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-author-search
+      description: APIs.io Engineering Platform Author Search
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-workers-ai.workersaisearchauthor
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-model
+      description: APIs.io Engineering Platform Get Model Schema
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-workers-ai.workersaigetmodelschema
+      with:
+        account_id: tools.account_id
+        model: tools.model
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-model-search
+      description: APIs.io Engineering Platform Model Search
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-workers-ai.workersaisearchmodel
+      with:
+        account_id: tools.account_id
+        per_page: tools.per_page
+        page: tools.page
+        task: tools.task
+        author: tools.author
+        source: tools.source
+        hide_experimental: tools.hide_experimental
+        search: tools.search
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-execute-ai
+      description: APIs.io Engineering Platform Execute AI model
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-workers-ai.workersaipostrunmodel
+      with:
+        account_id: tools.account_id
+        model_name: tools.model_name
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-task-search
+      description: APIs.io Engineering Platform Task Search
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-workers-ai.workersaisearchtask
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

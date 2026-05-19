@@ -1,0 +1,262 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Pages Project
+  description: 'APIs.io Engineering Platform Cloudflare API — Pages Project. 5 operations. Lead operation: APIs.io Engineering
+    Platform Get projects. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Pages Project
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-pages-project
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Pages Project business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-pages-projects
+      path: /accounts/{account_id}/pages/projects
+      operations:
+      - name: pagesprojectgetprojects
+        method: GET
+        description: APIs.io Engineering Platform Get projects
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: pagesprojectcreateproject
+        method: POST
+        description: APIs.io Engineering Platform Create project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-pages-projects-project_name
+      path: /accounts/{account_id}/pages/projects/{project_name}
+      operations:
+      - name: pagesprojectdeleteproject
+        method: DELETE
+        description: APIs.io Engineering Platform Delete project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: project_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: pagesprojectgetproject
+        method: GET
+        description: APIs.io Engineering Platform Get project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: project_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: pagesprojectupdateproject
+        method: PATCH
+        description: APIs.io Engineering Platform Update project
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: project_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-pages-project-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Pages Project. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/pages/projects
+      name: accounts-account-id-pages-projects
+      description: REST surface for accounts-account_id-pages-projects.
+      operations:
+      - method: GET
+        name: pagesprojectgetprojects
+        description: APIs.io Engineering Platform Get projects
+        call: cloudflare-pages-project.pagesprojectgetprojects
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: pagesprojectcreateproject
+        description: APIs.io Engineering Platform Create project
+        call: cloudflare-pages-project.pagesprojectcreateproject
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/pages/projects/{project-name}
+      name: accounts-account-id-pages-projects-project-name
+      description: REST surface for accounts-account_id-pages-projects-project_name.
+      operations:
+      - method: DELETE
+        name: pagesprojectdeleteproject
+        description: APIs.io Engineering Platform Delete project
+        call: cloudflare-pages-project.pagesprojectdeleteproject
+        with:
+          project_name: rest.project_name
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: pagesprojectgetproject
+        description: APIs.io Engineering Platform Get project
+        call: cloudflare-pages-project.pagesprojectgetproject
+        with:
+          project_name: rest.project_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: pagesprojectupdateproject
+        description: APIs.io Engineering Platform Update project
+        call: cloudflare-pages-project.pagesprojectupdateproject
+        with:
+          project_name: rest.project_name
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-pages-project-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Pages Project. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-projects
+      description: APIs.io Engineering Platform Get projects
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-pages-project.pagesprojectgetprojects
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-project
+      description: APIs.io Engineering Platform Create project
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-pages-project.pagesprojectcreateproject
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-project
+      description: APIs.io Engineering Platform Delete project
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-pages-project.pagesprojectdeleteproject
+      with:
+        project_name: tools.project_name
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-project
+      description: APIs.io Engineering Platform Get project
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-pages-project.pagesprojectgetproject
+      with:
+        project_name: tools.project_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-project
+      description: APIs.io Engineering Platform Update project
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-pages-project.pagesprojectupdateproject
+      with:
+        project_name: tools.project_name
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,81 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Account Billing Profile
+  description: 'APIs.io Engineering Platform Cloudflare API — Account Billing Profile. 1 operations. Lead operation: APIs.io
+    Engineering Platform Billing Profile Details. Self-contained Naftiko capability covering one Engineering Platform business
+    surface.'
+  tags:
+  - Engineering Platform
+  - Account Billing Profile
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-account-billing-profile
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Account Billing Profile business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-billing-profile
+      path: /accounts/{account_id}/billing/profile
+      operations:
+      - name: accountbillingprofiledeprecatedbillingprofiledetails
+        method: GET
+        description: APIs.io Engineering Platform Billing Profile Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-account-billing-profile-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Account Billing Profile. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/billing/profile
+      name: accounts-account-id-billing-profile
+      description: REST surface for accounts-account_id-billing-profile.
+      operations:
+      - method: GET
+        name: accountbillingprofiledeprecatedbillingprofiledetails
+        description: APIs.io Engineering Platform Billing Profile Details
+        call: cloudflare-account-billing-profile.accountbillingprofiledeprecatedbillingprofiledetails
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-account-billing-profile-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Account Billing Profile. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-billing-profile
+      description: APIs.io Engineering Platform Billing Profile Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-account-billing-profile.accountbillingprofiledeprecatedbillingprofiledetails
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

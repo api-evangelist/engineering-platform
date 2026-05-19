@@ -1,0 +1,229 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Email Routing Destination Addresses
+  description: 'APIs.io Engineering Platform Cloudflare API — Email Routing Destination Addresses. 4 operations. Lead operation:
+    APIs.io Engineering Platform List destination addresses. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Email Routing Destination Addresses
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-email-routing-destination-addresses
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Email Routing Destination Addresses business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-email-routing-addresses
+      path: /accounts/{account_id}/email/routing/addresses
+      operations:
+      - name: emailroutingdestinationaddresseslistdestinationaddresses
+        method: GET
+        description: APIs.io Engineering Platform List destination addresses
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+        - name: direction
+          in: query
+          type: string
+        - name: verified
+          in: query
+          type: boolean
+      - name: emailroutingdestinationaddressescreateadestinationaddress
+        method: POST
+        description: APIs.io Engineering Platform Create a destination address
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-email-routing-addresses-destination_address_identifier
+      path: /accounts/{account_id}/email/routing/addresses/{destination_address_identifier}
+      operations:
+      - name: emailroutingdestinationaddressesdeletedestinationaddress
+        method: DELETE
+        description: APIs.io Engineering Platform Delete destination address
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: destination_address_identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: emailroutingdestinationaddressesgetadestinationaddress
+        method: GET
+        description: APIs.io Engineering Platform Get a destination address
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: destination_address_identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-email-routing-destination-addresses-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Email Routing Destination Addresses. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/email/routing/addresses
+      name: accounts-account-id-email-routing-addresses
+      description: REST surface for accounts-account_id-email-routing-addresses.
+      operations:
+      - method: GET
+        name: emailroutingdestinationaddresseslistdestinationaddresses
+        description: APIs.io Engineering Platform List destination addresses
+        call: cloudflare-email-routing-destination-addresses.emailroutingdestinationaddresseslistdestinationaddresses
+        with:
+          account_id: rest.account_id
+          page: rest.page
+          per_page: rest.per_page
+          direction: rest.direction
+          verified: rest.verified
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: emailroutingdestinationaddressescreateadestinationaddress
+        description: APIs.io Engineering Platform Create a destination address
+        call: cloudflare-email-routing-destination-addresses.emailroutingdestinationaddressescreateadestinationaddress
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/email/routing/addresses/{destination-address-identifier}
+      name: accounts-account-id-email-routing-addresses-destination-address-identifier
+      description: REST surface for accounts-account_id-email-routing-addresses-destination_address_identifier.
+      operations:
+      - method: DELETE
+        name: emailroutingdestinationaddressesdeletedestinationaddress
+        description: APIs.io Engineering Platform Delete destination address
+        call: cloudflare-email-routing-destination-addresses.emailroutingdestinationaddressesdeletedestinationaddress
+        with:
+          destination_address_identifier: rest.destination_address_identifier
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: emailroutingdestinationaddressesgetadestinationaddress
+        description: APIs.io Engineering Platform Get a destination address
+        call: cloudflare-email-routing-destination-addresses.emailroutingdestinationaddressesgetadestinationaddress
+        with:
+          destination_address_identifier: rest.destination_address_identifier
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-email-routing-destination-addresses-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Email Routing Destination Addresses. One tool
+      per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-destination
+      description: APIs.io Engineering Platform List destination addresses
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-email-routing-destination-addresses.emailroutingdestinationaddresseslistdestinationaddresses
+      with:
+        account_id: tools.account_id
+        page: tools.page
+        per_page: tools.per_page
+        direction: tools.direction
+        verified: tools.verified
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-destination
+      description: APIs.io Engineering Platform Create a destination address
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-email-routing-destination-addresses.emailroutingdestinationaddressescreateadestinationaddress
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-destination
+      description: APIs.io Engineering Platform Delete destination address
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-email-routing-destination-addresses.emailroutingdestinationaddressesdeletedestinationaddress
+      with:
+        destination_address_identifier: tools.destination_address_identifier
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-destination
+      description: APIs.io Engineering Platform Get a destination address
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-email-routing-destination-addresses.emailroutingdestinationaddressesgetadestinationaddress
+      with:
+        destination_address_identifier: tools.destination_address_identifier
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.

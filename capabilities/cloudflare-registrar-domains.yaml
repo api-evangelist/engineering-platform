@@ -1,0 +1,174 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Registrar Domains
+  description: 'APIs.io Engineering Platform Cloudflare API — Registrar Domains. 3 operations. Lead operation: APIs.io Engineering
+    Platform List domains. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Registrar Domains
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-registrar-domains
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Registrar Domains business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-registrar-domains
+      path: /accounts/{account_id}/registrar/domains
+      operations:
+      - name: registrardomainslistdomains
+        method: GET
+        description: APIs.io Engineering Platform List domains
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-registrar-domains-domain_name
+      path: /accounts/{account_id}/registrar/domains/{domain_name}
+      operations:
+      - name: registrardomainsgetdomain
+        method: GET
+        description: APIs.io Engineering Platform Get domain
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: domain_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: registrardomainsupdatedomain
+        method: PUT
+        description: APIs.io Engineering Platform Update domain
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: domain_name
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-registrar-domains-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Registrar Domains. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/registrar/domains
+      name: accounts-account-id-registrar-domains
+      description: REST surface for accounts-account_id-registrar-domains.
+      operations:
+      - method: GET
+        name: registrardomainslistdomains
+        description: APIs.io Engineering Platform List domains
+        call: cloudflare-registrar-domains.registrardomainslistdomains
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/registrar/domains/{domain-name}
+      name: accounts-account-id-registrar-domains-domain-name
+      description: REST surface for accounts-account_id-registrar-domains-domain_name.
+      operations:
+      - method: GET
+        name: registrardomainsgetdomain
+        description: APIs.io Engineering Platform Get domain
+        call: cloudflare-registrar-domains.registrardomainsgetdomain
+        with:
+          domain_name: rest.domain_name
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: registrardomainsupdatedomain
+        description: APIs.io Engineering Platform Update domain
+        call: cloudflare-registrar-domains.registrardomainsupdatedomain
+        with:
+          domain_name: rest.domain_name
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-registrar-domains-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Registrar Domains. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-domains
+      description: APIs.io Engineering Platform List domains
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-registrar-domains.registrardomainslistdomains
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-domain
+      description: APIs.io Engineering Platform Get domain
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-registrar-domains.registrardomainsgetdomain
+      with:
+        domain_name: tools.domain_name
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-domain
+      description: APIs.io Engineering Platform Update domain
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-registrar-domains.registrardomainsupdatedomain
+      with:
+        domain_name: tools.domain_name
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

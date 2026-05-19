@@ -1,0 +1,137 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Durable Objects Namespace
+  description: 'APIs.io Engineering Platform Cloudflare API — Durable Objects Namespace. 2 operations. Lead operation: APIs.io
+    Engineering Platform List Namespaces. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Durable Objects Namespace
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-durable-objects-namespace
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Durable Objects Namespace business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-workers-durable_objects-namespaces
+      path: /accounts/{account_id}/workers/durable_objects/namespaces
+      operations:
+      - name: durableobjectsnamespacelistnamespaces
+        method: GET
+        description: APIs.io Engineering Platform List Namespaces
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+    - name: accounts-account_id-workers-durable_objects-namespaces-id-objects
+      path: /accounts/{account_id}/workers/durable_objects/namespaces/{id}/objects
+      operations:
+      - name: durableobjectsnamespacelistobjects
+        method: GET
+        description: APIs.io Engineering Platform List Objects
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: limit
+          in: query
+          type: number
+        - name: cursor
+          in: query
+          type: string
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-durable-objects-namespace-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Durable Objects Namespace. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/workers/durable-objects/namespaces
+      name: accounts-account-id-workers-durable-objects-namespaces
+      description: REST surface for accounts-account_id-workers-durable_objects-namespaces.
+      operations:
+      - method: GET
+        name: durableobjectsnamespacelistnamespaces
+        description: APIs.io Engineering Platform List Namespaces
+        call: cloudflare-durable-objects-namespace.durableobjectsnamespacelistnamespaces
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/workers/durable-objects/namespaces/{id}/objects
+      name: accounts-account-id-workers-durable-objects-namespaces-id-objects
+      description: REST surface for accounts-account_id-workers-durable_objects-namespaces-id-objects.
+      operations:
+      - method: GET
+        name: durableobjectsnamespacelistobjects
+        description: APIs.io Engineering Platform List Objects
+        call: cloudflare-durable-objects-namespace.durableobjectsnamespacelistobjects
+        with:
+          id: rest.id
+          account_id: rest.account_id
+          limit: rest.limit
+          cursor: rest.cursor
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-durable-objects-namespace-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Durable Objects Namespace. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-namespaces
+      description: APIs.io Engineering Platform List Namespaces
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-durable-objects-namespace.durableobjectsnamespacelistnamespaces
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-list-objects
+      description: APIs.io Engineering Platform List Objects
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-durable-objects-namespace.durableobjectsnamespacelistobjects
+      with:
+        id: tools.id
+        account_id: tools.account_id
+        limit: tools.limit
+        cursor: tools.cursor
+      outputParameters:
+      - type: object
+        mapping: $.

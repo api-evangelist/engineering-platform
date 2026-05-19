@@ -1,0 +1,254 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Calls Apps
+  description: 'APIs.io Engineering Platform Cloudflare API — Calls Apps. 5 operations. Lead operation: APIs.io Engineering
+    Platform List apps. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Calls Apps
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-calls-apps
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Calls Apps business capability. Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-calls-apps
+      path: /accounts/{account_id}/calls/apps
+      operations:
+      - name: callsappslist
+        method: GET
+        description: APIs.io Engineering Platform List apps
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: callsappscreateanewapp
+        method: POST
+        description: APIs.io Engineering Platform Create a new app
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-calls-apps-app_id
+      path: /accounts/{account_id}/calls/apps/{app_id}
+      operations:
+      - name: callsappsdeleteapp
+        method: DELETE
+        description: APIs.io Engineering Platform Delete app
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: app_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: callsappsretrieveappdetails
+        method: GET
+        description: APIs.io Engineering Platform Retrieve app details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: app_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: callsappsupdateappdetails
+        method: PUT
+        description: APIs.io Engineering Platform Edit app details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: app_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-calls-apps-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Calls Apps. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/calls/apps
+      name: accounts-account-id-calls-apps
+      description: REST surface for accounts-account_id-calls-apps.
+      operations:
+      - method: GET
+        name: callsappslist
+        description: APIs.io Engineering Platform List apps
+        call: cloudflare-calls-apps.callsappslist
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: callsappscreateanewapp
+        description: APIs.io Engineering Platform Create a new app
+        call: cloudflare-calls-apps.callsappscreateanewapp
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/calls/apps/{app-id}
+      name: accounts-account-id-calls-apps-app-id
+      description: REST surface for accounts-account_id-calls-apps-app_id.
+      operations:
+      - method: DELETE
+        name: callsappsdeleteapp
+        description: APIs.io Engineering Platform Delete app
+        call: cloudflare-calls-apps.callsappsdeleteapp
+        with:
+          app_id: rest.app_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: callsappsretrieveappdetails
+        description: APIs.io Engineering Platform Retrieve app details
+        call: cloudflare-calls-apps.callsappsretrieveappdetails
+        with:
+          app_id: rest.app_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: callsappsupdateappdetails
+        description: APIs.io Engineering Platform Edit app details
+        call: cloudflare-calls-apps.callsappsupdateappdetails
+        with:
+          app_id: rest.app_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-calls-apps-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Calls Apps. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-apps
+      description: APIs.io Engineering Platform List apps
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-calls-apps.callsappslist
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-new
+      description: APIs.io Engineering Platform Create a new app
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-calls-apps.callsappscreateanewapp
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-app
+      description: APIs.io Engineering Platform Delete app
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-calls-apps.callsappsdeleteapp
+      with:
+        app_id: tools.app_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-retrieve-app
+      description: APIs.io Engineering Platform Retrieve app details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-calls-apps.callsappsretrieveappdetails
+      with:
+        app_id: tools.app_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-edit-app
+      description: APIs.io Engineering Platform Edit app details
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-calls-apps.callsappsupdateappdetails
+      with:
+        app_id: tools.app_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

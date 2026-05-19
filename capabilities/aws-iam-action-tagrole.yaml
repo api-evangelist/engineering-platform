@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagRole'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagRole. 2 operations. Lead operation:
+    #Action=TagRole. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=TagRole'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-tagrole
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagRole business capability. Self-contained,
+      no shared references.'
+    resources:
+    - name: '#Action=TagRole'
+      path: /#Action=TagRole
+      operations:
+      - name: gettagrole
+        method: GET
+        description: <p>Adds one or more tags to an IAM role. The role can be a regular role or a service-linked role. If
+          a tag with the same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists
+          of a key name and an as
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: RoleName
+          in: query
+          type: string
+          description: <p>The name of the IAM role to which you want to add tags.</p> <p>This parameter accepts (through its
+            <a href="http://wikipedia.org/wiki/regex">regex pattern</a
+          required: true
+        - name: Tags
+          in: query
+          type: array
+          description: The list of tags that you want to attach to the IAM role. Each tag consists of a key name and an associated
+            value.
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: posttagrole
+        method: POST
+        description: <p>Adds one or more tags to an IAM role. The role can be a regular role or a service-linked role. If
+          a tag with the same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists
+          of a key name and an as
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-tagrole-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagRole. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-tagrole
+      name: action-tagrole
+      description: 'REST surface for #Action=TagRole.'
+      operations:
+      - method: GET
+        name: gettagrole
+        description: <p>Adds one or more tags to an IAM role. The role can be a regular role or a service-linked role. If
+          a tag with the same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists
+          of a key name and an as
+        call: aws-iam-action-tagrole.gettagrole
+        with:
+          RoleName: rest.RoleName
+          Tags: rest.Tags
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: posttagrole
+        description: <p>Adds one or more tags to an IAM role. The role can be a regular role or a service-linked role. If
+          a tag with the same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists
+          of a key name and an as
+        call: aws-iam-action-tagrole.posttagrole
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-tagrole-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagRole. One tool
+      per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-adds-one-more-tags-iam
+      description: <p>Adds one or more tags to an IAM role. The role can be a regular role or a service-linked role. If a
+        tag with the same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists
+        of a key name and an as
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-tagrole.gettagrole
+      with:
+        RoleName: tools.RoleName
+        Tags: tools.Tags
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-adds-one-more-tags-iam-2
+      description: <p>Adds one or more tags to an IAM role. The role can be a regular role or a service-linked role. If a
+        tag with the same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists
+        of a key name and an as
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-tagrole.posttagrole
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

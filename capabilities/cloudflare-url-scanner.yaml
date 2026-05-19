@@ -1,0 +1,390 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — URL Scanner
+  description: 'APIs.io Engineering Platform Cloudflare API — URL Scanner. 5 operations. Lead operation: APIs.io Engineering
+    Platform Search URL scans. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - URL Scanner
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-url-scanner
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — URL Scanner business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-accountId-urlscanner-scan
+      path: /accounts/{accountId}/urlscanner/scan
+      operations:
+      - name: urlscannersearchscans
+        method: GET
+        description: APIs.io Engineering Platform Search URL scans
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: accountId
+          in: path
+          type: string
+          description: Account Id
+          required: true
+        - name: scanId
+          in: query
+          type: string
+          description: Scan uuid
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: next_cursor
+          in: query
+          type: string
+          description: Pagination cursor to get the next set of results.
+        - name: date_start
+          in: query
+          type: string
+          description: Filter scans requested after date (inclusive).
+        - name: date_end
+          in: query
+          type: string
+          description: Filter scans requested before date (inclusive).
+        - name: url
+          in: query
+          type: string
+          description: Filter scans by URL of _any_ request made by the webpage
+        - name: hostname
+          in: query
+          type: string
+          description: Filter scans by hostname of _any_ request made by the webpage.
+        - name: path
+          in: query
+          type: string
+          description: Filter scans by url path of _any_ request made by the webpage.
+        - name: ip
+          in: query
+          type: string
+          description: Filter scans by IP address (IPv4 or IPv6) of _any_ request made by the webpage.
+        - name: asn
+          in: query
+          type: string
+          description: Filter scans by Autonomous System Number (ASN) of _any_ request made by the webpage.
+        - name: hash
+          in: query
+          type: string
+          description: Filter scans by hash of any html/js/css request made by the webpage.
+        - name: page_url
+          in: query
+          type: string
+          description: Filter scans by submitted or scanned URL
+        - name: page_hostname
+          in: query
+          type: string
+          description: Filter scans by main page hostname (domain of effective URL).
+        - name: page_path
+          in: query
+          type: string
+          description: Filter scans by exact match of effective URL path (also supports suffix search).
+        - name: page_asn
+          in: query
+          type: string
+          description: Filter scans by main page Autonomous System Number (ASN).
+        - name: page_ip
+          in: query
+          type: string
+          description: Filter scans by  main page IP address (IPv4 or IPv6).
+        - name: account_scans
+          in: query
+          type: boolean
+          description: Return only scans created by account.
+        - name: is_malicious
+          in: query
+          type: boolean
+          description: Filter scans by malicious verdict.
+      - name: urlscannercreatescan
+        method: POST
+        description: APIs.io Engineering Platform Create URL Scan
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: accountId
+          in: path
+          type: string
+          description: Account Id
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: accounts-accountId-urlscanner-scan-scanId
+      path: /accounts/{accountId}/urlscanner/scan/{scanId}
+      operations:
+      - name: urlscannergetscan
+        method: GET
+        description: APIs.io Engineering Platform Get URL scan
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: scanId
+          in: path
+          type: string
+          description: Scan uuid
+          required: true
+        - name: accountId
+          in: path
+          type: string
+          description: Account Id
+          required: true
+        - name: full
+          in: query
+          type: boolean
+          description: Whether to return full report (scan summary and network log).
+    - name: accounts-accountId-urlscanner-scan-scanId-har
+      path: /accounts/{accountId}/urlscanner/scan/{scanId}/har
+      operations:
+      - name: urlscannergetscanhar
+        method: GET
+        description: APIs.io Engineering Platform Get URL scan's HAR
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: scanId
+          in: path
+          type: string
+          description: Scan uuid
+          required: true
+        - name: accountId
+          in: path
+          type: string
+          description: Account Id
+          required: true
+    - name: accounts-accountId-urlscanner-scan-scanId-screenshot
+      path: /accounts/{accountId}/urlscanner/scan/{scanId}/screenshot
+      operations:
+      - name: urlscannergetscanscreenshot
+        method: GET
+        description: APIs.io Engineering Platform Get screenshot
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: scanId
+          in: path
+          type: string
+          description: Scan uuid
+          required: true
+        - name: accountId
+          in: path
+          type: string
+          description: Account Id
+          required: true
+        - name: resolution
+          in: query
+          type: string
+          description: Target device type
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-url-scanner-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — URL Scanner. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{accountid}/urlscanner/scan
+      name: accounts-accountid-urlscanner-scan
+      description: REST surface for accounts-accountId-urlscanner-scan.
+      operations:
+      - method: GET
+        name: urlscannersearchscans
+        description: APIs.io Engineering Platform Search URL scans
+        call: cloudflare-url-scanner.urlscannersearchscans
+        with:
+          accountId: rest.accountId
+          scanId: rest.scanId
+          limit: rest.limit
+          next_cursor: rest.next_cursor
+          date_start: rest.date_start
+          date_end: rest.date_end
+          url: rest.url
+          hostname: rest.hostname
+          path: rest.path
+          ip: rest.ip
+          asn: rest.asn
+          hash: rest.hash
+          page_url: rest.page_url
+          page_hostname: rest.page_hostname
+          page_path: rest.page_path
+          page_asn: rest.page_asn
+          page_ip: rest.page_ip
+          account_scans: rest.account_scans
+          is_malicious: rest.is_malicious
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: urlscannercreatescan
+        description: APIs.io Engineering Platform Create URL Scan
+        call: cloudflare-url-scanner.urlscannercreatescan
+        with:
+          accountId: rest.accountId
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{accountid}/urlscanner/scan/{scanid}
+      name: accounts-accountid-urlscanner-scan-scanid
+      description: REST surface for accounts-accountId-urlscanner-scan-scanId.
+      operations:
+      - method: GET
+        name: urlscannergetscan
+        description: APIs.io Engineering Platform Get URL scan
+        call: cloudflare-url-scanner.urlscannergetscan
+        with:
+          scanId: rest.scanId
+          accountId: rest.accountId
+          full: rest.full
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{accountid}/urlscanner/scan/{scanid}/har
+      name: accounts-accountid-urlscanner-scan-scanid-har
+      description: REST surface for accounts-accountId-urlscanner-scan-scanId-har.
+      operations:
+      - method: GET
+        name: urlscannergetscanhar
+        description: APIs.io Engineering Platform Get URL scan's HAR
+        call: cloudflare-url-scanner.urlscannergetscanhar
+        with:
+          scanId: rest.scanId
+          accountId: rest.accountId
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{accountid}/urlscanner/scan/{scanid}/screenshot
+      name: accounts-accountid-urlscanner-scan-scanid-screenshot
+      description: REST surface for accounts-accountId-urlscanner-scan-scanId-screenshot.
+      operations:
+      - method: GET
+        name: urlscannergetscanscreenshot
+        description: APIs.io Engineering Platform Get screenshot
+        call: cloudflare-url-scanner.urlscannergetscanscreenshot
+        with:
+          scanId: rest.scanId
+          accountId: rest.accountId
+          resolution: rest.resolution
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-url-scanner-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — URL Scanner. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-search-url
+      description: APIs.io Engineering Platform Search URL scans
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-url-scanner.urlscannersearchscans
+      with:
+        accountId: tools.accountId
+        scanId: tools.scanId
+        limit: tools.limit
+        next_cursor: tools.next_cursor
+        date_start: tools.date_start
+        date_end: tools.date_end
+        url: tools.url
+        hostname: tools.hostname
+        path: tools.path
+        ip: tools.ip
+        asn: tools.asn
+        hash: tools.hash
+        page_url: tools.page_url
+        page_hostname: tools.page_hostname
+        page_path: tools.page_path
+        page_asn: tools.page_asn
+        page_ip: tools.page_ip
+        account_scans: tools.account_scans
+        is_malicious: tools.is_malicious
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-url
+      description: APIs.io Engineering Platform Create URL Scan
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-url-scanner.urlscannercreatescan
+      with:
+        accountId: tools.accountId
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-url
+      description: APIs.io Engineering Platform Get URL scan
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-url-scanner.urlscannergetscan
+      with:
+        scanId: tools.scanId
+        accountId: tools.accountId
+        full: tools.full
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-url-2
+      description: APIs.io Engineering Platform Get URL scan's HAR
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-url-scanner.urlscannergetscanhar
+      with:
+        scanId: tools.scanId
+        accountId: tools.accountId
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-screenshot
+      description: APIs.io Engineering Platform Get screenshot
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-url-scanner.urlscannergetscanscreenshot
+      with:
+        scanId: tools.scanId
+        accountId: tools.accountId
+        resolution: tools.resolution
+      outputParameters:
+      - type: object
+        mapping: $.

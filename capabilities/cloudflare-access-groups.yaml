@@ -1,0 +1,255 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Access Groups
+  description: 'APIs.io Engineering Platform Cloudflare API — Access Groups. 5 operations. Lead operation: APIs.io Engineering
+    Platform List Access groups. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Access Groups
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-access-groups
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Access Groups business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-access-groups
+      path: /accounts/{account_id}/access/groups
+      operations:
+      - name: accessgroupslistaccessgroups
+        method: GET
+        description: APIs.io Engineering Platform List Access groups
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accessgroupscreateanaccessgroup
+        method: POST
+        description: APIs.io Engineering Platform Create an Access group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-access-groups-group_id
+      path: /accounts/{account_id}/access/groups/{group_id}
+      operations:
+      - name: accessgroupsdeleteanaccessgroup
+        method: DELETE
+        description: APIs.io Engineering Platform Delete an Access group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: group_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accessgroupsgetanaccessgroup
+        method: GET
+        description: APIs.io Engineering Platform Get an Access group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: group_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accessgroupsupdateanaccessgroup
+        method: PUT
+        description: APIs.io Engineering Platform Update an Access group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: group_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-access-groups-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Access Groups. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/access/groups
+      name: accounts-account-id-access-groups
+      description: REST surface for accounts-account_id-access-groups.
+      operations:
+      - method: GET
+        name: accessgroupslistaccessgroups
+        description: APIs.io Engineering Platform List Access groups
+        call: cloudflare-access-groups.accessgroupslistaccessgroups
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: accessgroupscreateanaccessgroup
+        description: APIs.io Engineering Platform Create an Access group
+        call: cloudflare-access-groups.accessgroupscreateanaccessgroup
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/access/groups/{group-id}
+      name: accounts-account-id-access-groups-group-id
+      description: REST surface for accounts-account_id-access-groups-group_id.
+      operations:
+      - method: DELETE
+        name: accessgroupsdeleteanaccessgroup
+        description: APIs.io Engineering Platform Delete an Access group
+        call: cloudflare-access-groups.accessgroupsdeleteanaccessgroup
+        with:
+          group_id: rest.group_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: accessgroupsgetanaccessgroup
+        description: APIs.io Engineering Platform Get an Access group
+        call: cloudflare-access-groups.accessgroupsgetanaccessgroup
+        with:
+          group_id: rest.group_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: accessgroupsupdateanaccessgroup
+        description: APIs.io Engineering Platform Update an Access group
+        call: cloudflare-access-groups.accessgroupsupdateanaccessgroup
+        with:
+          group_id: rest.group_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-access-groups-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Access Groups. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-access
+      description: APIs.io Engineering Platform List Access groups
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-groups.accessgroupslistaccessgroups
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-access
+      description: APIs.io Engineering Platform Create an Access group
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-access-groups.accessgroupscreateanaccessgroup
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-access
+      description: APIs.io Engineering Platform Delete an Access group
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-access-groups.accessgroupsdeleteanaccessgroup
+      with:
+        group_id: tools.group_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-access
+      description: APIs.io Engineering Platform Get an Access group
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-groups.accessgroupsgetanaccessgroup
+      with:
+        group_id: tools.group_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-access
+      description: APIs.io Engineering Platform Update an Access group
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-access-groups.accessgroupsupdateanaccessgroup
+      with:
+        group_id: tools.group_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

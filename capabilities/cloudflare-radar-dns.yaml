@@ -1,0 +1,239 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar DNS
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar DNS. 2 operations. Lead operation: APIs.io Engineering
+    Platform Get Top Autonomous Systems by DNS queries.. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Radar DNS
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-dns
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar DNS business capability. Self-contained, no shared references.
+    resources:
+    - name: radar-dns-top-ases
+      path: /radar/dns/top/ases
+      operations:
+      - name: radargetdnstopases
+        method: GET
+        description: APIs.io Engineering Platform Get Top Autonomous Systems by DNS queries.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: name
+          in: query
+          type: array
+          description: Array of names that will be used to name the series in responses.
+        - name: domain
+          in: query
+          type: array
+          description: Array of domain names.
+          required: true
+        - name: dateRange
+          in: query
+          type: array
+          description: For example, use `7d` and `7dControl` to compare this week with the previous week. Use this parameter
+            or set specific start and end dates (`dateStart` and `date
+        - name: dateStart
+          in: query
+          type: array
+          description: Array of datetimes to filter the start of a series.
+        - name: dateEnd
+          in: query
+          type: array
+          description: End of the date range (inclusive).
+        - name: asn
+          in: query
+          type: array
+          description: 'Array of comma separated list of ASNs, start with `-` to exclude from results. For example, `-174,
+            3356` excludes results from AS174, but includes results from '
+        - name: location
+          in: query
+          type: array
+          description: 'Array of comma separated list of locations (alpha-2 country codes). Start with `-` to exclude from
+            results. For example, `-US,PT` excludes results from the US, '
+        - name: continent
+          in: query
+          type: array
+          description: Array of comma separated list of continents (alpha-2 continent codes). Start with `-` to exclude from
+            results. For example, `-EU,NA` excludes results from Europ
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-dns-top-locations
+      path: /radar/dns/top/locations
+      operations:
+      - name: radargetdnstoplocations
+        method: GET
+        description: APIs.io Engineering Platform Get Top Locations by DNS queries
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: name
+          in: query
+          type: array
+          description: Array of names that will be used to name the series in responses.
+        - name: domain
+          in: query
+          type: array
+          description: Array of domain names.
+          required: true
+        - name: dateRange
+          in: query
+          type: array
+          description: For example, use `7d` and `7dControl` to compare this week with the previous week. Use this parameter
+            or set specific start and end dates (`dateStart` and `date
+        - name: dateStart
+          in: query
+          type: array
+          description: Array of datetimes to filter the start of a series.
+        - name: dateEnd
+          in: query
+          type: array
+          description: End of the date range (inclusive).
+        - name: asn
+          in: query
+          type: array
+          description: 'Array of comma separated list of ASNs, start with `-` to exclude from results. For example, `-174,
+            3356` excludes results from AS174, but includes results from '
+        - name: location
+          in: query
+          type: array
+          description: 'Array of comma separated list of locations (alpha-2 country codes). Start with `-` to exclude from
+            results. For example, `-US,PT` excludes results from the US, '
+        - name: continent
+          in: query
+          type: array
+          description: Array of comma separated list of continents (alpha-2 continent codes). Start with `-` to exclude from
+            results. For example, `-EU,NA` excludes results from Europ
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-dns-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar DNS. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/dns/top/ases
+      name: radar-dns-top-ases
+      description: REST surface for radar-dns-top-ases.
+      operations:
+      - method: GET
+        name: radargetdnstopases
+        description: APIs.io Engineering Platform Get Top Autonomous Systems by DNS queries.
+        call: cloudflare-radar-dns.radargetdnstopases
+        with:
+          limit: rest.limit
+          name: rest.name
+          domain: rest.domain
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          asn: rest.asn
+          location: rest.location
+          continent: rest.continent
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/dns/top/locations
+      name: radar-dns-top-locations
+      description: REST surface for radar-dns-top-locations.
+      operations:
+      - method: GET
+        name: radargetdnstoplocations
+        description: APIs.io Engineering Platform Get Top Locations by DNS queries
+        call: cloudflare-radar-dns.radargetdnstoplocations
+        with:
+          limit: rest.limit
+          name: rest.name
+          domain: rest.domain
+          dateRange: rest.dateRange
+          dateStart: rest.dateStart
+          dateEnd: rest.dateEnd
+          asn: rest.asn
+          location: rest.location
+          continent: rest.continent
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-dns-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar DNS. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-top
+      description: APIs.io Engineering Platform Get Top Autonomous Systems by DNS queries.
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-dns.radargetdnstopases
+      with:
+        limit: tools.limit
+        name: tools.name
+        domain: tools.domain
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        asn: tools.asn
+        location: tools.location
+        continent: tools.continent
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-top-2
+      description: APIs.io Engineering Platform Get Top Locations by DNS queries
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-dns.radargetdnstoplocations
+      with:
+        limit: tools.limit
+        name: tools.name
+        domain: tools.domain
+        dateRange: tools.dateRange
+        dateStart: tools.dateStart
+        dateEnd: tools.dateEnd
+        asn: tools.asn
+        location: tools.location
+        continent: tools.continent
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.

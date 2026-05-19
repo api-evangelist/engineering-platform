@@ -1,0 +1,121 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — DNS Settings for an Account
+  description: 'APIs.io Engineering Platform Cloudflare API — DNS Settings for an Account. 2 operations. Lead operation: APIs.io
+    Engineering Platform Show DNS Settings. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - DNS Settings for an Account
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-dns-settings-for-an-account
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — DNS Settings for an Account business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-dns_settings
+      path: /accounts/{account_id}/dns_settings
+      operations:
+      - name: dnssettingsforanaccountlistdnssettings
+        method: GET
+        description: APIs.io Engineering Platform Show DNS Settings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: dnssettingsforanaccountupdatednssettings
+        method: PATCH
+        description: APIs.io Engineering Platform Update DNS Settings
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-dns-settings-for-an-account-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — DNS Settings for an Account. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/dns-settings
+      name: accounts-account-id-dns-settings
+      description: REST surface for accounts-account_id-dns_settings.
+      operations:
+      - method: GET
+        name: dnssettingsforanaccountlistdnssettings
+        description: APIs.io Engineering Platform Show DNS Settings
+        call: cloudflare-dns-settings-for-an-account.dnssettingsforanaccountlistdnssettings
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: dnssettingsforanaccountupdatednssettings
+        description: APIs.io Engineering Platform Update DNS Settings
+        call: cloudflare-dns-settings-for-an-account.dnssettingsforanaccountupdatednssettings
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-dns-settings-for-an-account-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — DNS Settings for an Account. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-show-dns
+      description: APIs.io Engineering Platform Show DNS Settings
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-dns-settings-for-an-account.dnssettingsforanaccountlistdnssettings
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-dns
+      description: APIs.io Engineering Platform Update DNS Settings
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-dns-settings-for-an-account.dnssettingsforanaccountupdatednssettings
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

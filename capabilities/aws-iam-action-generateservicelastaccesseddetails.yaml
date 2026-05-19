@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GenerateServiceLastAccessedDetails'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GenerateServiceLastAccessedDetails.
+    2 operations. Lead operation: #Action=GenerateServiceLastAccessedDetails. Self-contained Naftiko capability covering one
+    Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=GenerateServiceLastAccessedDetails'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-generateservicelastaccesseddetails
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=GenerateServiceLastAccessedDetails
+      business capability. Self-contained, no shared references.'
+    resources:
+    - name: '#Action=GenerateServiceLastAccessedDetails'
+      path: /#Action=GenerateServiceLastAccessedDetails
+      operations:
+      - name: getgenerateservicelastaccesseddetails
+        method: GET
+        description: <p>Generates a report that includes details about when an IAM resource (user, group, role, or policy)
+          was last used in an attempt to access Amazon Web Services services. Recent activity usually appears within four
+          hours. IAM reports activit
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Arn
+          in: query
+          type: string
+          description: The ARN of the IAM resource (user, group, role, or managed policy) used to generate information about
+            when the resource was last used in an attempt to access an
+          required: true
+        - name: Granularity
+          in: query
+          type: string
+          description: The level of detail that you want to generate. You can specify whether you want to generate information
+            about the last attempt to access services or actions. If
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postgenerateservicelastaccesseddetails
+        method: POST
+        description: <p>Generates a report that includes details about when an IAM resource (user, group, role, or policy)
+          was last used in an attempt to access Amazon Web Services services. Recent activity usually appears within four
+          hours. IAM reports activit
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-generateservicelastaccesseddetails-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GenerateServiceLastAccessedDetails.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-generateservicelastaccesseddetails
+      name: action-generateservicelastaccesseddetails
+      description: 'REST surface for #Action=GenerateServiceLastAccessedDetails.'
+      operations:
+      - method: GET
+        name: getgenerateservicelastaccesseddetails
+        description: <p>Generates a report that includes details about when an IAM resource (user, group, role, or policy)
+          was last used in an attempt to access Amazon Web Services services. Recent activity usually appears within four
+          hours. IAM reports activit
+        call: aws-iam-action-generateservicelastaccesseddetails.getgenerateservicelastaccesseddetails
+        with:
+          Arn: rest.Arn
+          Granularity: rest.Granularity
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postgenerateservicelastaccesseddetails
+        description: <p>Generates a report that includes details about when an IAM resource (user, group, role, or policy)
+          was last used in an attempt to access Amazon Web Services services. Recent activity usually appears within four
+          hours. IAM reports activit
+        call: aws-iam-action-generateservicelastaccesseddetails.postgenerateservicelastaccesseddetails
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-generateservicelastaccesseddetails-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=GenerateServiceLastAccessedDetails.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-generates-report-that-includes-details
+      description: <p>Generates a report that includes details about when an IAM resource (user, group, role, or policy) was
+        last used in an attempt to access Amazon Web Services services. Recent activity usually appears within four hours.
+        IAM reports activit
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-generateservicelastaccesseddetails.getgenerateservicelastaccesseddetails
+      with:
+        Arn: tools.Arn
+        Granularity: tools.Granularity
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-generates-report-that-includes-details-2
+      description: <p>Generates a report that includes details about when an IAM resource (user, group, role, or policy) was
+        last used in an attempt to access Amazon Web Services services. Recent activity usually appears within four hours.
+        IAM reports activit
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-generateservicelastaccesseddetails.postgenerateservicelastaccesseddetails
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

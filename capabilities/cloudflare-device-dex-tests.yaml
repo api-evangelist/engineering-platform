@@ -1,0 +1,255 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Device DEX Tests
+  description: 'APIs.io Engineering Platform Cloudflare API — Device DEX Tests. 5 operations. Lead operation: APIs.io Engineering
+    Platform List Device DEX tests. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Device DEX Tests
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-device-dex-tests
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Device DEX Tests business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: accounts-account_id-devices-dex_tests
+      path: /accounts/{account_id}/devices/dex_tests
+      operations:
+      - name: devicedextestdetails
+        method: GET
+        description: APIs.io Engineering Platform List Device DEX tests
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: devicedextestcreatedevicedextest
+        method: POST
+        description: APIs.io Engineering Platform Create Device DEX test
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id-devices-dex_tests-dex_test_id
+      path: /accounts/{account_id}/devices/dex_tests/{dex_test_id}
+      operations:
+      - name: devicedextestdeletedevicedextest
+        method: DELETE
+        description: APIs.io Engineering Platform Delete Device DEX test
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: dex_test_id
+          in: path
+          type: string
+          required: true
+      - name: devicedextestgetdevicedextest
+        method: GET
+        description: APIs.io Engineering Platform Get Device DEX test
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: dex_test_id
+          in: path
+          type: string
+          required: true
+      - name: devicedextestupdatedevicedextest
+        method: PUT
+        description: APIs.io Engineering Platform Update Device DEX test
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: dex_test_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-device-dex-tests-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Device DEX Tests. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/devices/dex-tests
+      name: accounts-account-id-devices-dex-tests
+      description: REST surface for accounts-account_id-devices-dex_tests.
+      operations:
+      - method: GET
+        name: devicedextestdetails
+        description: APIs.io Engineering Platform List Device DEX tests
+        call: cloudflare-device-dex-tests.devicedextestdetails
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: devicedextestcreatedevicedextest
+        description: APIs.io Engineering Platform Create Device DEX test
+        call: cloudflare-device-dex-tests.devicedextestcreatedevicedextest
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/devices/dex-tests/{dex-test-id}
+      name: accounts-account-id-devices-dex-tests-dex-test-id
+      description: REST surface for accounts-account_id-devices-dex_tests-dex_test_id.
+      operations:
+      - method: DELETE
+        name: devicedextestdeletedevicedextest
+        description: APIs.io Engineering Platform Delete Device DEX test
+        call: cloudflare-device-dex-tests.devicedextestdeletedevicedextest
+        with:
+          account_id: rest.account_id
+          dex_test_id: rest.dex_test_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: devicedextestgetdevicedextest
+        description: APIs.io Engineering Platform Get Device DEX test
+        call: cloudflare-device-dex-tests.devicedextestgetdevicedextest
+        with:
+          account_id: rest.account_id
+          dex_test_id: rest.dex_test_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: devicedextestupdatedevicedextest
+        description: APIs.io Engineering Platform Update Device DEX test
+        call: cloudflare-device-dex-tests.devicedextestupdatedevicedextest
+        with:
+          account_id: rest.account_id
+          dex_test_id: rest.dex_test_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-device-dex-tests-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Device DEX Tests. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-device
+      description: APIs.io Engineering Platform List Device DEX tests
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-dex-tests.devicedextestdetails
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-device
+      description: APIs.io Engineering Platform Create Device DEX test
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-device-dex-tests.devicedextestcreatedevicedextest
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-device
+      description: APIs.io Engineering Platform Delete Device DEX test
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-device-dex-tests.devicedextestdeletedevicedextest
+      with:
+        account_id: tools.account_id
+        dex_test_id: tools.dex_test_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-device
+      description: APIs.io Engineering Platform Get Device DEX test
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-dex-tests.devicedextestgetdevicedextest
+      with:
+        account_id: tools.account_id
+        dex_test_id: tools.dex_test_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-device
+      description: APIs.io Engineering Platform Update Device DEX test
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-device-dex-tests.devicedextestupdatedevicedextest
+      with:
+        account_id: tools.account_id
+        dex_test_id: tools.dex_test_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

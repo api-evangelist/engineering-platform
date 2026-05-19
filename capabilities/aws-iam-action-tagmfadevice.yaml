@@ -1,0 +1,163 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagMFADevice'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagMFADevice. 2 operations. Lead
+    operation: #Action=TagMFADevice. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=TagMFADevice'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-tagmfadevice
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagMFADevice business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=TagMFADevice'
+      path: /#Action=TagMFADevice
+      operations:
+      - name: gettagmfadevice
+        method: GET
+        description: <p>Adds one or more tags to an IAM virtual multi-factor authentication (MFA) device. If a tag with the
+          same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists of a key name
+          and an associated valu
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: SerialNumber
+          in: query
+          type: string
+          description: <p>The unique identifier for the IAM virtual MFA device to which you want to add tags. For virtual
+            MFA devices, the serial number is the same as the ARN.</p> <p
+          required: true
+        - name: Tags
+          in: query
+          type: array
+          description: The list of tags that you want to attach to the IAM virtual MFA device. Each tag consists of a key
+            name and an associated value.
+          required: true
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: posttagmfadevice
+        method: POST
+        description: <p>Adds one or more tags to an IAM virtual multi-factor authentication (MFA) device. If a tag with the
+          same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists of a key name
+          and an associated valu
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-tagmfadevice-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagMFADevice.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-tagmfadevice
+      name: action-tagmfadevice
+      description: 'REST surface for #Action=TagMFADevice.'
+      operations:
+      - method: GET
+        name: gettagmfadevice
+        description: <p>Adds one or more tags to an IAM virtual multi-factor authentication (MFA) device. If a tag with the
+          same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists of a key name
+          and an associated valu
+        call: aws-iam-action-tagmfadevice.gettagmfadevice
+        with:
+          SerialNumber: rest.SerialNumber
+          Tags: rest.Tags
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: posttagmfadevice
+        description: <p>Adds one or more tags to an IAM virtual multi-factor authentication (MFA) device. If a tag with the
+          same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists of a key name
+          and an associated valu
+        call: aws-iam-action-tagmfadevice.posttagmfadevice
+        with:
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-tagmfadevice-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=TagMFADevice.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-adds-one-more-tags-iam
+      description: <p>Adds one or more tags to an IAM virtual multi-factor authentication (MFA) device. If a tag with the
+        same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists of a key name
+        and an associated valu
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-tagmfadevice.gettagmfadevice
+      with:
+        SerialNumber: tools.SerialNumber
+        Tags: tools.Tags
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-adds-one-more-tags-iam-2
+      description: <p>Adds one or more tags to an IAM virtual multi-factor authentication (MFA) device. If a tag with the
+        same key name already exists, then that tag is overwritten with the new value.</p> <p>A tag consists of a key name
+        and an associated valu
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-tagmfadevice.posttagmfadevice
+      with:
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,188 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Radar Datasets
+  description: 'APIs.io Engineering Platform Cloudflare API — Radar Datasets. 3 operations. Lead operation: APIs.io Engineering
+    Platform Get Datasets. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Radar Datasets
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-radar-datasets
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Radar Datasets business capability. Self-contained, no shared
+      references.
+    resources:
+    - name: radar-datasets
+      path: /radar/datasets
+      operations:
+      - name: radargetreportsdatasets
+        method: GET
+        description: APIs.io Engineering Platform Get Datasets
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: limit
+          in: query
+          type: integer
+          description: Limit the number of objects in the response.
+        - name: offset
+          in: query
+          type: integer
+          description: Number of objects to skip before grabbing results.
+        - name: datasetType
+          in: query
+          type: string
+          description: Dataset type.
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+    - name: radar-datasets-download
+      path: /radar/datasets/download
+      operations:
+      - name: radarpostreportsdatasetdownloadurl
+        method: POST
+        description: APIs.io Engineering Platform Get Dataset download url
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: format
+          in: query
+          type: string
+          description: Format results are returned in.
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: radar-datasets-alias
+      path: /radar/datasets/{alias}
+      operations:
+      - name: radargetreportsdatasetdownload
+        method: GET
+        description: APIs.io Engineering Platform Get Dataset csv Stream
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: alias
+          in: path
+          type: string
+          description: Dataset alias or id
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-radar-datasets-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Radar Datasets. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/radar/datasets
+      name: radar-datasets
+      description: REST surface for radar-datasets.
+      operations:
+      - method: GET
+        name: radargetreportsdatasets
+        description: APIs.io Engineering Platform Get Datasets
+        call: cloudflare-radar-datasets.radargetreportsdatasets
+        with:
+          limit: rest.limit
+          offset: rest.offset
+          datasetType: rest.datasetType
+          format: rest.format
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/datasets/download
+      name: radar-datasets-download
+      description: REST surface for radar-datasets-download.
+      operations:
+      - method: POST
+        name: radarpostreportsdatasetdownloadurl
+        description: APIs.io Engineering Platform Get Dataset download url
+        call: cloudflare-radar-datasets.radarpostreportsdatasetdownloadurl
+        with:
+          format: rest.format
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/radar/datasets/{alias}
+      name: radar-datasets-alias
+      description: REST surface for radar-datasets-alias.
+      operations:
+      - method: GET
+        name: radargetreportsdatasetdownload
+        description: APIs.io Engineering Platform Get Dataset csv Stream
+        call: cloudflare-radar-datasets.radargetreportsdatasetdownload
+        with:
+          alias: rest.alias
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-radar-datasets-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Radar Datasets. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-datasets
+      description: APIs.io Engineering Platform Get Datasets
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-datasets.radargetreportsdatasets
+      with:
+        limit: tools.limit
+        offset: tools.offset
+        datasetType: tools.datasetType
+        format: tools.format
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-dataset
+      description: APIs.io Engineering Platform Get Dataset download url
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: cloudflare-radar-datasets.radarpostreportsdatasetdownloadurl
+      with:
+        format: tools.format
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-get-dataset-2
+      description: APIs.io Engineering Platform Get Dataset csv Stream
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-radar-datasets.radargetreportsdatasetdownload
+      with:
+        alias: tools.alias
+      outputParameters:
+      - type: object
+        mapping: $.

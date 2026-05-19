@@ -1,0 +1,123 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform AWS Lambda — 2021 11 15
+  description: 'APIs.io Engineering Platform AWS Lambda — 2021 11 15. 1 operations. Lead operation: 2021 11 15. Self-contained
+    Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - 2021 11 15
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-lambda-2021-11-15
+    baseUri: http://lambda.{region}.amazonaws.com
+    description: APIs.io Engineering Platform AWS Lambda — 2021 11 15 business capability. Self-contained, no shared references.
+    resources:
+    - name: 2021-11-15-functions-FunctionName-response-streaming-invocations
+      path: /2021-11-15/functions/{FunctionName}/response-streaming-invocations
+      operations:
+      - name: invokewithresponsestream
+        method: POST
+        description: <p>Configure your Lambda functions to stream response payloads back to clients. For more information,
+          see <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html">Configuring a Lambda
+          function to stream r
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: FunctionName
+          in: path
+          type: string
+          description: <p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function
+            name</b> â€“ <code>my-function</code>.</p> </li> <l
+          required: true
+        - name: X-Amz-Invocation-Type
+          in: header
+          type: string
+          description: <p>Use one of the following options:</p> <ul> <li> <p> <code>RequestResponse</code> (default) â€“ Invoke
+            the function synchronously. Keep the connection open un
+        - name: X-Amz-Log-Type
+          in: header
+          type: string
+          description: Set to <code>Tail</code> to include the execution log in the response. Applies to synchronously invoked
+            functions only.
+        - name: X-Amz-Client-Context
+          in: header
+          type: string
+          description: Up to 3,583 bytes of base64-encoded data about the invoking client to pass to the function in the context
+            object.
+        - name: Qualifier
+          in: query
+          type: string
+          description: The alias name.
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-lambda-2021-11-15-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform AWS Lambda — 2021 11 15. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/2021-11-15/functions/{functionname}/response-streaming-invocations
+      name: 2021-11-15-functions-functionname-response-streaming-invocations
+      description: REST surface for 2021-11-15-functions-FunctionName-response-streaming-invocations.
+      operations:
+      - method: POST
+        name: invokewithresponsestream
+        description: <p>Configure your Lambda functions to stream response payloads back to clients. For more information,
+          see <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html">Configuring a Lambda
+          function to stream r
+        call: aws-lambda-2021-11-15.invokewithresponsestream
+        with:
+          FunctionName: rest.FunctionName
+          X-Amz-Invocation-Type: rest.X-Amz-Invocation-Type
+          X-Amz-Log-Type: rest.X-Amz-Log-Type
+          X-Amz-Client-Context: rest.X-Amz-Client-Context
+          Qualifier: rest.Qualifier
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-lambda-2021-11-15-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform AWS Lambda — 2021 11 15. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: p-configure-your-lambda-functions-stream
+      description: <p>Configure your Lambda functions to stream response payloads back to clients. For more information, see
+        <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-response-streaming.html">Configuring a Lambda
+        function to stream r
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-lambda-2021-11-15.invokewithresponsestream
+      with:
+        FunctionName: tools.FunctionName
+        X-Amz-Invocation-Type: tools.X-Amz-Invocation-Type
+        X-Amz-Log-Type: tools.X-Amz-Log-Type
+        X-Amz-Client-Context: tools.X-Amz-Client-Context
+        Qualifier: tools.Qualifier
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

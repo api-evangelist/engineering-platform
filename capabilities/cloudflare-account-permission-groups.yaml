@@ -1,0 +1,153 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Account Permission Groups
+  description: 'APIs.io Engineering Platform Cloudflare API — Account Permission Groups. 2 operations. Lead operation: APIs.io
+    Engineering Platform List Account Permission Groups. Self-contained Naftiko capability covering one Engineering Platform
+    business surface.'
+  tags:
+  - Engineering Platform
+  - Account Permission Groups
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-account-permission-groups
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Account Permission Groups business capability. Self-contained,
+      no shared references.
+    resources:
+    - name: accounts-account_id-iam-permission_groups
+      path: /accounts/{account_id}/iam/permission_groups
+      operations:
+      - name: accountpermissiongrouplist
+        method: GET
+        description: APIs.io Engineering Platform List Account Permission Groups
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: id
+          in: query
+          type: string
+        - name: name
+          in: query
+          type: string
+        - name: label
+          in: query
+          type: string
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+    - name: accounts-account_id-iam-permission_groups-permission_group_id
+      path: /accounts/{account_id}/iam/permission_groups/{permission_group_id}
+      operations:
+      - name: accountpermissiongroupdetails
+        method: GET
+        description: APIs.io Engineering Platform Permission Group Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: permission_group_id
+          in: path
+          type: string
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-account-permission-groups-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Account Permission Groups. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/iam/permission-groups
+      name: accounts-account-id-iam-permission-groups
+      description: REST surface for accounts-account_id-iam-permission_groups.
+      operations:
+      - method: GET
+        name: accountpermissiongrouplist
+        description: APIs.io Engineering Platform List Account Permission Groups
+        call: cloudflare-account-permission-groups.accountpermissiongrouplist
+        with:
+          account_id: rest.account_id
+          id: rest.id
+          name: rest.name
+          label: rest.label
+          page: rest.page
+          per_page: rest.per_page
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/iam/permission-groups/{permission-group-id}
+      name: accounts-account-id-iam-permission-groups-permission-group-id
+      description: REST surface for accounts-account_id-iam-permission_groups-permission_group_id.
+      operations:
+      - method: GET
+        name: accountpermissiongroupdetails
+        description: APIs.io Engineering Platform Permission Group Details
+        call: cloudflare-account-permission-groups.accountpermissiongroupdetails
+        with:
+          account_id: rest.account_id
+          permission_group_id: rest.permission_group_id
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-account-permission-groups-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Account Permission Groups. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-account
+      description: APIs.io Engineering Platform List Account Permission Groups
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-account-permission-groups.accountpermissiongrouplist
+      with:
+        account_id: tools.account_id
+        id: tools.id
+        name: tools.name
+        label: tools.label
+        page: tools.page
+        per_page: tools.per_page
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-permission-group
+      description: APIs.io Engineering Platform Permission Group Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-account-permission-groups.accountpermissiongroupdetails
+      with:
+        account_id: tools.account_id
+        permission_group_id: tools.permission_group_id
+      outputParameters:
+      - type: object
+        mapping: $.

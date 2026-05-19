@@ -1,0 +1,173 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Stream MP4 Downloads
+  description: 'APIs.io Engineering Platform Cloudflare API — Stream MP4 Downloads. 3 operations. Lead operation: APIs.io
+    Engineering Platform Delete downloads. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Stream MP4 Downloads
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-stream-mp4-downloads
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Stream MP4 Downloads business capability. Self-contained, no
+      shared references.
+    resources:
+    - name: accounts-account_id-stream-identifier-downloads
+      path: /accounts/{account_id}/stream/{identifier}/downloads
+      operations:
+      - name: streammp4downloadsdeletedownloads
+        method: DELETE
+        description: APIs.io Engineering Platform Delete downloads
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: streammp4downloadslistdownloads
+        method: GET
+        description: APIs.io Engineering Platform List downloads
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: streammp4downloadscreatedownloads
+        method: POST
+        description: APIs.io Engineering Platform Create downloads
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: identifier
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-stream-mp4-downloads-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Stream MP4 Downloads. One Spectral-compliant
+      resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/stream/{identifier}/downloads
+      name: accounts-account-id-stream-identifier-downloads
+      description: REST surface for accounts-account_id-stream-identifier-downloads.
+      operations:
+      - method: DELETE
+        name: streammp4downloadsdeletedownloads
+        description: APIs.io Engineering Platform Delete downloads
+        call: cloudflare-stream-mp4-downloads.streammp4downloadsdeletedownloads
+        with:
+          identifier: rest.identifier
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: streammp4downloadslistdownloads
+        description: APIs.io Engineering Platform List downloads
+        call: cloudflare-stream-mp4-downloads.streammp4downloadslistdownloads
+        with:
+          identifier: rest.identifier
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: streammp4downloadscreatedownloads
+        description: APIs.io Engineering Platform Create downloads
+        call: cloudflare-stream-mp4-downloads.streammp4downloadscreatedownloads
+        with:
+          identifier: rest.identifier
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-stream-mp4-downloads-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Stream MP4 Downloads. One tool per consumed
+      operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-delete-downloads
+      description: APIs.io Engineering Platform Delete downloads
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-stream-mp4-downloads.streammp4downloadsdeletedownloads
+      with:
+        identifier: tools.identifier
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-list-downloads
+      description: APIs.io Engineering Platform List downloads
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-stream-mp4-downloads.streammp4downloadslistdownloads
+      with:
+        identifier: tools.identifier
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-downloads
+      description: APIs.io Engineering Platform Create downloads
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-stream-mp4-downloads.streammp4downloadscreatedownloads
+      with:
+        identifier: tools.identifier
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

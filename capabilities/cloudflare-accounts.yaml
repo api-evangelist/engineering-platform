@@ -1,0 +1,244 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Accounts
+  description: 'APIs.io Engineering Platform Cloudflare API — Accounts. 5 operations. Lead operation: APIs.io Engineering
+    Platform List Accounts. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Accounts
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-accounts
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Accounts business capability. Self-contained, no shared references.
+    resources:
+    - name: accounts
+      path: /accounts
+      operations:
+      - name: accountslistaccounts
+        method: GET
+        description: APIs.io Engineering Platform List Accounts
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: string
+        - name: page
+          in: query
+          type: number
+        - name: per_page
+          in: query
+          type: number
+        - name: direction
+          in: query
+          type: string
+      - name: accountcreation
+        method: POST
+        description: APIs.io Engineering Platform Create an account
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: accounts-account_id
+      path: /accounts/{account_id}
+      operations:
+      - name: accountdeletion
+        method: DELETE
+        description: APIs.io Engineering Platform Delete a specific account
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accountsaccountdetails
+        method: GET
+        description: APIs.io Engineering Platform Account Details
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: accountsupdateaccount
+        method: PUT
+        description: APIs.io Engineering Platform Update Account
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-accounts-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Accounts. One Spectral-compliant resource
+      per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts
+      name: accounts
+      description: REST surface for accounts.
+      operations:
+      - method: GET
+        name: accountslistaccounts
+        description: APIs.io Engineering Platform List Accounts
+        call: cloudflare-accounts.accountslistaccounts
+        with:
+          name: rest.name
+          page: rest.page
+          per_page: rest.per_page
+          direction: rest.direction
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: accountcreation
+        description: APIs.io Engineering Platform Create an account
+        call: cloudflare-accounts.accountcreation
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}
+      name: accounts-account-id
+      description: REST surface for accounts-account_id.
+      operations:
+      - method: DELETE
+        name: accountdeletion
+        description: APIs.io Engineering Platform Delete a specific account
+        call: cloudflare-accounts.accountdeletion
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: accountsaccountdetails
+        description: APIs.io Engineering Platform Account Details
+        call: cloudflare-accounts.accountsaccountdetails
+        with:
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: accountsupdateaccount
+        description: APIs.io Engineering Platform Update Account
+        call: cloudflare-accounts.accountsupdateaccount
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-accounts-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Accounts. One tool per consumed operation,
+      routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-list-accounts
+      description: APIs.io Engineering Platform List Accounts
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-accounts.accountslistaccounts
+      with:
+        name: tools.name
+        page: tools.page
+        per_page: tools.per_page
+        direction: tools.direction
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-create-account
+      description: APIs.io Engineering Platform Create an account
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-accounts.accountcreation
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-delete-specific
+      description: APIs.io Engineering Platform Delete a specific account
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: cloudflare-accounts.accountdeletion
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-account-details
+      description: APIs.io Engineering Platform Account Details
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-accounts.accountsaccountdetails
+      with:
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-account
+      description: APIs.io Engineering Platform Update Account
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-accounts.accountsupdateaccount
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

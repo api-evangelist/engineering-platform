@@ -1,0 +1,134 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — IP Address Management Dynamic Advertisement
+  description: 'APIs.io Engineering Platform Cloudflare API — IP Address Management Dynamic Advertisement. 2 operations. Lead
+    operation: APIs.io Engineering Platform Get Advertisement Status. Self-contained Naftiko capability covering one Engineering
+    Platform business surface.'
+  tags:
+  - Engineering Platform
+  - IP Address Management Dynamic Advertisement
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-ip-address-management-dynamic-advertisement
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — IP Address Management Dynamic Advertisement business capability.
+      Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-addressing-prefixes-prefix_id-bgp-status
+      path: /accounts/{account_id}/addressing/prefixes/{prefix_id}/bgp/status
+      operations:
+      - name: ipaddressmanagementdynamicadvertisementgetadvertisementstatus
+        method: GET
+        description: APIs.io Engineering Platform Get Advertisement Status
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: prefix_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+      - name: ipaddressmanagementdynamicadvertisementupdateprefixdynamicadvertisementstatus
+        method: PATCH
+        description: APIs.io Engineering Platform Update Prefix Dynamic Advertisement Status
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: prefix_id
+          in: path
+          type: string
+          required: true
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-ip-address-management-dynamic-advertisement-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — IP Address Management Dynamic Advertisement.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/addressing/prefixes/{prefix-id}/bgp/status
+      name: accounts-account-id-addressing-prefixes-prefix-id-bgp-status
+      description: REST surface for accounts-account_id-addressing-prefixes-prefix_id-bgp-status.
+      operations:
+      - method: GET
+        name: ipaddressmanagementdynamicadvertisementgetadvertisementstatus
+        description: APIs.io Engineering Platform Get Advertisement Status
+        call: cloudflare-ip-address-management-dynamic-advertisement.ipaddressmanagementdynamicadvertisementgetadvertisementstatus
+        with:
+          prefix_id: rest.prefix_id
+          account_id: rest.account_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: ipaddressmanagementdynamicadvertisementupdateprefixdynamicadvertisementstatus
+        description: APIs.io Engineering Platform Update Prefix Dynamic Advertisement Status
+        call: cloudflare-ip-address-management-dynamic-advertisement.ipaddressmanagementdynamicadvertisementupdateprefixdynamicadvertisementstatus
+        with:
+          prefix_id: rest.prefix_id
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-ip-address-management-dynamic-advertisement-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — IP Address Management Dynamic Advertisement.
+      One tool per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-advertisement
+      description: APIs.io Engineering Platform Get Advertisement Status
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-address-management-dynamic-advertisement.ipaddressmanagementdynamicadvertisementgetadvertisementstatus
+      with:
+        prefix_id: tools.prefix_id
+        account_id: tools.account_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-update-prefix
+      description: APIs.io Engineering Platform Update Prefix Dynamic Advertisement Status
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: cloudflare-ip-address-management-dynamic-advertisement.ipaddressmanagementdynamicadvertisementupdateprefixdynamicadvertisementstatus
+      with:
+        prefix_id: tools.prefix_id
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

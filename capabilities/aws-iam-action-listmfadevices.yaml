@@ -1,0 +1,180 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListMFADevices'
+  description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListMFADevices. 2 operations. Lead
+    operation: #Action=ListMFADevices. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - '#Action=ListMFADevices'
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: aws-iam-action-listmfadevices
+    baseUri: https://iam.amazonaws.com
+    description: 'APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListMFADevices business capability.
+      Self-contained, no shared references.'
+    resources:
+    - name: '#Action=ListMFADevices'
+      path: /#Action=ListMFADevices
+      operations:
+      - name: getlistmfadevices
+        method: GET
+        description: '<p>Lists the MFA devices for an IAM user. If the request includes a IAM user name, then this operation
+          lists all the MFA devices associated with the specified user. If you do not specify a user name, IAM determines
+          the user name implicitly '
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: UserName
+          in: query
+          type: string
+          description: <p>The name of the user whose MFA devices you want to list.</p> <p>This parameter allows (through its
+            <a href="http://wikipedia.org/wiki/regex">regex pattern</a
+        - name: Marker
+          in: query
+          type: string
+          description: Use this parameter only when paginating results and only after you receive a response indicating that
+            the results are truncated. Set it to the value of the <cod
+        - name: MaxItems
+          in: query
+          type: integer
+          description: <p>Use this only when paginating results to indicate the maximum number of items you want in the response.
+            If additional items exist beyond the maximum you spec
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+      - name: postlistmfadevices
+        method: POST
+        description: '<p>Lists the MFA devices for an IAM user. If the request includes a IAM user name, then this operation
+          lists all the MFA devices associated with the specified user. If you do not specify a user name, IAM determines
+          the user name implicitly '
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: MaxItems
+          in: query
+          type: string
+          description: Pagination limit
+        - name: Marker
+          in: query
+          type: string
+          description: Pagination token
+        - name: Action
+          in: query
+          type: string
+          required: true
+        - name: Version
+          in: query
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: aws-iam-action-listmfadevices-rest
+    port: 8080
+    description: 'REST adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListMFADevices.
+      One Spectral-compliant resource per consumed operation, prefixed with /v1.'
+    resources:
+    - path: /v1/action-listmfadevices
+      name: action-listmfadevices
+      description: 'REST surface for #Action=ListMFADevices.'
+      operations:
+      - method: GET
+        name: getlistmfadevices
+        description: '<p>Lists the MFA devices for an IAM user. If the request includes a IAM user name, then this operation
+          lists all the MFA devices associated with the specified user. If you do not specify a user name, IAM determines
+          the user name implicitly '
+        call: aws-iam-action-listmfadevices.getlistmfadevices
+        with:
+          UserName: rest.UserName
+          Marker: rest.Marker
+          MaxItems: rest.MaxItems
+          Action: rest.Action
+          Version: rest.Version
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: postlistmfadevices
+        description: '<p>Lists the MFA devices for an IAM user. If the request includes a IAM user name, then this operation
+          lists all the MFA devices associated with the specified user. If you do not specify a user name, IAM determines
+          the user name implicitly '
+        call: aws-iam-action-listmfadevices.postlistmfadevices
+        with:
+          MaxItems: rest.MaxItems
+          Marker: rest.Marker
+          Action: rest.Action
+          Version: rest.Version
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: aws-iam-action-listmfadevices-mcp
+    port: 9090
+    transport: http
+    description: 'MCP adapter for APIs.io Engineering Platform AWS Identity and Access Management — #Action=ListMFADevices.
+      One tool per consumed operation, routed inline through this capability''s consumes block.'
+    tools:
+    - name: p-lists-mfa-devices-iam-user
+      description: '<p>Lists the MFA devices for an IAM user. If the request includes a IAM user name, then this operation
+        lists all the MFA devices associated with the specified user. If you do not specify a user name, IAM determines the
+        user name implicitly '
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: aws-iam-action-listmfadevices.getlistmfadevices
+      with:
+        UserName: tools.UserName
+        Marker: tools.Marker
+        MaxItems: tools.MaxItems
+        Action: tools.Action
+        Version: tools.Version
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: p-lists-mfa-devices-iam-user-2
+      description: '<p>Lists the MFA devices for an IAM user. If the request includes a IAM user name, then this operation
+        lists all the MFA devices associated with the specified user. If you do not specify a user name, IAM determines the
+        user name implicitly '
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: aws-iam-action-listmfadevices.postlistmfadevices
+      with:
+        MaxItems: tools.MaxItems
+        Marker: tools.Marker
+        Action: tools.Action
+        Version: tools.Version
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

@@ -1,0 +1,72 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Postman API — Audit Logs
+  description: 'APIs.io Engineering Platform Postman API — Audit Logs. 1 operations. Lead operation: APIs.io Engineering Platform
+    Get team audit logs. Self-contained Naftiko capability covering one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Audit Logs
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: postman-audit-logs
+    baseUri: https://api.getpostman.com
+    description: APIs.io Engineering Platform Postman API — Audit Logs business capability. Self-contained, no shared references.
+    resources:
+    - name: audit-logs
+      path: /audit/logs
+      operations:
+      - name: getauditlogs
+        method: GET
+        description: APIs.io Engineering Platform Get team audit logs
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: apikey
+      key: x-api-key
+      value: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: postman-audit-logs-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Postman API — Audit Logs. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/audit/logs
+      name: audit-logs
+      description: REST surface for audit-logs.
+      operations:
+      - method: GET
+        name: getauditlogs
+        description: APIs.io Engineering Platform Get team audit logs
+        call: postman-audit-logs.getauditlogs
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: postman-audit-logs-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Postman API — Audit Logs. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-get-team
+      description: APIs.io Engineering Platform Get team audit logs
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: postman-audit-logs.getauditlogs
+      outputParameters:
+      - type: object
+        mapping: $.

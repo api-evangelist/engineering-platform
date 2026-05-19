@@ -1,0 +1,136 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: APIs.io Engineering Platform Cloudflare API — Workers AI Automatic Speech Recognition
+  description: 'APIs.io Engineering Platform Cloudflare API — Workers AI Automatic Speech Recognition. 2 operations. Lead
+    operation: APIs.io Engineering Platform Execute @cf/openai/whisper model.. Self-contained Naftiko capability covering
+    one Engineering Platform business surface.'
+  tags:
+  - Engineering Platform
+  - Workers AI Automatic Speech Recognition
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    ENGINEERING_PLATFORM_API_KEY: ENGINEERING_PLATFORM_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: cloudflare-workers-ai-automatic-speech-recognition
+    baseUri: ''
+    description: APIs.io Engineering Platform Cloudflare API — Workers AI Automatic Speech Recognition business capability.
+      Self-contained, no shared references.
+    resources:
+    - name: accounts-account_id-ai-run-@cf-openai-whisper
+      path: /accounts/{account_id}/ai/run/@cf/openai/whisper
+      operations:
+      - name: workersaipostruncfopenaiwhisper
+        method: POST
+        description: APIs.io Engineering Platform Execute @cf/openai/whisper model.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    - name: accounts-account_id-ai-run-@cf-openai-whisper-tiny-en
+      path: /accounts/{account_id}/ai/run/@cf/openai/whisper-tiny-en
+      operations:
+      - name: workersaipostruncfopenaiwhispertinyen
+        method: POST
+        description: APIs.io Engineering Platform Execute @cf/openai/whisper-tiny-en model.
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: account_id
+          in: path
+          type: string
+          required: true
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: bearer
+      token: '{{env.ENGINEERING_PLATFORM_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: cloudflare-workers-ai-automatic-speech-recognition-rest
+    port: 8080
+    description: REST adapter for APIs.io Engineering Platform Cloudflare API — Workers AI Automatic Speech Recognition. One
+      Spectral-compliant resource per consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/accounts/{account-id}/ai/run/cf/openai/whisper
+      name: accounts-account-id-ai-run-cf-openai-whisper
+      description: REST surface for accounts-account_id-ai-run-@cf-openai-whisper.
+      operations:
+      - method: POST
+        name: workersaipostruncfopenaiwhisper
+        description: APIs.io Engineering Platform Execute @cf/openai/whisper model.
+        call: cloudflare-workers-ai-automatic-speech-recognition.workersaipostruncfopenaiwhisper
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/accounts/{account-id}/ai/run/cf/openai/whisper-tiny-en
+      name: accounts-account-id-ai-run-cf-openai-whisper-tiny-en
+      description: REST surface for accounts-account_id-ai-run-@cf-openai-whisper-tiny-en.
+      operations:
+      - method: POST
+        name: workersaipostruncfopenaiwhispertinyen
+        description: APIs.io Engineering Platform Execute @cf/openai/whisper-tiny-en model.
+        call: cloudflare-workers-ai-automatic-speech-recognition.workersaipostruncfopenaiwhispertinyen
+        with:
+          account_id: rest.account_id
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: cloudflare-workers-ai-automatic-speech-recognition-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for APIs.io Engineering Platform Cloudflare API — Workers AI Automatic Speech Recognition. One
+      tool per consumed operation, routed inline through this capability's consumes block.
+    tools:
+    - name: apis-io-engineering-platform-execute-cf
+      description: APIs.io Engineering Platform Execute @cf/openai/whisper model.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-workers-ai-automatic-speech-recognition.workersaipostruncfopenaiwhisper
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: apis-io-engineering-platform-execute-cf-2
+      description: APIs.io Engineering Platform Execute @cf/openai/whisper-tiny-en model.
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: cloudflare-workers-ai-automatic-speech-recognition.workersaipostruncfopenaiwhispertinyen
+      with:
+        account_id: tools.account_id
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
