@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "#/components/schemas/rulesets_RedirectRule",
+  "title": "rulesets_RedirectRule",
+  "allOf": [
+    {
+      "$ref": "#/components/schemas/rulesets_Rule"
+    },
+    {
+      "properties": {
+        "action": {
+          "enum": [
+            "redirect"
+          ]
+        },
+        "action_parameters": {
+          "properties": {
+            "from_list": {
+              "description": "Serve a redirect based on a bulk list lookup.",
+              "properties": {
+                "key": {
+                  "description": "Expression that evaluates to the list lookup key.",
+                  "example": "http.request.full_uri",
+                  "minLength": 1,
+                  "title": "Key",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "The name of the list to match against.",
+                  "example": "list1",
+                  "maxLength": 50,
+                  "pattern": "^[a-zA-Z0-9_]+$",
+                  "title": "Name",
+                  "type": "string"
+                }
+              },
+              "title": "Bulk Redirect",
+              "type": "object"
+            },
+            "from_value": {
+              "description": "Serve a redirect based on the request properties.",
+              "properties": {
+                "preserve_query_string": {
+                  "description": "Keep the query string of the original request.",
+                  "title": "Preserve query string",
+                  "type": "boolean"
+                },
+                "status_code": {
+                  "description": "The status code to be used for the redirect.",
+                  "enum": [
+                    301,
+                    302,
+                    303,
+                    307,
+                    308
+                  ],
+                  "title": "Status Code",
+                  "type": "number"
+                },
+                "target_url": {
+                  "description": "The URL to redirect the request to.",
+                  "example": {
+                    "expression": "concat(\"https://m.example.com\", http.request.uri.path)"
+                  },
+                  "oneOf": [
+                    {
+                      "properties": {
+                        "value": {
+                          "description": "The URL to redirect the request to.",
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "title": "Static URL redirect",
+                      "type": "object"
+                    },
+                    {
+                      "properties": {
+                        "expression": {
+                          "description": "An expression to evaluate to get the URL to redirect the request to.",
+                          "minLength": 1,
+                          "type": "string"
+                        }
+                      },
+                      "title": "Dynamic URL redirect",
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              "title": "Single redirect",
+              "type": "object"
+            }
+          }
+        },
+        "description": {
+          "example": "Redirect when IP address is not 1.1.1.1"
+        }
+      },
+      "title": "Redirect rule"
+    }
+  ]
+}

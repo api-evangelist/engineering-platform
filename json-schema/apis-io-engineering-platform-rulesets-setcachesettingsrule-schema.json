@@ -1,0 +1,389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "#/components/schemas/rulesets_SetCacheSettingsRule",
+  "title": "rulesets_SetCacheSettingsRule",
+  "allOf": [
+    {
+      "$ref": "#/components/schemas/rulesets_Rule"
+    },
+    {
+      "properties": {
+        "action": {
+          "enum": [
+            "set_cache_settings"
+          ]
+        },
+        "action_parameters": {
+          "properties": {
+            "additional_cacheable_ports": {
+              "description": "List of additional ports that caching can be enabled on.",
+              "items": {
+                "description": "A port to enable caching on",
+                "title": "Additional Cacheable Port",
+                "type": "integer"
+              },
+              "title": "Additional Cacheable Ports (Enterprise-only)",
+              "type": "array"
+            },
+            "browser_ttl": {
+              "description": "Specify how long client browsers should cache the response. Cloudflare cache purge will not purge content cached on client browsers, so high browser TTLs may lead to stale content.",
+              "example": "{\n    \"mode\": \"override_origin\",\n    \"default\": 1000\n}",
+              "properties": {
+                "default": {
+                  "description": "The TTL (in seconds) if you choose override_origin mode.",
+                  "title": "Default TTL",
+                  "type": "integer"
+                },
+                "mode": {
+                  "description": "Determines which browser ttl mode to use.",
+                  "enum": [
+                    "respect_origin",
+                    "bypass_by_default",
+                    "override_origin"
+                  ],
+                  "title": "Mode",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "mode"
+              ],
+              "title": "Browser TTL",
+              "type": "object"
+            },
+            "cache": {
+              "description": "Mark whether the request\u2019s response from origin is eligible for caching. Caching itself will still depend on the cache-control header and your other caching configurations.",
+              "title": "Cache",
+              "type": "boolean"
+            },
+            "cache_key": {
+              "description": "Define which components of the request are included or excluded from the cache key Cloudflare uses to store the response in cache.",
+              "properties": {
+                "cache_by_device_type": {
+                  "description": "Separate cached content based on the visitor\u2019s device type",
+                  "title": "Cache by Device Type",
+                  "type": "boolean"
+                },
+                "cache_deception_armor": {
+                  "description": "Protect from web cache deception attacks while allowing static assets to be cached",
+                  "title": "Cache Deception Armor",
+                  "type": "boolean"
+                },
+                "custom_key": {
+                  "description": "Customize which components of the request are included or excluded from the cache key.",
+                  "properties": {
+                    "cookie": {
+                      "description": "The cookies to include in building the cache key.",
+                      "properties": {
+                        "check_presence": {
+                          "description": "Checks for the presence of these cookie names. The presence of these cookies is used in building the cache key.",
+                          "items": {
+                            "description": "A cookie name to check presence of.",
+                            "title": "Cookie name",
+                            "type": "string"
+                          },
+                          "title": "Check presence of cookies",
+                          "type": "array"
+                        },
+                        "include": {
+                          "description": "Include these cookies' names and their values.",
+                          "items": {
+                            "description": "Cookie name and corresponding value to include.",
+                            "title": "Cookie name",
+                            "type": "string"
+                          },
+                          "title": "Include cookies",
+                          "type": "array"
+                        }
+                      },
+                      "title": "Cookie",
+                      "type": "object"
+                    },
+                    "header": {
+                      "description": "The header names and values to include in building the cache key.",
+                      "properties": {
+                        "check_presence": {
+                          "description": "Checks for the presence of these header names. The presence of these headers is used in building the cache key.",
+                          "items": {
+                            "description": "A header name to check presence of.",
+                            "title": "Header name",
+                            "type": "string"
+                          },
+                          "title": "Check presence of headers",
+                          "type": "array"
+                        },
+                        "contains": {
+                          "additionalProperties": {
+                            "description": "Check if the corresponding header contains any of the values in the list.",
+                            "items": {
+                              "type": "string"
+                            },
+                            "title": "Header values",
+                            "type": "array"
+                          },
+                          "description": "For each header name and list of values combination, check if the request header contains any of the values provided. The presence of the request header and whether any of the values provided are contained in the request header value is used in building the cache key.",
+                          "title": "Header contains",
+                          "type": "object"
+                        },
+                        "exclude_origin": {
+                          "description": "Whether or not to include the origin header. A value of true will exclude the origin header in the cache key.",
+                          "title": "Exclude origin header",
+                          "type": "boolean"
+                        },
+                        "include": {
+                          "description": "Include these headers' names and their values.",
+                          "items": {
+                            "description": "Header name and corresponding value to include.",
+                            "title": "Header name",
+                            "type": "string"
+                          },
+                          "title": "Include headers",
+                          "type": "array"
+                        }
+                      },
+                      "title": "Headers",
+                      "type": "object"
+                    },
+                    "host": {
+                      "description": "Whether to use the original host or the resolved host in the cache key.",
+                      "properties": {
+                        "resolved": {
+                          "description": "Use the resolved host in the cache key. A value of true will use the resolved host, while a value or false will use the original host.",
+                          "example": true,
+                          "title": "Use Resolved host",
+                          "type": "boolean"
+                        }
+                      },
+                      "title": "Host",
+                      "type": "object"
+                    },
+                    "query_string": {
+                      "description": "Use the presence or absence of parameters in the query string to build the cache key.",
+                      "properties": {
+                        "exclude": {
+                          "description": "build the cache key using all query string parameters EXCECPT these excluded parameters",
+                          "properties": {
+                            "all": {
+                              "description": "Exclude all query string parameters from use in building the cache key.",
+                              "title": "All",
+                              "type": "boolean"
+                            },
+                            "list": {
+                              "description": "A list of query string parameters NOT used to build the cache key. All parameters present in the request but missing in this list will be used to build the cache key.",
+                              "items": {
+                                "description": "A parameter in the list of query string parameters excluded from use in building a cache key.",
+                                "title": "parameter",
+                                "type": "string"
+                              },
+                              "title": "List",
+                              "type": "array"
+                            }
+                          },
+                          "title": "Excluded query string parameters",
+                          "type": "object"
+                        },
+                        "include": {
+                          "description": "build the cache key using a list of query string parameters that ARE in the request.",
+                          "properties": {
+                            "all": {
+                              "description": "Use all query string parameters in the cache key.",
+                              "title": "All",
+                              "type": "boolean"
+                            },
+                            "list": {
+                              "description": "A list of query string parameters used to build the cache key.",
+                              "items": {
+                                "description": "parameter to include in the list of query string parameters used to build a cache key.",
+                                "title": "parameter",
+                                "type": "string"
+                              },
+                              "title": "List",
+                              "type": "array"
+                            }
+                          },
+                          "title": "Included query string parameters",
+                          "type": "object"
+                        }
+                      },
+                      "title": "Query String",
+                      "type": "object"
+                    },
+                    "user": {
+                      "description": "Characteristics of the request user agent used in building the cache key.",
+                      "properties": {
+                        "device_type": {
+                          "description": "Use the user agent's device type in the cache key.",
+                          "title": "Device Type",
+                          "type": "boolean"
+                        },
+                        "geo": {
+                          "description": "Use the user agents's country in the cache key.",
+                          "title": "Country",
+                          "type": "boolean"
+                        },
+                        "lang": {
+                          "description": "Use the user agent's language in the cache key.",
+                          "title": "Language",
+                          "type": "boolean"
+                        }
+                      },
+                      "title": "User",
+                      "type": "object"
+                    }
+                  },
+                  "title": "Custom Key",
+                  "type": "object"
+                },
+                "ignore_query_strings_order": {
+                  "description": "Treat requests with the same query parameters the same, regardless of the order those query parameters are in. A value of true ignores the query strings' order.",
+                  "title": "Ignore Query Strings Order",
+                  "type": "boolean"
+                }
+              },
+              "title": "Cache Key",
+              "type": "object"
+            },
+            "cache_reserve": {
+              "description": "Mark whether the request's response from origin is eligible for  Cache Reserve (requires a Cache Reserve add-on plan).",
+              "properties": {
+                "eligible": {
+                  "description": "Determines whether cache reserve is enabled. If this is true and a request meets eligibility criteria, Cloudflare will write the resource to cache reserve.",
+                  "example": "{\n    \"eligible\": true,\n    \"minimum_file_size\": 100000\n}",
+                  "title": "Eligible",
+                  "type": "boolean"
+                },
+                "minimum_file_size": {
+                  "description": "The minimum file size eligible for store in cache reserve.",
+                  "title": "Minimum File Size",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "eligible",
+                "minimum_file_size"
+              ],
+              "title": "CacheReserve",
+              "type": "object"
+            },
+            "edge_ttl": {
+              "description": "TTL (Time to Live) specifies the maximum time to cache a resource in the Cloudflare edge network.",
+              "example": "{\n    \"status_code_ttl\": [\n        {\n            \"status_code_range\": {\n                \"to\": 299\n            },\n            \"value\": 86400\n        },\n        {\n            \"status_code_range\": {\n                \"from\": 300,\n                \"to\": 499\n            },\n            \"value\": 0\n        },\n        {\n            \"status_code_range\": {\n                \"from\": 500\n            },\n            \"value\": -1\n        }\n    ],\n    \"mode\": \"respect_origin\"\n}",
+              "properties": {
+                "default": {
+                  "description": "The TTL (in seconds) if you choose override_origin mode.",
+                  "maximum": 9.223372036854774e+18,
+                  "minimum": 0,
+                  "title": "Default",
+                  "type": "integer"
+                },
+                "mode": {
+                  "description": "edge ttl options",
+                  "enum": [
+                    "respect_origin",
+                    "bypass_by_default",
+                    "override_origin"
+                  ],
+                  "title": "Mode",
+                  "type": "string"
+                },
+                "status_code_ttl": {
+                  "description": "List of single status codes, or status code ranges to apply the selected mode",
+                  "items": {
+                    "description": "Specify how long Cloudflare should cache the response based on the status code from the origin. Can be a single status code or a range or status codes",
+                    "properties": {
+                      "status_code_range": {
+                        "description": "The range of status codes used to apply the selected mode.",
+                        "properties": {
+                          "from": {
+                            "description": "response status code lower bound",
+                            "title": "Status Code lower bound",
+                            "type": "integer"
+                          },
+                          "to": {
+                            "description": "response status code upper bound",
+                            "title": "Status Code upper bound",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "from",
+                          "to"
+                        ],
+                        "title": "Status Code Range",
+                        "type": "object"
+                      },
+                      "status_code_value": {
+                        "description": "Set the ttl for responses with this specific status code",
+                        "title": "Status Code Value",
+                        "type": "integer"
+                      },
+                      "value": {
+                        "description": "Time to cache a response (in seconds). A value of 0 is equivalent to setting the Cache-Control header with the value \"no-cache\". A value of -1 is equivalent to setting Cache-Control header with the value of \"no-store\".",
+                        "title": "TTL value",
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ],
+                    "title": "Status Code TTL",
+                    "type": "object"
+                  },
+                  "title": "Status Code TTLs",
+                  "type": "array"
+                }
+              },
+              "required": [
+                "mode",
+                "default",
+                "status_code_ttl"
+              ],
+              "title": "Edge TTL",
+              "type": "object"
+            },
+            "origin_cache_control": {
+              "description": "When enabled, Cloudflare will aim to strictly adhere to RFC 7234.",
+              "title": "Origin Cache Control (Enterprise-only)",
+              "type": "boolean"
+            },
+            "origin_error_page_passthru": {
+              "description": "Generate Cloudflare error pages from issues sent from the origin server. When on, error pages will trigger for issues from the origin",
+              "title": "Origin Error Page Passthru",
+              "type": "boolean"
+            },
+            "read_timeout": {
+              "description": "Define a timeout value between two successive read operations to your origin server. Historically, the timeout value between two read options from Cloudflare to an origin server is 100 seconds. If you are attempting to reduce HTTP 524 errors because of timeouts from an origin server, try increasing this timeout value.",
+              "example": 900,
+              "title": "Read Timeout (Enterprise-only)",
+              "type": "integer"
+            },
+            "respect_strong_etags": {
+              "description": "Specify whether or not Cloudflare should respect strong ETag (entity tag) headers. When off, Cloudflare converts strong ETag headers to weak ETag headers.",
+              "title": "Respect Strong Etags",
+              "type": "boolean"
+            },
+            "serve_stale": {
+              "description": "Define if Cloudflare should serve stale content while getting the latest content from the origin. If on, Cloudflare will not serve stale content while getting the latest content from the origin.",
+              "properties": {
+                "disable_stale_while_updating": {
+                  "description": "Defines whether Cloudflare should serve stale content while updating. If true, Cloudflare will not serve stale content while getting the latest content from the origin.",
+                  "title": "Disable Stale While Updating",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "disable_stale_while_updating"
+              ],
+              "title": "Serve Stale",
+              "type": "object"
+            }
+          }
+        },
+        "description": {
+          "example": "Set cache settings when the hostname  address is not example.com"
+        }
+      },
+      "title": "Set Cache Settings rule"
+    }
+  ]
+}

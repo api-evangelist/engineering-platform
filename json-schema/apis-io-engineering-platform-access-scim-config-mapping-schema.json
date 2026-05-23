@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "#/components/schemas/access_scim_config_mapping",
+  "title": "access_scim_config_mapping",
+  "description": "Transformations and filters applied to resources before they are provisioned in the remote SCIM service.",
+  "properties": {
+    "enabled": {
+      "description": "Whether or not this mapping is enabled.",
+      "type": "boolean"
+    },
+    "filter": {
+      "description": "A [SCIM filter expression](https://datatracker.ietf.org/doc/html/rfc7644#section-3.4.2.2) that matches resources that should be provisioned to this application.",
+      "example": "title pr or userType eq \"Intern\"",
+      "type": "string"
+    },
+    "operations": {
+      "description": "Whether or not this mapping applies to creates, updates, or deletes.",
+      "properties": {
+        "create": {
+          "description": "Whether or not this mapping applies to create (POST) operations.",
+          "type": "boolean"
+        },
+        "delete": {
+          "description": "Whether or not this mapping applies to DELETE operations.",
+          "type": "boolean"
+        },
+        "update": {
+          "description": "Whether or not this mapping applies to update (PATCH/PUT) operations.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "schema": {
+      "description": "Which SCIM resource type this mapping applies to.",
+      "example": "urn:ietf:params:scim:schemas:core:2.0:User",
+      "type": "string"
+    },
+    "transform_jsonata": {
+      "description": "A [JSONata](https://jsonata.org/) expression that transforms the resource before provisioning it in the application.",
+      "example": "$merge([$, {'userName': $substringBefore($.userName, '@') & '+test@' & $substringAfter($.userName, '@')}])",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema"
+  ],
+  "type": "object"
+}

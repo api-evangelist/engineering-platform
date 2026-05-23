@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "#/components/schemas/EvaluationResult",
+  "title": "EvaluationResult",
+  "type": "object",
+  "required": [
+    "EvalActionName",
+    "EvalDecision"
+  ],
+  "properties": {
+    "EvalActionName": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/ActionNameType"
+        },
+        {
+          "description": "The name of the API operation tested on the indicated resource."
+        }
+      ]
+    },
+    "EvalResourceName": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/ResourceNameType"
+        },
+        {
+          "description": "The ARN of the resource that the indicated API operation was tested on."
+        }
+      ]
+    },
+    "EvalDecision": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/PolicyEvaluationDecisionType"
+        },
+        {
+          "description": "The result of the simulation."
+        }
+      ]
+    },
+    "MatchedStatements": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/StatementListType"
+        },
+        {
+          "description": "A list of the statements in the input policies that determine the result for this scenario. Remember that even if multiple statements allow the operation on the resource, if only one statement denies that operation, then the explicit deny overrides any allow. In addition, the deny statement is the only entry included in the result."
+        }
+      ]
+    },
+    "MissingContextValues": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/ContextKeyNamesResultListType"
+        },
+        {
+          "description": "A list of context keys that are required by the included input policies but that were not provided by one of the input parameters. This list is used when the resource in a simulation is \"*\", either explicitly, or when the <code>ResourceArns</code> parameter blank. If you include a list of resources, then any missing context values are instead included under the <code>ResourceSpecificResults</code> section. To discover the context keys used by a set of policies, you can call <a>GetContextKeysForCustomPolicy</a> or <a>GetContextKeysForPrincipalPolicy</a>."
+        }
+      ]
+    },
+    "OrganizationsDecisionDetail": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/OrganizationsDecisionDetail"
+        },
+        {
+          "description": "A structure that details how Organizations and its service control policies affect the results of the simulation. Only applies if the simulated user's account is part of an organization."
+        }
+      ]
+    },
+    "PermissionsBoundaryDecisionDetail": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/PermissionsBoundaryDecisionDetail"
+        },
+        {
+          "description": "Contains information about the effect that a permissions boundary has on a policy simulation when the boundary is applied to an IAM entity."
+        }
+      ]
+    },
+    "EvalDecisionDetails": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/EvalDecisionDetailsType"
+        },
+        {
+          "description": "<p>Additional details about the results of the cross-account evaluation decision. This parameter is populated for only cross-account simulations. It contains a brief summary of how each policy type contributes to the final evaluation decision.</p> <p>If the simulation evaluates policies within the same account and includes a resource ARN, then the parameter is present but the response is empty. If the simulation evaluates policies within the same account and specifies all resources (<code>*</code>), then the parameter is not returned.</p> <p>When you make a cross-account request, Amazon Web Services evaluates the request in the trusting account and the trusted account. The request is allowed only if both evaluations return <code>true</code>. For more information about how policies are evaluated, see <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html#policy-eval-basics\">Evaluating policies within a single account</a>.</p> <p>If an Organizations SCP included in the evaluation denies access, the simulation ends. In this case, policy evaluation does not proceed any further and this parameter is not returned.</p>"
+        }
+      ]
+    },
+    "ResourceSpecificResults": {
+      "allOf": [
+        {
+          "$ref": "#/components/schemas/ResourceSpecificResultListType"
+        },
+        {
+          "description": "The individual results of the simulation of the API operation specified in EvalActionName on each resource."
+        }
+      ]
+    }
+  },
+  "description": "<p>Contains the results of a simulation.</p> <p>This data type is used by the return parameter of <code> <a>SimulateCustomPolicy</a> </code> and <code> <a>SimulatePrincipalPolicy</a> </code>.</p>"
+}

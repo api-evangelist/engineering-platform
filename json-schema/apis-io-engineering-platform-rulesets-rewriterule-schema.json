@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "#/components/schemas/rulesets_RewriteRule",
+  "title": "rulesets_RewriteRule",
+  "allOf": [
+    {
+      "$ref": "#/components/schemas/rulesets_Rule"
+    },
+    {
+      "properties": {
+        "action": {
+          "enum": [
+            "rewrite"
+          ]
+        },
+        "action_parameters": {
+          "properties": {
+            "headers": {
+              "additionalProperties": {
+                "oneOf": [
+                  {
+                    "description": "Remove the header from the request.",
+                    "properties": {
+                      "operation": {
+                        "enum": [
+                          "remove"
+                        ],
+                        "title": "Operation",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "operation"
+                    ],
+                    "title": "Remove header",
+                    "type": "object"
+                  },
+                  {
+                    "description": "Set a request header with a static value.",
+                    "properties": {
+                      "operation": {
+                        "enum": [
+                          "set"
+                        ],
+                        "title": "Operation",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Static value for the header.",
+                        "example": "static-header-value",
+                        "minLength": 1,
+                        "title": "Value",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "operation",
+                      "value"
+                    ],
+                    "title": "Static header",
+                    "type": "object"
+                  },
+                  {
+                    "description": "Set a request header with a dynamic value.",
+                    "properties": {
+                      "expression": {
+                        "description": "Expression for the header value.",
+                        "example": "ip.src",
+                        "minLength": 1,
+                        "title": "Expression",
+                        "type": "string"
+                      },
+                      "operation": {
+                        "enum": [
+                          "set"
+                        ],
+                        "title": "Operation",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "operation",
+                      "expression"
+                    ],
+                    "title": "Dynamic header",
+                    "type": "object"
+                  }
+                ]
+              },
+              "description": "Map of request headers to modify.",
+              "example": {
+                "client-http-version": {
+                  "expression": "http.request.version",
+                  "operation": "set"
+                }
+              },
+              "title": "Headers",
+              "type": "object"
+            },
+            "uri": {
+              "description": "URI to rewrite the request to.",
+              "properties": {
+                "path": {
+                  "allOf": [
+                    {
+                      "description": "Path portion rewrite.",
+                      "example": {
+                        "expression": "regex_replace(http.request.uri.path, \"/bar$\", \"/baz\")"
+                      },
+                      "title": "Path"
+                    },
+                    {
+                      "$ref": "#/components/schemas/rulesets_RewriteUriPart"
+                    }
+                  ]
+                },
+                "query": {
+                  "allOf": [
+                    {
+                      "description": "Query portion rewrite.",
+                      "example": {
+                        "expression": "regex_replace(http.request.uri.query, \"foo=bar\", \"\")"
+                      },
+                      "title": "Query"
+                    },
+                    {
+                      "$ref": "#/components/schemas/rulesets_RewriteUriPart"
+                    }
+                  ]
+                }
+              },
+              "title": "URI",
+              "type": "object"
+            }
+          }
+        },
+        "description": {
+          "example": "Add a header when the IP address is not 1.1.1.1"
+        }
+      },
+      "title": "Rewrite rule"
+    }
+  ]
+}

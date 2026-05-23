@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "#/components/schemas/rulesets_ExecuteRule",
+  "title": "rulesets_ExecuteRule",
+  "allOf": [
+    {
+      "$ref": "#/components/schemas/rulesets_Rule"
+    },
+    {
+      "properties": {
+        "action": {
+          "enum": [
+            "execute"
+          ]
+        },
+        "action_parameters": {
+          "properties": {
+            "id": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/rulesets_RulesetId"
+                },
+                {
+                  "description": "The ID of the ruleset to execute.",
+                  "example": "4814384a9e5d4991b9815dcfc25d2f1f"
+                }
+              ]
+            },
+            "matched_data": {
+              "description": "The configuration to use for matched data logging.",
+              "properties": {
+                "public_key": {
+                  "description": "The public key to encrypt matched data logs with.",
+                  "example": "iGqBmyIUxuWt1rvxoAharN9FUXneUBxA/Y19PyyrEG0=",
+                  "minLength": 1,
+                  "title": "Public key",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "public_key"
+              ],
+              "title": "Matched data",
+              "type": "object"
+            },
+            "overrides": {
+              "description": "A set of overrides to apply to the target ruleset.",
+              "minProperties": 1,
+              "properties": {
+                "action": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/rulesets_RuleAction"
+                    },
+                    {
+                      "description": "An action to override all rules with. This option has lower precedence than rule and category overrides.",
+                      "example": "log"
+                    }
+                  ]
+                },
+                "categories": {
+                  "description": "A list of category-level overrides. This option has the second-highest precedence after rule-level overrides.",
+                  "items": {
+                    "description": "A category-level override",
+                    "minProperties": 2,
+                    "properties": {
+                      "action": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/rulesets_RuleAction"
+                          },
+                          {
+                            "description": "The action to override rules in the category with.",
+                            "example": "log"
+                          }
+                        ]
+                      },
+                      "category": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/rulesets_RuleCategory"
+                          },
+                          {
+                            "description": "The name of the category to override."
+                          }
+                        ]
+                      },
+                      "enabled": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/rulesets_RuleEnabled"
+                          },
+                          {
+                            "description": "Whether to enable execution of rules in the category."
+                          }
+                        ]
+                      },
+                      "sensitivity_level": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/rulesets_ExecuteSensitivityLevel"
+                          },
+                          {
+                            "description": "The sensitivity level to use for rules in the category."
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "category"
+                    ],
+                    "title": "Category override",
+                    "type": "object"
+                  },
+                  "minItems": 1,
+                  "title": "Category overrides",
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "enabled": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/rulesets_RuleEnabled"
+                    },
+                    {
+                      "description": "Whether to enable execution of all rules. This option has lower precedence than rule and category overrides."
+                    }
+                  ]
+                },
+                "rules": {
+                  "description": "A list of rule-level overrides. This option has the highest precedence.",
+                  "items": {
+                    "description": "A rule-level override",
+                    "minProperties": 2,
+                    "properties": {
+                      "action": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/rulesets_RuleAction"
+                          },
+                          {
+                            "description": "The action to override the rule with.",
+                            "example": "log"
+                          }
+                        ]
+                      },
+                      "enabled": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/rulesets_RuleEnabled"
+                          },
+                          {
+                            "description": "Whether to enable execution of the rule."
+                          }
+                        ]
+                      },
+                      "id": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/rulesets_RuleId"
+                          },
+                          {
+                            "description": "The ID of the rule to override.",
+                            "example": "8ac8bc2a661e475d940980f9317f28e1"
+                          }
+                        ]
+                      },
+                      "score_threshold": {
+                        "description": "The score threshold to use for the rule.",
+                        "title": "Score threshold",
+                        "type": "integer"
+                      },
+                      "sensitivity_level": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/rulesets_ExecuteSensitivityLevel"
+                          },
+                          {
+                            "description": "The sensitivity level to use for the rule."
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "title": "Rule override",
+                    "type": "object"
+                  },
+                  "minItems": 1,
+                  "title": "Rule overrides",
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "sensitivity_level": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/rulesets_ExecuteSensitivityLevel"
+                    },
+                    {
+                      "description": "A sensitivity level to set for all rules. This option has lower precedence than rule and category overrides and is only applicable for DDoS phases."
+                    }
+                  ]
+                }
+              },
+              "title": "Overrides",
+              "type": "object"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "description": {
+          "example": "Execute the OWASP ruleset when the IP address is not 1.1.1.1"
+        }
+      },
+      "title": "Execute rule"
+    }
+  ]
+}

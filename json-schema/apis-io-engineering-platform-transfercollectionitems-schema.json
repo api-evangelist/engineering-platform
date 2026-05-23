@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "#/components/schemas/transferCollectionItems",
+  "title": "Transfer Items Payload",
+  "type": "object",
+  "required": [
+    "ids",
+    "target",
+    "location",
+    "mode"
+  ],
+  "properties": {
+    "ids": {
+      "type": "array",
+      "description": "A list of collection request, response, or folder UIDs to transfer.",
+      "items": {
+        "type": "string",
+        "format": "uid",
+        "example": "12345678-a9b481c1-3e78-4af7-8db0-dce3f3f3c105"
+      }
+    },
+    "mode": {
+      "type": "string",
+      "description": "The transfer operation to perform.",
+      "enum": [
+        "copy",
+        "move"
+      ],
+      "example": "move"
+    },
+    "target": {
+      "type": "object",
+      "description": "Information about the item transfer's destination location.",
+      "required": [
+        "model",
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uid",
+          "example": "12345678-b91270fa-048d-4f5f-a033-8b5523bf053f",
+          "description": "The UID of the destination collection, folder, or request."
+        },
+        "model": {
+          "type": "string",
+          "description": "The collection, folder, or request the items will be transferred to. For response transfers, use the `request` value.",
+          "enum": [
+            "collection",
+            "folder",
+            "request"
+          ],
+          "example": "request"
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "description": "The transferred items' placement in the target destination:\n- For `start` or `end` \u2014 Do not include the `model` and `id` values.\n- For `before` or `after` \u2014 Include the `model` and `id` properties.\n",
+      "required": [
+        "position"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "nullable": true,
+          "format": "uid",
+          "description": "For `before` or `after` positions, the model's UID.",
+          "example": "12345678-80812b16-ac27-45b3-b3eb-793f78530d32"
+        },
+        "model": {
+          "type": "string",
+          "nullable": true,
+          "description": "For `before` or `after` positions, the type of item (model) that the transferred item will be positioned by. One of: `folder`, `request`, or `response.`\n",
+          "example": "response"
+        },
+        "position": {
+          "type": "string",
+          "default": "end",
+          "description": "The transferred item's position within the destination object.",
+          "enum": [
+            "start",
+            "end",
+            "before",
+            "after"
+          ],
+          "example": "before"
+        }
+      }
+    }
+  }
+}

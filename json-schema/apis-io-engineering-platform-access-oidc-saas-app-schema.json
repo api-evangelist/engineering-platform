@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "#/components/schemas/access_oidc_saas_app",
+  "title": "OIDC SaaS App",
+  "properties": {
+    "access_token_lifetime": {
+      "description": "The lifetime of the OIDC Access Token after creation. Valid units are m,h. Must be greater than or equal to 1m and less than or equal to 24h.",
+      "example": "5m",
+      "type": "string"
+    },
+    "allow_pkce_without_client_secret": {
+      "description": "If client secret should be required on the token endpoint when authorization_code_with_pkce grant is used.",
+      "example": true,
+      "type": "boolean"
+    },
+    "app_launcher_url": {
+      "description": "The URL where this applications tile redirects users",
+      "example": "https://example.com/login",
+      "type": "string"
+    },
+    "auth_type": {
+      "description": "Identifier of the authentication protocol used for the saas app. Required for OIDC.",
+      "enum": [
+        "saml",
+        "oidc"
+      ],
+      "example": "oidc",
+      "type": "string"
+    },
+    "client_id": {
+      "description": "The application client id",
+      "example": "oidc client id",
+      "type": "string"
+    },
+    "client_secret": {
+      "description": "The application client secret, only returned on POST request.",
+      "example": "oidc client secret",
+      "type": "string"
+    },
+    "created_at": {
+      "$ref": "#/components/schemas/access_timestamp"
+    },
+    "custom_claims": {
+      "properties": {
+        "name": {
+          "description": "The name of the claim.",
+          "example": "family_name",
+          "type": "string"
+        },
+        "required": {
+          "description": "If the claim is required when building an OIDC token.",
+          "example": true,
+          "type": "boolean"
+        },
+        "scope": {
+          "description": "The scope of the claim.",
+          "enum": [
+            "groups",
+            "profile",
+            "email",
+            "openid"
+          ],
+          "example": "profile",
+          "type": "string"
+        },
+        "source": {
+          "properties": {
+            "name": {
+              "description": "The name of the IdP claim.",
+              "example": "last_name",
+              "type": "string"
+            },
+            "name_by_idp": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "A mapping from IdP ID to claim name.",
+              "example": {
+                "exampleIdPID1": "ClaimName1",
+                "exampleIdPID2": "ClaimName2"
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "grant_types": {
+      "description": "The OIDC flows supported by this application",
+      "example": [
+        "authorization_code"
+      ],
+      "items": {
+        "enum": [
+          "authorization_code",
+          "authorization_code_with_pkce",
+          "refresh_tokens",
+          "hybrid",
+          "implicit"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "group_filter_regex": {
+      "description": "A regex to filter Cloudflare groups returned in ID token and userinfo endpoint",
+      "example": "^GROUP_FILTER-*$",
+      "type": "string"
+    },
+    "hybrid_and_implicit_options": {
+      "properties": {
+        "return_access_token_from_authorization_endpoint": {
+          "description": "If an Access Token should be returned from the OIDC Authorization endpoint",
+          "type": "boolean"
+        },
+        "return_id_token_from_authorization_endpoint": {
+          "description": "If an ID Token should be returned from the OIDC Authorization endpoint",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "public_key": {
+      "description": "The Access public certificate that will be used to verify your identity.",
+      "example": "example unique name",
+      "type": "string"
+    },
+    "redirect_uris": {
+      "description": "The permitted URL's for Cloudflare to return Authorization codes and Access/ID tokens",
+      "example": [
+        "https://example.com"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "refresh_token_options": {
+      "properties": {
+        "lifetime": {
+          "description": "How long a refresh token will be valid for after creation. Valid units are m,h,d. Must be longer than 1m.",
+          "example": "30d",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "scopes": {
+      "description": "Define the user information shared with access, \"offline_access\" scope will be automatically enabled if refresh tokens are enabled",
+      "example": [
+        "openid",
+        "groups",
+        "email",
+        "profile"
+      ],
+      "items": {
+        "enum": [
+          "openid",
+          "groups",
+          "email",
+          "profile"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "updated_at": {
+      "$ref": "#/components/schemas/access_timestamp"
+    }
+  },
+  "type": "object"
+}
