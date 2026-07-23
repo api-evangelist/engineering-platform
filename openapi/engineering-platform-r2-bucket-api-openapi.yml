@@ -1,0 +1,1327 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 R2 Bucket API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: R2 Bucket
+paths:
+  /accounts/{account_id}/r2/buckets:
+    get:
+      description: Lists all R2 buckets on your account
+      operationId: r2-list-buckets
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: query
+        name: name_contains
+        schema:
+          description: Bucket names to filter by. Only buckets with this phrase in their name will be returned.
+          example: my-bucket
+          type: string
+      - in: query
+        name: start_after
+        schema:
+          description: Bucket name to start searching after. Buckets are ordered lexicographically.
+          example: my-bucket
+          type: string
+      - in: query
+        name: per_page
+        schema:
+          default: 20
+          description: Maximum number of buckets to return in a single call
+          maximum: 1000
+          minimum: 1
+          type: number
+      - in: query
+        name: order
+        schema:
+          description: Field to order buckets by
+          enum:
+          - name
+          type: string
+      - in: query
+        name: direction
+        schema:
+          description: Direction to order buckets
+          enum:
+          - asc
+          - desc
+          example: desc
+          type: string
+      - in: query
+        name: cursor
+        schema:
+          description: Pagination cursor received during the last List Buckets call. R2 buckets are paginated using cursors instead of page numbers.
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: List Buckets response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response_list'
+                - properties:
+                    result:
+                      properties:
+                        buckets:
+                          items:
+                            $ref: '#/components/schemas/r2_bucket'
+                          type: array
+                      type: object
+                  type: object
+          description: List Buckets response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform List Buckets
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.list
+    post:
+      description: Creates a new R2 bucket.
+      operationId: r2-create-bucket
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              example: '{"name": "example-bucket"}'
+              properties:
+                locationHint:
+                  $ref: '#/components/schemas/r2_bucket_location'
+                name:
+                  $ref: '#/components/schemas/r2_bucket_name'
+                storageClass:
+                  $ref: '#/components/schemas/r2_storage_class'
+              required:
+              - name
+              type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Create Bucket response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_bucket'
+                  type: object
+          description: Create Bucket response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Create Bucket
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.create
+  /accounts/{account_id}/r2/buckets/{bucket_name}:
+    delete:
+      description: Deletes an existing R2 bucket.
+      operationId: r2-delete-bucket
+      parameters:
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Delete Bucket response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response'
+          description: Delete Bucket response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Delete Bucket
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.delete
+    get:
+      description: Gets metadata for an existing R2 bucket.
+      operationId: r2-get-bucket
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Get Bucket response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_bucket'
+                  type: object
+          description: Get Bucket response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Get Bucket
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.read
+  /accounts/{account_id}/r2/buckets/{bucket_name}/domains/custom:
+    get:
+      description: Gets a list of all custom domains registered with an existing R2 bucket.
+      operationId: r2-list-custom-domains
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: List Custom Domains response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_list_custom_domains_response'
+                  type: object
+          description: List Custom Domains response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform List Custom Domains of Bucket
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.read
+    post:
+      description: Register a new custom domain for an existing R2 bucket.
+      operationId: r2-add-custom-domain
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/r2_add_custom_domain_request'
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Add Custom Domain response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_add_custom_domain_response'
+                  type: object
+          description: Add Custom Domain response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Attach Custom Domain To Bucket
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.write
+  /accounts/{account_id}/r2/buckets/{bucket_name}/domains/custom/{domain_name}:
+    delete:
+      description: Remove custom domain registration from an existing R2 bucket
+      operationId: r2-delete-custom-domain
+      parameters:
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: domain_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_domain_name'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Delete Custom Domain response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_remove_custom_domain_response'
+                  type: object
+          description: Delete Custom Domain response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Remove Custom Domain From Bucket
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.delete
+    put:
+      description: Edit the configuration for a custom domain on an existing R2 bucket.
+      operationId: r2-edit-custom-domain-settings
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      - in: path
+        name: domain_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_domain_name'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/r2_edit_custom_domain_request'
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Edit Custom Domain Configuration response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      allOf:
+                      - $ref: '#/components/schemas/r2_edit_custom_domain_response'
+                  type: object
+          description: Edit Custom Domain Configuration response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Configure Custom Domain Settings
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.write
+  /accounts/{account_id}/r2/buckets/{bucket_name}/domains/managed:
+    get:
+      description: Gets state of public access over the bucket's R2-managed (r2.dev) domain.
+      operationId: r2-get-bucket-public-policy
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Get Managed Subdomain response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_managed_domain_response'
+                  type: object
+          description: Get Managed Subdomain response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Get r2.dev Domain of Bucket
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.read
+    put:
+      description: Updates state of public access over the bucket's R2-managed (r2.dev) domain.
+      operationId: r2-put-bucket-public-policy
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/r2_edit_managed_domain_request'
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Update Managed Subdomain response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_managed_domain_response'
+                  type: object
+          description: Update Managed Subdomain response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Update r2.dev Domain of Bucket
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.write
+  /accounts/{account_id}/r2/buckets/{bucket_name}/sippy:
+    delete:
+      description: Disables Sippy on this bucket
+      operationId: r2-delete-bucket-sippy-config
+      parameters:
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Delete Sippy Configuration response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      properties:
+                        enabled:
+                          enum:
+                          - false
+                          type: boolean
+                      type: object
+                  type: object
+          description: Delete Sippy Configuration response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Disable Sippy
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.delete
+    get:
+      description: Gets configuration for Sippy for an existing R2 bucket.
+      operationId: r2-get-bucket-sippy-config
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Get Sippy Configuration response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_sippy'
+                  type: object
+          description: Get Sippy Configuration response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Get Sippy Configuration
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.read
+    put:
+      description: Sets configuration for Sippy for an existing R2 bucket.
+      operationId: r2-put-bucket-sippy-config
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      - in: path
+        name: bucket_name
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_bucket_name'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/r2_enable_sippy_aws'
+              - $ref: '#/components/schemas/r2_enable_sippy_gcs'
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Get Sippy Configuration response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_sippy'
+                  type: object
+          description: Set Sippy Configuration response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Enable Sippy
+      tags:
+      - R2 Bucket
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.r2.bucket.write
+  /accounts/{account_id}/r2/temp-access-credentials:
+    post:
+      description: Creates temporary access credentials on a bucket that can be optionally scoped to prefixes or objects.
+      operationId: r2-create-temp-access-credentials
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/r2_account_identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/r2_temp_access_creds_request'
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/r2_v4_response_failure'
+          description: Create temporary access credentials response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/r2_v4_response'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/r2_temp_access_creds_response'
+                  type: object
+          description: Create temporary access credentials response
+      security:
+      - api_token: []
+      summary: APIs.io Engineering Platform Create Temporary Access Credentials
+      tags:
+      - R2 Bucket
+components:
+  schemas:
+    r2_errors:
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    r2_v4_response_failure:
+      properties:
+        errors:
+          $ref: '#/components/schemas/r2_errors'
+        messages:
+          $ref: '#/components/schemas/r2_messages'
+        result:
+          enum:
+          - null
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    r2_account_identifier:
+      description: Account ID
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    r2_v4_response:
+      properties:
+        errors:
+          $ref: '#/components/schemas/r2_errors'
+        messages:
+          $ref: '#/components/schemas/r2_messages'
+        result:
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    r2_bucket_name:
+      description: Name of the bucket
+      example: example-bucket
+      maxLength: 64
+      minLength: 3
+      pattern: ^[a-z0-9][a-z0-9-]*[a-z0-9]
+      type: string
+    r2_edit_custom_domain_response:
+      example:
+        domain: example-domain.com
+        enabled: true
+      properties:
+        domain:
+          description: Domain name of the affected custom domain
+          type: string
+        enabled:
+          description: Whether this bucket is publicly accessible at the specified custom domain
+          type: boolean
+        minTLS:
+          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to 1.0.
+          enum:
+          - '1.0'
+          - '1.1'
+          - '1.2'
+          - '1.3'
+          type: string
+      required:
+      - domain
+      type: object
+    r2_temp_access_creds_request:
+      example:
+        bucket: example-bucket
+        objects:
+        - example-object
+        parentAccessKeyId: example-access-key-id
+        permission: object-read-write
+        prefixes:
+        - example-prefix/
+        ttlSeconds: 3600
+      properties:
+        bucket:
+          description: Name of the R2 bucket
+          type: string
+        objects:
+          description: Optional object paths to scope the credentials to
+          items:
+            type: string
+          type: array
+        parentAccessKeyId:
+          description: The parent access key id to use for signing
+          type: string
+        permission:
+          description: Permissions allowed on the credentials
+          enum:
+          - admin-read-write
+          - admin-read-only
+          - object-read-write
+          - object-read-only
+          type: string
+        prefixes:
+          description: Optional prefix paths to scope the credentials to
+          items:
+            type: string
+          type: array
+        ttlSeconds:
+          default: 900
+          description: How long the credentials will live for in seconds
+          maximum: 604800
+          type: number
+      required:
+      - bucket
+      - permission
+      - ttlSeconds
+      - parentAccessKeyId
+      type: object
+    r2_storage_class:
+      default: Standard
+      description: Storage class for newly uploaded objects, unless specified otherwise.
+      enum:
+      - Standard
+      - InfrequentAccess
+      type: string
+    r2_edit_managed_domain_request:
+      example:
+        enabled: true
+      properties:
+        enabled:
+          description: Whether to enable public bucket access at the r2.dev domain
+          type: boolean
+      required:
+      - enabled
+      type: object
+    r2_enable_sippy_gcs:
+      properties:
+        destination:
+          description: R2 bucket to copy objects to
+          properties:
+            accessKeyId:
+              description: 'ID of a Cloudflare API token.
+
+                This is the value labelled "Access Key ID" when creating an API
+
+                token from the [R2 dashboard](https://dash.cloudflare.com/?to=/:account/r2/api-tokens).
+
+
+                Sippy will use this token when writing objects to R2, so it is
+
+                best to scope this token to the bucket you''re enabling Sippy for.
+
+                '
+              type: string
+            provider:
+              enum:
+              - r2
+              type: string
+            secretAccessKey:
+              description: 'Value of a Cloudflare API token.
+
+                This is the value labelled "Secret Access Key" when creating an API
+
+                token from the [R2 dashboard](https://dash.cloudflare.com/?to=/:account/r2/api-tokens).
+
+
+                Sippy will use this token when writing objects to R2, so it is
+
+                best to scope this token to the bucket you''re enabling Sippy for.
+
+                '
+              type: string
+          type: object
+        source:
+          description: GCS bucket to copy objects from
+          properties:
+            bucket:
+              description: Name of the GCS bucket
+              type: string
+            clientEmail:
+              description: Client email of an IAM credential (ideally scoped to a single GCS bucket)
+              type: string
+            privateKey:
+              description: Private Key of an IAM credential (ideally scoped to a single GCS bucket)
+              type: string
+            provider:
+              enum:
+              - gcs
+              type: string
+          type: object
+    r2_bucket:
+      description: A single R2 bucket
+      properties:
+        creation_date:
+          description: Creation timestamp
+          type: string
+        location:
+          $ref: '#/components/schemas/r2_bucket_location'
+        name:
+          $ref: '#/components/schemas/r2_bucket_name'
+        storage_class:
+          $ref: '#/components/schemas/r2_storage_class'
+      type: object
+    r2_edit_custom_domain_request:
+      example:
+        enabled: true
+        minTLS: '1.2'
+      properties:
+        enabled:
+          description: Whether to enable public bucket access at the specified custom domain
+          type: boolean
+        minTLS:
+          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to previous value.
+          enum:
+          - '1.0'
+          - '1.1'
+          - '1.2'
+          - '1.3'
+          type: string
+      type: object
+    r2_domain_name:
+      description: Name of the custom domain
+      example: example-domain/custom-domain.com
+      type: string
+    r2_list_custom_domains_response:
+      example:
+        domains:
+        - domain: prefix.example-domain.one.com
+          enabled: false
+          status:
+            ownership: deactivated
+            ssl: pending
+          zoneId: 36ca64a6d92827b8a6b90be344bb1bfd
+          zoneName: example-domain.one.com
+        - domain: prefix.example-domain.two.com
+          enabled: true
+          status:
+            ownership: active
+            ssl: active
+          zoneId: d9d28585d5f8f5b0f857b055bf574f19
+      properties:
+        domains:
+          items:
+            properties:
+              domain:
+                description: Domain name of the custom domain to be added
+                type: string
+              enabled:
+                description: Whether this bucket is publicly accessible at the specified custom domain
+                type: boolean
+              minTLS:
+                description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to 1.0.
+                enum:
+                - '1.0'
+                - '1.1'
+                - '1.2'
+                - '1.3'
+                type: string
+              status:
+                properties:
+                  ownership:
+                    description: Ownership status of the domain
+                    enum:
+                    - pending
+                    - active
+                    - deactivated
+                    - blocked
+                    - error
+                    - unknown
+                    type: string
+                  ssl:
+                    description: SSL certificate status
+                    enum:
+                    - initializing
+                    - pending
+                    - active
+                    - deactivated
+                    - error
+                    - unknown
+                    type: string
+                required:
+                - ssl
+                - ownership
+                type: object
+              zoneId:
+                description: Zone ID of the custom domain resides in
+                type: string
+              zoneName:
+                description: Zone that the custom domain resides in
+                type: string
+            required:
+            - domain
+            - status
+            - enabled
+            type: object
+          type: array
+      required:
+      - domains
+      type: object
+    r2_add_custom_domain_response:
+      example:
+        domain: example-domain.com
+        enabled: true
+      properties:
+        domain:
+          description: Domain name of the affected custom domain
+          type: string
+        enabled:
+          description: Whether this bucket is publicly accessible at the specified custom domain
+          type: boolean
+        minTLS:
+          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to 1.0.
+          enum:
+          - '1.0'
+          - '1.1'
+          - '1.2'
+          - '1.3'
+          type: string
+      required:
+      - domain
+      - enabled
+      type: object
+    r2_v4_response_list:
+      allOf:
+      - $ref: '#/components/schemas/r2_v4_response'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/r2_result_info'
+        type: object
+    r2_temp_access_creds_response:
+      example:
+        accessKeyId: example-access-key-id
+        secretAccessKey: example-secret-key
+        sessionToken: example-session-token
+      properties:
+        accessKeyId:
+          description: ID for new access key
+          type: string
+        secretAccessKey:
+          description: Secret access key
+          type: string
+        sessionToken:
+          description: Security token
+          type: string
+      type: object
+    r2_result_info:
+      properties:
+        cursor:
+          description: A continuation token that should be used to fetch the next page of results
+          example: 1-JTdCJTIydiUyMiUzQTElMkMlMjJzdGFydEFmdGVyJTIyJTNBJTIyZGF2aWRwdWJsaWMlMjIlN0Q=
+          type: string
+        per_page:
+          description: Maximum number of results on this page
+          example: 20
+          type: number
+      type: object
+    r2_bucket_location:
+      description: Location of the bucket
+      enum:
+      - apac
+      - eeur
+      - enam
+      - weur
+      - wnam
+      type: string
+    r2_messages:
+      items:
+        type: string
+      type: array
+    r2_enable_sippy_aws:
+      properties:
+        destination:
+          description: R2 bucket to copy objects to
+          properties:
+            accessKeyId:
+              description: 'ID of a Cloudflare API token.
+
+                This is the value labelled "Access Key ID" when creating an API
+
+                token from the [R2 dashboard](https://dash.cloudflare.com/?to=/:account/r2/api-tokens).
+
+
+                Sippy will use this token when writing objects to R2, so it is
+
+                best to scope this token to the bucket you''re enabling Sippy for.
+
+                '
+              type: string
+            provider:
+              enum:
+              - r2
+              type: string
+            secretAccessKey:
+              description: 'Value of a Cloudflare API token.
+
+                This is the value labelled "Secret Access Key" when creating an API
+
+                token from the [R2 dashboard](https://dash.cloudflare.com/?to=/:account/r2/api-tokens).
+
+
+                Sippy will use this token when writing objects to R2, so it is
+
+                best to scope this token to the bucket you''re enabling Sippy for.
+
+                '
+              type: string
+          type: object
+        source:
+          description: AWS S3 bucket to copy objects from
+          properties:
+            accessKeyId:
+              description: Access Key ID of an IAM credential (ideally scoped to a single S3 bucket)
+              type: string
+            bucket:
+              description: Name of the AWS S3 bucket
+              type: string
+            provider:
+              enum:
+              - aws
+              type: string
+            region:
+              description: Name of the AWS availability zone
+              type: string
+            secretAccessKey:
+              description: Secret Access Key of an IAM credential (ideally scoped to a single S3 bucket)
+              type: string
+          type: object
+    r2_sippy:
+      properties:
+        destination:
+          description: Details about the configured destination bucket
+          properties:
+            accessKeyId:
+              description: 'ID of the Cloudflare API token used when writing objects to this
+
+                bucket
+
+                '
+              type: string
+            account:
+              type: string
+            bucket:
+              description: Name of the bucket on the provider
+              type: string
+            provider:
+              enum:
+              - r2
+              type: string
+          type: object
+        enabled:
+          description: State of Sippy for this bucket
+          type: boolean
+        source:
+          description: Details about the configured source bucket
+          properties:
+            bucket:
+              description: Name of the bucket on the provider
+              type: string
+            provider:
+              enum:
+              - aws
+              - gcs
+              type: string
+            region:
+              description: Region where the bucket resides (AWS only)
+              nullable: true
+              type: string
+          type: object
+      type: object
+    r2_add_custom_domain_request:
+      example:
+        domain: prefix.example-domain.com
+        zoneId: 36ca64a6d92827b8a6b90be344bb1bfd
+      properties:
+        domain:
+          description: Name of the custom domain to be added
+          type: string
+        enabled:
+          description: Whether to enable public bucket access at the custom domain. If undefined, the domain will be enabled.
+          type: boolean
+        minTLS:
+          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to 1.0.
+          enum:
+          - '1.0'
+          - '1.1'
+          - '1.2'
+          - '1.3'
+          type: string
+        zoneId:
+          description: Zone ID of the custom domain
+          type: string
+      required:
+      - domain
+      - zoneId
+      type: object
+    r2_managed_domain_response:
+      example:
+        bucketId: 0113a9e4549cf9b1ff1bf56e04da0cef
+        domain: pub-0113a9e4549cf9b1ff1bf56e04da0cef.r2.dev
+        enabled: true
+      properties:
+        bucketId:
+          description: Bucket ID
+          maxLength: 32
+          type: string
+        domain:
+          description: Domain name of the bucket's r2.dev domain
+          type: string
+        enabled:
+          description: Whether this bucket is publicly accessible at the r2.dev domain
+          type: boolean
+      required:
+      - bucketId
+      - domain
+      - enabled
+      type: object
+    r2_remove_custom_domain_response:
+      example:
+        domain: example-domain/custom-domain.com
+      properties:
+        domain:
+          description: Name of the removed custom domain
+          type: string
+      required:
+      - domain
+      type: object
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

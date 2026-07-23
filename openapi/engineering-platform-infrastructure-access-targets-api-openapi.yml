@@ -1,0 +1,579 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Infrastructure Access Targets API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: Infrastructure Access Targets
+paths:
+  /accounts/{account_id}/infrastructure/targets:
+    get:
+      operationId: infra-targets-list
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/infra_AccountTag'
+      - description: Hostname of a target
+        in: query
+        name: hostname
+        schema:
+          nullable: true
+          type: string
+      - description: Partial match to the hostname of a target
+        in: query
+        name: hostname_contains
+        schema:
+          nullable: true
+          type: string
+      - description: Private virtual network identifier of the target
+        in: query
+        name: virtual_network_id
+        schema:
+          format: uuid
+          nullable: true
+          type: string
+      - description: IPv4 address of the target
+        in: query
+        name: ip_v4
+        schema:
+          nullable: true
+          type: string
+      - description: IPv6 address of the target
+        in: query
+        name: ip_v6
+        schema:
+          nullable: true
+          type: string
+      - description: Date and time at which the target was created
+        in: query
+        name: created_after
+        schema:
+          format: date-time
+          nullable: true
+          type: string
+      - description: Date and time at which the target was modified
+        in: query
+        name: modified_after
+        schema:
+          format: date-time
+          nullable: true
+          type: string
+      - description: Current page in the response
+        in: query
+        name: page
+        schema:
+          default: 1
+          format: int32
+          minimum: 1
+          type: integer
+      - description: Max amount of entries returned per page
+        in: query
+        name: per_page
+        schema:
+          default: 1000
+          format: int32
+          maximum: 1000
+          minimum: 1
+          type: integer
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/infra_api-response-common-failure'
+          description: Failed to retrieve all targets in the account
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/infra_api-response-collection'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/infra_TargetArray'
+                  type: object
+          description: Successfully retrieved all targets in the account
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform List all targets
+      tags:
+      - Infrastructure Access Targets
+      x-api-token-group:
+      - Teams Read
+      - Teams Write
+    post:
+      operationId: infra-targets-post
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/infra_AccountTag'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                hostname:
+                  description: 'A non-unique field that refers to a target. Case insensitive, maximum
+
+                    length of 255 characters, supports the use of special characters dash
+
+                    and period, does not support spaces, and must start and end with an
+
+                    alphanumeric character.'
+                  example: infra-access-target
+                  type: string
+                ip:
+                  $ref: '#/components/schemas/infra_IPInfo'
+              required:
+              - hostname
+              - ip
+              type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/infra_api-response-common-failure'
+          description: Failed to create the target
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/infra_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/infra_Target'
+                  type: object
+          description: Successfully created the target
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Create new target
+      tags:
+      - Infrastructure Access Targets
+      x-api-token-group:
+      - Teams Write
+  /accounts/{account_id}/infrastructure/targets/{target_id}:
+    delete:
+      operationId: infra-targets-delete
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/infra_AccountTag'
+      - in: path
+        name: target_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/infra_TargetId'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/infra_api-response-common-failure'
+          description: Failed to delete the target
+        '200':
+          description: Successfully deleted the target
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Delete target
+      tags:
+      - Infrastructure Access Targets
+    get:
+      operationId: infra-targets-get
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/infra_AccountTag'
+      - in: path
+        name: target_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/infra_TargetId'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/infra_api-response-common-failure'
+          description: Failed to retrieve the target
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/infra_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/infra_Target'
+                  type: object
+          description: Successfully retrieved the target
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Get target
+      tags:
+      - Infrastructure Access Targets
+    put:
+      operationId: infra-targets-put
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/infra_AccountTag'
+      - in: path
+        name: target_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/infra_TargetId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                hostname:
+                  description: 'A non-unique field that refers to a target. Case insensitive, maximum
+
+                    length of 255 characters, supports the use of special characters dash
+
+                    and period, does not support spaces, and must start and end with an
+
+                    alphanumeric character.'
+                  example: infra-access-target
+                  type: string
+                ip:
+                  $ref: '#/components/schemas/infra_IPInfo'
+              required:
+              - hostname
+              - ip
+              type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/infra_api-response-common-failure'
+          description: Failed to update the target
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/infra_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/infra_Target'
+                  type: object
+          description: Successfully updated the target
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Update target
+      tags:
+      - Infrastructure Access Targets
+components:
+  schemas:
+    infra_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/infra_messages'
+        messages:
+          $ref: '#/components/schemas/infra_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    infra_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    infra_Target:
+      properties:
+        created_at:
+          description: Date and time at which the target was created
+          example: '2019-08-24T14:15:22Z'
+          format: date-time
+          type: string
+        hostname:
+          description: A non-unique field that refers to a target
+          example: infra-access-target
+          type: string
+        id:
+          $ref: '#/components/schemas/infra_TargetId'
+        ip:
+          $ref: '#/components/schemas/infra_IPInfo'
+        modified_at:
+          description: Date and time at which the target was modified
+          example: '2019-08-24T14:15:22Z'
+          format: date-time
+          type: string
+      required:
+      - id
+      - hostname
+      - ip
+      - created_at
+      - modified_at
+      type: object
+    infra_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/infra_api-response-common'
+      type: object
+    infra_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/infra_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/infra_result_info'
+      type: object
+    infra_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    infra_TargetArray:
+      items:
+        $ref: '#/components/schemas/infra_Target'
+      type: array
+    infra_IPInfo:
+      description: The IPv4/IPv6 address that identifies where to reach a target
+      properties:
+        ipv4:
+          description: The target's IPv4 address
+          properties:
+            ip_addr:
+              description: IP address of the target
+              example: 187.26.29.249
+              type: string
+            virtual_network_id:
+              description: Private virtual network identifier for the target
+              example: c77b744e-acc8-428f-9257-6878c046ed55
+              format: uuid
+              type: string
+          type: object
+        ipv6:
+          description: The target's IPv6 address
+          properties:
+            ip_addr:
+              description: IP address of the target
+              example: 64c0:64e8:f0b4:8dbf:7104:72b0:ec8f:f5e0
+              type: string
+            virtual_network_id:
+              description: Private virtual network identifier for the target
+              example: c77b744e-acc8-428f-9257-6878c046ed55
+              format: uuid
+              type: string
+          type: object
+      type: object
+    infra_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/infra_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/infra_messages'
+          example: []
+        result:
+          enum:
+          - null
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    infra_TargetId:
+      description: Target identifier
+      example: 0191dce4-9ab4-7fce-b660-8e5dec5172da
+      format: uuid
+      maxLength: 36
+      title: target_id
+      type: string
+    infra_AccountTag:
+      description: Account identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      title: account_id
+      type: string
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

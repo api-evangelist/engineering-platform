@@ -1,0 +1,689 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Turnstile API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: Turnstile
+paths:
+  /accounts/{account_id}/challenges/widgets:
+    parameters:
+    - in: path
+      name: account_id
+      required: true
+      schema:
+        $ref: '#/components/schemas/turnstile_identifier'
+    - in: query
+      name: page
+      schema:
+        default: 1
+        description: Page number of paginated results.
+        minimum: 1
+        type: number
+    - in: query
+      name: per_page
+      schema:
+        default: 25
+        description: Number of items per page.
+        maximum: 1000
+        minimum: 5
+        type: number
+    - in: query
+      name: order
+      schema:
+        description: Field to order widgets by.
+        enum:
+        - id
+        - sitekey
+        - name
+        - created_on
+        - modified_on
+        example: id
+    - in: query
+      name: direction
+      schema:
+        description: Direction to order widgets.
+        enum:
+        - asc
+        - desc
+        example: asc
+    get:
+      description: Lists all turnstile widgets of an account.
+      operationId: accounts-turnstile-widgets-list
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/turnstile_api-response-common-failure'
+          description: List Turnstile Widgets Error
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/turnstile_api-response-common'
+                - properties:
+                    result_info:
+                      $ref: '#/components/schemas/turnstile_result_info'
+                - properties:
+                    result:
+                      items:
+                        $ref: '#/components/schemas/turnstile_widget_list'
+                      type: array
+          description: List Turnstile Widgets
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform List Turnstile Widgets
+      tags:
+      - Turnstile
+      x-api-token-group:
+      - Turnstile Sites Read
+      - Account Settings Read
+    post:
+      description: Lists challenge widgets.
+      operationId: accounts-turnstile-widget-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                bot_fight_mode:
+                  $ref: '#/components/schemas/turnstile_bot_fight_mode'
+                clearance_level:
+                  $ref: '#/components/schemas/turnstile_clearance_level'
+                domains:
+                  $ref: '#/components/schemas/turnstile_domains'
+                mode:
+                  $ref: '#/components/schemas/turnstile_mode'
+                name:
+                  $ref: '#/components/schemas/turnstile_name'
+                offlabel:
+                  $ref: '#/components/schemas/turnstile_offlabel'
+                region:
+                  $ref: '#/components/schemas/turnstile_region'
+              required:
+              - name
+              - mode
+              - domains
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/turnstile_api-response-common-failure'
+          description: Create Turnstile Widget Response Error
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/turnstile_api-response-common'
+                - properties:
+                    result_info:
+                      $ref: '#/components/schemas/turnstile_result_info'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/turnstile_widget_detail'
+          description: Create Turnstile Widget Response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Create a Turnstile Widget
+      tags:
+      - Turnstile
+  /accounts/{account_id}/challenges/widgets/{sitekey}:
+    parameters:
+    - in: path
+      name: account_id
+      required: true
+      schema:
+        $ref: '#/components/schemas/turnstile_identifier'
+    - in: path
+      name: sitekey
+      required: true
+      schema:
+        $ref: '#/components/schemas/turnstile_sitekey'
+    delete:
+      description: Destroy a Turnstile Widget.
+      operationId: accounts-turnstile-widget-delete
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/turnstile_api-response-common-failure'
+          description: Delete Turnstile Widget Response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/turnstile_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/turnstile_widget_detail'
+          description: Delete Turnstile Widget Response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Delete a Turnstile Widget
+      tags:
+      - Turnstile
+    get:
+      description: Show a single challenge widget configuration.
+      operationId: accounts-turnstile-widget-get
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/turnstile_api-response-common-failure'
+          description: Turnstile Widget Details Response Error
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/turnstile_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/turnstile_widget_detail'
+          description: Turnstile Widget Details Response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Turnstile Widget Details
+      tags:
+      - Turnstile
+      x-api-token-group:
+      - Turnstile Sites Read
+      - Account Settings Read
+    put:
+      description: Update the configuration of a widget.
+      operationId: accounts-turnstile-widget-update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                bot_fight_mode:
+                  $ref: '#/components/schemas/turnstile_bot_fight_mode'
+                clearance_level:
+                  $ref: '#/components/schemas/turnstile_clearance_level'
+                domains:
+                  $ref: '#/components/schemas/turnstile_domains'
+                mode:
+                  $ref: '#/components/schemas/turnstile_mode'
+                name:
+                  $ref: '#/components/schemas/turnstile_name'
+                offlabel:
+                  $ref: '#/components/schemas/turnstile_offlabel'
+              required:
+              - name
+              - mode
+              - domains
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/turnstile_api-response-common-failure'
+          description: Update Turnstile Widget Response Error
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/turnstile_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/turnstile_widget_detail'
+          description: Update Turnstile Widget Response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Update a Turnstile Widget
+      tags:
+      - Turnstile
+  /accounts/{account_id}/challenges/widgets/{sitekey}/rotate_secret:
+    parameters:
+    - in: path
+      name: account_id
+      required: true
+      schema:
+        $ref: '#/components/schemas/turnstile_identifier'
+    - in: path
+      name: sitekey
+      required: true
+      schema:
+        $ref: '#/components/schemas/turnstile_sitekey'
+    post:
+      description: 'Generate a new secret key for this widget. If `invalidate_immediately`
+
+        is set to `false`, the previous secret remains valid for 2 hours.
+
+
+        Note that secrets cannot be rotated again during the grace period.
+
+        '
+      operationId: accounts-turnstile-widget-rotate-secret
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                invalidate_immediately:
+                  $ref: '#/components/schemas/turnstile_invalidate_immediately'
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/turnstile_api-response-common-failure'
+          description: Rotate Secret Response Error
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/turnstile_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/turnstile_widget_detail'
+          description: Rotate Secret Response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Rotate Secret for a Turnstile Widget
+      tags:
+      - Turnstile
+components:
+  schemas:
+    turnstile_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/turnstile_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/turnstile_messages'
+          example: []
+        result:
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    turnstile_secret:
+      description: Secret key for this widget.
+      example: 0x4AAF00AAAABn0R22HWm098HVBjhdsYUc
+      type: string
+    turnstile_domains:
+      example:
+      - 203.0.113.1
+      - cloudflare.com
+      - blog.example.com
+      items:
+        description: 'Hosts as a hostname or IPv4/IPv6 address represented by strings. The
+
+          widget will only work on these domains, and their subdomains.
+
+          '
+        example: 203.0.113.1
+        type: string
+      maxLength: 10
+      type: array
+    turnstile_name:
+      description: 'Human readable widget name. Not unique. Cloudflare suggests that you
+
+        set this to a meaningful string to make it easier to identify your
+
+        widget, and where it is used.
+
+        '
+      example: blog.cloudflare.com login form
+      maxLength: 254
+      minLength: 1
+      type: string
+    turnstile_sitekey:
+      description: Widget item identifier tag.
+      example: 0x4AAF00AAAABn0R22HWm-YUc
+      maxLength: 32
+      type: string
+    turnstile_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/turnstile_messages'
+        messages:
+          $ref: '#/components/schemas/turnstile_messages'
+        success:
+          description: Whether the API call was successful
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    turnstile_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    turnstile_invalidate_immediately:
+      default: false
+      description: 'If `invalidate_immediately` is set to `false`, the previous secret will
+
+        remain valid for two hours. Otherwise, the secret is immediately
+
+        invalidated, and requests using it will be rejected.
+
+        '
+      type: boolean
+    turnstile_offlabel:
+      description: 'Do not show any Cloudflare branding on the widget (ENT only).
+
+        '
+      example: false
+      type: boolean
+    turnstile_region:
+      default: world
+      description: Region where this widget can be used.
+      enum:
+      - world
+      type: string
+    turnstile_mode:
+      description: Widget Mode
+      enum:
+      - non-interactive
+      - invisible
+      - managed
+      example: invisible
+      type: string
+    turnstile_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      required:
+      - page
+      - per_page
+      - count
+      - total_count
+      type: object
+    turnstile_clearance_level:
+      description: 'If Turnstile is embedded on a Cloudflare site and the widget should grant challenge clearance,
+
+        this setting can determine the clearance level to be set
+
+        '
+      enum:
+      - no_clearance
+      - jschallenge
+      - managed
+      - interactive
+      example: interactive
+      type: string
+    turnstile_bot_fight_mode:
+      description: 'If bot_fight_mode is set to `true`, Cloudflare issues computationally
+
+        expensive challenges in response to malicious bots (ENT only).
+
+        '
+      example: false
+      type: boolean
+    turnstile_widget_list:
+      description: A Turnstile Widgets configuration as it appears in listings
+      properties:
+        bot_fight_mode:
+          $ref: '#/components/schemas/turnstile_bot_fight_mode'
+        clearance_level:
+          $ref: '#/components/schemas/turnstile_clearance_level'
+        created_on:
+          $ref: '#/components/schemas/turnstile_created_on'
+        domains:
+          $ref: '#/components/schemas/turnstile_domains'
+        mode:
+          $ref: '#/components/schemas/turnstile_mode'
+        modified_on:
+          $ref: '#/components/schemas/turnstile_modified_on'
+        name:
+          $ref: '#/components/schemas/turnstile_name'
+        offlabel:
+          $ref: '#/components/schemas/turnstile_offlabel'
+        region:
+          $ref: '#/components/schemas/turnstile_region'
+        sitekey:
+          $ref: '#/components/schemas/turnstile_sitekey'
+      required:
+      - sitekey
+      - created_on
+      - modified_on
+      - name
+      - domains
+      - mode
+      - region
+      - bot_fight_mode
+      - offlabel
+      - clearance_level
+      type: object
+    turnstile_widget_detail:
+      description: A Turnstile widget's detailed configuration
+      properties:
+        bot_fight_mode:
+          $ref: '#/components/schemas/turnstile_bot_fight_mode'
+        clearance_level:
+          $ref: '#/components/schemas/turnstile_clearance_level'
+        created_on:
+          $ref: '#/components/schemas/turnstile_created_on'
+        domains:
+          $ref: '#/components/schemas/turnstile_domains'
+        mode:
+          $ref: '#/components/schemas/turnstile_mode'
+        modified_on:
+          $ref: '#/components/schemas/turnstile_modified_on'
+        name:
+          $ref: '#/components/schemas/turnstile_name'
+        offlabel:
+          $ref: '#/components/schemas/turnstile_offlabel'
+        region:
+          $ref: '#/components/schemas/turnstile_region'
+        secret:
+          $ref: '#/components/schemas/turnstile_secret'
+        sitekey:
+          $ref: '#/components/schemas/turnstile_sitekey'
+      required:
+      - sitekey
+      - secret
+      - created_on
+      - modified_on
+      - name
+      - domains
+      - mode
+      - region
+      - bot_fight_mode
+      - offlabel
+      - clearance_level
+      type: object
+    turnstile_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    turnstile_created_on:
+      description: When the widget was created.
+      example: '2014-01-01T05:20:00.123123Z'
+      format: date-time
+      readOnly: true
+      type: string
+    turnstile_modified_on:
+      description: When the widget was modified.
+      example: '2014-01-01T05:20:00.123123Z'
+      format: date-time
+      readOnly: true
+      type: string
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

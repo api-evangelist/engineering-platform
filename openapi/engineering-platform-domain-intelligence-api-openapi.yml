@@ -1,0 +1,455 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Domain Intelligence API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: Domain Intelligence
+paths:
+  /accounts/{account_id}/intel/domain:
+    get:
+      operationId: domain-intelligence-get-domain-details
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/intel_identifier'
+      - in: query
+        name: domain
+        schema:
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/intel_single_response'
+                - $ref: '#/components/schemas/intel_api-response-common-failure'
+          description: Get Domain Details response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intel_single_response'
+          description: Get Domain Details response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Get Domain Details
+      tags:
+      - Domain Intelligence
+  /accounts/{account_id}/intel/domain/bulk:
+    get:
+      operationId: domain-intelligence-get-multiple-domain-details
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/intel_identifier'
+      - in: query
+        name: domain
+        schema:
+          description: Accepts multiple values, i.e. `?domain=cloudflare.com&domain=example.com`.
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/intel_collection_response'
+                - $ref: '#/components/schemas/intel_api-response-common-failure'
+          description: Get Multiple Domain Details response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intel_collection_response'
+          description: Get Multiple Domain Details response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Get Multiple Domain Details
+      tags:
+      - Domain Intelligence
+components:
+  schemas:
+    intel_single_response:
+      allOf:
+      - $ref: '#/components/schemas/intel_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/intel_domain'
+    intel_resolves_to_ref:
+      properties:
+        id:
+          $ref: '#/components/schemas/intel_stix_identifier'
+        value:
+          description: IP address or domain name.
+          example: 192.0.2.0
+          type: string
+      type: object
+    intel_domain_name:
+      example: cloudflare.com
+      type: string
+    intel_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    intel_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/intel_api-response-common'
+      - properties:
+          result:
+            items: {}
+            nullable: true
+            type: array
+          result_info:
+            $ref: '#/components/schemas/intel_result_info'
+      type: object
+    intel_category_with_super_category_id:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        super_category_id:
+          type: integer
+    intel_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/intel_schemas-api-response-common'
+      type: object
+    intel_application:
+      description: Application that the hostname belongs to.
+      properties:
+        id:
+          type: integer
+        name:
+          example: CLOUDFLARE
+          type: string
+      type: object
+    intel_categories_with_super_category_ids_example_empty:
+      example: []
+      items:
+        $ref: '#/components/schemas/intel_category_with_super_category_id'
+      type: array
+    intel_inherited_risk_types:
+      $ref: '#/components/schemas/intel_categories_with_super_category_ids_example_empty'
+    intel_inherited_from:
+      description: Domain from which `inherited_content_categories` and `inherited_risk_types` are inherited, if applicable.
+      type: string
+    intel_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    intel_risk_types:
+      example: []
+    intel_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/intel_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/intel_messages'
+          example: []
+        result:
+          enum:
+          - null
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    intel_popularity_rank:
+      description: Global Cloudflare 100k ranking for the last 30 days, if available for the hostname. The top ranked domain is 1, the lowest ranked domain is 100,000.
+      type: integer
+    intel_domain:
+      properties:
+        additional_information:
+          $ref: '#/components/schemas/intel_additional_information'
+        application:
+          $ref: '#/components/schemas/intel_application'
+        content_categories:
+          $ref: '#/components/schemas/intel_content_categories'
+        domain:
+          $ref: '#/components/schemas/intel_domain_name'
+        inherited_content_categories:
+          $ref: '#/components/schemas/intel_inherited_content_categories'
+        inherited_from:
+          $ref: '#/components/schemas/intel_inherited_from'
+        inherited_risk_types:
+          $ref: '#/components/schemas/intel_inherited_risk_types'
+        popularity_rank:
+          $ref: '#/components/schemas/intel_popularity_rank'
+        resolves_to_refs:
+          $ref: '#/components/schemas/intel_resolves_to_refs'
+        risk_score:
+          $ref: '#/components/schemas/intel_risk_score'
+        risk_types:
+          $ref: '#/components/schemas/intel_risk_types'
+    intel_additional_information:
+      description: Additional information related to the host name.
+      properties:
+        suspected_malware_family:
+          description: Suspected DGA malware family.
+          example: ''
+          type: string
+      type: object
+    intel_stix_identifier:
+      description: 'STIX 2.1 identifier: https://docs.oasis-open.org/cti/stix/v2.1/cs02/stix-v2.1-cs02.html#_64yvzeku5a5c'
+      example: ipv4-addr--baa568ec-6efe-5902-be55-0663833db537
+      type: string
+    intel_schemas-api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/intel_messages'
+        messages:
+          $ref: '#/components/schemas/intel_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    intel_risk_score:
+      description: Hostname risk score, which is a value between 0 (lowest risk) to 1 (highest risk).
+      type: number
+    intel_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/intel_messages'
+        messages:
+          $ref: '#/components/schemas/intel_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    intel_content_categories:
+      description: Current content categories.
+      example:
+      - id: 155
+        name: Technology
+        super_category_id: 26
+    intel_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    intel_resolves_to_refs:
+      description: Specifies a list of references to one or more IP addresses or domain names that the domain name currently resolves to.
+      items:
+        $ref: '#/components/schemas/intel_resolves_to_ref'
+      type: array
+    intel_inherited_content_categories:
+      $ref: '#/components/schemas/intel_categories_with_super_category_ids_example_empty'
+    intel_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/intel_api-response-collection'
+      - properties:
+          result:
+            items:
+              properties:
+                additional_information:
+                  $ref: '#/components/schemas/intel_additional_information'
+                application:
+                  $ref: '#/components/schemas/intel_application'
+                content_categories:
+                  $ref: '#/components/schemas/intel_content_categories'
+                domain:
+                  $ref: '#/components/schemas/intel_domain_name'
+                inherited_content_categories:
+                  $ref: '#/components/schemas/intel_inherited_content_categories'
+                inherited_from:
+                  $ref: '#/components/schemas/intel_inherited_from'
+                inherited_risk_types:
+                  $ref: '#/components/schemas/intel_inherited_risk_types'
+                popularity_rank:
+                  $ref: '#/components/schemas/intel_popularity_rank'
+                risk_score:
+                  $ref: '#/components/schemas/intel_risk_score'
+                risk_types:
+                  $ref: '#/components/schemas/intel_risk_types'
+            type: array
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

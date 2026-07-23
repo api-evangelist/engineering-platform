@@ -1,0 +1,833 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 DLP Datasets API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: DLP Datasets
+paths:
+  /accounts/{account_id}/dlp/datasets:
+    get:
+      operationId: dlp-datasets-read-all
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Datasets read failed
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/dlp_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/dlp_DatasetArray'
+                  type: object
+          description: Datasets read successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Fetch all datasets
+      tags:
+      - DLP Datasets
+    post:
+      operationId: dlp-datasets-create
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dlp_NewDataset'
+        description: Dataset description
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Dataset creation failed
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/dlp_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/dlp_DatasetCreation'
+                  type: object
+          description: Dataset created successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Create a new dataset
+      tags:
+      - DLP Datasets
+  /accounts/{account_id}/dlp/datasets/{dataset_id}:
+    delete:
+      description: This deletes all versions of the dataset.
+      operationId: dlp-datasets-delete
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: dataset_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Dataset delete failed
+        '200':
+          description: Dataset deleted successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Delete a dataset
+      tags:
+      - DLP Datasets
+    get:
+      operationId: dlp-datasets-read
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: dataset_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Dataset read failed
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/dlp_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/dlp_Dataset'
+                  type: object
+          description: Dataset read successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Fetch a specific dataset
+      tags:
+      - DLP Datasets
+    put:
+      operationId: dlp-datasets-update
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: dataset_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dlp_DatasetUpdate'
+        description: Dataset description
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Dataset update failed
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/dlp_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/dlp_Dataset'
+                  type: object
+          description: Dataset updated successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Update details about a dataset
+      tags:
+      - DLP Datasets
+  /accounts/{account_id}/dlp/datasets/{dataset_id}/upload:
+    post:
+      operationId: dlp-datasets-create-version
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: dataset_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Dataset version creation failed
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/dlp_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/dlp_DatasetNewVersion'
+                  type: object
+          description: Dataset version created successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Prepare to upload a new version of a dataset
+      tags:
+      - DLP Datasets
+  /accounts/{account_id}/dlp/datasets/{dataset_id}/upload/{version}:
+    post:
+      description: 'This is used for single-column EDMv1 and Custom Word Lists. The EDM format
+
+        can only be created in the Cloudflare dashboard. For other clients, this
+
+        operation can only be used for non-secret Custom Word Lists. The body must
+
+        be a UTF-8 encoded, newline (NL or CRNL) separated list of words to be matched.'
+      operationId: dlp-datasets-upload-version
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: dataset_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: version
+        required: true
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+        description: Dataset. For custom wordlists this contains UTF-8 patterns separated by newline characters.
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Dataset version upload failed
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/dlp_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/dlp_Dataset'
+                  type: object
+          description: Dataset version uploaded successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Upload a new version of a dataset
+      tags:
+      - DLP Datasets
+  /accounts/{account_id}/dlp/datasets/{dataset_id}/versions/{version}:
+    post:
+      description: 'This is used for multi-column EDMv2 datasets. The EDMv2 format can only be
+
+        created in the Cloudflare dashboard. The columns in the response appear in
+
+        the same order as in the request.'
+      operationId: dlp-datasets-define-columns
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: dataset_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: version
+        required: true
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/dlp_NewDatasetColumn'
+              type: array
+        description: array of new columns to create for this dataset version
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Failed to create dataset columns
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/dlp_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/dlp_DatasetColumnArray'
+                  type: object
+          description: Dataset columns created successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Sets the column information for a multi-column upload
+      tags:
+      - DLP Datasets
+  /accounts/{account_id}/dlp/datasets/{dataset_id}/versions/{version}/entries/{entry_id}:
+    post:
+      description: 'This is used for multi-column EDMv2 datasets. The EDMv2 format can only be
+
+        created in the Cloudflare dashboard.'
+      operationId: dlp-datasets-upload-dataset-column
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: dataset_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: path
+        name: version
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - in: path
+        name: entry_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+        description: Dataset content
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dlp_api-response-common-failure'
+          description: Failed to upload dataset column
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/dlp_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/dlp_DatasetColumn'
+                  type: object
+          description: Dataset column uploaded successfully
+      security:
+      - api_email: []
+        api_key: []
+        api_token: []
+      summary: APIs.io Engineering Platform Upload a new version of a multi-column dataset
+      tags:
+      - DLP Datasets
+components:
+  schemas:
+    dlp_DatasetUpdate:
+      properties:
+        description:
+          description: The description of the dataset
+          nullable: true
+          type: string
+        name:
+          description: The name of the dataset, must be unique
+          nullable: true
+          type: string
+      type: object
+    dlp_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dlp_api-response-common'
+      type: object
+    dlp_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/dlp_messages'
+        messages:
+          $ref: '#/components/schemas/dlp_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    dlp_DatasetColumnArray:
+      items:
+        $ref: '#/components/schemas/dlp_DatasetColumn'
+      type: array
+    dlp_NewDatasetColumn:
+      allOf:
+      - oneOf:
+        - properties:
+            entry_id:
+              format: uuid
+              type: string
+          required:
+          - entry_id
+          title: Existing Column
+          type: object
+        - properties:
+            entry_name:
+              type: string
+          required:
+          - entry_name
+          title: New Column
+          type: object
+      - properties:
+          header_name:
+            type: string
+          num_cells:
+            format: int64
+            type: integer
+        required:
+        - header_name
+        - num_cells
+        type: object
+    dlp_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example: []
+        result:
+          enum:
+          - null
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    dlp_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dlp_DatasetColumn:
+      properties:
+        entry_id:
+          format: uuid
+          type: string
+        header_name:
+          type: string
+        num_cells:
+          format: int64
+          type: integer
+        upload_status:
+          $ref: '#/components/schemas/dlp_DatasetUploadStatus'
+      required:
+      - entry_id
+      - upload_status
+      - header_name
+      - num_cells
+      type: object
+    dlp_NewDataset:
+      properties:
+        description:
+          description: The description of the dataset
+          nullable: true
+          type: string
+        encoding_version:
+          description: 'Dataset encoding version
+
+
+            Non-secret custom word lists with no header are always version 1.
+
+            Secret EDM lists with no header are version 1.
+
+            Multicolumn CSV with headers are version 2.
+
+            Omitting this field provides the default value 0, which is interpreted
+
+            the same as 1.'
+          format: int32
+          minimum: 0
+          type: integer
+        name:
+          type: string
+        secret:
+          description: 'Generate a secret dataset.
+
+
+            If true, the response will include a secret to use with the EDM encoder.
+
+            If false, the response has no secret and the dataset is uploaded in plaintext.'
+          type: boolean
+      required:
+      - name
+      type: object
+    dlp_DatasetArray:
+      items:
+        $ref: '#/components/schemas/dlp_Dataset'
+      type: array
+    dlp_DatasetNewVersion:
+      properties:
+        columns:
+          items:
+            $ref: '#/components/schemas/dlp_DatasetColumn'
+          type: array
+        encoding_version:
+          format: int32
+          minimum: 0
+          type: integer
+        max_cells:
+          format: int64
+          minimum: 0
+          type: integer
+        secret:
+          format: password
+          type: string
+        version:
+          format: int64
+          type: integer
+      required:
+      - version
+      - max_cells
+      - encoding_version
+      type: object
+    dlp_DatasetUploadStatus:
+      enum:
+      - empty
+      - uploading
+      - processing
+      - failed
+      - complete
+      type: string
+    dlp_DatasetUpload:
+      properties:
+        num_cells:
+          format: int64
+          type: integer
+        status:
+          $ref: '#/components/schemas/dlp_DatasetUploadStatus'
+        version:
+          format: int64
+          type: integer
+      required:
+      - version
+      - status
+      - num_cells
+      type: object
+    dlp_Dataset:
+      properties:
+        columns:
+          items:
+            $ref: '#/components/schemas/dlp_DatasetColumn'
+          type: array
+        created_at:
+          format: date-time
+          type: string
+        description:
+          description: The description of the dataset
+          nullable: true
+          type: string
+        encoding_version:
+          format: int32
+          minimum: 0
+          type: integer
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        num_cells:
+          format: int64
+          type: integer
+        secret:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/dlp_DatasetUploadStatus'
+        updated_at:
+          format: date-time
+          type: string
+        uploads:
+          items:
+            $ref: '#/components/schemas/dlp_DatasetUpload'
+          type: array
+      required:
+      - name
+      - id
+      - status
+      - num_cells
+      - created_at
+      - updated_at
+      - uploads
+      - secret
+      - encoding_version
+      - columns
+      type: object
+    dlp_DatasetCreation:
+      properties:
+        dataset:
+          $ref: '#/components/schemas/dlp_Dataset'
+        encoding_version:
+          description: Encoding version to use for dataset
+          format: int32
+          minimum: 0
+          type: integer
+        max_cells:
+          format: int64
+          minimum: 0
+          type: integer
+        secret:
+          description: 'The secret to use for Exact Data Match datasets. This is not present in
+
+            Custom Wordlists.'
+          format: password
+          type: string
+        version:
+          description: The version to use when uploading the dataset.
+          format: int64
+          type: integer
+      required:
+      - version
+      - max_cells
+      - dataset
+      - encoding_version
+      type: object
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

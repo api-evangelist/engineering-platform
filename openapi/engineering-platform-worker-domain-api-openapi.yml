@@ -1,0 +1,450 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Worker Domain API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: Worker Domain
+paths:
+  /accounts/{account_id}/workers/domains:
+    get:
+      description: Lists all Worker Domains for an account.
+      operationId: worker-domain-list-domains
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/workers_account_identifier'
+      - in: query
+        name: zone_name
+        schema:
+          $ref: '#/components/schemas/workers_zone_name'
+      - in: query
+        name: service
+        schema:
+          $ref: '#/components/schemas/workers_schemas-service'
+      - in: query
+        name: zone_id
+        schema:
+          $ref: '#/components/schemas/workers_zone_identifier'
+      - in: query
+        name: hostname
+        schema:
+          description: Hostname of the Worker Domain.
+          example: foo.example.com
+          type: string
+      - in: query
+        name: environment
+        schema:
+          description: Worker environment associated with the zone and hostname.
+          example: production
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/workers_domain-response-collection'
+                - $ref: '#/components/schemas/workers_api-response-common-failure'
+          description: List Domains response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workers_domain-response-collection'
+          description: List Domains response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform List Domains
+      tags:
+      - Worker Domain
+      x-api-token-group:
+      - Workers Scripts Write
+      - Workers Scripts Read
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.worker.domain.list
+    put:
+      description: Attaches a Worker to a zone and hostname.
+      operationId: worker-domain-attach-to-domain
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/workers_account_identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                environment:
+                  $ref: '#/components/schemas/workers_schemas-environment'
+                hostname:
+                  $ref: '#/components/schemas/workers_hostname'
+                service:
+                  $ref: '#/components/schemas/workers_schemas-service'
+                zone_id:
+                  $ref: '#/components/schemas/workers_zone_identifier'
+              required:
+              - zone_id
+              - hostname
+              - service
+              - environment
+              type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/workers_domain-response-single'
+                - $ref: '#/components/schemas/workers_api-response-common-failure'
+          description: Attach to Domain response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workers_domain-response-single'
+          description: Attach to Domain response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Attach to Domain
+      tags:
+      - Worker Domain
+      x-api-token-group:
+      - Workers Scripts Write
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.worker.domain.update
+  /accounts/{account_id}/workers/domains/{domain_id}:
+    delete:
+      description: Detaches a Worker from a zone and hostname.
+      operationId: worker-domain-detach-from-domain
+      parameters:
+      - in: path
+        name: domain_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/workers_domain_identifier'
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/workers_account_identifier'
+      requestBody:
+        content:
+          application/json: {}
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json: {}
+          description: Detach from Domain response failure
+        '200':
+          content:
+            application/json: {}
+          description: Detach from Domain response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Detach from Domain
+      tags:
+      - Worker Domain
+      x-api-token-group:
+      - Workers Scripts Write
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.worker.domain.delete
+    get:
+      description: Gets a Worker domain.
+      operationId: worker-domain-get-a-domain
+      parameters:
+      - in: path
+        name: domain_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/workers_domain_identifier'
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/workers_account_identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/workers_domain-response-single'
+                - $ref: '#/components/schemas/workers_api-response-common-failure'
+          description: Get a Domain response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workers_domain-response-single'
+          description: Get a Domain response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Get a Domain
+      tags:
+      - Worker Domain
+      x-api-token-group:
+      - Workers Scripts Write
+      - Workers Scripts Read
+      x-cfPermissionsRequired:
+        enum:
+        - com.cloudflare.edge.worker.domain.read
+components:
+  schemas:
+    workers_domain:
+      properties:
+        environment:
+          $ref: '#/components/schemas/workers_schemas-environment'
+        hostname:
+          $ref: '#/components/schemas/workers_hostname'
+        id:
+          $ref: '#/components/schemas/workers_domain_identifier'
+        service:
+          $ref: '#/components/schemas/workers_schemas-service'
+        zone_id:
+          $ref: '#/components/schemas/workers_zone_identifier'
+        zone_name:
+          $ref: '#/components/schemas/workers_zone_name'
+      type: object
+    workers_hostname:
+      description: Hostname of the Worker Domain.
+      example: foo.example.com
+      type: string
+    workers_domain-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/workers_domain'
+            type: array
+        type: object
+    workers_domain-response-single:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_domain'
+        type: object
+    workers_zone_identifier:
+      description: Identifier of the zone.
+      example: 593c9c94de529bbbfaac7c53ced0447d
+      type: string
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    workers_domain_identifier:
+      description: Identifer of the Worker Domain.
+      example: dbe10b4bc17c295377eabd600e1787fd
+      type: string
+    workers_account_identifier:
+      description: Identifer of the account.
+      example: 9a7806061c88ada191ed06f989cc3dac
+      type: string
+    workers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers_messages'
+        messages:
+          $ref: '#/components/schemas/workers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers_schemas-service:
+      description: Worker service associated with the zone and hostname.
+      example: foo
+      type: string
+    workers_schemas-environment:
+      description: Worker environment associated with the zone and hostname.
+      example: production
+      type: string
+    workers_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/workers_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/workers_messages'
+          example: []
+        result:
+          enum:
+          - null
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    workers_zone_name:
+      description: Name of the zone.
+      example: example.com
+      type: string
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

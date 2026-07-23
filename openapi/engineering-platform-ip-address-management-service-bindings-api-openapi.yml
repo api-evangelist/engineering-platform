@@ -1,0 +1,467 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 IP Address Management Service Bindings API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: IP Address Management Service Bindings
+paths:
+  /accounts/{account_id}/addressing/prefixes/{prefix_id}/bindings:
+    get:
+      description: 'List the Cloudflare services this prefix is currently bound to. Traffic sent to an address within an IP prefix will be routed to the Cloudflare service of the most-specific Service Binding matching the address.
+
+        **Example:** binding `192.0.2.0/24` to Cloudflare Magic Transit and `192.0.2.1/32` to the Cloudflare CDN would route traffic for `192.0.2.1` to the CDN, and traffic for all other IPs in the prefix to Cloudflare Magic Transit.
+
+        '
+      operationId: ip-address-management-service-bindings-list-service-bindings
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      - in: path
+        name: prefix_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/addressing_api-response-common-failure'
+          description: List Service Bindings response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/addressing_api-response-common'
+                - properties:
+                    result:
+                      items:
+                        $ref: '#/components/schemas/addressing_service_binding'
+                      type: array
+          description: Service Bindings attached to the Prefix
+      security:
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform List Service Bindings
+      tags:
+      - IP Address Management Service Bindings
+      x-api-token-group:
+      - 'IP Prefixes: Write'
+      - 'IP Prefixes: Read'
+    post:
+      description: 'Creates a new Service Binding, routing traffic to IPs within the given CIDR to a service running on Cloudflare''s network.
+
+        **Note:** This API may only be used on prefixes currently configured with a Magic Transit service binding, and only allows creating service bindings for the Cloudflare CDN or Cloudflare Spectrum.
+
+        '
+      operationId: ip-address-management-service-bindings-create-service-binding
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      - in: path
+        name: prefix_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/addressing_create_binding_request'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/addressing_api-response-common-failure'
+          description: Create Service Binding response failure
+        '201':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/addressing_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/addressing_service_binding'
+          description: The created Service Binding
+      security:
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Create Service Binding
+      tags:
+      - IP Address Management Service Bindings
+      x-api-token-group:
+      - 'IP Prefixes: Write'
+  /accounts/{account_id}/addressing/prefixes/{prefix_id}/bindings/{binding_id}:
+    delete:
+      description: Delete a Service Binding
+      operationId: ip-address-management-service-bindings-delete-service-binding
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      - in: path
+        name: prefix_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      - in: path
+        name: binding_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/addressing_api-response-common-failure'
+          description: Delete Service Binding response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/addressing_api-response-common'
+          description: Service Binding deleted
+      security:
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Delete Service Binding
+      tags:
+      - IP Address Management Service Bindings
+      x-api-token-group:
+      - 'IP Prefixes: Write'
+    get:
+      description: Fetch a single Service Binding
+      operationId: ip-address-management-service-bindings-get-service-binding
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      - in: path
+        name: prefix_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      - in: path
+        name: binding_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/addressing_api-response-common-failure'
+          description: Get Service Binding response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/addressing_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/addressing_service_binding'
+          description: The Service Binding with the requested ID
+      security:
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Get Service Binding
+      tags:
+      - IP Address Management Service Bindings
+      x-api-token-group:
+      - 'IP Prefixes: Write'
+      - 'IP Prefixes: Read'
+  /accounts/{account_id}/addressing/services:
+    get:
+      description: 'Bring-Your-Own IP (BYOIP) prefixes onboarded to Cloudflare must be bound to a service running on the Cloudflare network to enable a Cloudflare product on the IP addresses. This endpoint can be used as a reference of available services on the Cloudflare network, and their service IDs.
+
+        '
+      operationId: ip-address-management-service-bindings-list-services
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/addressing_identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/addressing_api-response-common-failure'
+          description: List Services response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/addressing_api-response-common'
+                - properties:
+                    result:
+                      items:
+                        properties:
+                          id:
+                            $ref: '#/components/schemas/addressing_service_identifier'
+                          name:
+                            $ref: '#/components/schemas/addressing_service_name'
+                      type: array
+          description: Service names and IDs
+      security:
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform List Services
+      tags:
+      - IP Address Management Service Bindings
+      x-api-token-group:
+      - 'IP Prefixes: Write'
+      - 'IP Prefixes: Read'
+components:
+  schemas:
+    addressing_cidr:
+      description: IP Prefix in Classless Inter-Domain Routing format.
+      example: 192.0.2.0/24
+      type: string
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_service_name:
+      description: Name of a service running on the Cloudflare network
+      example: Magic Transit
+      type: string
+    addressing_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/addressing_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/addressing_messages'
+          example: []
+        result:
+          enum:
+          - null
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    addressing_service_identifier:
+      description: Identifier
+      example: 2db684ee7ca04e159946fd05b99e1bcd
+      maxLength: 32
+      type: string
+    addressing_service_binding:
+      properties:
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        id:
+          $ref: '#/components/schemas/addressing_identifier'
+        provisioning:
+          $ref: '#/components/schemas/addressing_provisioning'
+        service_id:
+          $ref: '#/components/schemas/addressing_service_identifier'
+        service_name:
+          $ref: '#/components/schemas/addressing_service_name'
+      type: object
+    addressing_provisioning:
+      description: Status of a Service Binding's deployment to the Cloudflare network
+      properties:
+        state:
+          description: 'When a binding has been deployed to a majority of Cloudflare datacenters, the binding will become active and can be used with its associated service.
+
+            '
+          enum:
+          - provisioning
+          - active
+          example: provisioning
+          type: string
+      type: object
+    addressing_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/addressing_messages'
+        messages:
+          $ref: '#/components/schemas/addressing_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    addressing_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    addressing_create_binding_request:
+      properties:
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        service_id:
+          $ref: '#/components/schemas/addressing_service_identifier'
+      type: object
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

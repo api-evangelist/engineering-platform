@@ -1,0 +1,967 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Audit Logs API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: Audit Logs
+paths:
+  /accounts/{account_id}/audit_logs:
+    get:
+      description: Gets a list of audit logs for an account. Can be filtered by who made the change, on which zone, and the timeframe of the change.
+      operationId: audit-logs-get-account-audit-logs
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/aaa_identifier'
+      - in: query
+        name: id
+        schema:
+          description: Finds a specific log by its ID.
+          example: f174be97-19b1-40d6-954d-70cd5fbd52db
+          type: string
+      - in: query
+        name: export
+        schema:
+          description: Indicates that this request is an export of logs in CSV format.
+          example: true
+          type: boolean
+      - in: query
+        name: action.type
+        schema:
+          description: Filters by the action type.
+          example: add
+          type: string
+      - in: query
+        name: actor.ip
+        schema:
+          description: Filters by the IP address of the request that made the change by specific IP address or valid CIDR Range.
+          example: 17.168.228.63
+          type: string
+      - in: query
+        name: actor.email
+        schema:
+          description: Filters by the email address of the actor that made the change.
+          example: alice@example.com
+          format: email
+          type: string
+      - in: query
+        name: since
+        schema:
+          oneOf:
+          - description: Limits the returned results to logs newer than the specified date. A `full-date` that conforms to RFC3339.
+            example: '2019-04-30'
+            format: date
+            type: string
+          - description: Limits the returned results to logs newer than the specified date. A `date-time` that conforms to RFC3339.
+            example: '2019-04-30T01:12:20Z'
+            format: date-time
+            type: string
+      - in: query
+        name: before
+        schema:
+          oneOf:
+          - description: Limits the returned results to logs older than the specified date. A `full-date` that conforms to RFC3339.
+            example: '2019-04-30'
+            format: date
+            type: string
+          - description: Limits the returned results to logs older than the specified date. A `date-time` that conforms to RFC3339.
+            example: '2019-04-30T01:12:20Z'
+            format: date-time
+            type: string
+      - in: query
+        name: zone.name
+        schema:
+          description: Filters by the name of the zone associated to the change.
+          example: example.com
+          type: string
+      - in: query
+        name: direction
+        schema:
+          default: desc
+          description: Changes the direction of the chronological sorting.
+          enum:
+          - desc
+          - asc
+          example: desc
+          type: string
+      - in: query
+        name: per_page
+        schema:
+          default: 100
+          description: Sets the number of results to return per page.
+          example: 25
+          maximum: 1000
+          minimum: 1
+          type: number
+      - in: query
+        name: page
+        schema:
+          default: 1
+          description: Defines which page of results to return.
+          example: 50
+          minimum: 1
+          type: number
+      - in: query
+        name: hide_user_logs
+        schema:
+          default: false
+          description: Indicates whether or not to hide user level audit logs.
+          type: boolean
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/aaa_audit_logs_response_collection'
+                - $ref: '#/components/schemas/aaa_api-response-common-failure'
+          description: Get account audit logs response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/aaa_audit_logs_response_collection'
+          description: Get account audit logs response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Get account audit logs
+      tags:
+      - Audit Logs
+      x-api-token-group:
+      - Account Settings Write
+      - Account Settings Read
+      x-cfPlanAvailability:
+        business: true
+        enterprise: true
+        free: true
+        pro: true
+  /organizations/{organization_id}/audit_logs:
+    get:
+      deprecated: true
+      description: Gets a list of audit logs for an organization. Can be filtered by who made the change, on which zone, and the timeframe of the change.
+      operationId: audit-logs-get-organization-audit-logs
+      parameters:
+      - in: path
+        name: organization_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/aaa_identifier'
+      - in: query
+        name: id
+        schema:
+          description: Finds a specific log by its ID.
+          example: f174be97-19b1-40d6-954d-70cd5fbd52db
+          type: string
+      - in: query
+        name: export
+        schema:
+          description: Indicates that this request is an export of logs in CSV format.
+          example: true
+          type: boolean
+      - in: query
+        name: action.type
+        schema:
+          description: Filters by the action type.
+          example: add
+          type: string
+      - in: query
+        name: actor.ip
+        schema:
+          description: Filters by the IP address of the request that made the change by specific IP address or valid CIDR Range.
+          example: 17.168.228.63
+          type: string
+      - in: query
+        name: actor.email
+        schema:
+          description: Filters by the email address of the actor that made the change.
+          example: alice@example.com
+          format: email
+          type: string
+      - in: query
+        name: since
+        schema:
+          oneOf:
+          - description: Limits the returned results to logs newer than the specified date. A `full-date` that conforms to RFC3339.
+            example: '2019-04-30'
+            format: date
+            type: string
+          - description: Limits the returned results to logs newer than the specified date. A `date-time` that conforms to RFC3339.
+            example: '2019-04-30T01:12:20Z'
+            format: date-time
+            type: string
+      - in: query
+        name: before
+        schema:
+          oneOf:
+          - description: Limits the returned results to logs older than the specified date. A `full-date` that conforms to RFC3339.
+            example: '2019-04-30'
+            format: date
+            type: string
+          - description: Limits the returned results to logs older than the specified date. A `date-time` that conforms to RFC3339.
+            example: '2019-04-30T01:12:20Z'
+            format: date-time
+            type: string
+      - in: query
+        name: zone.name
+        schema:
+          description: Filters by the name of the zone associated to the change.
+          example: example.com
+          type: string
+      - in: query
+        name: direction
+        schema:
+          default: desc
+          description: Changes the direction of the chronological sorting.
+          enum:
+          - desc
+          - asc
+          example: desc
+          type: string
+      - in: query
+        name: per_page
+        schema:
+          default: 100
+          description: Sets the number of results to return per page.
+          example: 25
+          maximum: 1000
+          minimum: 1
+          type: number
+      - in: query
+        name: page
+        schema:
+          default: 1
+          description: Defines which page of results to return.
+          example: 50
+          minimum: 1
+          type: number
+      - in: query
+        name: hide_user_logs
+        schema:
+          default: false
+          description: Indicates whether or not to hide user level audit logs.
+          type: boolean
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/aaa_audit_logs_response_collection'
+                - $ref: '#/components/schemas/aaa_api-response-common-failure'
+          description: Get organization audit logs response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/aaa_audit_logs_response_collection'
+          description: Get organization audit logs response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Get organization audit logs
+      tags:
+      - Audit Logs
+      x-cfDeprecation:
+        description: This endpoint and its related APIs are deprecated in favor of the `/accounts` equivalent APIs, which have a broader range of features and are backwards compatible with these API.
+        display: true
+        eol: '2020-02-04'
+        id: org_deprecation
+      x-cfPlanAvailability:
+        business: false
+        enterprise: true
+        free: false
+        pro: false
+  /user/audit_logs:
+    get:
+      description: Gets a list of audit logs for a user account. Can be filtered by who made the change, on which zone, and the timeframe of the change.
+      operationId: audit-logs-get-user-audit-logs
+      parameters:
+      - in: query
+        name: id
+        schema:
+          description: Finds a specific log by its ID.
+          example: f174be97-19b1-40d6-954d-70cd5fbd52db
+          type: string
+      - in: query
+        name: export
+        schema:
+          description: Indicates that this request is an export of logs in CSV format.
+          example: true
+          type: boolean
+      - in: query
+        name: action.type
+        schema:
+          description: Filters by the action type.
+          example: add
+          type: string
+      - in: query
+        name: actor.ip
+        schema:
+          description: Filters by the IP address of the request that made the change by specific IP address or valid CIDR Range.
+          example: 17.168.228.63
+          type: string
+      - in: query
+        name: actor.email
+        schema:
+          description: Filters by the email address of the actor that made the change.
+          example: alice@example.com
+          format: email
+          type: string
+      - in: query
+        name: since
+        schema:
+          oneOf:
+          - description: Limits the returned results to logs newer than the specified date. A `full-date` that conforms to RFC3339.
+            example: '2019-04-30'
+            format: date
+            type: string
+          - description: Limits the returned results to logs newer than the specified date. A `date-time` that conforms to RFC3339.
+            example: '2019-04-30T01:12:20Z'
+            format: date-time
+            type: string
+      - in: query
+        name: before
+        schema:
+          oneOf:
+          - description: Limits the returned results to logs older than the specified date. A `full-date` that conforms to RFC3339.
+            example: '2019-04-30'
+            format: date
+            type: string
+          - description: Limits the returned results to logs older than the specified date. A `date-time` that conforms to RFC3339.
+            example: '2019-04-30T01:12:20Z'
+            format: date-time
+            type: string
+      - in: query
+        name: zone.name
+        schema:
+          description: Filters by the name of the zone associated to the change.
+          example: example.com
+          type: string
+      - in: query
+        name: direction
+        schema:
+          default: desc
+          description: Changes the direction of the chronological sorting.
+          enum:
+          - desc
+          - asc
+          example: desc
+          type: string
+      - in: query
+        name: per_page
+        schema:
+          default: 100
+          description: Sets the number of results to return per page.
+          example: 25
+          maximum: 1000
+          minimum: 1
+          type: number
+      - in: query
+        name: page
+        schema:
+          default: 1
+          description: Defines which page of results to return.
+          example: 50
+          minimum: 1
+          type: number
+      - in: query
+        name: hide_user_logs
+        schema:
+          default: false
+          description: Indicates whether or not to hide user level audit logs.
+          type: boolean
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/aaa_audit_logs_response_collection'
+                - $ref: '#/components/schemas/aaa_api-response-common-failure'
+          description: Get user audit logs response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/aaa_audit_logs_response_collection'
+          description: Get user audit logs response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Get user audit logs
+      tags:
+      - Audit Logs
+      x-api-token-group:
+      - Account Settings Write
+      - Account Settings Read
+      x-cfPlanAvailability:
+        business: true
+        enterprise: true
+        free: true
+        pro: true
+  /audit/logs:
+    get:
+      summary: APIs.io Engineering Platform Get team audit logs
+      description: Gets a list of your team's generated audit events. For a complete list of all audit events, see [Audit logs](https://learning.postman.com/docs/administration/audit-logs/).
+      operationId: getAuditLogs
+      x-postman-plan: Enterprise
+      tags:
+      - Audit Logs
+      responses:
+        '200':
+          $ref: '#/components/responses/getAuditLogs'
+        '401':
+          $ref: '#/components/responses/common401Error'
+        '500':
+          $ref: '#/components/responses/common500ErrorServerError'
+      parameters:
+      - $ref: '#/components/parameters/auditLogsSinceQuery'
+      - $ref: '#/components/parameters/auditLogsUntilQuery'
+      - $ref: '#/components/parameters/auditLogsLimitQuery'
+      - $ref: '#/components/parameters/cursor'
+      - $ref: '#/components/parameters/auditLogsOrderBy'
+components:
+  schemas:
+    ascDescDefaultDesc:
+      type: string
+      default: desc
+      enum:
+      - asc
+      - desc
+      example: desc
+    getAuditLogs:
+      title: Successful Response
+      type: object
+      properties:
+        trails:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                description: The audit event's ID.
+                example: 12345678
+              ip:
+                type: string
+                description: The IP address of the user that performed the action.
+                example: 192.0.2.0
+              userAgent:
+                type: string
+                description: The user agent information.
+                example: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36
+              action:
+                type: string
+                description: The action performed by the user.
+                example: user.login_google_success
+              timestamp:
+                type: string
+                format: date-time
+                description: The date and time at which the event occurred.
+                example: '2022-08-31T15:19:32.000Z'
+              message:
+                type: string
+                description: The audit event's description.
+                example: Taylor Lee successfully logged in using the Google OAuth.
+              data:
+                type: object
+                properties:
+                  actor:
+                    type: object
+                    description: Information about the user who preformed the audit event.
+                    properties:
+                      name:
+                        type: string
+                        description: The user's name.
+                        example: Taylor Lee
+                      username:
+                        type: string
+                        description: The user's username.
+                        example: taylor-lee
+                      email:
+                        type: string
+                        format: email
+                        description: The user's email address.
+                        example: taylor.lee@example.com
+                      id:
+                        type: number
+                        example: 12345678
+                      active:
+                        type: boolean
+                        description: If true, the user is active. If false, the user is deactivated.
+                        example: true
+                  user:
+                    type: object
+                    description: Information about the user.
+                    properties:
+                      name:
+                        type: string
+                        description: The user's name.
+                        example: Taylor Lee
+                      username:
+                        type: string
+                        description: The user's username.
+                        example: taylor-lee
+                      email:
+                        type: string
+                        format: email
+                        description: The user's email address.
+                        example: taylor.lee@example.com
+                      id:
+                        type: number
+                        description: The user's ID.
+                        example: 12345678
+                  team:
+                    type: object
+                    description: The user's team information.
+                    properties:
+                      name:
+                        type: string
+                        description: The team's name.
+                        example: Test-Team
+                      id:
+                        type: number
+                        description: The team's ID.
+                        example: 1234
+                  variables:
+                    type: object
+                    description: Additional information about the performed action.
+                    additionalProperties: true
+    aaa_audit_logs_response_collection:
+      oneOf:
+      - properties:
+          errors:
+            $ref: '#/components/schemas/aaa_messages'
+          messages:
+            $ref: '#/components/schemas/aaa_messages'
+          result:
+            items:
+              $ref: '#/components/schemas/aaa_audit-logs'
+            type: array
+          success:
+            example: true
+            type: boolean
+      - $ref: '#/components/schemas/aaa_api-response-common'
+    aaa_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/aaa_messages'
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    auditLogsLimitQuery:
+      type: integer
+      maximum: 300
+      example: 50
+    untilDateQuery:
+      type: string
+      format: date
+      example: '2022-09-15'
+    aaa_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
+    sinceDateQuery:
+      type: string
+      format: date
+      example: '2022-08-30'
+    aaa_audit-logs:
+      properties:
+        action:
+          properties:
+            result:
+              description: A boolean that indicates if the action attempted was successful.
+              example: true
+              type: boolean
+            type:
+              description: A short string that describes the action that was performed.
+              example: change_setting
+              type: string
+          type: object
+        actor:
+          properties:
+            email:
+              description: The email of the user that performed the action.
+              example: michelle@example.com
+              format: email
+              type: string
+            id:
+              description: The ID of the actor that performed the action. If a user performed the action, this will be their User ID.
+              example: f6b5de0326bb5182b8a4840ee01ec774
+              type: string
+            ip:
+              description: The IP address of the request that performed the action.
+              example: 198.41.129.166
+              type: string
+            type:
+              description: The type of actor, whether a User, Cloudflare Admin, or an Automated System.
+              enum:
+              - user
+              - admin
+              - Cloudflare
+              example: user
+              type: string
+          type: object
+        id:
+          description: A string that uniquely identifies the audit log.
+          example: d5b0f326-1232-4452-8858-1089bd7168ef
+          type: string
+        interface:
+          description: The source of the event.
+          example: API
+          type: string
+        metadata:
+          description: An object which can lend more context to the action being logged. This is a flexible value and varies between different actions.
+          example:
+            name: security_level
+            type: firewall
+            value: high
+            zone_name: example.com
+          type: object
+        newValue:
+          description: The new value of the resource that was modified.
+          example: low
+          type: string
+        oldValue:
+          description: The value of the resource before it was modified.
+          example: high
+          type: string
+        owner:
+          properties:
+            id:
+              $ref: '#/components/schemas/aaa_identifier'
+          type: object
+        resource:
+          properties:
+            id:
+              description: An identifier for the resource that was affected by the action.
+              example: 023e105f4ecef8ad9ca31a8372d0c353
+              type: string
+            type:
+              description: A short string that describes the resource that was affected by the action.
+              example: zone
+              type: string
+          type: object
+        when:
+          description: A UTC RFC3339 timestamp that specifies when the action being logged occured.
+          example: '2017-04-26T17:31:07Z'
+          format: date-time
+          type: string
+      type: object
+    aaa_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+  parameters:
+    auditLogsSinceQuery:
+      name: since
+      in: query
+      description: Return logs created after the given time, in `YYYY-MM-DD` format.
+      schema:
+        $ref: '#/components/schemas/sinceDateQuery'
+    auditLogsLimitQuery:
+      name: limit
+      in: query
+      description: The maximum number of audit events to return at once.
+      schema:
+        $ref: '#/components/schemas/auditLogsLimitQuery'
+    cursor:
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
+    auditLogsOrderBy:
+      name: order_by
+      in: query
+      description: Return the records in ascending (`asc`) or descending (`desc`) order.
+      schema:
+        $ref: '#/components/schemas/ascDescDefaultDesc'
+    auditLogsUntilQuery:
+      name: until
+      in: query
+      description: Return logs created before the given time, in `YYYY-MM-DD` format.
+      schema:
+        $ref: '#/components/schemas/untilDateQuery'
+  examples:
+    getAuditLogs:
+      value:
+        trails:
+        - id: 12345678
+          ip: 192.0.2.0
+          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36
+          action: user.login_google_success
+          timestamp: '2022-08-31T15:19:32.000Z'
+          message: Taylor Lee successfully logged in using the Google OAuth.
+          data:
+            actor:
+              name: Taylor Lee
+              username: taylor-lee
+              email: taylor.lee@example.com
+              id: 12345678
+              active: true
+            user:
+              name: Taylor Lee
+              username: taylor-lee
+              email: taylor.lee@example.com
+              id: 12345678
+            team:
+              name: Test-Team
+              id: 1234
+        - id: 87654321
+          ip: 192.0.2.1
+          userAgent: PostmanRuntime/7.29.0 Postman/5.5.4 ChromeApp
+          action: user.login_password_success
+          timestamp: '2022-09-01T06:30:21.000Z'
+          message: Alex Cruz successfully logged in using the Postman password.
+          data:
+            actor:
+              name: Alex Cruz
+              username: alex-cruz
+              email: alex.cruz@example.com
+              id: 87654321
+              active: true
+            user:
+              name: Alex Cruz
+              username: alex-cruz
+              email: alex.cruz@example.com
+              id: 87654321
+            team:
+              name: Test-Team
+              id: 1234
+  responses:
+    common401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
+    getAuditLogs:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getAuditLogs'
+          examples:
+            Successful Response:
+              $ref: '#/components/examples/getAuditLogs'
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

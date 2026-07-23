@@ -1,0 +1,1896 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 DEX Synthetic Application Monitoring API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: DEX Synthetic Application Monitoring
+paths:
+  /accounts/{account_id}/dex/colos:
+    get:
+      description: List Cloudflare colos that account's devices were connected to during a time period, sorted by usage starting from the most used colo. Colos without traffic are also returned and sorted alphabetically.
+      operationId: dex-endpoints-list-colos
+      parameters:
+      - description: unique identifier linked to an account in the API request path.
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: Start time for connection period in RFC3339 (ISO 8601) format.
+        in: query
+        name: from
+        required: true
+        schema:
+          example: '2023-08-20T20:45:00Z'
+          type: string
+      - description: End time for connection period in RFC3339 (ISO 8601) format.
+        in: query
+        name: to
+        required: true
+        schema:
+          example: '2023-08-24T20:45:00Z'
+          type: string
+      - description: Type of usage that colos should be sorted by. If unspecified, returns all Cloudflare colos sorted alphabetically.
+        in: query
+        name: sortBy
+        schema:
+          enum:
+          - fleet-status-usage
+          - application-tests-usage
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: List colos failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-collection'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_colos_response'
+          description: List colos response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform List Cloudflare colos
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/fleet-status/devices:
+    get:
+      description: List details for devices using WARP
+      operationId: dex-fleet-status-devices
+      parameters:
+      - description: Unique identifier for account
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: Time range end in ISO format
+        in: query
+        name: to
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_timestamp'
+      - description: Time range beginning in ISO format
+        in: query
+        name: from
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_timestamp'
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_page'
+      - description: Number of results per page
+        in: query
+        name: per_page
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_per_page'
+      - description: Dimension to sort results by
+        in: query
+        name: sort_by
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_sort_by'
+      - description: Cloudflare colo
+        in: query
+        name: colo
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_colo'
+      - description: Device-specific ID, given as UUID v4
+        in: query
+        name: device_id
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_device_id'
+      - description: The mode under which the WARP client is run
+        in: query
+        name: mode
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_mode'
+      - description: Network status
+        in: query
+        name: status
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_status'
+      - description: Operating system
+        in: query
+        name: platform
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_platform'
+      - description: WARP client version
+        in: query
+        name: version
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_version'
+      - description: "Source:\n  * `hourly` - device details aggregated hourly, up to 7 days prior\n  * `last_seen` - device details, up to 24 hours prior\n  * `raw` - device details, up to 7 days prior\n"
+        in: query
+        name: source
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_source'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: List devices response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_fleet_status_devices_response'
+          description: List devices response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform List fleet status devices
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/fleet-status/live:
+    get:
+      description: List details for live (up to 60 minutes) devices using WARP
+      operationId: dex-fleet-status-live
+      parameters:
+      - description: Unique identifier for account
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: Number of minutes before current time
+        in: query
+        name: since_minutes
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_since_minutes'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: List device details (live) response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_fleet_status_live_response'
+          description: List device details (live) response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform List fleet status details by dimension
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/fleet-status/over-time:
+    get:
+      description: List details for devices using WARP, up to 7 days
+      operationId: dex-fleet-status-over-time
+      parameters:
+      - description: Unique identifier for account
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: Time range end in ISO format
+        in: query
+        name: to
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_timestamp'
+      - description: Time range beginning in ISO format
+        in: query
+        name: from
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_timestamp'
+      - description: Cloudflare colo
+        in: query
+        name: colo
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_colo'
+      - description: Device-specific ID, given as UUID v4
+        in: query
+        name: device_id
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_device_id'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: DEX HTTP test details failure response
+        '200':
+          description: List DEX devices response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform List fleet status aggregate details by dimension
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/http-tests/{test_id}:
+    get:
+      description: Get test details and aggregate performance metrics for an http test for a given time period between 1 hour and 7 days.
+      operationId: dex-endpoints-http-test-details
+      parameters:
+      - description: unique identifier linked to an account in the API request path.
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: unique identifier for a specific test
+        in: path
+        name: test_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+      - description: Optionally filter result stats to a specific device(s). Cannot be used in combination with colo param.
+        in: query
+        name: deviceId
+        schema:
+          items:
+            type: string
+          type: array
+      - description: Start time for aggregate metrics in ISO ms
+        in: query
+        name: from
+        required: true
+        schema:
+          example: 1689520412000.0
+          type: string
+      - description: End time for aggregate metrics in ISO ms
+        in: query
+        name: to
+        required: true
+        schema:
+          example: 1689606812000.0
+          type: string
+      - description: Time interval for aggregate time slots.
+        in: query
+        name: interval
+        required: true
+        schema:
+          enum:
+          - minute
+          - hour
+          type: string
+      - description: Optionally filter result stats to a Cloudflare colo. Cannot be used in combination with deviceId param.
+        in: query
+        name: colo
+        schema:
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: DEX HTTP test details failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_http_details_response'
+          description: DEX HTTP test details response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform Get details and aggregate metrics for an http test
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/http-tests/{test_id}/percentiles:
+    get:
+      description: Get percentiles for an http test for a given time period between 1 hour and 7 days.
+      operationId: dex-endpoints-http-test-percentiles
+      parameters:
+      - description: unique identifier linked to an account in the API request path.
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: unique identifier for a specific test
+        in: path
+        name: test_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+      - description: Optionally filter result stats to a specific device(s). Cannot be used in combination with colo param.
+        in: query
+        name: deviceId
+        schema:
+          items:
+            type: string
+          type: array
+      - description: Start time for aggregate metrics in ISO format
+        in: query
+        name: from
+        required: true
+        schema:
+          example: '2023-09-20T17:00:00Z'
+          type: string
+      - description: End time for aggregate metrics in ISO format
+        in: query
+        name: to
+        required: true
+        schema:
+          example: '2023-09-20T17:00:00Z'
+          type: string
+      - description: Optionally filter result stats to a Cloudflare colo. Cannot be used in combination with deviceId param.
+        in: query
+        name: colo
+        schema:
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: DEX HTTP test percentiles failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_http_details_percentiles_response'
+          description: DEX HTTP test percentiles response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform Get percentiles for an http test
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/tests/overview:
+    get:
+      description: List DEX tests with overview metrics
+      operationId: dex-endpoints-list-tests-overview
+      parameters:
+      - description: unique identifier linked to an account in the API request path.
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: Optionally filter result stats to a Cloudflare colo. Cannot be used in combination with deviceId param.
+        in: query
+        name: colo
+        schema:
+          type: string
+      - description: Optionally filter results by test name
+        in: query
+        name: testName
+        schema:
+          type: string
+      - description: Optionally filter result stats to a specific device(s). Cannot be used in combination with colo param.
+        in: query
+        name: deviceId
+        schema:
+          items:
+            type: string
+          type: array
+      - description: Page number of paginated results
+        in: query
+        name: page
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+      - description: Number of items per page
+        in: query
+        name: per_page
+        schema:
+          default: 10
+          maximum: 50
+          minimum: 1
+          type: number
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_tests_response'
+                    result_info:
+                      $ref: '#/components/schemas/digital-experience-monitoring_result_info'
+          description: success response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform List DEX test analytics
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/tests/unique-devices:
+    get:
+      description: Returns unique count of devices that have run synthetic application monitoring tests in the past 7 days.
+      operationId: dex-endpoints-tests-unique-devices
+      parameters:
+      - description: unique identifier linked to an account in the API request path.
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: Optionally filter results by test name
+        in: query
+        name: testName
+        schema:
+          type: string
+      - description: Optionally filter result stats to a specific device(s). Cannot be used in combination with colo param.
+        in: query
+        name: deviceId
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: DEX unique devices targeted failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_unique_devices_response'
+          description: DEX unique devices targeted response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform Get count of devices targeted
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/traceroute-test-results/{test_result_id}/network-path:
+    get:
+      description: Get a breakdown of hops and performance metrics for a specific traceroute test run
+      operationId: dex-endpoints-traceroute-test-result-network-path
+      parameters:
+      - description: unique identifier linked to an account
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: unique identifier for a specific traceroute test
+        in: path
+        name: test_result_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: DEX traceroute test result network path failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_traceroute_test_result_network_path_response'
+          description: DEX traceroute test result network path response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform Get details for a specific traceroute test run
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/traceroute-tests/{test_id}:
+    get:
+      description: Get test details and aggregate performance metrics for an traceroute test for a given time period between 1 hour and 7 days.
+      operationId: dex-endpoints-traceroute-test-details
+      parameters:
+      - description: Unique identifier linked to an account
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: Unique identifier for a specific test
+        in: path
+        name: test_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+      - description: Optionally filter result stats to a specific device(s). Cannot be used in combination with colo param.
+        in: query
+        name: deviceId
+        schema:
+          items:
+            type: string
+          type: array
+      - description: Start time for aggregate metrics in ISO ms
+        in: query
+        name: from
+        required: true
+        schema:
+          example: 1689520412000.0
+          type: string
+      - description: End time for aggregate metrics in ISO ms
+        in: query
+        name: to
+        required: true
+        schema:
+          example: 1689606812000.0
+          type: string
+      - description: Time interval for aggregate time slots.
+        in: query
+        name: interval
+        required: true
+        schema:
+          enum:
+          - minute
+          - hour
+          type: string
+      - description: Optionally filter result stats to a Cloudflare colo. Cannot be used in combination with deviceId param.
+        in: query
+        name: colo
+        schema:
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: DEX traceroute test details response failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_traceroute_details_response'
+          description: DEX traceroute test details response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform Get details and aggregate metrics for a traceroute test
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/traceroute-tests/{test_id}/network-path:
+    get:
+      description: Get a breakdown of metrics by hop for individual traceroute test runs
+      operationId: dex-endpoints-traceroute-test-network-path
+      parameters:
+      - description: unique identifier linked to an account
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: unique identifier for a specific test
+        in: path
+        name: test_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+      - description: Device to filter tracroute result runs to
+        in: query
+        name: deviceId
+        required: true
+        schema:
+          type: string
+      - description: Start time for aggregate metrics in ISO ms
+        in: query
+        name: from
+        required: true
+        schema:
+          example: 1689520412000.0
+          type: string
+      - description: End time for aggregate metrics in ISO ms
+        in: query
+        name: to
+        required: true
+        schema:
+          example: 1689606812000.0
+          type: string
+      - description: Time interval for aggregate time slots.
+        in: query
+        name: interval
+        required: true
+        schema:
+          enum:
+          - minute
+          - hour
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: DEX traceroute test network path failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_traceroute_test_network_path_response'
+          description: DEX traceroute test network path response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform Get network path breakdown for a traceroute test
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+  /accounts/{account_id}/dex/traceroute-tests/{test_id}/percentiles:
+    get:
+      description: Get percentiles for a traceroute test for a given time period between 1 hour and 7 days.
+      operationId: dex-endpoints-traceroute-test-percentiles
+      parameters:
+      - description: unique identifier linked to an account in the API request path.
+        in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_account_identifier'
+      - description: unique identifier for a specific test
+        in: path
+        name: test_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+      - description: Optionally filter result stats to a specific device(s). Cannot be used in combination with colo param.
+        in: query
+        name: deviceId
+        schema:
+          items:
+            type: string
+          type: array
+      - description: Start time for aggregate metrics in ISO format
+        in: query
+        name: from
+        required: true
+        schema:
+          example: '2023-09-20T17:00:00Z'
+          type: string
+      - description: End time for aggregate metrics in ISO format
+        in: query
+        name: to
+        required: true
+        schema:
+          example: '2023-09-20T17:00:00Z'
+          type: string
+      - description: Optionally filter result stats to a Cloudflare colo. Cannot be used in combination with deviceId param.
+        in: query
+        name: colo
+        schema:
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/digital-experience-monitoring_api-response-common-failure'
+          description: DEX Traceroute test percentiles failure response
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/digital-experience-monitoring_traceroute_details_percentiles_response'
+          description: DEX Traceroute test percentiles response
+      security:
+      - api_email: []
+        api_key: []
+      - api_token: []
+      - user_service_key: []
+      summary: APIs.io Engineering Platform Get percentiles for a traceroute test
+      tags:
+      - DEX Synthetic Application Monitoring
+      x-cfPermissionsRequired:
+        enum:
+        - '#dex:read'
+        - '#teams:report'
+components:
+  schemas:
+    digital-experience-monitoring_test_stat_over_time:
+      properties:
+        avg:
+          description: average observed in the time period
+          nullable: true
+          type: integer
+        max:
+          description: highest observed in the time period
+          nullable: true
+          type: integer
+        min:
+          description: lowest observed in the time period
+          nullable: true
+          type: integer
+        slots:
+          items:
+            properties:
+              timestamp:
+                example: 2023-07-16 15:00:00+00:00
+                type: string
+              value:
+                type: integer
+            required:
+            - timestamp
+            - value
+            type: object
+          type: array
+      required:
+      - slots
+      type: object
+    digital-experience-monitoring_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common'
+      type: object
+    digital-experience-monitoring_device_id:
+      description: Device-specific ID, given as UUID v4
+      example: cb49c27f-7f97-49c5-b6f3-f7c01ead0fd7
+      type: string
+    digital-experience-monitoring_percentiles:
+      properties:
+        p50:
+          description: p50 observed in the time period
+          nullable: true
+          type: number
+        p90:
+          description: p90 observed in the time period
+          nullable: true
+          type: number
+        p95:
+          description: p95 observed in the time period
+          nullable: true
+          type: number
+        p99:
+          description: p99 observed in the time period
+          nullable: true
+          type: number
+      type: object
+    digital-experience-monitoring_mode:
+      description: The mode under which the WARP client is run
+      example: proxy
+      type: string
+    digital-experience-monitoring_traceroute_details_percentiles_response:
+      properties:
+        hopsCount:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+        packetLossPct:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+        roundTripTimeMs:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+      type: object
+    digital-experience-monitoring_test_stat_pct_over_time:
+      properties:
+        avg:
+          description: average observed in the time period
+          format: float
+          nullable: true
+          type: number
+        max:
+          description: highest observed in the time period
+          format: float
+          nullable: true
+          type: number
+        min:
+          description: lowest  observed in the time period
+          format: float
+          nullable: true
+          type: number
+        slots:
+          items:
+            properties:
+              timestamp:
+                example: 2023-07-16 15:00:00+00:00
+                type: string
+              value:
+                format: float
+                type: number
+            required:
+            - timestamp
+            - value
+            type: object
+          type: array
+      required:
+      - slots
+      type: object
+    digital-experience-monitoring_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/digital-experience-monitoring_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/digital-experience-monitoring_messages'
+          example: []
+        result:
+          enum:
+          - null
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    digital-experience-monitoring_timing_aggregates:
+      properties:
+        avgMs:
+          nullable: true
+          type: integer
+        history:
+          items:
+            $ref: '#/components/schemas/digital-experience-monitoring_aggregate_stat'
+          type: array
+        overTime:
+          nullable: true
+          properties:
+            timePeriod:
+              $ref: '#/components/schemas/digital-experience-monitoring_aggregate_time_period'
+            values:
+              items:
+                $ref: '#/components/schemas/digital-experience-monitoring_aggregate_time_slot'
+              type: array
+          required:
+          - values
+          - timePeriod
+          type: object
+      required:
+      - history
+      type: object
+    digital-experience-monitoring_device:
+      properties:
+        colo:
+          $ref: '#/components/schemas/digital-experience-monitoring_colo'
+        deviceId:
+          description: Device identifier (UUID v4)
+          type: string
+        deviceName:
+          description: Device identifier (human readable)
+          type: string
+        personEmail:
+          $ref: '#/components/schemas/digital-experience-monitoring_personEmail'
+        platform:
+          $ref: '#/components/schemas/digital-experience-monitoring_platform'
+        status:
+          $ref: '#/components/schemas/digital-experience-monitoring_status'
+        version:
+          $ref: '#/components/schemas/digital-experience-monitoring_version'
+      required:
+      - colo
+      - deviceId
+      - mode
+      - platform
+      - status
+      - timestamp
+      - version
+      type: object
+    digital-experience-monitoring_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    digital-experience-monitoring_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/digital-experience-monitoring_result_info'
+      type: object
+    digital-experience-monitoring_http_details_response:
+      properties:
+        host:
+          description: The url of the HTTP synthetic application test
+          example: http://example.com
+          type: string
+        httpStats:
+          nullable: true
+          properties:
+            availabilityPct:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+            dnsResponseTimeMs:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+            httpStatusCode:
+              items:
+                properties:
+                  status200:
+                    type: integer
+                  status300:
+                    type: integer
+                  status400:
+                    type: integer
+                  status500:
+                    type: integer
+                  timestamp:
+                    example: 2023-07-16 15:00:00+00:00
+                    type: string
+                required:
+                - timestamp
+                - status200
+                - status300
+                - status400
+                - status500
+                type: object
+              type: array
+            resourceFetchTimeMs:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+            serverResponseTimeMs:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+            uniqueDevicesTotal:
+              description: Count of unique devices that have run this test in the given time period
+              example: 57
+              type: integer
+          required:
+          - uniqueDevicesTotal
+          - resourceFetchTimeMs
+          - serverResponseTimeMs
+          - dnsResponseTimeMs
+          - httpStatusCode
+          - availabilityPct
+          type: object
+        httpStatsByColo:
+          items:
+            properties:
+              availabilityPct:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+              colo:
+                example: DFW
+                type: string
+              dnsResponseTimeMs:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+              httpStatusCode:
+                items:
+                  properties:
+                    status200:
+                      type: integer
+                    status300:
+                      type: integer
+                    status400:
+                      type: integer
+                    status500:
+                      type: integer
+                    timestamp:
+                      example: 2023-07-16 15:00:00+00:00
+                      type: string
+                  required:
+                  - timestamp
+                  - status200
+                  - status300
+                  - status400
+                  - status500
+                  type: object
+                type: array
+              resourceFetchTimeMs:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+              serverResponseTimeMs:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+              uniqueDevicesTotal:
+                description: Count of unique devices that have run this test in the given time period
+                example: 57
+                type: integer
+            required:
+            - colo
+            - uniqueDevicesTotal
+            - resourceFetchTimeMs
+            - serverResponseTimeMs
+            - dnsResponseTimeMs
+            - httpStatusCode
+            - availabilityPct
+            type: object
+          type: array
+        interval:
+          description: The interval at which the HTTP synthetic application test is set to run.
+          example: 0h5m0s
+          type: string
+        kind:
+          enum:
+          - http
+        method:
+          description: The HTTP method to use when running the test
+          example: GET
+          type: string
+        name:
+          description: The name of the HTTP synthetic application test
+          example: Atlassian Sign In Page
+          type: string
+        target_policies:
+          items:
+            properties:
+              default:
+                description: Whether the policy is the default for the account
+                type: boolean
+              id:
+                type: string
+              name:
+                type: string
+            required:
+            - id
+            - name
+            - default
+            type: object
+          nullable: true
+          type: array
+        targeted:
+          type: boolean
+      type: object
+    digital-experience-monitoring_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    digital-experience-monitoring_traceroute_test_network_path_response:
+      properties:
+        deviceName:
+          type: string
+        id:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+        interval:
+          description: The interval at which the Traceroute synthetic application test is set to run.
+          example: 0h5m0s
+          type: string
+        kind:
+          enum:
+          - traceroute
+        name:
+          type: string
+        networkPath:
+          nullable: true
+          properties:
+            sampling:
+              description: Specifies the sampling applied, if any, to the slots response. When sampled, results shown represent the first test run to the start of each sampling interval.
+              nullable: true
+              properties:
+                unit:
+                  enum:
+                  - hours
+                value:
+                  type: integer
+              required:
+              - value
+              - unit
+              type: object
+            slots:
+              items:
+                properties:
+                  clientToAppRttMs:
+                    description: Round trip time in ms of the client to app mile
+                    nullable: true
+                    type: integer
+                  clientToCfEgressRttMs:
+                    description: Round trip time in ms of the client to Cloudflare egress mile
+                    nullable: true
+                    type: integer
+                  clientToCfIngressRttMs:
+                    description: Round trip time in ms of the client to Cloudflare ingress mile
+                    nullable: true
+                    type: integer
+                  clientToIspRttMs:
+                    description: Round trip time in ms of the client to ISP mile
+                    nullable: true
+                    type: integer
+                  id:
+                    $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+                  timestamp:
+                    example: 2023-07-16 15:00:00+00:00
+                    type: string
+                required:
+                - id
+                - timestamp
+                - clientToAppRttMs
+                - clientToCfIngressRttMs
+                - clientToCfEgressRttMs
+                type: object
+              type: array
+          required:
+          - slots
+          type: object
+        url:
+          description: The host of the Traceroute synthetic application test
+          example: 1.1.1.1
+          type: string
+      required:
+      - id
+      type: object
+    digital-experience-monitoring_timestamp:
+      description: Timestamp in ISO format
+      example: '2023-10-11T00:00:00Z'
+      type: string
+    digital-experience-monitoring_status:
+      description: Network status
+      example: connected
+      type: string
+    digital-experience-monitoring_source:
+      default: last_seen
+      description: Specifies fleet status details source
+      enum:
+      - last_seen
+      - hourly
+      - raw
+      example: last_seen
+      type: string
+    digital-experience-monitoring_unique_devices_response:
+      properties:
+        uniqueDevicesTotal:
+          description: total number of unique devices
+          type: integer
+      required:
+      - uniqueDevicesTotal
+      type: object
+    digital-experience-monitoring_account_identifier:
+      example: 01a7362d577a6c3019a474fd6f485823
+      maxLength: 32
+      readOnly: true
+      type: string
+    digital-experience-monitoring_colo:
+      description: Cloudflare colo
+      example: SJC
+      type: string
+    digital-experience-monitoring_http_details_percentiles_response:
+      properties:
+        dnsResponseTimeMs:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+        resourceFetchTimeMs:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+        serverResponseTimeMs:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+      type: object
+    digital-experience-monitoring_uniqueDevicesTotal:
+      description: Number of unique devices
+      type: number
+    digital-experience-monitoring_page:
+      default: 1
+      description: Page number of paginated results
+      example: 1
+      minimum: 1
+      type: number
+    digital-experience-monitoring_live_stat:
+      properties:
+        uniqueDevicesTotal:
+          $ref: '#/components/schemas/digital-experience-monitoring_uniqueDevicesTotal'
+        value:
+          type: string
+      type: object
+    digital-experience-monitoring_traceroute_details_response:
+      properties:
+        host:
+          description: The host of the Traceroute synthetic application test
+          example: 1.1.1.1
+          type: string
+        interval:
+          description: The interval at which the Traceroute synthetic application test is set to run.
+          example: 0h5m0s
+          type: string
+        kind:
+          enum:
+          - traceroute
+        name:
+          description: The name of the Traceroute synthetic application test
+          example: Atlassian Sign In Page
+          type: string
+        target_policies:
+          items:
+            properties:
+              default:
+                description: Whether the policy is the default for the account
+                type: boolean
+              id:
+                type: string
+              name:
+                type: string
+            required:
+            - id
+            - name
+            - default
+            type: object
+          nullable: true
+          type: array
+        targeted:
+          type: boolean
+        tracerouteStats:
+          nullable: true
+          properties:
+            availabilityPct:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+            hopsCount:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+            packetLossPct:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+            roundTripTimeMs:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+            uniqueDevicesTotal:
+              description: Count of unique devices that have run this test in the given time period
+              example: 57
+              type: integer
+          required:
+          - uniqueDevicesTotal
+          - roundTripTimeMs
+          - hopsCount
+          - packetLossPct
+          - availabilityPct
+          type: object
+        tracerouteStatsByColo:
+          items:
+            properties:
+              availabilityPct:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+              colo:
+                example: DFW
+                type: string
+              hopsCount:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+              packetLossPct:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+              roundTripTimeMs:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+              uniqueDevicesTotal:
+                description: Count of unique devices that have run this test in the given time period
+                example: 57
+                type: integer
+            required:
+            - colo
+            - uniqueDevicesTotal
+            - roundTripTimeMs
+            - hopsCount
+            - packetLossPct
+            - availabilityPct
+            type: object
+          type: array
+      required:
+      - kind
+      - name
+      - host
+      - interval
+      type: object
+    digital-experience-monitoring_uuid:
+      description: API Resource UUID tag.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    digital-experience-monitoring_since_minutes:
+      default: 10
+      description: Number of minutes before current time
+      example: 10
+      maximum: 60
+      minimum: 1
+      type: number
+    digital-experience-monitoring_aggregate_stat:
+      properties:
+        avgMs:
+          nullable: true
+          type: integer
+        deltaPct:
+          format: float
+          nullable: true
+          type: number
+        timePeriod:
+          $ref: '#/components/schemas/digital-experience-monitoring_aggregate_time_period'
+      required:
+      - timePeriod
+      type: object
+    digital-experience-monitoring_fleet_status_live_response:
+      allOf:
+      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+      - properties:
+          result:
+            properties:
+              deviceStats:
+                properties:
+                  byColo:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    nullable: true
+                    type: array
+                  byMode:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    nullable: true
+                    type: array
+                  byPlatform:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    nullable: true
+                    type: array
+                  byStatus:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    nullable: true
+                    type: array
+                  byVersion:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    nullable: true
+                    type: array
+                  uniqueDevicesTotal:
+                    $ref: '#/components/schemas/digital-experience-monitoring_uniqueDevicesTotal'
+                type: object
+            type: object
+        type: object
+    digital-experience-monitoring_aggregate_time_slot:
+      properties:
+        avgMs:
+          type: integer
+        timestamp:
+          type: string
+      required:
+      - timestamp
+      - avgMs
+      type: object
+    digital-experience-monitoring_aggregate_time_period:
+      properties:
+        units:
+          enum:
+          - hours
+          - days
+          - testRuns
+          type: string
+        value:
+          type: integer
+      required:
+      - value
+      - units
+      type: object
+    digital-experience-monitoring_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/digital-experience-monitoring_messages'
+        messages:
+          $ref: '#/components/schemas/digital-experience-monitoring_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    digital-experience-monitoring_fleet_status_devices_response:
+      allOf:
+      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/digital-experience-monitoring_device'
+            type: array
+        type: object
+    digital-experience-monitoring_personEmail:
+      description: User contact email address
+      type: string
+    digital-experience-monitoring_colos_response:
+      description: array of colos.
+      items:
+        required:
+        - airportCode
+        - countryCode
+        - city
+        type: object
+      properties:
+        airportCode:
+          description: Airport code
+          example: SFO
+          type: string
+        city:
+          description: City
+          example: San Francisco
+          type: string
+        countryCode:
+          description: Country code
+          example: US
+          type: string
+      type: array
+    digital-experience-monitoring_version:
+      description: WARP client version
+      example: 1.0.0
+      type: string
+    digital-experience-monitoring_per_page:
+      description: Number of items per page
+      example: 10
+      maximum: 50
+      minimum: 1
+      type: number
+    digital-experience-monitoring_traceroute_test_result_network_path_response:
+      properties:
+        deviceName:
+          description: name of the device associated with this network path response
+          type: string
+        hops:
+          description: an array of the hops taken by the device to reach the end destination
+          items:
+            properties:
+              asn:
+                nullable: true
+                type: integer
+              aso:
+                nullable: true
+                type: string
+              ipAddress:
+                nullable: true
+                type: string
+              location:
+                nullable: true
+                properties:
+                  city:
+                    nullable: true
+                    type: string
+                  state:
+                    nullable: true
+                    type: string
+                  zip:
+                    nullable: true
+                    type: string
+                type: object
+              mile:
+                enum:
+                - client-to-app
+                - client-to-cf-egress
+                - client-to-cf-ingress
+                - client-to-isp
+                nullable: true
+                type: string
+              name:
+                nullable: true
+                type: string
+              packetLossPct:
+                format: float
+                nullable: true
+                type: number
+              rttMs:
+                nullable: true
+                type: integer
+              ttl:
+                type: integer
+            required:
+            - ttl
+            type: object
+          type: array
+        resultId:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+        testId:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+        testName:
+          description: name of the tracroute test
+          type: string
+      required:
+      - resultId
+      - hops
+      type: object
+    digital-experience-monitoring_sort_by:
+      default: timestamp
+      description: Dimension to sort results by
+      enum:
+      - colo
+      - device_id
+      - mode
+      - platform
+      - status
+      - timestamp
+      - version
+      type: string
+    digital-experience-monitoring_tests_response:
+      properties:
+        overviewMetrics:
+          properties:
+            avgHttpAvailabilityPct:
+              description: percentage availability for all HTTP test results in response
+              format: float
+              nullable: true
+              type: number
+            avgTracerouteAvailabilityPct:
+              description: percentage availability for all traceroutes results in response
+              format: float
+              nullable: true
+              type: number
+            testsTotal:
+              description: number of  tests.
+              type: integer
+          required:
+          - testsTotal
+          type: object
+        tests:
+          description: array of test results objects.
+          items:
+            properties:
+              created:
+                description: date the test was created.
+                type: string
+              description:
+                description: the test description defined during configuration
+                type: string
+              enabled:
+                description: if true, then the test will run on targeted devices. Else, the test will not run.
+                type: boolean
+              host:
+                type: string
+              httpResults:
+                nullable: true
+                properties:
+                  resourceFetchTime:
+                    $ref: '#/components/schemas/digital-experience-monitoring_timing_aggregates'
+                required:
+                - resourceFetchTime
+                type: object
+              httpResultsByColo:
+                items:
+                  properties:
+                    colo:
+                      description: Cloudflare colo
+                      example: SJC
+                      type: string
+                    resourceFetchTime:
+                      $ref: '#/components/schemas/digital-experience-monitoring_timing_aggregates'
+                  required:
+                  - colo
+                  - resourceFetchTime
+                  type: object
+                type: array
+              id:
+                $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+              interval:
+                description: The interval at which the synthetic application test is set to run.
+                type: string
+              kind:
+                description: test type, http or traceroute
+                enum:
+                - http
+                - traceroute
+                type: string
+              method:
+                description: for HTTP, the method to use when running the test
+                type: string
+              name:
+                description: name given to this test
+                type: string
+              target_policies:
+                items:
+                  properties:
+                    default:
+                      description: Whether the policy is the default for the account
+                      type: boolean
+                    id:
+                      type: string
+                    name:
+                      type: string
+                  required:
+                  - id
+                  - name
+                  - default
+                  type: object
+                nullable: true
+                type: array
+              targeted:
+                type: boolean
+              tracerouteResults:
+                nullable: true
+                properties:
+                  roundTripTime:
+                    $ref: '#/components/schemas/digital-experience-monitoring_timing_aggregates'
+                required:
+                - roundTripTime
+                type: object
+              tracerouteResultsByColo:
+                items:
+                  properties:
+                    colo:
+                      description: Cloudflare colo
+                      example: SJC
+                      type: string
+                    roundTripTime:
+                      $ref: '#/components/schemas/digital-experience-monitoring_timing_aggregates'
+                  required:
+                  - colo
+                  - roundTripTime
+                  type: object
+                type: array
+              updated:
+                type: string
+            required:
+            - id
+            - name
+            - kind
+            - interval
+            - enabled
+            - description
+            - updated
+            - created
+            - host
+            type: object
+          type: array
+      required:
+      - overviewMetrics
+      - tests
+      type: object
+    digital-experience-monitoring_platform:
+      description: Operating system
+      example: windows
+      type: string
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

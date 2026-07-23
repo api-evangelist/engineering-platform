@@ -1,0 +1,946 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 D1 API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: D1
+paths:
+  /accounts/{account_id}/d1/database:
+    get:
+      description: Returns a list of D1 databases.
+      operationId: cloudflare-d1-list-databases
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_account-identifier'
+      - in: query
+        name: name
+        schema:
+          description: a database name to search for.
+          type: string
+      - in: query
+        name: page
+        schema:
+          default: 1
+          description: Page number of paginated results.
+          minimum: 1
+          type: number
+      - in: query
+        name: per_page
+        schema:
+          default: 1000
+          description: Number of items per page.
+          maximum: 10000
+          minimum: 10
+          type: number
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/d1_api-response-common-failure'
+          description: List D1 databases response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      items:
+                        $ref: '#/components/schemas/d1_database-response'
+                      type: array
+                    result_info:
+                      properties:
+                        count:
+                          description: Total number of results for the requested service
+                          example: 1
+                          type: number
+                        page:
+                          description: Current page within paginated list of results
+                          example: 1
+                          type: number
+                        per_page:
+                          description: Number of results per page of results
+                          example: 20
+                          type: number
+                        total_count:
+                          description: Total results available without any search parameters
+                          example: 2000
+                          type: number
+                      type: object
+          description: List D1 databases response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform List D1 Databases
+      tags:
+      - D1
+      x-api-token-group:
+      - D1 Read
+      - D1 Write
+    post:
+      description: Returns the created D1 database.
+      operationId: cloudflare-d1-create-database
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_account-identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  $ref: '#/components/schemas/d1_database-name'
+                primary_location_hint:
+                  $ref: '#/components/schemas/d1_primary-location-hint'
+              required:
+              - name
+              type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/d1_api-response-common-failure'
+          description: Database details response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/d1_database-details-response'
+          description: Returns the created D1 database's metadata
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Create D1 Database
+      tags:
+      - D1
+      x-api-token-group:
+      - D1 Write
+  /accounts/{account_id}/d1/database/{database_id}:
+    delete:
+      description: Deletes the specified D1 database.
+      operationId: cloudflare-d1-delete-database
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_account-identifier'
+      - in: path
+        name: database_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_database-identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/d1_api-response-common-failure'
+          description: Delete D1 database response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      enum:
+                      - null
+                      nullable: true
+                      type: object
+          description: Delete D1 database response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Delete D1 Database
+      tags:
+      - D1
+      x-api-token-group:
+      - D1 Write
+    get:
+      description: Returns the specified D1 database.
+      operationId: cloudflare-d1-get-database
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_account-identifier'
+      - in: path
+        name: database_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_database-identifier'
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/d1_api-response-common-failure'
+          description: Database details response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/d1_database-details-response'
+          description: Database details response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Get D1 Database
+      tags:
+      - D1
+      x-api-token-group:
+      - D1 Read
+      - D1 Write
+  /accounts/{account_id}/d1/database/{database_id}/export:
+    post:
+      description: 'Returns a URL where the SQL contents of your D1 can be downloaded. Note: this process may take
+
+        some time for larger DBs, during which your D1 will be unavailable to serve queries. To avoid
+
+        blocking your DB unnecessarily, an in-progress export must be continually polled or will automatically cancel.
+
+        '
+      operationId: cloudflare-d1-export-database
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_account-identifier'
+      - in: path
+        name: database_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_database-identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                current_bookmark:
+                  description: To poll an in-progress export, provide the current bookmark (returned by your first polling response)
+                  type: string
+                dump_options:
+                  properties:
+                    no_data:
+                      description: Export only the table definitions, not their contents
+                      type: boolean
+                    no_schema:
+                      description: Export only each table's contents, not its definition
+                      type: boolean
+                    tables:
+                      description: 'Filter the export to just one or more tables. Passing an empty array is the same as not passing anything and means: export all tables.'
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                output_format:
+                  description: Specifies that you will poll this endpoint until the export completes
+                  enum:
+                  - polling
+                  type: string
+              required:
+              - output_format
+              type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/d1_api-response-common-failure'
+          description: Poll failed (API error)
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      properties:
+                        at_bookmark:
+                          description: The current time-travel bookmark for your D1, used to poll for updates. Will not change for the duration of the export task.
+                          type: string
+                        error:
+                          description: Only present when status = 'error'. Contains the error message.
+                          type: string
+                        messages:
+                          description: Logs since the last time you polled
+                          items:
+                            type: string
+                          type: array
+                        result:
+                          description: Only present when status = 'complete'
+                          properties:
+                            filename:
+                              description: The generated SQL filename.
+                              type: string
+                            signed_url:
+                              description: The URL to download the exported SQL. Available for one hour.
+                              type: string
+                          type: object
+                        status:
+                          enum:
+                          - complete
+                          - error
+                          type: string
+                        success:
+                          type: boolean
+                        type:
+                          enum:
+                          - export
+                          type: string
+                      type: object
+          description: Polled successfully, task no longer running (errored or complete)
+        '202':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      properties:
+                        at_bookmark:
+                          description: The current time-travel bookmark for your D1, used to poll for updates. Will not change for the duration of the export task.
+                          type: string
+                        messages:
+                          description: Logs since the last time you polled
+                          items:
+                            type: string
+                          type: array
+                        status:
+                          enum:
+                          - active
+                          type: string
+                        success:
+                          type: boolean
+                        type:
+                          enum:
+                          - export
+                          type: string
+                      type: object
+          description: Polled successfully, task is currently running
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Export D1 Database as SQL
+      tags:
+      - D1
+  /accounts/{account_id}/d1/database/{database_id}/import:
+    post:
+      description: 'Generates a temporary URL for uploading an SQL file to, then instructing the D1 to import it
+
+        and polling it for status updates. Imports block the D1 for their duration.
+
+        '
+      operationId: cloudflare-d1-import-database
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_account-identifier'
+      - in: path
+        name: database_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_database-identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - properties:
+                  action:
+                    description: Indicates you have a new SQL file to upload.
+                    enum:
+                    - init
+                    type: string
+                  etag:
+                    description: Required when action is 'init' or 'ingest'. An md5 hash of the file you're uploading. Used to check if it already exists, and validate its contents before ingesting.
+                    type: string
+                required:
+                - action
+                - etag
+                type: object
+              - properties:
+                  action:
+                    description: Indicates you've finished uploading to tell the D1 to start consuming it
+                    enum:
+                    - ingest
+                    type: string
+                  etag:
+                    description: An md5 hash of the file you're uploading. Used to check if it already exists, and validate its contents before ingesting.
+                    type: string
+                  filename:
+                    description: The filename you have successfully uploaded.
+                    type: string
+                required:
+                - action
+                - etag
+                - filename
+                type: object
+              - properties:
+                  action:
+                    description: Indicates you've finished uploading to tell the D1 to start consuming it
+                    enum:
+                    - poll
+                    type: string
+                  current_bookmark:
+                    description: This identifies the currently-running import, checking its status.
+                    type: string
+                required:
+                - action
+                - current_bookmark
+                type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/d1_api-response-common-failure'
+          description: Poll failed (API error)
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      properties:
+                        at_bookmark:
+                          description: The current time-travel bookmark for your D1, used to poll for updates. Will not change for the duration of the import. Only returned if an import process is currently running or recently finished.
+                          type: string
+                        error:
+                          description: Only present when status = 'error'. Contains the error message that prevented the import from succeeding.
+                          type: string
+                        filename:
+                          description: Derived from the database ID and etag, to use in avoiding repeated uploads. Only returned when for the 'init' action.
+                          type: string
+                        messages:
+                          description: Logs since the last time you polled
+                          items:
+                            type: string
+                          type: array
+                        result:
+                          description: Only present when status = 'complete'
+                          properties:
+                            final_bookmark:
+                              description: The time-travel bookmark if you need restore your D1 to directly after the import succeeded.
+                              type: string
+                            meta:
+                              $ref: '#/components/schemas/d1_query-meta'
+                            num_queries:
+                              description: The total number of queries that were executed during the import.
+                              type: number
+                          type: object
+                        status:
+                          enum:
+                          - complete
+                          - error
+                          type: string
+                        success:
+                          type: boolean
+                        type:
+                          enum:
+                          - import
+                          type: string
+                        upload_url:
+                          description: The R2 presigned URL to use for uploading. Only returned when for the 'init' action.
+                          type: string
+                      type: object
+          description: Successful action. Import is either ready to start, under way, or finished (succeeded or failed).
+        '202':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      properties:
+                        at_bookmark:
+                          description: The current time-travel bookmark for your D1, used to poll for updates. Will not change for the duration of the import.
+                          type: string
+                        messages:
+                          description: Logs since the last time you polled
+                          items:
+                            type: string
+                          type: array
+                        status:
+                          enum:
+                          - active
+                          type: string
+                        success:
+                          type: boolean
+                        type:
+                          enum:
+                          - import
+                          type: string
+                      type: object
+          description: Polled successfully, task is currently running
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Import SQL into your D1 Database
+      tags:
+      - D1
+  /accounts/{account_id}/d1/database/{database_id}/query:
+    post:
+      description: Returns the query result as an object.
+      operationId: cloudflare-d1-query-database
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_account-identifier'
+      - in: path
+        name: database_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_database-identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                params:
+                  $ref: '#/components/schemas/d1_params'
+                sql:
+                  $ref: '#/components/schemas/d1_sql'
+              required:
+              - sql
+              type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/d1_api-response-common-failure'
+          description: Query response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      items:
+                        $ref: '#/components/schemas/d1_query-result-response'
+                      type: array
+          description: Query response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Query D1 Database
+      tags:
+      - D1
+      x-api-token-group:
+      - D1 Read
+      - D1 Write
+  /accounts/{account_id}/d1/database/{database_id}/raw:
+    post:
+      description: Returns the query result rows as arrays rather than objects. This is a performance-optimized version of the /query endpoint.
+      operationId: cloudflare-d1-raw-database-query
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_account-identifier'
+      - in: path
+        name: database_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/d1_database-identifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                params:
+                  $ref: '#/components/schemas/d1_params'
+                sql:
+                  $ref: '#/components/schemas/d1_sql'
+              required:
+              - sql
+              type: object
+        required: true
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/d1_api-response-common-failure'
+          description: Query response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/d1_api-response-common'
+                - properties:
+                    result:
+                      items:
+                        $ref: '#/components/schemas/d1_raw-result-response'
+                      type: array
+          description: Raw query response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Raw D1 Database query
+      tags:
+      - D1
+components:
+  schemas:
+    d1_database-name:
+      example: my-database
+      pattern: ^[a-z0-9][a-z0-9-_]*$
+      type: string
+    d1_sql:
+      description: Your SQL query. Supports multiple statements, joined by semicolons, which will be executed as a batch.
+      example: SELECT * FROM myTable WHERE field = ? OR field = ?;
+      type: string
+    d1_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/d1_messages'
+        messages:
+          $ref: '#/components/schemas/d1_messages'
+        result:
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    d1_primary-location-hint:
+      description: Specify the region to create the D1 primary, if available. If this option is omitted, the D1 will be created as close as possible to the current user.
+      enum:
+      - wnam
+      - enam
+      - weur
+      - eeur
+      - apac
+      - oc
+      example: wnam
+      type: string
+    d1_database-version:
+      example: production
+      pattern: ^(alpha|beta|production)$
+      type: string
+    d1_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    d1_raw-result-response:
+      properties:
+        meta:
+          $ref: '#/components/schemas/d1_query-meta'
+        results:
+          properties:
+            columns:
+              items:
+                type: string
+              type: array
+            rows:
+              items:
+                items:
+                  anyOf:
+                  - type: number
+                  - type: string
+                  - type: object
+                type: array
+              type: array
+          type: object
+        success:
+          type: boolean
+      type: object
+    d1_database-identifier:
+      example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      readOnly: true
+      type: string
+    d1_params:
+      example:
+      - firstParam
+      - secondParam
+      items:
+        type: string
+      type: array
+    d1_database-details-response:
+      properties:
+        created_at:
+          $ref: '#/components/schemas/d1_created-at'
+        file_size:
+          $ref: '#/components/schemas/d1_file-size'
+        name:
+          $ref: '#/components/schemas/d1_database-name'
+        num_tables:
+          $ref: '#/components/schemas/d1_table-count'
+        uuid:
+          $ref: '#/components/schemas/d1_database-identifier'
+        version:
+          $ref: '#/components/schemas/d1_database-version'
+      type: object
+    d1_query-meta:
+      properties:
+        changed_db:
+          type: boolean
+        changes:
+          type: number
+        duration:
+          type: number
+        last_row_id:
+          type: number
+        rows_read:
+          type: number
+        rows_written:
+          type: number
+        size_after:
+          type: number
+      type: object
+    d1_created-at:
+      description: Specifies the timestamp the resource was created as an ISO8601 string.
+      example: '2022-11-15T18:25:44.442097Z'
+      format: date-time
+      readOnly: true
+      type: string
+    d1_table-count:
+      example: 12
+      type: number
+    d1_account-identifier:
+      description: Account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    d1_file-size:
+      description: The D1 database's size, in bytes.
+      example: 12
+      type: number
+    d1_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/d1_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/d1_messages'
+          example: []
+        result:
+          enum:
+          - null
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    d1_query-result-response:
+      properties:
+        meta:
+          $ref: '#/components/schemas/d1_query-meta'
+        results:
+          items:
+            type: object
+          type: array
+        success:
+          type: boolean
+      type: object
+    d1_database-response:
+      properties:
+        created_at:
+          $ref: '#/components/schemas/d1_created-at'
+        name:
+          $ref: '#/components/schemas/d1_database-name'
+        uuid:
+          $ref: '#/components/schemas/d1_database-identifier'
+        version:
+          $ref: '#/components/schemas/d1_database-version'
+      type: object
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

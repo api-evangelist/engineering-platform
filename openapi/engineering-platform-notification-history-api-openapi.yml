@@ -1,0 +1,409 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Notification History API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: Notification History
+paths:
+  /accounts/{account_id}/alerting/v3/history:
+    get:
+      description: Gets a list of history records for notifications sent to an account. The records are displayed for last `x` number of days based on the zone plan (free = 30, pro = 30, biz = 30, ent = 90).
+      operationId: notification-history-list-history
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/aaa_account-id'
+      - in: query
+        name: per_page
+        schema:
+          $ref: '#/components/schemas/aaa_per_page'
+      - in: query
+        name: before
+        schema:
+          $ref: '#/components/schemas/aaa_before'
+      - in: query
+        name: page
+        schema:
+          default: 1
+          description: Page number of paginated results.
+          minimum: 1
+          type: number
+      - in: query
+        name: since
+        schema:
+          description: Limit the returned results to history records newer than the specified date. This must be a timestamp that conforms to RFC3339.
+          example: '2022-05-19T20:29:58.679897Z'
+          format: date-time
+          type: string
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/aaa_history_components-schemas-response_collection'
+                - $ref: '#/components/schemas/aaa_schemas-api-response-common-failure'
+          description: List History response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/aaa_history_components-schemas-response_collection'
+          description: List History response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform List History
+      tags:
+      - Notification History
+      x-api-token-group:
+      - Cloudflare Zero Trust PII Read
+      - Notifications Write
+      - Notifications Read
+      - Account Settings Write
+      - Account Settings Read
+components:
+  schemas:
+    aaa_alert_body:
+      description: Message body included in the notification sent.
+      example: SSL certificate has expired
+      type: string
+    aaa_history_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-collection'
+      - properties:
+          result:
+            example:
+            - alert_body:
+                data:
+                  custom_csr_id: ''
+                  expires_on: null
+                  hosts: []
+                  id: '11111111111'
+                  issuer: ''
+                  method: txt
+                  serial_number: ''
+                  settings: null
+                  signature: ''
+                  status: ''
+                  type: ''
+                  uploaded_on: null
+                  validation_errors: []
+                  validation_records:
+                  - cname: ''
+                    cname_target: ''
+                    emails: []
+                    http_body: ''
+                    http_url: ''
+                    txt_name: _acme-challenge.example.com
+                    txt_value: '11111111111'
+                metadata:
+                  account: null
+                  event:
+                    created_at: null
+                    id: ''
+                    type: ssl.certificate.validation.failed
+                  zone:
+                    id: '11111111111'
+              alert_type: universal_ssl_event_type
+              description: Universal Certificate validation status, issuance, renewal, and expiration notices.
+              id: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+              mechanism: test@example.com
+              mechanism_type: email
+              name: SSL Notification Event Policy
+              policy_id: 35040955-3102-4710-938c-0f4eaf736e25
+              sent: '2021-10-08T17:52:17.571336Z'
+            items:
+              $ref: '#/components/schemas/aaa_history'
+            type: array
+          result_info:
+            example:
+              count: 1
+              page: 1
+              per_page: 20
+            type: object
+    aaa_mechanism:
+      description: The mechanism to which the notification has been dispatched.
+      example: test@example.com
+      type: string
+    aaa_policy-id:
+      description: The unique identifier of a notification policy
+      example: 0da2b59e-f118-439d-8097-bdfb215203c9
+      maxLength: 36
+      readOnly: true
+      type: string
+    aaa_schemas-name:
+      description: Name of the policy.
+      example: SSL Notification Event Policy
+      type: string
+    aaa_history:
+      properties:
+        alert_body:
+          $ref: '#/components/schemas/aaa_alert_body'
+        alert_type:
+          $ref: '#/components/schemas/aaa_schemas-alert_type'
+        description:
+          $ref: '#/components/schemas/aaa_components-schemas-description'
+        id:
+          $ref: '#/components/schemas/aaa_uuid'
+        mechanism:
+          $ref: '#/components/schemas/aaa_mechanism'
+        mechanism_type:
+          $ref: '#/components/schemas/aaa_mechanism_type'
+        name:
+          $ref: '#/components/schemas/aaa_schemas-name'
+        policy_id:
+          $ref: '#/components/schemas/aaa_policy-id'
+        sent:
+          $ref: '#/components/schemas/aaa_sent'
+      type: object
+    aaa_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    aaa_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      readOnly: true
+      type: string
+      x-auditable: true
+    aaa_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/aaa_messages'
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_schemas-alert_type:
+      description: Type of notification that has been dispatched.
+      example: universal_ssl_event_type
+      type: string
+    aaa_before:
+      description: Limit the returned results to history records older than the specified date. This must be a timestamp that conforms to RFC3339.
+      example: '2022-05-20T20:29:58.679897Z'
+      format: date-time
+      type: string
+    aaa_schemas-api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example: []
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_account-id:
+      description: The account id
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    aaa_per_page:
+      default: 25
+      description: Number of items per page.
+      maximum: 1000
+      minimum: 5
+      type: number
+    aaa_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/aaa_result_info'
+      type: object
+    aaa_sent:
+      description: Timestamp of when the notification was dispatched in ISO 8601 format.
+      example: '2021-10-08T17:52:17.571336Z'
+      format: date-time
+      type: string
+    aaa_components-schemas-description:
+      description: Description of the notification policy (if present).
+      example: Universal Certificate validation status, issuance, renewal, and expiration notices
+      type: string
+    aaa_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    aaa_mechanism_type:
+      description: The type of mechanism to which the notification has been dispatched. This can be email/pagerduty/webhook based on the mechanism configured.
+      enum:
+      - email
+      - pagerduty
+      - webhook
+      example: email
+      type: string
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

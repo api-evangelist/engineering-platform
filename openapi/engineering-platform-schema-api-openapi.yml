@@ -1,0 +1,1360 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Schema API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: Schema
+  description: The **Schema** endpoints enable you to manage your API definitions. These endpoints also support multi-file schema.
+paths:
+  /apis/{apiId}/schemas:
+    parameters:
+    - $ref: '#/components/parameters/apiId'
+    - $ref: '#/components/parameters/v10Accept'
+    post:
+      summary: APIs.io Engineering Platform Create a schema
+      description: Creates a schema for an API.
+      operationId: createApiSchema
+      tags:
+      - Schema
+      requestBody:
+        $ref: '#/components/requestBodies/createApiSchema'
+      responses:
+        '200':
+          $ref: '#/components/responses/createApiSchema'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema400ErrorInvalidParams'
+                - $ref: '#/components/schemas/v10HeaderMissing'
+              examples:
+                Schema Already Exists:
+                  $ref: '#/components/examples/apiSchema400ErrorInvalidParams'
+                Missing v10 Accept Header:
+                  $ref: '#/components/examples/v10HeaderMissing'
+        '401':
+          $ref: '#/components/responses/api401ErrorUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema403ErrorForbidden'
+                - $ref: '#/components/schemas/featureUnavailable403Error'
+              examples:
+                Forbidden:
+                  $ref: '#/components/examples/apiSchema403ErrorForbidden'
+                Feature Unavailable:
+                  $ref: '#/components/examples/featureUnavailable403Error'
+        '404':
+          $ref: '#/components/responses/api404ErrorInstanceNotFound'
+        '422':
+          $ref: '#/components/responses/gitLinkedApi422Error'
+        '500':
+          $ref: '#/components/responses/common500Error'
+  /apis/{apiId}/schemas/{schemaId}:
+    parameters:
+    - $ref: '#/components/parameters/apiId'
+    - $ref: '#/components/parameters/apiSchemaId'
+    - $ref: '#/components/parameters/v10Accept'
+    get:
+      summary: APIs.io Engineering Platform Get a schema
+      description: 'Gets information about API schema. You can use the `versionId` query parameter to get a schema published in an API version.
+
+
+        You can use this API to do the following:
+
+
+        - Get a schema''s metadata.
+
+        - Get all the files in a schema. This only returns the first file in the schema. The endpoint response contains a link to the next set of response results.
+
+        - Get a schema''s contents in multi-file or bundled format.
+
+
+        **Note:**
+
+
+        The `versionId` query parameter is a required parameter for API viewers.
+
+        '
+      operationId: getApiSchema
+      tags:
+      - Schema
+      responses:
+        '200':
+          $ref: '#/components/responses/getApiSchema'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema400ErrorNotLinked'
+                - $ref: '#/components/schemas/v10HeaderMissing'
+              examples:
+                Schema Not Linked to API:
+                  $ref: '#/components/examples/apiSchema400ErrorNotLinked'
+                Missing v10 Accept Header:
+                  $ref: '#/components/examples/v10HeaderMissing'
+        '401':
+          $ref: '#/components/responses/api401ErrorUnauthorized'
+        '403':
+          $ref: '#/components/responses/api403ErrorAndFeatureUnavailable'
+        '404':
+          $ref: '#/components/responses/api404ErrorInstanceNotFound'
+        '422':
+          $ref: '#/components/responses/gitLinkedApi422Error'
+        '500':
+          $ref: '#/components/responses/common500Error'
+      parameters:
+      - $ref: '#/components/parameters/apiVersionQuery'
+      - $ref: '#/components/parameters/apiSchemaOutput'
+  /apis/{apiId}/schemas/{schemaId}/files:
+    parameters:
+    - $ref: '#/components/parameters/apiId'
+    - $ref: '#/components/parameters/apiSchemaId'
+    - $ref: '#/components/parameters/v10Accept'
+    get:
+      summary: APIs.io Engineering Platform Get schema files
+      description: 'Gets the files in an API schema. You can use the `versionId` query parameter to get schema files published in an API version.
+
+
+        **Note:**
+
+
+        The `versionId` query parameter is a required parameter for API viewers.
+
+        '
+      operationId: getApiSchemaFiles
+      tags:
+      - Schema
+      responses:
+        '200':
+          $ref: '#/components/responses/getApiSchemaFiles'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema400ErrorNotLinked'
+                - $ref: '#/components/schemas/v10HeaderMissing'
+              examples:
+                Schema Not Linked to API:
+                  $ref: '#/components/examples/apiSchema400ErrorNotLinked'
+                Missing v10 Accept Header:
+                  $ref: '#/components/examples/v10HeaderMissing'
+        '401':
+          $ref: '#/components/responses/api401ErrorUnauthorized'
+        '403':
+          $ref: '#/components/responses/featureUnavailable403Error'
+        '404':
+          $ref: '#/components/responses/api404ErrorInstanceNotFound'
+        '422':
+          $ref: '#/components/responses/gitLinkedApi422Error'
+        '500':
+          $ref: '#/components/responses/common500Error'
+      parameters:
+      - $ref: '#/components/parameters/apiVersionQuery'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/cursor'
+  /apis/{apiId}/schemas/{schemaId}/files/{file-path}:
+    parameters:
+    - $ref: '#/components/parameters/apiId'
+    - $ref: '#/components/parameters/apiSchemaId'
+    - $ref: '#/components/parameters/file-path'
+    - $ref: '#/components/parameters/v10Accept'
+    get:
+      summary: APIs.io Engineering Platform Get schema file contents
+      description: 'Gets an API schema file contents at the defined path. You can use the `versionId` query parameter to get schema file contents published in an API version.
+
+
+        **Note:**
+
+
+        The `versionId` query parameter is a required parameter for API viewers.
+
+        '
+      operationId: getApiSchemaFileContents
+      tags:
+      - Schema
+      responses:
+        '200':
+          $ref: '#/components/responses/getApiSchemaFileContents'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema400ErrorNotLinked'
+                - $ref: '#/components/schemas/v10HeaderMissing'
+              examples:
+                Schema Not Linked to API:
+                  $ref: '#/components/examples/apiSchema400ErrorNotLinked'
+                Missing v10 Accept Header:
+                  $ref: '#/components/examples/v10HeaderMissing'
+        '401':
+          $ref: '#/components/responses/api401ErrorUnauthorized'
+        '403':
+          $ref: '#/components/responses/featureUnavailable403Error'
+        '404':
+          $ref: '#/components/responses/api404ErrorInstanceNotFound'
+        '422':
+          $ref: '#/components/responses/gitLinkedApi422Error'
+        '500':
+          $ref: '#/components/responses/common500Error'
+      parameters:
+      - $ref: '#/components/parameters/apiVersionQuery'
+    put:
+      summary: APIs.io Engineering Platform Create or update a schema file
+      description: 'Creates or updates an API schema file.
+
+
+        **Note:**
+
+
+        - If the provided file path exists, the file is updated with the new contents.
+
+        - If the provided file path does not exist, then a new schema file is created.
+
+        - If the file path contains a `/` (forward slash) character, then a folder is created. For example, if the file path is the `dir/schema.json` value, then a `dir` folder is created with the `schema.json` file inside.
+
+        - You can only update the `root` tag for protobuf specifications.
+
+        '
+      operationId: createUpdateApiSchemaFile
+      tags:
+      - Schema
+      requestBody:
+        $ref: '#/components/requestBodies/createUpdateApiSchemaFile'
+      responses:
+        '200':
+          $ref: '#/components/responses/createUpdateApiSchemaFile'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema400ErrorNotLinked'
+                - $ref: '#/components/schemas/v10HeaderMissing'
+              examples:
+                Schema Not Linked to API:
+                  $ref: '#/components/examples/apiSchema400ErrorNotLinked'
+                Missing v10 Accept Header:
+                  $ref: '#/components/examples/v10HeaderMissing'
+        '401':
+          $ref: '#/components/responses/api401ErrorUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema403ErrorForbidden'
+                - $ref: '#/components/schemas/featureUnavailable403Error'
+              examples:
+                Forbidden:
+                  $ref: '#/components/examples/apiSchema403ErrorForbidden'
+                Feature Unavailable:
+                  $ref: '#/components/examples/featureUnavailable403Error'
+        '404':
+          $ref: '#/components/responses/apiSchema404ErrorNotFound'
+        '422':
+          $ref: '#/components/responses/gitLinkedApi422Error'
+        '500':
+          $ref: '#/components/responses/common500Error'
+    delete:
+      summary: APIs.io Engineering Platform Delete a schema file
+      description: Deletes a file in an API schema. On success, this returns an HTTP `204 No Content` response.
+      operationId: deleteApiSchemaFile
+      tags:
+      - Schema
+      responses:
+        '204':
+          description: Deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema400ErrorNotLinked'
+                - $ref: '#/components/schemas/v10HeaderMissing'
+              examples:
+                Schema Not Linked to API:
+                  $ref: '#/components/examples/apiSchema400ErrorNotLinked'
+                Missing v10 Accept Header:
+                  $ref: '#/components/examples/v10HeaderMissing'
+        '401':
+          $ref: '#/components/responses/api401ErrorUnauthorized'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: '#/components/schemas/apiSchema403ErrorForbidden'
+                - $ref: '#/components/schemas/featureUnavailable403Error'
+              examples:
+                Forbidden:
+                  $ref: '#/components/examples/apiSchema403ErrorForbidden'
+                Feature Unavailable:
+                  $ref: '#/components/examples/featureUnavailable403Error'
+        '404':
+          $ref: '#/components/responses/api404ErrorInstanceNotFound'
+        '422':
+          $ref: '#/components/responses/gitLinkedApi422Error'
+        '500':
+          $ref: '#/components/responses/common500Error'
+components:
+  responses:
+    createApiSchema:
+      description: Created
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Information about the created API schema.
+            properties:
+              id:
+                type: string
+                description: The schema's ID.
+                example: b4fc1bdc-6587-4f9b-95c9-f768146089b4
+              type:
+                type: string
+                description: The schema's type.
+                enum:
+                - proto:2
+                - proto:3
+                - graphql
+                - openapi:3_1
+                - openapi:3
+                - openapi:2
+                - openapi:1
+                - raml:1
+                - raml:0_8
+                - wsdl:2
+                - wsdl:1
+                - asyncapi:2
+                example: openapi:3
+              files:
+                type: array
+                description: The list of the schema's files.
+                items:
+                  type: object
+                  title: Schema File Base Data
+                  description: Information about the schema file.
+                  properties:
+                    id:
+                      type: string
+                      description: The schema file's ID.
+                      example: b4fc1bdc-6587-4f9b-95c9-f768146089b4
+                    name:
+                      type: string
+                      description: The schema file's name.
+                      example: index.json
+                    path:
+                      type: string
+                      description: The file system path to the schema file.
+                      example: index.json
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the file was created.
+                      example: '2023-03-29T11:37:15Z'
+                    root:
+                      type: object
+                      description: An object that contains root file information.
+                      properties:
+                        enabled:
+                          type: boolean
+                          description: If true, the file is tagged as the schema's root file.
+                          example: true
+                    createdBy:
+                      type: string
+                      description: The user ID of the user that created the file.
+                      example: '12345678'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the file was last updated.
+                      example: '2023-03-29T11:37:15Z'
+                    updatedBy:
+                      type: string
+                      description: The user ID of the user that last updated the file.
+                      example: '12345678'
+              createdAt:
+                type: string
+                format: date-time
+                description: The date and time at which the schema was created.
+                example: '2023-03-29T11:37:15Z'
+              createdBy:
+                type: string
+                description: The user ID of the user that created the schema.
+                example: '12345678'
+              updatedAt:
+                type: string
+                format: date-time
+                description: The date and time at which the schema was last updated.
+                example: '2023-03-29T11:37:15Z'
+              updatedBy:
+                type: string
+                description: The user ID of the user that updated the schema.
+                example: '12345678'
+          example:
+            type: openapi:3
+            files:
+            - createdBy: '12345678'
+              path: index.json
+              updatedBy: '12345678'
+              updatedAt: '2024-07-18T13:17:30.000Z'
+              root:
+                enabled: true
+              id: b4fc1bdc-6587-4f9b-95c9-f768146089b4
+              name: index.json
+              createdAt: '2024-07-18T13:17:30.000Z'
+            updatedAt: '2024-07-18T13:17:30.000Z'
+            createdAt: '2024-07-18T13:17:30.000Z'
+            createdBy: '12345678'
+            updatedBy: '12345678'
+            id: b4fc1bdc-6587-4f9b-95c9-f768146089b4
+    featureUnavailable403Error:
+      description: Feature Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/featureUnavailable403Error'
+          example:
+            value:
+              type: https://api.postman.com/problems/forbidden
+              title: Forbidden
+              detail: This feature isn't available in your region.
+              status: 403
+    api401ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: An API key must be provided in the request header or query string
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+              instance:
+                type: string
+                description: The URI reference that identifies the specific occurrence of the problem.
+                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: An API key must be provided in the request header or query string
+            status: 401
+            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+    common500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
+    gitLinkedApi422Error:
+      description: Git-Linked API Errror
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The error type.
+                example: actionNotAllowedError
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Action not allowed
+              detail:
+                type: string
+                description: Details about the error.
+                example: This action is not allowed for Git linked APIs
+          example:
+            type: actionNotAllowedError
+            title: Action not allowed
+            detail: This action is not allowed for Git linked APIs
+    createUpdateApiSchemaFile:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            title: Schema File Base Data
+            description: Information about the schema file.
+            properties:
+              createdBy:
+                type: string
+                description: The user ID of the user that created the file.
+                example: '12345678'
+              createdAt:
+                type: string
+                format: date-time
+                description: The date and time at which the file was created.
+                example: '2024-07-18T13:48:28.000Z'
+              root:
+                type: object
+                description: Information about the schema's root file.
+                properties:
+                  enabled:
+                    type: boolean
+                    description: If true, the file is the schema's the root file.
+                    example: true
+              name:
+                type: string
+                description: The schema file's name.
+                example: index.json
+              path:
+                type: string
+                description: The file system path to the schema file.
+                example: index.json
+              updatedBy:
+                type: string
+                description: The user ID of the user that last updated the file.
+                example: '12345678'
+              id:
+                type: string
+                description: The schema file's ID.
+                example: 2fdc8ea1-d02e-4e50-989e-6fa28f42b995
+              updatedAt:
+                type: string
+                format: date-time
+                description: The date and time at which the file was last updated.
+                example: '2024-07-18T13:48:28.000Z'
+          example:
+            createdBy: '12345678'
+            createdAt: '2024-07-18T13:47:39.000Z'
+            root:
+              enabled: true
+            name: index.json
+            path: index.json
+            updatedBy: '12345678'
+            id: 2fdc8ea1-d02e-4e50-989e-6fa28f42b995
+            updatedAt: '2024-07-18T13:48:28.000Z'
+    getApiSchema:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            anyOf:
+            - type: object
+              title: Get Schema
+              description: Information about the schema.
+              properties:
+                id:
+                  type: string
+                  description: The schema's ID.
+                  example: ae2b9ab2-28f2-401d-912f-eca09a78e98b
+                type:
+                  type: string
+                  description: The schema's type.
+                  example: openapi:3
+                files:
+                  type: object
+                  description: Information about the schema's files. The response is paginated and limited to one page.
+                  properties:
+                    data:
+                      type: array
+                      description: A list of the schema files.
+                      items:
+                        title: Schema File Base Data
+                        description: Information about the schema file.
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The schema file's ID.
+                            example: cf98c187-17c1-455f-afbf-d4be51f12770
+                          name:
+                            type: string
+                            description: The schema file's name.
+                            example: s1.json
+                          path:
+                            type: string
+                            description: The file system path to the schema file.
+                            example: dir/s1.json
+                          createdAt:
+                            type: string
+                            format: date-time
+                            description: The date and time at which the file was created.
+                            example: '2023-03-16T18:38:56.000Z'
+                          createdBy:
+                            type: string
+                            description: The user ID of the user that created the file.
+                            example: '5000842'
+                          updatedAt:
+                            type: string
+                            format: date-time
+                            description: The date and time at which the file was last updated.
+                            example: '2023-03-16T19:11:24.000Z'
+                          updatedBy:
+                            type: string
+                            description: The user ID of the user that last updated the file.
+                            example: '5000842'
+                    meta:
+                      type: object
+                      properties:
+                        nextPath:
+                          type: string
+                          description: The URL path to the next file.
+                          example: /apis/1fdbff7c-036b-4f8a-91bc-17bf3ae74fd2/schemas/cf98c187-17c1-455f-afbf-d4be51f12770/files?cursor=eyJzY2hlbWUiOiJwYXRoX2FzYyIsImRpcmVjdGlvblR5cGUiOiJuZXh0IiwicGl2b3QiOiJwYXRoIiwidmFsdWUiOiJkaXIvczEuanNvbiJ9
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: The date and time at which the schema was created.
+                  example: '2022-03-29T11:37:15Z'
+                createdBy:
+                  type: string
+                  description: The user ID of the user that created the schema.
+                  example: '12345678'
+                updatedAt:
+                  type: string
+                  format: date-time
+                  description: The date and time at which the schema was last updated.
+                  example: '2022-03-29T11:37:15Z'
+                updatedBy:
+                  type: string
+                  description: The user ID of the user that last updated the schema.
+                  example: '12345678'
+            - type: object
+              title: Get Bundled Schema
+              description: Information about the schema.
+              properties:
+                id:
+                  type: string
+                  description: The schema's ID.
+                  example: ae2b9ab2-28f2-401d-912f-eca09a78e98b
+                type:
+                  type: string
+                  description: The schema's type.
+                  example: openapi:3
+                createdBy:
+                  type: string
+                  description: The user ID of the user that created the schema.
+                  example: '12345678'
+                updatedBy:
+                  type: string
+                  description: The user ID of the user that last updated the schema.
+                  example: '12345678'
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: '2022-03-29T11:37:15Z'
+                  description: The date and time at which the schema was created.
+                updatedAt:
+                  type: string
+                  format: date-time
+                  description: The date and time at which the schema was last updated.
+                  example: '2022-03-29T11:37:15Z'
+                content:
+                  type: string
+                  description: The schema file, in a bundled format.
+                  example: "openapi: '3.0.0'\ninfo:\n  version: '1.0.0'\n  title: 'Sample API'\n  description: Buy or rent spacecrafts\n\npaths:\n  /spacecrafts/{spacecraftId}:\n    parameters:\n      - name: spacecraftId\n        description: The unique identifier of the spacecraft\n        in: path\n        required: true\n        schema:\n          $ref: '#/components/schemas/SpacecraftId'\n    get:\n      summary: Read a spacecraft\n      responses:\n        '200':\n          description: The spacecraft corresponding to the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Spacecraft'\n        404:\n          description: No spacecraft found for the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Error'\n        500:\n          description: Unexpected error\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Error'\ncomponents:\n  schemas:\n    SpacecraftId:\n      description: The unique identifier of a spacecraft\n      type: string\n    Spacecraft:\n      type: object\n      required:\n        - id\n        - names\n        - type\n      properties:\n        id:\n          $ref: '#/components/schemas/SpacecraftId'\n        name:\n          type: string\n        type:\n          type: string\n          enum:\n            - capsule\n            - probe\n            - satellite\n            - spaceplane\n            - station\n        description:\n          type: string\n    Error:\n      type: object\n      required:\n        - message\n      properties:\n        message:\n          description: A human readable error message\n          type: string\n  securitySchemes:\n    ApiKey:\n      type: apiKey\n      in: header\n      name: X-Api-Key\nsecurity:\n  - ApiKey: []"
+          example:
+            createdAt: '2022-03-29T11:37:15Z'
+            updatedAt: '2022-03-29T11:37:15Z'
+            files:
+              meta:
+                nextPath: /apis/1fdbff7c-036b-4f8a-91bc-17bf3ae74fd2/schemas/cf98c187-17c1-455f-afbf-d4be51f12770/files?cursor=eyJzY2hlbWUiOiJwYXRoX2FzYyIsImRpcmVjdGlvblR5cGUiOiJuZXh0IiwicGl2b3QiOiJwYXRoIiwidmFsdWUiOiJkaXIvczEuanNvbiJ9
+              data:
+              - createdBy: '12345678'
+                path: dir/s1.json
+                updatedBy: '12345678'
+                updatedAt: '2023-03-16T19:11:24.000Z'
+                createdAt: '2023-03-16T18:38:56.000Z'
+                id: cf98c187-17c1-455f-afbf-d4be51f12770
+                name: s1.json
+    api403ErrorAndFeatureUnavailable:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            anyOf:
+            - $ref: '#/components/schemas/api403ErrorForbidden'
+            - $ref: '#/components/schemas/featureUnavailable403Error'
+          examples:
+            Forbidden:
+              $ref: '#/components/examples/api403ErrorForbidden'
+            Feature Unavailable:
+              $ref: '#/components/examples/featureUnavailable403Error'
+    getApiSchemaFiles:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Information about the schema files and its meta information.
+            properties:
+              meta:
+                type: object
+                description: The schema's non-standard meta information.
+                properties:
+                  nextCursor:
+                    type: string
+                    description: The pointer to the next record in the set of paginated results.
+                    example: eyJzY2hlbWUiOiJwYXRoX2FzYyIsImRpcmVjdGlvblR5cGUiOiJuZXh0IiwicGl2b3QiOiJwYXRoIiwidmFsdWUiOiJOZXdQZXQuanNvbiJ9
+              files:
+                type: array
+                description: The schema's files.
+                items:
+                  type: object
+                  title: Schema File Base Data
+                  description: Information about the schema file.
+                  properties:
+                    id:
+                      type: string
+                      description: The schema file's ID.
+                      example: e8a015e0-f472-4bb3-a523-57ce7c4583ed
+                    name:
+                      type: string
+                      description: The schema file's name.
+                      example: error.yaml
+                    path:
+                      type: string
+                      description: The file system path to the schema file.
+                      example: data-model/error.yaml
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the file was created.
+                      example: '2022-03-29T11:37:15Z'
+                    createdBy:
+                      type: integer
+                      format: int64
+                      description: The user Id of the user that created the file.
+                      example: 12345678
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the file was last updated.
+                      example: '2022-03-29T11:37:15Z'
+                    updatedBy:
+                      type: integer
+                      format: int64
+                      description: The user ID of the user that last updated the file.
+                      example: 12345678
+          example:
+            meta:
+              nextCursor: eyJzY2hlbWUiOiJwYXRoX2FzYyIsImRpcmVjdGlvblR5cGUiOiJuZXh0IiwicGl2b3QiOiJwYXRoIiwidmFsdWUiOiJOZXdQZXQuanNvbiJ9
+            files:
+            - id: e8a015e0-f472-4bb3-a523-57ce7c4583ed
+              path: data-model/error.yaml
+              name: error.yaml
+              createdAt: '2022-03-29T11:37:15Z'
+              updatedAt: '2022-03-29T11:37:15Z'
+              createdBy: 12345678
+              updatedBy: 12345678
+            - id: e8a015e0-f472-4bb3-a523-57ce7c4583ef
+              path: data-model/error2.yaml
+              name: error2.yaml
+              createdAt: '2022-03-29T11:37:15Z'
+              updatedAt: '2022-03-29T11:37:15Z'
+              createdBy: 12345678
+              updatedBy: 12345678
+    api404ErrorInstanceNotFound:
+      description: API Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/api404ErrorInstanceNotFound'
+          examples:
+            API Not Found:
+              $ref: '#/components/examples/api404ErrorInstanceNotFound'
+    apiSchema404ErrorNotFound:
+      description: Schema Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/apiSchema404ErrorNotFound'
+          examples:
+            Schema Not Found:
+              $ref: '#/components/examples/apiSchema404ErrorNotFound'
+    getApiSchemaFileContents:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            title: Schema File Contents
+            description: Information about the schema file.
+            properties:
+              id:
+                type: string
+                description: The schema file's ID.
+                example: 0784657a-668d-4530-85c8-468becdb06fd
+              name:
+                type: string
+                description: The schema file's name.
+                example: index.json
+              path:
+                type: string
+                description: The file system path to the schema file.
+                example: common/Test.json
+              content:
+                type: string
+                description: The schema file's stringified contents.
+                example: "openapi: '3.0.0'\ninfo:\n  version: '1.0.0'\n  title: 'Sample API'\n  description: Buy or rent spacecrafts\n\npaths:\n  /spacecrafts/{spacecraftId}:\n    parameters:\n      - name: spacecraftId\n        description: The unique identifier of the spacecraft\n        in: path\n        required: true\n        schema:\n          $ref: '#/components/schemas/SpacecraftId'\n    get:\n      summary: Read a spacecraft\n      responses:\n        '200':\n          description: The spacecraft corresponding to the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Spacecraft'\n        404:\n          description: No spacecraft found for the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Error'\n        500:\n          description: Unexpected error\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Error'\ncomponents:\n  schemas:\n    SpacecraftId:\n      description: The unique identifier of a spacecraft\n      type: string\n    Spacecraft:\n      type: object\n      required:\n        - id\n        - names\n        - type\n      properties:\n        id:\n          $ref: '#/components/schemas/SpacecraftId'\n        name:\n          type: string\n        type:\n          type: string\n          enum:\n            - capsule\n            - probe\n            - satellite\n            - spaceplane\n            - station\n        description:\n          type: string\n    Error:\n      type: object\n      required:\n        - message\n      properties:\n        message:\n          description: A human readable error message\n          type: string\n  securitySchemes:\n    ApiKey:\n      type: apiKey\n      in: header\n      name: X-Api-Key\nsecurity:\n  - ApiKey: []"
+              createdAt:
+                type: string
+                format: date-time
+                description: The date and time at which the file was created.
+                example: '2023-03-15T13:27:45.000Z'
+              createdBy:
+                type: string
+                description: The user Id of the user that created the file.
+                example: '12345678'
+              updatedAt:
+                type: string
+                format: date-time
+                description: The date and time at which the file was last updated.
+                example: '2023-03-15T13:27:45.000Z'
+              updatedBy:
+                type: string
+                description: The user ID of the user that last updated the file.
+                example: '12345678'
+          example:
+            id: 0784657a-668d-4530-85c8-468becdb06fd
+            name: Test.json
+            path: common/Test.json
+            content: "openapi: '3.0.0'\ninfo:\n  version: '1.0.0'\n  title: 'Sample API'\n  description: Buy or rent spacecrafts\n\npaths:\n  /spacecrafts/{spacecraftId}:\n    parameters:\n      - name: spacecraftId\n        description: The unique identifier of the spacecraft\n        in: path\n        required: true\n        schema:\n          $ref: '#/components/schemas/SpacecraftId'\n    get:\n      summary: Read a spacecraft\n      responses:\n        '200':\n          description: The spacecraft corresponding to the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Spacecraft'\n        404:\n          description: No spacecraft found for the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Error'\n        500:\n          description: Unexpected error\n          content:\n            application/json:\n              schema:\n                $ref: '#/components/schemas/Error'\ncomponents:\n  schemas:\n    SpacecraftId:\n      description: The unique identifier of a spacecraft\n      type: string\n    Spacecraft:\n      type: object\n      required:\n        - id\n        - names\n        - type\n      properties:\n        id:\n          $ref: '#/components/schemas/SpacecraftId'\n        name:\n          type: string\n        type:\n          type: string\n          enum:\n            - capsule\n            - probe\n            - satellite\n            - spaceplane\n            - station\n        description:\n          type: string\n    Error:\n      type: object\n      required:\n        - message\n      properties:\n        message:\n          description: A human readable error message\n          type: string\n  securitySchemes:\n    ApiKey:\n      type: apiKey\n      in: header\n      name: X-Api-Key\nsecurity:\n  - ApiKey: []"
+            createdAt: '2023-03-15T13:27:45.000Z'
+            createdBy: '12345678'
+            updatedAt: '2023-03-15T13:27:45.000Z'
+            updatedBy: '12345678'
+  examples:
+    apiSchema404ErrorNotFound:
+      value:
+        type: instanceNotFoundError
+        title: Schema not found
+        detail: We could not find a schema linked to this API
+    v10HeaderMissing:
+      value:
+        name: instanceNotFoundError
+        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    updateYamlSchema:
+      value:
+        content: "openapi: \"3.1.0\"\ninfo:\n  version: \"1.0.0\"\n  title: \"Sample API\"\n  description: Buy or rent spacecrafts\n\npaths:\n  /spacecrafts/{spacecraftId}:\n    parameters:\n      - name: spacecraftId\n        description: The unique identifier of the spacecraft\n        in: path\n        required: true\n        schema:\n          $ref: \"#/components/schemas/SpacecraftId\"\n    get:\n      summary: Read a spacecraft\n      responses:\n        \"200\":\n          description: The spacecraft corresponding to the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Spacecraft\"\n        404:\n          description: No spacecraft found for the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Error\"\n        500:\n          description: Unexpected error\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Error\"\ncomponents:\n  schemas:\n    SpacecraftId:\n      description: The unique identifier of a spacecraft\n      type: string\n    Spacecraft:\n      type: object\n      required:\n        - id\n        - name\n        - type\n      properties:\n        id:\n          $ref: \"#/components/schemas/SpacecraftId\"\n        name:\n          type: string\n        type:\n          type: string\n          enum:\n            - capsule\n            - probe\n            - satellite\n            - spaceplane\n            - station\n        description:\n          type: string\n    Error:\n      type: object\n      required:\n        - message\n      properties:\n        message:\n          description: A human readable error message\n          type: string\n  securitySchemes:\n    ApiKey:\n      type: apiKey\n      in: header\n      name: X-Api-Key\nsecurity:\n  - ApiKey: []\n"
+    api404ErrorInstanceNotFound:
+      value:
+        type: instanceNotFoundError
+        title: Resource not found
+        detail: We could not find the API you are looking for
+    featureUnavailable403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: This feature isn't available in your region.
+        status: 403
+    updateGraphQlSchema:
+      value:
+        content: "type Query {\r\n  allPosts: [Post]\r\n  allUsers: [User]\r\n  postById(id: Int!): Post\r\n  userById(id: Int!): User\r\n}\r\n\r\ntype Mutation {\r\n  createPost(input: CreatePostInput!): CreatePostPayload\r\n  createUser(input: CreateUserInput!): CreateUserPayload\r\n}\r\n\r\ntype Post {\r\n  id: Int!\r\n  title: String\r\n  body: String\r\n  createdDate: Datetime\r\n  authorId: Int!\r\n  userByAuthorId: User\r\n}\r\n\r\ntype User {\r\n  id: Int!\r\n  username: String\r\n  createdDate: Datetime\r\n  postsByAuthorId: [Post]\r\n}\r\n\r\ntype CreatePostPayload {\r\n  clientMutationId: String\r\n  post: Post\r\n  userByAuthorId: User\r\n}\r\n\r\ninput CreatePostInput {\r\n  clientMutationId: String\r\n  post: PostInput!\r\n}\r\n\r\ninput PostInput {\r\n  id: Int\r\n  title: String\r\n  body: String\r\n  createdDate: Datetime\r\n  authorId: Int!\r\n}\r\n\r\ntype CreateUserPayload {\r\n  clientMutationId: String\r\n  user: User\r\n}\r\n\r\ninput CreateUserInput {\r\n  clientMutationId: String\r\n  user: UserInput!\r\n}\r\n\r\ninput UserInput {\r\n  id: Int\r\n  username: String\r\n  createdDate: Datetime\r\n}\r\n\r\nscalar Datetime\r\n"
+    createGraphQlSchema:
+      value:
+        type: graphql
+        files:
+        - path: posts.graphql
+          content: "type Query {\r\n  allPosts: [Post]\r\n  allUsers: [User]\r\n  postById(id: Int!): Post\r\n  userById(id: Int!): User\r\n}\r\n\r\ntype Mutation {\r\n  createPost(input: CreatePostInput!): CreatePostPayload\r\n  createUser(input: CreateUserInput!): CreateUserPayload\r\n}\r\n\r\ntype Post {\r\n  id: Int!\r\n  title: String\r\n  body: String\r\n  createdDate: Datetime\r\n  authorId: Int!\r\n  userByAuthorId: User\r\n}\r\n\r\ntype User {\r\n  id: Int!\r\n  username: String\r\n  createdDate: Datetime\r\n  postsByAuthorId: [Post]\r\n}\r\n\r\ntype CreatePostPayload {\r\n  clientMutationId: String\r\n  post: Post\r\n  userByAuthorId: User\r\n}\r\n\r\ninput CreatePostInput {\r\n  clientMutationId: String\r\n  post: PostInput!\r\n}\r\n\r\ninput PostInput {\r\n  id: Int\r\n  title: String\r\n  body: String\r\n  createdDate: Datetime\r\n  authorId: Int!\r\n}\r\n\r\ntype CreateUserPayload {\r\n  clientMutationId: String\r\n  user: User\r\n}\r\n\r\ninput CreateUserInput {\r\n  clientMutationId: String\r\n  user: UserInput!\r\n}\r\n\r\ninput UserInput {\r\n  id: Int\r\n  username: String\r\n  createdDate: Datetime\r\n}\r\n\r\nscalar Datetime\r\n"
+    createProtoSchema:
+      value:
+        type: proto:2
+        files:
+        - path: index.proto
+          content: <file contents>
+          root:
+            enabled: true
+    apiSchema400ErrorNotLinked:
+      value:
+        type: invalidParamError
+        title: Invalid param error
+        detail: Schema is not linked to the API
+    apiSchema400ErrorInvalidParams:
+      value:
+        type: invalidParamsError
+        title: Could not create the resource
+        detail: Schema already exists for this API
+    createYamlSchema:
+      value:
+        type: openapi:3_1
+        files:
+        - path: index.yaml
+          content: "openapi: \"3.1.0\"\ninfo:\n  version: \"1.0.0\"\n  title: \"Sample API\"\n  description: Buy or rent spacecrafts\n\npaths:\n  /spacecrafts/{spacecraftId}:\n    parameters:\n      - name: spacecraftId\n        description: The unique identifier of the spacecraft\n        in: path\n        required: true\n        schema:\n          $ref: \"#/components/schemas/SpacecraftId\"\n    get:\n      summary: Read a spacecraft\n      responses:\n        \"200\":\n          description: The spacecraft corresponding to the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Spacecraft\"\n        404:\n          description: No spacecraft found for the provided `spacecraftId`\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Error\"\n        500:\n          description: Unexpected error\n          content:\n            application/json:\n              schema:\n                $ref: \"#/components/schemas/Error\"\ncomponents:\n  schemas:\n    SpacecraftId:\n      description: The unique identifier of a spacecraft\n      type: string\n    Spacecraft:\n      type: object\n      required:\n        - id\n        - name\n        - type\n      properties:\n        id:\n          $ref: \"#/components/schemas/SpacecraftId\"\n        name:\n          type: string\n        type:\n          type: string\n          enum:\n            - capsule\n            - probe\n            - satellite\n            - spaceplane\n            - station\n        description:\n          type: string\n    Error:\n      type: object\n      required:\n        - message\n      properties:\n        message:\n          description: A human readable error message\n          type: string\n  securitySchemes:\n    ApiKey:\n      type: apiKey\n      in: header\n      name: X-Api-Key\nsecurity:\n  - ApiKey: []\n"
+    updateJsonSchema:
+      value:
+        content: "{\n  \"openapi\": \"3.0.0\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Sample API\",\n    \"description\": \"Buy or rent spacecrafts\"\n  },\n  \"paths\": {\n    \"/spacecrafts/{spacecraftId}\": {\n      \"parameters\": [\n        {\n          \"name\": \"spacecraftId\",\n          \"description\": \"The unique identifier of the spacecraft\",\n          \"in\": \"path\",\n          \"required\": true,\n          \"schema\": {\n            \"$ref\": \"#/components/schemas/SpacecraftId\"\n          }\n        }\n      ],\n      \"get\": {\n        \"summary\": \"Read a spacecraft\",\n        \"responses\": {\n          \"200\": {\n            \"description\": \"The spacecraft corresponding to the provided `spacecraftId`\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Spacecraft\"\n                }\n              }\n            }\n          },\n          \"404\": {\n            \"description\": \"No spacecraft found for the provided `spacecraftId`\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Error\"\n                }\n              }\n            }\n          },\n          \"500\": {\n            \"description\": \"Unexpected error\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Error\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\": {\n      \"SpacecraftId\": {\n        \"description\": \"The unique identifier of a spacecraft\",\n        \"type\": \"string\"\n      },\n      \"Spacecraft\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"id\",\n          \"name\",\n          \"type\"\n        ],\n        \"properties\": {\n          \"id\": {\n            \"$ref\": \"#/components/schemas/SpacecraftId\"\n          },\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"type\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"capsule\",\n              \"probe\",\n              \"satellite\",\n              \"spaceplane\",\n              \"station\"\n            ]\n          },\n          \"description\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"Error\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"message\"\n        ],\n        \"properties\": {\n          \"message\": {\n            \"description\": \"A human readable error message\",\n            \"type\": \"string\"\n          }\n        }\n      }\n    },\n    \"securitySchemes\": {\n      \"ApiKey\": {\n        \"type\": \"apiKey\",\n        \"in\": \"header\",\n        \"name\": \"X-Api-Key\"\n      }\n    }\n  },\n  \"security\": [\n    {\n      \"ApiKey\": [\n\n      ]\n    }\n  ]\n}"
+    createJsonSchema:
+      value:
+        type: openapi:3
+        files:
+        - path: index.json
+          content: "{\n  \"openapi\": \"3.0.0\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Sample API\",\n    \"description\": \"Buy or rent spacecrafts\"\n  },\n  \"paths\": {\n    \"/spacecrafts/{spacecraftId}\": {\n      \"parameters\": [\n        {\n          \"name\": \"spacecraftId\",\n          \"description\": \"The unique identifier of the spacecraft\",\n          \"in\": \"path\",\n          \"required\": true,\n          \"schema\": {\n            \"$ref\": \"#/components/schemas/SpacecraftId\"\n          }\n        }\n      ],\n      \"get\": {\n        \"summary\": \"Read a spacecraft\",\n        \"responses\": {\n          \"200\": {\n            \"description\": \"The spacecraft corresponding to the provided `spacecraftId`\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Spacecraft\"\n                }\n              }\n            }\n          },\n          \"404\": {\n            \"description\": \"No spacecraft found for the provided `spacecraftId`\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Error\"\n                }\n              }\n            }\n          },\n          \"500\": {\n            \"description\": \"Unexpected error\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Error\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\": {\n      \"SpacecraftId\": {\n        \"description\": \"The unique identifier of a spacecraft\",\n        \"type\": \"string\"\n      },\n      \"Spacecraft\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"id\",\n          \"name\",\n          \"type\"\n        ],\n        \"properties\": {\n          \"id\": {\n            \"$ref\": \"#/components/schemas/SpacecraftId\"\n          },\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"type\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"capsule\",\n              \"probe\",\n              \"satellite\",\n              \"spaceplane\",\n              \"station\"\n            ]\n          },\n          \"description\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"Error\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"message\"\n        ],\n        \"properties\": {\n          \"message\": {\n            \"description\": \"A human readable error message\",\n            \"type\": \"string\"\n          }\n        }\n      }\n    },\n    \"securitySchemes\": {\n      \"ApiKey\": {\n        \"type\": \"apiKey\",\n        \"in\": \"header\",\n        \"name\": \"X-Api-Key\"\n      }\n    }\n  },\n  \"security\": [\n    {\n      \"ApiKey\": [\n\n      ]\n    }\n  ]\n}"
+    api403ErrorForbidden:
+      value:
+        title: You are not permitted to perform the action.
+        detail: Please ensure that you have required permissions
+        type: ForbiddenError
+    apiSchema403ErrorForbidden:
+      value:
+        title: You are not permitted to perform the action.
+        detail: You do not have access to perform this operation.
+        type: ForbiddenError
+  schemas:
+    apiSchema400ErrorNotLinked:
+      title: Schema Not Linked to API
+      type: object
+      properties:
+        type:
+          type: string
+          description: The error type.
+          example: invalidParamError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Invalid param error
+        detail:
+          type: string
+          description: Details about the error.
+          example: Schema is not linked to the API
+    v10HeaderMissing:
+      title: Missing v10 Accept Header
+      type: object
+      properties:
+        name:
+          type: string
+          description: The error name.
+          example: instanceNotFoundError
+        message:
+          type: string
+          description: The error message.
+          example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    api404ErrorInstanceNotFound:
+      title: API Not Found
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: instanceNotFoundError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Resource not found
+        detail:
+          type: string
+          description: Information about the error.
+          example: We could not find the API you are looking for
+    apiVersionId:
+      type: string
+      example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+    featureUnavailable403Error:
+      title: Feature Unavailable
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Forbidden
+        detail:
+          type: string
+          description: Information about the error.
+          example: This feature isn't available in your region.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+    limit:
+      type: integer
+      default: 10
+      example: 10
+    apiSchema403ErrorForbidden:
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: ForbiddenError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: You are not permitted to perform the action.
+        detail:
+          type: string
+          description: Information about the error.
+          example: You do not have access to perform this operation.
+    apiSchema404ErrorNotFound:
+      title: Schema Not Found
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: instanceNotFoundError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Schema not found
+        detail:
+          type: string
+          description: Information about the error.
+          example: We could not find a schema linked to this API
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
+    api403ErrorForbidden:
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: ForbiddenError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: You are not permitted to perform the action.
+        detail:
+          type: string
+          description: Information about the error.
+          example: Please ensure that you have required permissions
+    apiSchema400ErrorInvalidParams:
+      title: Schema Already Exists
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: invalidParamsError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Could not create the resource
+        detail:
+          type: string
+          description: Information about the error.
+          example: Schema already exists for this API
+  parameters:
+    v10Accept:
+      name: Accept
+      in: header
+      required: true
+      description: The `application/vnd.api.v10+json` request header required to use the endpoint.
+      schema:
+        type: string
+        enum:
+        - application/vnd.api.v10+json
+        example: application/vnd.api.v10+json
+    apiId:
+      name: apiId
+      in: path
+      required: true
+      description: The API's ID.
+      schema:
+        type: string
+        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
+    cursor:
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
+    apiSchemaOutput:
+      name: bundled
+      in: query
+      description: If true, return the schema in a bundled format.
+      schema:
+        type: boolean
+        default: false
+        example: true
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of rows to return in the response.
+      schema:
+        $ref: '#/components/schemas/limit'
+    apiVersionQuery:
+      name: versionId
+      in: query
+      description: The API's version ID.
+      schema:
+        $ref: '#/components/schemas/apiVersionId'
+    file-path:
+      name: file-path
+      in: path
+      required: true
+      description: The path to the schema file.
+      schema:
+        type: string
+        example: postman/collection/c1.json
+    apiSchemaId:
+      name: schemaId
+      in: path
+      required: true
+      description: The API schema's ID.
+      schema:
+        type: string
+        example: 5381f010-c4c1-11ed-afa1-0242ac120002
+  requestBodies:
+    createApiSchema:
+      description: The request body to create an API schema.
+      content:
+        application/json:
+          schema:
+            description: Information about the API schema.
+            title: Create API Schema
+            type: object
+            required:
+            - type
+            - files
+            properties:
+              type:
+                type: string
+                description: The schema's type.
+                enum:
+                - proto:2
+                - proto:3
+                - graphql
+                - openapi:3_1
+                - openapi:3
+                - openapi:2
+                - openapi:1
+                - raml:1
+                - raml:0_8
+                - wsdl:2
+                - wsdl:1
+                - asyncapi:2
+                example: openapi:3
+              files:
+                type: array
+                description: The list of files that are part of the schema.
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: The schema's file path.
+                      example: index.json
+                    root:
+                      type: object
+                      description: Information about the schema's root file.
+                      properties:
+                        enabled:
+                          type: boolean
+                          default: true
+                          description: If true, tag the file as the root file. You can only update the root tag for protobuf specifications.
+                          example: true
+                    content:
+                      type: string
+                      description: The schema file's stringified contents.
+          examples:
+            Create JSON Schema:
+              $ref: '#/components/examples/createJsonSchema'
+            Create YAML Schema:
+              $ref: '#/components/examples/createYamlSchema'
+            Create GraphQL Schema:
+              $ref: '#/components/examples/createGraphQlSchema'
+            Create Schema with Proto:
+              $ref: '#/components/examples/createProtoSchema'
+    createUpdateApiSchemaFile:
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Information about schema file.
+            properties:
+              name:
+                type: string
+                description: The schema file's name.
+                example: index.json
+              root:
+                type: object
+                description: Information about the schema's root file.
+                properties:
+                  enabled:
+                    type: boolean
+                    description: If true, tag the file as the root file. You can only update the root tag for protobuf specifications.
+                    example: true
+              content:
+                type: string
+                description: The schema file's stringified contents.
+                example: "{\n  \"openapi\": \"3.1.0\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Sample API\",\n    \"description\": \"Buy or rent spacecrafts\"\n  },\n  \"paths\": {\n    \"/spacecrafts/{spacecraftId}\": {\n      \"parameters\": [\n        {\n          \"name\": \"spacecraftId\",\n          \"description\": \"The unique identifier of the spacecraft\",\n          \"in\": \"path\",\n          \"required\": true,\n          \"schema\": {\n            \"$ref\": \"#/components/schemas/SpacecraftId\"\n          }\n        }\n      ],\n      \"get\": {\n        \"summary\": \"Read a spacecraft\",\n        \"responses\": {\n          \"200\": {\n            \"description\": \"The spacecraft corresponding to the provided `spacecraftId`\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Spacecraft\"\n                }\n              }\n            }\n          },\n          \"404\": {\n            \"description\": \"No spacecraft found for the provided `spacecraftId`\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Error\"\n                }\n              }\n            }\n          },\n          \"500\": {\n            \"description\": \"Unexpected error\",\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/Error\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\": {\n      \"SpacecraftId\": {\n        \"description\": \"The unique identifier of a spacecraft\",\n        \"type\": \"string\"\n      },\n      \"Spacecraft\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"id\",\n          \"name\",\n          \"type\"\n        ],\n        \"properties\": {\n          \"id\": {\n            \"$ref\": \"#/components/schemas/SpacecraftId\"\n          },\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"type\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"capsule\",\n              \"probe\",\n              \"satellite\",\n              \"spaceplane\",\n              \"station\"\n            ]\n          },\n          \"description\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"Error\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"message\"\n        ],\n        \"properties\": {\n          \"message\": {\n            \"description\": \"A human readable error message\",\n            \"type\": \"string\"\n          }\n        }\n      }\n    },\n    \"securitySchemes\": {\n      \"ApiKey\": {\n        \"type\": \"apiKey\",\n        \"in\": \"header\",\n        \"name\": \"X-Api-Key\"\n      }\n    }\n  },\n  \"security\": [\n    {\n      \"ApiKey\": [\n\n      ]\n    }\n  ]\n}"
+          examples:
+            JSON Schema:
+              $ref: '#/components/examples/updateJsonSchema'
+            YAML Schema:
+              $ref: '#/components/examples/updateYamlSchema'
+            GraphQL Schema:
+              $ref: '#/components/examples/updateGraphQlSchema'
+            Update root Tag:
+              value:
+                root:
+                  enabled: true
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true

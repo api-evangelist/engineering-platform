@@ -1,0 +1,422 @@
+openapi: 3.0.0
+info:
+  version: 2015-07-09
+  x-release: v4
+  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Workers KV Stored Data Analytics API
+  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  x-logo:
+    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
+    backgroundColor: '#FFFFFF'
+  termsOfService: https://aws.amazon.com/service-terms/
+  contact:
+    name: Mike Ralphson
+    email: mike.ralphson@gmail.com
+    url: https://github.com/mermade/aws2openapi
+    x-twitter: PermittedSoc
+  license:
+    name: Apache 2.0 License
+    url: http://www.apache.org/licenses/
+  x-providerName: amazonaws.com
+  x-serviceName: apigateway
+  x-origin:
+  - contentType: application/json
+    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
+    converter:
+      url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
+    x-apisguru-driver: external
+  x-apiClientRegistration:
+    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
+  x-apisguru-categories:
+  - cloud
+  x-preferred: true
+servers:
+- url: http://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: https://apigateway.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The Amazon API Gateway multi-region endpoint
+- url: http://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: https://apigateway.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+security:
+- hmac: []
+tags:
+- name: Workers KV Stored Data Analytics
+paths:
+  /accounts/{account_id}/storage/analytics/stored:
+    get:
+      description: Retrieves Workers KV stored data metrics for the given account.
+      operationId: workers-kv-stored-data-analytics-query-stored-data-analytics
+      parameters:
+      - in: path
+        name: account_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/workers-kv_identifier'
+      - in: query
+        name: query
+        schema:
+          allOf:
+          - $ref: '#/components/schemas/workers-kv_query'
+          - properties:
+              dimensions:
+                example:
+                - namespaceId
+                items:
+                  enum:
+                  - namespaceId
+              filters:
+                example: namespaceId==a4e8cbb7-1b58-4990-925e-e026d40c4c64
+              metrics:
+                default: '["storedBytes"]'
+                example:
+                - storedBytes
+                - storedKeys
+                items:
+                  enum:
+                  - storedBytes
+                  - storedKeys
+              sort:
+                example:
+                - +storedBytes
+                - -namespaceId
+      responses:
+        4XX:
+          content:
+            application/json:
+              schema:
+                allOf:
+                - allOf:
+                  - $ref: '#/components/schemas/workers-kv_api-response-common'
+                  - properties:
+                      result:
+                        $ref: '#/components/schemas/workers-kv_result'
+                    type: object
+                - $ref: '#/components/schemas/workers-kv_api-response-common-failure'
+          description: Query Stored Data Analytics response failure
+        '200':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/workers-kv_api-response-common'
+                - properties:
+                    result:
+                      $ref: '#/components/schemas/workers-kv_components-schemas-result'
+                  type: object
+          description: Query Stored Data Analytics response
+      security:
+      - api_token: []
+      - api_email: []
+        api_key: []
+      summary: APIs.io Engineering Platform Query Stored Data Analytics
+      tags:
+      - Workers KV Stored Data Analytics
+      x-api-token-group:
+      - Workers KV Storage Write
+      - Workers KV Storage Read
+components:
+  schemas:
+    workers-kv_result:
+      description: Metrics on Workers KV requests.
+      properties:
+        data:
+          items:
+            properties:
+              dimensions:
+                items:
+                  type: string
+                type: array
+              metrics:
+                description: List of metrics returned by the query.
+                items:
+                  items:
+                    format: float
+                    type: number
+                  type: array
+                type: array
+            required:
+            - metrics
+            type: object
+          nullable: true
+          type: array
+        data_lag:
+          description: Number of seconds between current time and last processed event, i.e. how many seconds of data could be missing.
+          example: 0
+          minimum: 0
+          type: number
+        max:
+          additionalProperties:
+            type: number
+          description: Maximum results for each metric.
+          type: object
+        min:
+          additionalProperties:
+            type: number
+          description: Minimum results for each metric.
+          type: object
+        query:
+          $ref: '#/components/schemas/workers-kv_query'
+        rows:
+          description: Total number of rows in the result.
+          example: 2
+          minimum: 0
+          type: number
+        time_intervals:
+          description: Time interval buckets by beginning and ending
+          items:
+            items:
+              example: '2019-01-02T02:20:00Z'
+              format: date-time
+              maxItems: 2
+              minItems: 2
+              type: string
+            type: array
+          type: array
+        totals:
+          additionalProperties:
+            type: number
+          description: Total results for metrics across all data.
+          type: object
+      required:
+      - rows
+      - data
+      - data_lag
+      - min
+      - max
+      - totals
+      - query
+      type: object
+    workers-kv_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers-kv_messages'
+        messages:
+          $ref: '#/components/schemas/workers-kv_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers-kv_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/workers-kv_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/workers-kv_messages'
+          example: []
+        result:
+          nullable: true
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    workers-kv_query:
+      description: For specifying result metrics.
+      properties:
+        dimensions:
+          default: '[]'
+          description: Can be used to break down the data by given attributes.
+          items:
+            description: For drilling down on metrics.
+            type: string
+          type: array
+        filters:
+          default: '""'
+          description: 'Used to filter rows by one or more dimensions. Filters can be combined using OR and AND boolean logic. AND takes precedence over OR in all the expressions. The OR operator is defined using a comma (,) or OR keyword surrounded by whitespace. The AND operator is defined using a semicolon (;) or AND keyword surrounded by whitespace. Note that the semicolon is a reserved character in URLs (rfc1738) and needs to be percent-encoded as %3B. Comparison options are:
+
+
+            Operator                  | Name                            | URL Encoded
+
+            --------------------------|---------------------------------|--------------------------
+
+            ==                        | Equals                          | %3D%3D
+
+            !=                        | Does not equals                 | !%3D
+
+            >                        | Greater Than                    | %3E
+
+            <                         | Less Than                       | %3C
+
+            >=                       | Greater than or equal to        | %3E%3D
+
+            <=                        | Less than or equal to           | %3C%3D     .'
+          type: string
+        limit:
+          default: 10000
+          description: Limit number of returned metrics.
+          type: integer
+        metrics:
+          description: One or more metrics to compute.
+          items:
+            description: A quantitative measurement of KV usage.
+            type: string
+          type: array
+        since:
+          default: <6 hours ago>
+          description: Start of time interval to query, defaults to 6 hours before request received.
+          example: '2019-01-02T02:20:00Z'
+          format: date-time
+          type: string
+        sort:
+          default: '[]'
+          description: Array of dimensions or metrics to sort by, each dimension/metric may be prefixed by - (descending) or + (ascending).
+          items:
+            type: string
+          type: array
+        until:
+          default: <now>
+          description: End of time interval to query, defaults to current time.
+          example: '2019-01-02T03:20:00Z'
+          format: date-time
+          type: string
+      type: object
+    workers-kv_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    workers-kv_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    workers-kv_components-schemas-result:
+      allOf:
+      - $ref: '#/components/schemas/workers-kv_result'
+      - properties:
+          data:
+            example:
+            - metrics:
+              - - 2
+                - 4
+              - - 16
+                - 32
+          max:
+            example:
+              storedBytes: 32
+              storedKeys: 4
+          min:
+            example:
+              storedBytes: 16
+              storedKeys: 2
+          query:
+            $ref: '#/components/schemas/workers-kv_query'
+          totals:
+            example:
+              storedBytes: 48
+              storedKeys: 6
+  securitySchemes:
+    hmac:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: Amazon Signature authorization v4
+      x-amazon-apigateway-authtype: awsSigv4
+externalDocs:
+  description: Amazon Web Services documentation
+  url: https://docs.aws.amazon.com/apigateway/
+x-hasEquivalentPaths: true
