@@ -1,8 +1,8 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  version: "1.0.0"
+  version: 2015-07-09
   x-release: v4
-  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Usageplans API
+  title: APIs.io Engineering Platform Amazon API Gateway Usageplans API
   description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
   x-logo:
     url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
@@ -23,6 +23,7 @@ info:
     url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
     converter:
       url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
     x-apisguru-driver: external
   x-apiClientRegistration:
     url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
@@ -858,109 +859,28 @@ paths:
       tags:
       - Usageplans
 components:
-  parameters:
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Credential:
-      name: X-Amz-Credential
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Date:
-      name: X-Amz-Date
-      in: header
-      schema:
-        type: string
-      required: false
   schemas:
-    TooManyRequestsException: {}
-    QuotaPeriodType:
-      type: string
-      enum:
-      - DAY
-      - WEEK
-      - MONTH
-    NotFoundException: {}
-    Double:
-      type: number
-      format: double
-    Op:
-      type: string
-      enum:
-      - add
-      - remove
-      - replace
-      - move
-      - copy
-      - test
-    ListOfUsage:
-      type: array
-      items:
-        $ref: '#/components/schemas/ListOfLong'
-    Integer:
-      type: integer
-    UnauthorizedException: {}
-    Usage:
+    ConflictException: {}
+    UsagePlanKey:
       type: object
       properties:
-        usagePlanId:
+        id:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The plan Id associated with this usage data.
-        startDate:
+          - description: The Id of a usage plan key.
+        type:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The starting date of the usage data.
-        endDate:
+          - description: The type of a usage plan key. Currently, the valid key type is <code>API_KEY</code>.
+        value:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The ending date of the usage data.
-        position:
-          $ref: '#/components/schemas/String'
-        items:
+          - description: The value of a usage plan key.
+        name:
           allOf:
-          - $ref: '#/components/schemas/MapOfKeyUsages'
-          - xml:
-              name: values
-            description: 'The usage data, as daily logs of used and remaining quotas, over the specified time interval indexed over the API keys in a usage plan. For example, <code>{..., "values" : { "{api_key}" : [ [0, 100], [10, 90], [100, 10]]}</code>, where <code>{api_key}</code> stands for an API key value and the daily log entry is of the format <code>[used quota, remaining quota]</code>.'
-      description: Represents the usage data of a usage plan.
-    ConflictException: {}
-    MapOfKeyUsages:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/ListOfUsage'
-    Long:
-      type: integer
-    BadRequestException: {}
+          - $ref: '#/components/schemas/String'
+          - description: The name of a usage plan key.
+      description: Represents a usage plan key to identify a plan customer.
     PatchOperation:
       type: object
       properties:
@@ -981,45 +901,6 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
       description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
-    LimitExceededException: {}
-    ApiStage:
-      type: object
-      properties:
-        apiId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: API Id of the associated API stage in a usage plan.
-        stage:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: API stage name of the associated API stage in a usage plan.
-        throttle:
-          allOf:
-          - $ref: '#/components/schemas/MapOfApiStageThrottleSettings'
-          - description: Map containing method level throttling information for API stage in a usage plan.
-      description: API stage name of the associated API stage in a usage plan.
-    MapOfApiStageThrottleSettings:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/ThrottleSettings'
-    ListOfUsagePlanKey:
-      type: array
-      items:
-        $ref: '#/components/schemas/UsagePlanKey'
-    ListOfUsagePlan:
-      type: array
-      items:
-        $ref: '#/components/schemas/UsagePlan'
-    ListOfLong:
-      type: array
-      items:
-        $ref: '#/components/schemas/Long'
-    String:
-      type: string
-    MapOfStringToString:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/String'
     UsagePlan:
       type: object
       properties:
@@ -1056,38 +937,56 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: Represents a usage plan used to specify who can assess associated API stages. Optionally, target request rate and quota limits can be set. In some cases clients can exceed the targets that you set. Don't rely on usage plans to control costs. Consider using <a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">Amazon Web Services Budgets</a> to monitor costs and <a href="https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html">WAF</a> to manage API requests.
-    ThrottleSettings:
+    MapOfStringToString:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    ListOfUsagePlan:
+      type: array
+      items:
+        $ref: '#/components/schemas/UsagePlan'
+    ApiStage:
       type: object
       properties:
-        burstLimit:
+        apiId:
           allOf:
-          - $ref: '#/components/schemas/Integer'
-          - description: The API target request burst rate limit. This allows more requests through for a period of time than the target rate limit.
-        rateLimit:
+          - $ref: '#/components/schemas/String'
+          - description: API Id of the associated API stage in a usage plan.
+        stage:
           allOf:
-          - $ref: '#/components/schemas/Double'
-          - description: The API target request rate limit.
-      description: ' The API request rate limits.'
-    UsagePlanKey:
+          - $ref: '#/components/schemas/String'
+          - description: API stage name of the associated API stage in a usage plan.
+        throttle:
+          allOf:
+          - $ref: '#/components/schemas/MapOfApiStageThrottleSettings'
+          - description: Map containing method level throttling information for API stage in a usage plan.
+      description: API stage name of the associated API stage in a usage plan.
+    Long:
+      type: integer
+    Usage:
       type: object
       properties:
-        id:
+        usagePlanId:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The Id of a usage plan key.
-        type:
+          - description: The plan Id associated with this usage data.
+        startDate:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The type of a usage plan key. Currently, the valid key type is <code>API_KEY</code>.
-        value:
+          - description: The starting date of the usage data.
+        endDate:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The value of a usage plan key.
-        name:
+          - description: The ending date of the usage data.
+        position:
+          $ref: '#/components/schemas/String'
+        items:
           allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The name of a usage plan key.
-      description: Represents a usage plan key to identify a plan customer.
+          - $ref: '#/components/schemas/MapOfKeyUsages'
+          - xml:
+              name: values
+            description: 'The usage data, as daily logs of used and remaining quotas, over the specified time interval indexed over the API keys in a usage plan. For example, <code>{..., "values" : { "{api_key}" : [ [0, 100], [10, 90], [100, 10]]}</code>, where <code>{api_key}</code> stands for an API key value and the daily log entry is of the format <code>[used quota, remaining quota]</code>.'
+      description: Represents the usage data of a usage plan.
     UsagePlans:
       type: object
       properties:
@@ -1100,22 +999,30 @@ components:
               name: item
             description: The current page of elements from this collection.
       description: Represents a collection of usage plans for an AWS account.
-    UsagePlanKeys:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfUsagePlanKey'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents the collection of usage plan keys added to usage plans for the associated API keys and, possibly, other types of keys.
+    LimitExceededException: {}
     ListOfApiStage:
       type: array
       items:
         $ref: '#/components/schemas/ApiStage'
+    MapOfApiStageThrottleSettings:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ThrottleSettings'
+    MapOfKeyUsages:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ListOfUsage'
+    UnauthorizedException: {}
+    String:
+      type: string
+    NotFoundException: {}
+    Double:
+      type: number
+      format: double
+    ListOfUsagePlanKey:
+      type: array
+      items:
+        $ref: '#/components/schemas/UsagePlanKey'
     QuotaSettings:
       type: object
       properties:
@@ -1132,6 +1039,100 @@ components:
           - $ref: '#/components/schemas/QuotaPeriodType'
           - description: The time period in which the limit applies. Valid values are "DAY", "WEEK" or "MONTH".
       description: Quotas configured for a usage plan.
+    Op:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      - move
+      - copy
+      - test
+    ThrottleSettings:
+      type: object
+      properties:
+        burstLimit:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          - description: The API target request burst rate limit. This allows more requests through for a period of time than the target rate limit.
+        rateLimit:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          - description: The API target request rate limit.
+      description: ' The API request rate limits.'
+    ListOfUsage:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListOfLong'
+    Integer:
+      type: integer
+    BadRequestException: {}
+    TooManyRequestsException: {}
+    UsagePlanKeys:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfUsagePlanKey'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents the collection of usage plan keys added to usage plans for the associated API keys and, possibly, other types of keys.
+    ListOfLong:
+      type: array
+      items:
+        $ref: '#/components/schemas/Long'
+    QuotaPeriodType:
+      type: string
+      enum:
+      - DAY
+      - WEEK
+      - MONTH
+  parameters:
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Credential:
+      name: X-Amz-Credential
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
   securitySchemes:
     hmac:
       type: apiKey

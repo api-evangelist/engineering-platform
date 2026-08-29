@@ -1,115 +1,22 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  version: "1.0.0"
-  x-release: v4
-  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Queue API
-  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
-  x-logo:
-    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
-    backgroundColor: '#FFFFFF'
-  termsOfService: https://aws.amazon.com/service-terms/
-  contact:
-    name: Mike Ralphson
-    email: mike.ralphson@gmail.com
-    url: https://github.com/mermade/aws2openapi
-    x-twitter: PermittedSoc
+  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
+
+
+    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
   license:
-    name: Apache 2.0 License
-    url: http://www.apache.org/licenses/
-  x-providerName: amazonaws.com
-  x-serviceName: apigateway
-  x-origin:
-  - contentType: application/json
-    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
-    converter:
-      url: https://github.com/mermade/aws2openapi
-    x-apisguru-driver: external
-  x-apiClientRegistration:
-    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
-  x-apisguru-categories:
-  - cloud
-  x-preferred: true
-servers:
-- url: http://apigateway.{region}.amazonaws.com
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - us-east-1
-      - us-east-2
-      - us-west-1
-      - us-west-2
-      - us-gov-west-1
-      - us-gov-east-1
-      - ca-central-1
-      - eu-north-1
-      - eu-west-1
-      - eu-west-2
-      - eu-west-3
-      - eu-central-1
-      - eu-south-1
-      - af-south-1
-      - ap-northeast-1
-      - ap-northeast-2
-      - ap-northeast-3
-      - ap-southeast-1
-      - ap-southeast-2
-      - ap-east-1
-      - ap-south-1
-      - sa-east-1
-      - me-south-1
-      default: us-east-1
-  description: The Amazon API Gateway multi-region endpoint
-- url: https://apigateway.{region}.amazonaws.com
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - us-east-1
-      - us-east-2
-      - us-west-1
-      - us-west-2
-      - us-gov-west-1
-      - us-gov-east-1
-      - ca-central-1
-      - eu-north-1
-      - eu-west-1
-      - eu-west-2
-      - eu-west-3
-      - eu-central-1
-      - eu-south-1
-      - af-south-1
-      - ap-northeast-1
-      - ap-northeast-2
-      - ap-northeast-3
-      - ap-southeast-1
-      - ap-southeast-2
-      - ap-east-1
-      - ap-south-1
-      - sa-east-1
-      - me-south-1
-      default: us-east-1
-  description: The Amazon API Gateway multi-region endpoint
-- url: http://apigateway.{region}.amazonaws.com.cn
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - cn-north-1
-      - cn-northwest-1
-      default: cn-north-1
-  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
-- url: https://apigateway.{region}.amazonaws.com.cn
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - cn-north-1
-      - cn-northwest-1
-      default: cn-north-1
-  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
-security:
-- hmac: []
+    name: BSD-3-Clause
+    url: https://opensource.org/licenses/BSD-3-Clause
+  title: APIs.io Engineering Platform Cloudflare Queue API
+  version: 4.0.0
 tags:
 - name: Queue
 paths:
@@ -973,64 +880,47 @@ paths:
         - com.cloudflare.edge.worker.queue.update
 components:
   schemas:
-    mq_queue_created:
+    mq_producer:
       properties:
-        created_on:
+        environment:
           readOnly: true
           type: string
-        modified_on:
+        service:
           readOnly: true
           type: string
-        queue_id:
-          readOnly: true
-          type: string
-        queue_name:
-          $ref: '#/components/schemas/mq_name'
       type: object
-    mq_queue_updated:
+    mq_api-response-common:
       properties:
-        created_on:
-          readOnly: true
-          type: string
-        modified_on:
-          readOnly: true
-          type: string
-        queue_id:
-          readOnly: true
-          type: string
-        queue_name:
-          $ref: '#/components/schemas/mq_renamed_name'
+        errors:
+          $ref: '#/components/schemas/mq_messages'
+        messages:
+          $ref: '#/components/schemas/mq_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
       type: object
-    mq_queue_message:
-      properties:
-        attempts:
-          example: 1
-          readOnly: true
-          type: number
-        body:
-          example: hello world
-          readOnly: true
-          type: string
-        id:
-          example: b01b5594f784d0165c2985833f5660dd
-          readOnly: true
-          type: string
-        lease_id:
-          $ref: '#/components/schemas/mq_lease_id'
-        metadata:
-          example:
-            CF-Content-Type: text
-            CF-sourceMessageSource: dash
-          readOnly: true
-          type: object
-        timestamp_ms:
-          example: 1710950954154.0
-          readOnly: true
-          type: number
-      type: object
-    mq_visibility_timeout:
-      description: The number of milliseconds that a message is exclusively leased. After the timeout, the message becomes available for another attempt.
-      example: 6000
+    mq_identifier:
+      description: Identifier.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    mq_max_wait_time_ms:
+      example: 5000
       type: number
     mq_consumer_updated:
       properties:
@@ -1059,34 +949,88 @@ components:
               $ref: '#/components/schemas/mq_max_wait_time_ms'
           type: object
       type: object
-    mq_api-response-common:
+    mq_queue_updated:
       properties:
-        errors:
-          $ref: '#/components/schemas/mq_messages'
-        messages:
-          $ref: '#/components/schemas/mq_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
+        created_on:
+          readOnly: true
+          type: string
+        modified_on:
+          readOnly: true
+          type: string
+        queue_id:
+          readOnly: true
+          type: string
+        queue_name:
+          $ref: '#/components/schemas/mq_renamed_name'
       type: object
-    mq_lease_id:
-      example: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..Q8p21d7dceR6vUfwftONdQ.JVqZgAS-Zk7MqmqccYtTHeeMElNHaOMigeWdb8LyMOg.T2_HV99CYzGaQuhTyW8RsgbnpTRZHRM6N7UoSaAKeK0
-      readOnly: true
+    mq_max_retries:
+      description: The maximum number of retries
+      example: 3
+      type: number
+    mq_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service.
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results.
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results.
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters.
+          example: 2000
+          type: number
+      type: object
+    mq_batch_size:
+      description: The maximum number of messages to include in a batch.
+      example: 50
+      type: number
+    mq_name:
+      example: example-queue
       type: string
+    mq_consumer:
+      properties:
+        created_on:
+          readOnly: true
+          type: string
+        environment:
+          readOnly: true
+          type: string
+        queue_name:
+          readOnly: true
+          type: string
+        service:
+          readOnly: true
+          type: string
+        settings:
+          properties:
+            batch_size:
+              $ref: '#/components/schemas/mq_batch_size'
+            max_retries:
+              $ref: '#/components/schemas/mq_max_retries'
+            max_wait_time_ms:
+              $ref: '#/components/schemas/mq_max_wait_time_ms'
+          type: object
+      type: object
+    mq_queue_created:
+      properties:
+        created_on:
+          readOnly: true
+          type: string
+        modified_on:
+          readOnly: true
+          type: string
+        queue_id:
+          readOnly: true
+          type: string
+        queue_name:
+          $ref: '#/components/schemas/mq_name'
+      type: object
     mq_queue:
       properties:
         consumers:
@@ -1117,33 +1061,13 @@ components:
         queue_name:
           $ref: '#/components/schemas/mq_name'
       type: object
-    mq_name:
-      example: example-queue
+    mq_renamed_name:
+      example: renamed-example-queue
       type: string
-    mq_consumer:
-      properties:
-        created_on:
-          readOnly: true
-          type: string
-        environment:
-          readOnly: true
-          type: string
-        queue_name:
-          readOnly: true
-          type: string
-        service:
-          readOnly: true
-          type: string
-        settings:
-          properties:
-            batch_size:
-              $ref: '#/components/schemas/mq_batch_size'
-            max_retries:
-              $ref: '#/components/schemas/mq_max_retries'
-            max_wait_time_ms:
-              $ref: '#/components/schemas/mq_max_wait_time_ms'
-          type: object
-      type: object
+    mq_lease_id:
+      example: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..Q8p21d7dceR6vUfwftONdQ.JVqZgAS-Zk7MqmqccYtTHeeMElNHaOMigeWdb8LyMOg.T2_HV99CYzGaQuhTyW8RsgbnpTRZHRM6N7UoSaAKeK0
+      readOnly: true
+      type: string
     mq_messages:
       example: []
       items:
@@ -1159,99 +1083,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    mq_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/mq_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/mq_messages'
-          example: []
-        result:
-          enum:
-          - null
-          nullable: true
-          type: object
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    mq_identifier:
-      description: Identifier.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    mq_max_retries:
-      description: The maximum number of retries
-      example: 3
-      type: number
-    mq_dlq_name:
-      description: The name of the dead letter queue.
-      example: example-dlq
-      type: string
-    mq_batch_size:
-      description: The maximum number of messages to include in a batch.
-      example: 50
-      type: number
-    mq_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service.
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results.
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results.
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters.
-          example: 2000
-          type: number
-      type: object
-    mq_renamed_name:
-      example: renamed-example-queue
-      type: string
-    mq_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/mq_api-response-common'
-      - properties:
-          result:
-            items: {}
-            nullable: true
-            type: array
-          result_info:
-            $ref: '#/components/schemas/mq_result_info'
-      type: object
-    mq_producer:
-      properties:
-        environment:
-          readOnly: true
-          type: string
-        service:
-          readOnly: true
-          type: string
-      type: object
-    mq_max_wait_time_ms:
-      example: 5000
-      type: number
     mq_consumer_created:
       properties:
         created_on:
@@ -1278,14 +1109,97 @@ components:
               $ref: '#/components/schemas/mq_max_wait_time_ms'
           type: object
       type: object
+    mq_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/mq_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/mq_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    mq_dlq_name:
+      description: The name of the dead letter queue.
+      example: example-dlq
+      type: string
+    mq_visibility_timeout:
+      description: The number of milliseconds that a message is exclusively leased. After the timeout, the message becomes available for another attempt.
+      example: 6000
+      type: number
+    mq_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/mq_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/mq_result_info'
+      type: object
+    mq_queue_message:
+      properties:
+        attempts:
+          example: 1
+          readOnly: true
+          type: number
+        body:
+          example: hello world
+          readOnly: true
+          type: string
+        id:
+          example: b01b5594f784d0165c2985833f5660dd
+          readOnly: true
+          type: string
+        lease_id:
+          $ref: '#/components/schemas/mq_lease_id'
+        metadata:
+          example:
+            CF-Content-Type: text
+            CF-sourceMessageSource: dash
+          readOnly: true
+          type: object
+        timestamp_ms:
+          example: 1710950954154.0
+          readOnly: true
+          type: number
+      type: object
   securitySchemes:
-    hmac:
-      type: apiKey
-      name: Authorization
+    api_email:
       in: header
-      description: Amazon Signature authorization v4
-      x-amazon-apigateway-authtype: awsSigv4
-externalDocs:
-  description: Amazon Web Services documentation
-  url: https://docs.aws.amazon.com/apigateway/
-x-hasEquivalentPaths: true
+      name: X-Auth-Email
+      type: apiKey
+    api_key:
+      in: header
+      name: X-Auth-Key
+      type: apiKey
+    api_token:
+      scheme: bearer
+      type: http
+    user_service_key:
+      in: header
+      name: X-Auth-User-Service-Key
+      type: apiKey

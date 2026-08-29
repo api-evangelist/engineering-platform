@@ -1,115 +1,22 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  version: "1.0.0"
-  x-release: v4
-  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 DNS Firewall Analytics API
-  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
-  x-logo:
-    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
-    backgroundColor: '#FFFFFF'
-  termsOfService: https://aws.amazon.com/service-terms/
-  contact:
-    name: Mike Ralphson
-    email: mike.ralphson@gmail.com
-    url: https://github.com/mermade/aws2openapi
-    x-twitter: PermittedSoc
+  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
+
+
+    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
   license:
-    name: Apache 2.0 License
-    url: http://www.apache.org/licenses/
-  x-providerName: amazonaws.com
-  x-serviceName: apigateway
-  x-origin:
-  - contentType: application/json
-    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
-    converter:
-      url: https://github.com/mermade/aws2openapi
-    x-apisguru-driver: external
-  x-apiClientRegistration:
-    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
-  x-apisguru-categories:
-  - cloud
-  x-preferred: true
-servers:
-- url: http://apigateway.{region}.amazonaws.com
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - us-east-1
-      - us-east-2
-      - us-west-1
-      - us-west-2
-      - us-gov-west-1
-      - us-gov-east-1
-      - ca-central-1
-      - eu-north-1
-      - eu-west-1
-      - eu-west-2
-      - eu-west-3
-      - eu-central-1
-      - eu-south-1
-      - af-south-1
-      - ap-northeast-1
-      - ap-northeast-2
-      - ap-northeast-3
-      - ap-southeast-1
-      - ap-southeast-2
-      - ap-east-1
-      - ap-south-1
-      - sa-east-1
-      - me-south-1
-      default: us-east-1
-  description: The Amazon API Gateway multi-region endpoint
-- url: https://apigateway.{region}.amazonaws.com
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - us-east-1
-      - us-east-2
-      - us-west-1
-      - us-west-2
-      - us-gov-west-1
-      - us-gov-east-1
-      - ca-central-1
-      - eu-north-1
-      - eu-west-1
-      - eu-west-2
-      - eu-west-3
-      - eu-central-1
-      - eu-south-1
-      - af-south-1
-      - ap-northeast-1
-      - ap-northeast-2
-      - ap-northeast-3
-      - ap-southeast-1
-      - ap-southeast-2
-      - ap-east-1
-      - ap-south-1
-      - sa-east-1
-      - me-south-1
-      default: us-east-1
-  description: The Amazon API Gateway multi-region endpoint
-- url: http://apigateway.{region}.amazonaws.com.cn
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - cn-north-1
-      - cn-northwest-1
-      default: cn-north-1
-  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
-- url: https://apigateway.{region}.amazonaws.com.cn
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - cn-north-1
-      - cn-northwest-1
-      default: cn-north-1
-  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
-security:
-- hmac: []
+    name: BSD-3-Clause
+    url: https://opensource.org/licenses/BSD-3-Clause
+  title: APIs.io Engineering Platform Cloudflare DNS Firewall Analytics API
+  version: 4.0.0
 tags:
 - name: DNS Firewall Analytics
 paths:
@@ -279,10 +186,37 @@ paths:
         - '#analytics:read'
 components:
   schemas:
-    dns-analytics_filters:
-      description: Segmentation filter in 'attribute operator value' format.
-      example: responseCode==NOERROR,queryType==A
-      type: string
+    dns-analytics_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/dns-analytics_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/dns-analytics_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     dns-analytics_report_bytime:
       allOf:
       - $ref: '#/components/schemas/dns-analytics_result'
@@ -327,31 +261,10 @@ components:
         - time_intervals
         - query
         - data
-    dns-analytics_since:
-      description: Start date and time of requesting data period in ISO 8601 format.
-      example: '2023-11-11T12:00:00Z'
-      format: date-time
+    dns-analytics_dimensions:
+      description: A comma-separated list of dimensions to group results by.
+      example: queryType
       type: string
-    dns-analytics_limit:
-      default: 100000
-      description: Limit number of returned metrics.
-      example: 100
-      type: integer
-    dns-analytics_data:
-      description: Array with one row per combination of dimension values.
-      items:
-        properties:
-          dimensions:
-            description: Array of dimension values, representing the combination of dimension values corresponding to this row.
-            items:
-              description: Dimension value.
-              example: NODATA
-              type: string
-            type: array
-        required:
-        - dimensions
-        type: object
-      type: array
     dns-analytics_api-response-common:
       properties:
         errors:
@@ -369,14 +282,6 @@ components:
       - errors
       - messages
       type: object
-    dns-analytics_sort:
-      description: A comma-separated list of dimensions to sort by, where each dimension may be prefixed by - (descending) or + (ascending).
-      example: +responseCode,-queryName
-      type: string
-    dns-analytics_metrics:
-      description: A comma-separated list of metrics to query.
-      example: queryCount,uncachedCount
-      type: string
     dns-analytics_report:
       allOf:
       - $ref: '#/components/schemas/dns-analytics_result'
@@ -394,49 +299,43 @@ components:
               - metrics
         required:
         - data
-    dns-analytics_dimensions:
-      description: A comma-separated list of dimensions to group results by.
-      example: queryType
+    dns-analytics_filters:
+      description: Segmentation filter in 'attribute operator value' format.
+      example: responseCode==NOERROR,queryType==A
       type: string
-    dns-analytics_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/dns-analytics_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/dns-analytics_messages'
-          example: []
-        result:
-          enum:
-          - null
-          nullable: true
-          type: object
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    dns-analytics_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    dns-analytics_limit:
+      default: 100000
+      description: Limit number of returned metrics.
+      example: 100
+      type: integer
+    dns-analytics_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dns-analytics_sort:
+      description: A comma-separated list of dimensions to sort by, where each dimension may be prefixed by - (descending) or + (ascending).
+      example: +responseCode,-queryName
       type: string
     dns-analytics_until:
       description: End date and time of requesting data period in ISO 8601 format.
       example: '2023-11-11T13:00:00Z'
       format: date-time
+      type: string
+    dns-analytics_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
     dns-analytics_query:
       properties:
@@ -485,10 +384,21 @@ components:
       - until
       - limit
       type: object
-    dns-analytics_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dns-analytics_api-response-common'
-      type: object
+    dns-analytics_data:
+      description: Array with one row per combination of dimension values.
+      items:
+        properties:
+          dimensions:
+            description: Array of dimension values, representing the combination of dimension values corresponding to this row.
+            items:
+              description: Dimension value.
+              example: NODATA
+              type: string
+            type: array
+        required:
+        - dimensions
+        type: object
+      type: array
     dns-analytics_time_delta:
       description: Unit of time to group data by.
       enum:
@@ -504,6 +414,19 @@ components:
       - minute
       example: hour
       type: string
+    dns-analytics_metrics:
+      description: A comma-separated list of metrics to query.
+      example: queryCount,uncachedCount
+      type: string
+    dns-analytics_since:
+      description: Start date and time of requesting data period in ISO 8601 format.
+      example: '2023-11-11T12:00:00Z'
+      format: date-time
+      type: string
+    dns-analytics_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dns-analytics_api-response-common'
+      type: object
     dns-analytics_result:
       properties:
         data:
@@ -538,29 +461,19 @@ components:
       - query
       - data
       type: object
-    dns-analytics_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
   securitySchemes:
-    hmac:
-      type: apiKey
-      name: Authorization
+    api_email:
       in: header
-      description: Amazon Signature authorization v4
-      x-amazon-apigateway-authtype: awsSigv4
-externalDocs:
-  description: Amazon Web Services documentation
-  url: https://docs.aws.amazon.com/apigateway/
-x-hasEquivalentPaths: true
+      name: X-Auth-Email
+      type: apiKey
+    api_key:
+      in: header
+      name: X-Auth-Key
+      type: apiKey
+    api_token:
+      scheme: bearer
+      type: http
+    user_service_key:
+      in: header
+      name: X-Auth-User-Service-Key
+      type: apiKey

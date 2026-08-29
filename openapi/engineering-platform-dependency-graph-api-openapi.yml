@@ -1,115 +1,26 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  version: "1.0.0"
-  x-release: v4
-  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Dependency-Graph API
-  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
-  x-logo:
-    url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
-    backgroundColor: '#FFFFFF'
-  termsOfService: https://aws.amazon.com/service-terms/
-  contact:
-    name: Mike Ralphson
-    email: mike.ralphson@gmail.com
-    url: https://github.com/mermade/aws2openapi
-    x-twitter: PermittedSoc
+  version: 1.1.4
+  title: APIs.io Engineering Platform GitHub v3 REST Dependency Graph API
+  description: GitHub's v3 REST API.
   license:
-    name: Apache 2.0 License
-    url: http://www.apache.org/licenses/
-  x-providerName: amazonaws.com
-  x-serviceName: apigateway
-  x-origin:
-  - contentType: application/json
-    url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
-    converter:
-      url: https://github.com/mermade/aws2openapi
-    x-apisguru-driver: external
-  x-apiClientRegistration:
-    url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
-  x-apisguru-categories:
-  - cloud
-  x-preferred: true
+    name: MIT
+    url: https://spdx.org/licenses/MIT
+  termsOfService: https://docs.github.com/articles/github-terms-of-service
+  contact:
+    name: Support
+    url: https://support.github.com/contact?tags=dotcom-rest-api
+  x-github-plan: ghes
+  x-github-release: 3.9
 servers:
-- url: http://apigateway.{region}.amazonaws.com
+- url: '{protocol}://{hostname}/api/v3'
   variables:
-    region:
-      description: The AWS region
-      enum:
-      - us-east-1
-      - us-east-2
-      - us-west-1
-      - us-west-2
-      - us-gov-west-1
-      - us-gov-east-1
-      - ca-central-1
-      - eu-north-1
-      - eu-west-1
-      - eu-west-2
-      - eu-west-3
-      - eu-central-1
-      - eu-south-1
-      - af-south-1
-      - ap-northeast-1
-      - ap-northeast-2
-      - ap-northeast-3
-      - ap-southeast-1
-      - ap-southeast-2
-      - ap-east-1
-      - ap-south-1
-      - sa-east-1
-      - me-south-1
-      default: us-east-1
-  description: The Amazon API Gateway multi-region endpoint
-- url: https://apigateway.{region}.amazonaws.com
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - us-east-1
-      - us-east-2
-      - us-west-1
-      - us-west-2
-      - us-gov-west-1
-      - us-gov-east-1
-      - ca-central-1
-      - eu-north-1
-      - eu-west-1
-      - eu-west-2
-      - eu-west-3
-      - eu-central-1
-      - eu-south-1
-      - af-south-1
-      - ap-northeast-1
-      - ap-northeast-2
-      - ap-northeast-3
-      - ap-southeast-1
-      - ap-southeast-2
-      - ap-east-1
-      - ap-south-1
-      - sa-east-1
-      - me-south-1
-      default: us-east-1
-  description: The Amazon API Gateway multi-region endpoint
-- url: http://apigateway.{region}.amazonaws.com.cn
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - cn-north-1
-      - cn-northwest-1
-      default: cn-north-1
-  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
-- url: https://apigateway.{region}.amazonaws.com.cn
-  variables:
-    region:
-      description: The AWS region
-      enum:
-      - cn-north-1
-      - cn-northwest-1
-      default: cn-north-1
-  description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
-security:
-- hmac: []
+    hostname:
+      description: Self-hosted Enterprise Server hostname
+      default: HOSTNAME
+    protocol:
+      description: Self-hosted Enterprise Server protocol
+      default: http
 tags:
 - name: Dependency-Graph
   description: Endpoints to access Dependency Graph features.
@@ -252,14 +163,14 @@ paths:
         subcategory: dependency-submission
 components:
   responses:
-    forbidden:
-      description: Forbidden
+    not_found:
+      description: Resource not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
-    not_found:
-      description: Resource not found
+    forbidden:
+      description: Forbidden
       content:
         application/json:
           schema:
@@ -296,30 +207,205 @@ components:
       required:
       - name
       additionalProperties: false
-    basic-error:
-      title: Basic Error
-      description: Basic Error
-      type: object
-      properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        url:
-          type: string
-        status:
-          type: string
+    dependency-graph-diff:
+      title: Dependency Graph Diff
+      description: A diff of the dependencies between two commits.
+      type: array
+      items:
+        type: object
+        properties:
+          change_type:
+            type: string
+            enum:
+            - added
+            - removed
+          manifest:
+            type: string
+            example: path/to/package-lock.json
+          ecosystem:
+            type: string
+            example: npm
+          name:
+            type: string
+            example: '@actions/core'
+          version:
+            type: string
+            example: 1.0.0
+          package_url:
+            type:
+            - string
+            - 'null'
+            example: pkg:/npm/%40actions/core@1.1.0
+          license:
+            type:
+            - string
+            - 'null'
+            example: MIT
+          source_repository_url:
+            type:
+            - string
+            - 'null'
+            example: https://github.com/github/actions
+          vulnerabilities:
+            type: array
+            items:
+              type: object
+              properties:
+                severity:
+                  type: string
+                  example: critical
+                advisory_ghsa_id:
+                  type: string
+                  example: GHSA-rf4j-j272-fj86
+                advisory_summary:
+                  type: string
+                  example: A summary of the advisory.
+                advisory_url:
+                  type: string
+                  example: https://github.com/advisories/GHSA-rf4j-j272-fj86
+              required:
+              - severity
+              - advisory_ghsa_id
+              - advisory_summary
+              - advisory_url
+          scope:
+            description: Where the dependency is utilized. `development` means that the dependency is only utilized in the development environment. `runtime` means that the dependency is utilized at runtime and in the development environment.
+            type: string
+            enum:
+            - unknown
+            - runtime
+            - development
+        required:
+        - change_type
+        - manifest
+        - ecosystem
+        - name
+        - version
+        - package_url
+        - license
+        - source_repository_url
+        - vulnerabilities
+        - scope
     metadata:
       title: metadata
       description: User-defined metadata to store domain-specific information limited to 8 keys with scalar values.
       type: object
       maxProperties: 8
       additionalProperties:
-        nullable: true
         anyOf:
         - type: string
         - type: number
         - type: boolean
+    dependency:
+      type: object
+      properties:
+        package_url:
+          type: string
+          description: Package-url (PURL) of dependency. See https://github.com/package-url/purl-spec for more details.
+          example: pkg:/npm/%40actions/http-client@1.0.11
+          pattern: ^pkg
+        metadata:
+          $ref: '#/components/schemas/metadata'
+        relationship:
+          type: string
+          description: A notation of whether a dependency is requested directly by this manifest or is a dependency of another dependency.
+          example: direct
+          enum:
+          - direct
+          - indirect
+        scope:
+          type: string
+          description: A notation of whether the dependency is required for the primary build artifact (runtime) or is only used for development. Future versions of this specification may allow for more granular scopes.
+          example: runtime
+          enum:
+          - runtime
+          - development
+        dependencies:
+          type: array
+          description: Array of package-url (PURLs) of direct child dependencies.
+          example: '@actions/http-client'
+          items:
+            type: string
+      additionalProperties: false
+    snapshot:
+      title: snapshot
+      description: Create a new snapshot of a repository's dependencies.
+      type: object
+      properties:
+        version:
+          description: The version of the repository snapshot submission.
+          type: integer
+        job:
+          type: object
+          properties:
+            id:
+              type: string
+              description: The external ID of the job.
+              example: 5622a2b0-63f6-4732-8c34-a1ab27e102a11
+            correlator:
+              type: string
+              description: Correlator provides a key that is used to group snapshots submitted over time. Only the "latest" submitted snapshot for a given combination of `job.correlator` and `detector.name` will be considered when calculating a repository's current dependencies. Correlator should be as unique as it takes to distinguish all detection runs for a given "wave" of CI workflow you run. If you're using GitHub Actions, a good default value for this could be the environment variables GITHUB_WORKFLOW and GITHUB_JOB concatenated together. If you're using a build matrix, then you'll also need to add additional key(s) to distinguish between each submission inside a matrix variation.
+              example: yourworkflowname_yourjobname
+            html_url:
+              type: string
+              description: The url for the job.
+              example: http://example.com/build
+          required:
+          - id
+          - correlator
+          additionalProperties: false
+        sha:
+          description: 'The commit SHA associated with this dependency snapshot. Maximum length: 40 characters.'
+          type: string
+          example: ddc951f4b1293222421f2c8df679786153acf689
+          minLength: 40
+          maxLength: 40
+        ref:
+          description: The repository branch that triggered this snapshot.
+          type: string
+          pattern: ^refs/
+          example: refs/heads/main
+        detector:
+          type: object
+          description: A description of the detector used.
+          properties:
+            name:
+              type: string
+              description: The name of the detector used.
+              example: docker buildtime detector
+            version:
+              type: string
+              description: The version of the detector used.
+              example: 1.0.0
+            url:
+              type: string
+              description: The url of the detector used.
+              example: http://example.com/docker-buildtimer-detector
+          required:
+          - name
+          - version
+          - url
+          additionalProperties: false
+        metadata:
+          $ref: '#/components/schemas/metadata'
+        manifests:
+          type: object
+          description: A collection of package manifests, which are a collection of related dependencies declared in a file or representing a logical group of dependencies.
+          additionalProperties:
+            $ref: '#/components/schemas/manifest'
+        scanned:
+          type: string
+          format: date-time
+          description: The time at which the snapshot was scanned.
+          example: '2020-06-13T14:52:50-05:00'
+      required:
+      - detector
+      - version
+      - ref
+      - sha
+      - job
+      - scanned
+      additionalProperties: false
     dependency-graph-spdx-sbom:
       title: Dependency Graph SPDX SBOM
       description: A schema for the SPDX JSON format returned by the Dependency Graph.
@@ -460,192 +546,19 @@ components:
           - packages
       required:
       - sbom
-    dependency:
+    basic-error:
+      title: Basic Error
+      description: Basic Error
       type: object
       properties:
-        package_url:
+        message:
           type: string
-          description: Package-url (PURL) of dependency. See https://github.com/package-url/purl-spec for more details.
-          example: pkg:/npm/%40actions/http-client@1.0.11
-          pattern: ^pkg
-        metadata:
-          $ref: '#/components/schemas/metadata'
-        relationship:
+        documentation_url:
           type: string
-          description: A notation of whether a dependency is requested directly by this manifest or is a dependency of another dependency.
-          example: direct
-          enum:
-          - direct
-          - indirect
-        scope:
+        url:
           type: string
-          description: A notation of whether the dependency is required for the primary build artifact (runtime) or is only used for development. Future versions of this specification may allow for more granular scopes.
-          example: runtime
-          enum:
-          - runtime
-          - development
-        dependencies:
-          type: array
-          description: Array of package-url (PURLs) of direct child dependencies.
-          example: '@actions/http-client'
-          items:
-            type: string
-      additionalProperties: false
-    snapshot:
-      title: snapshot
-      description: Create a new snapshot of a repository's dependencies.
-      type: object
-      properties:
-        version:
-          description: The version of the repository snapshot submission.
-          type: integer
-        job:
-          type: object
-          properties:
-            id:
-              type: string
-              description: The external ID of the job.
-              example: 5622a2b0-63f6-4732-8c34-a1ab27e102a11
-            correlator:
-              type: string
-              description: Correlator provides a key that is used to group snapshots submitted over time. Only the "latest" submitted snapshot for a given combination of `job.correlator` and `detector.name` will be considered when calculating a repository's current dependencies. Correlator should be as unique as it takes to distinguish all detection runs for a given "wave" of CI workflow you run. If you're using GitHub Actions, a good default value for this could be the environment variables GITHUB_WORKFLOW and GITHUB_JOB concatenated together. If you're using a build matrix, then you'll also need to add additional key(s) to distinguish between each submission inside a matrix variation.
-              example: yourworkflowname_yourjobname
-            html_url:
-              type: string
-              description: The url for the job.
-              example: http://example.com/build
-          required:
-          - id
-          - correlator
-          additionalProperties: false
-        sha:
-          description: 'The commit SHA associated with this dependency snapshot. Maximum length: 40 characters.'
+        status:
           type: string
-          example: ddc951f4b1293222421f2c8df679786153acf689
-          minLength: 40
-          maxLength: 40
-        ref:
-          description: The repository branch that triggered this snapshot.
-          type: string
-          pattern: ^refs/
-          example: refs/heads/main
-        detector:
-          type: object
-          description: A description of the detector used.
-          properties:
-            name:
-              type: string
-              description: The name of the detector used.
-              example: docker buildtime detector
-            version:
-              type: string
-              description: The version of the detector used.
-              example: 1.0.0
-            url:
-              type: string
-              description: The url of the detector used.
-              example: http://example.com/docker-buildtimer-detector
-          required:
-          - name
-          - version
-          - url
-          additionalProperties: false
-        metadata:
-          $ref: '#/components/schemas/metadata'
-        manifests:
-          type: object
-          description: A collection of package manifests, which are a collection of related dependencies declared in a file or representing a logical group of dependencies.
-          additionalProperties:
-            $ref: '#/components/schemas/manifest'
-        scanned:
-          type: string
-          format: date-time
-          description: The time at which the snapshot was scanned.
-          example: '2020-06-13T14:52:50-05:00'
-      required:
-      - detector
-      - version
-      - ref
-      - sha
-      - job
-      - scanned
-      additionalProperties: false
-    dependency-graph-diff:
-      title: Dependency Graph Diff
-      description: A diff of the dependencies between two commits.
-      type: array
-      items:
-        type: object
-        properties:
-          change_type:
-            type: string
-            enum:
-            - added
-            - removed
-          manifest:
-            type: string
-            example: path/to/package-lock.json
-          ecosystem:
-            type: string
-            example: npm
-          name:
-            type: string
-            example: '@actions/core'
-          version:
-            type: string
-            example: 1.0.0
-          package_url:
-            type: string
-            nullable: true
-            example: pkg:/npm/%40actions/core@1.1.0
-          license:
-            type: string
-            nullable: true
-            example: MIT
-          source_repository_url:
-            type: string
-            nullable: true
-            example: https://github.com/github/actions
-          vulnerabilities:
-            type: array
-            items:
-              type: object
-              properties:
-                severity:
-                  type: string
-                  example: critical
-                advisory_ghsa_id:
-                  type: string
-                  example: GHSA-rf4j-j272-fj86
-                advisory_summary:
-                  type: string
-                  example: A summary of the advisory.
-                advisory_url:
-                  type: string
-                  example: https://github.com/advisories/GHSA-rf4j-j272-fj86
-              required:
-              - severity
-              - advisory_ghsa_id
-              - advisory_summary
-              - advisory_url
-          scope:
-            description: Where the dependency is utilized. `development` means that the dependency is only utilized in the development environment. `runtime` means that the dependency is utilized at runtime and in the development environment.
-            type: string
-            enum:
-            - unknown
-            - runtime
-            - development
-        required:
-        - change_type
-        - manifest
-        - ecosystem
-        - name
-        - version
-        - package_url
-        - license
-        - source_repository_url
-        - vulnerabilities
-        - scope
   examples:
     dependency-graph-create-snapshot-success:
       value:
@@ -653,6 +566,35 @@ components:
         created_at: '2018-05-04T01:14:52Z'
         message: Dependency results for the repo have been successfully updated.
         result: SUCCESS
+    dependency-graph-create-snapshot-request:
+      value:
+        version: 0
+        sha: ce587453ced02b1526dfb4cb910479d431683101
+        ref: refs/heads/main
+        job:
+          correlator: yourworkflowname_youractionname
+          id: yourrunid
+        detector:
+          name: octo-detector
+          version: 0.0.1
+          url: https://github.com/octo-org/octo-repo
+        scanned: '2022-06-14T20:25:00Z'
+        manifests:
+          package-lock.json:
+            name: package-lock.json
+            file:
+              source_location: src/package-lock.json
+            resolved:
+              '@actions/core':
+                package_url: pkg:/npm/%40actions/core@1.1.9
+                dependencies:
+                - '@actions/http-client'
+              '@actions/http-client':
+                package_url: pkg:/npm/%40actions/http-client@1.0.7
+                dependencies:
+                - tunnel
+              tunnel:
+                package_url: pkg:/npm/tunnel@0.0.6
     diff-range-response:
       value:
       - change_type: removed
@@ -686,35 +628,6 @@ components:
           advisory_ghsa_id: GHSA-fqfj-cmh6-hj49
           advisory_summary: Ruby OpenID
           advisory_url: https://github.com/advisories/GHSA-fqfj-cmh6-hj49
-    dependency-graph-create-snapshot-request:
-      value:
-        version: 0
-        sha: ce587453ced02b1526dfb4cb910479d431683101
-        ref: refs/heads/main
-        job:
-          correlator: yourworkflowname_youractionname
-          id: yourrunid
-        detector:
-          name: octo-detector
-          version: 0.0.1
-          url: https://github.com/octo-org/octo-repo
-        scanned: '2022-06-14T20:25:00Z'
-        manifests:
-          package-lock.json:
-            name: package-lock.json
-            file:
-              source_location: src/package-lock.json
-            resolved:
-              '@actions/core':
-                package_url: pkg:/npm/%40actions/core@1.1.9
-                dependencies:
-                - '@actions/http-client'
-              '@actions/http-client':
-                package_url: pkg:/npm/%40actions/http-client@1.0.7
-                dependencies:
-                - tunnel
-              tunnel:
-                package_url: pkg:/npm/tunnel@0.0.6
     dependency-graph-export-sbom-response:
       value:
         sbom:
@@ -764,14 +677,6 @@ components:
       example: <https://api.github.com/resource?page=2>; rel="next", <https://api.github.com/resource?page=5>; rel="last"
       schema:
         type: string
-  securitySchemes:
-    hmac:
-      type: apiKey
-      name: Authorization
-      in: header
-      description: Amazon Signature authorization v4
-      x-amazon-apigateway-authtype: awsSigv4
 externalDocs:
-  description: Amazon Web Services documentation
-  url: https://docs.aws.amazon.com/apigateway/
-x-hasEquivalentPaths: true
+  description: GitHub Enterprise Developer Docs
+  url: https://docs.github.com/enterprise-server@3.9/rest/

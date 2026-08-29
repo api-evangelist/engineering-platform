@@ -1,8 +1,8 @@
-openapi: 3.0.0
+openapi: 3.2.0
 info:
-  version: "1.0.0"
+  version: 2015-07-09
   x-release: v4
-  title: APIs.io Engineering Platform Amazon API Gateway 2014 11 13 Restapis API
+  title: APIs.io Engineering Platform Amazon API Gateway Restapis API
   description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
   x-logo:
     url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
@@ -23,6 +23,7 @@ info:
     url: https://raw.githubusercontent.com/aws/aws-sdk-js/master/apis/apigateway-2015-07-09.normal.json
     converter:
       url: https://github.com/mermade/aws2openapi
+      version: 1.0.0
     x-apisguru-driver: external
   x-apiClientRegistration:
     url: https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct
@@ -5624,110 +5625,198 @@ paths:
       - Restapis
 components:
   schemas:
-    ListOfAuthorizer:
-      type: array
-      items:
-        $ref: '#/components/schemas/Authorizer'
-    TooManyRequestsException: {}
-    NotFoundException: {}
-    Integration:
+    Models:
       type: object
       properties:
-        type:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
           allOf:
-          - $ref: '#/components/schemas/IntegrationType'
-          - description: <p>Specifies an API method integration type. The valid value is one of the following:</p> <p>For the HTTP and HTTP proxy integrations, each integration can specify a protocol (<code>http/https</code>), port and path. Standard 80 and 443 ports are supported as well as custom ports above 1024. An HTTP or HTTP proxy integration with a <code>connectionType</code> of <code>VPC_LINK</code> is referred to as a private integration and uses a VpcLink to connect API Gateway to a network load balancer of a VPC.</p>
-        httpMethod:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: Specifies the integration's HTTP method type.
-        uri:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: <p>Specifies Uniform Resource Identifier (URI) of the integration endpoint.</p> <p>For <code>HTTP</code> or <code>HTTP_PROXY</code> integrations, the URI must be a fully formed, encoded HTTP(S) URL according to the RFC-3986 specification, for either standard integration, where <code>connectionType</code> is not <code>VPC_LINK</code>, or private integration, where <code>connectionType</code> is <code>VPC_LINK</code>. For a private HTTP integration, the URI is not used for routing. For <code>AWS</code> or <code>AWS_PROXY</code> integrations, the URI is of the form <code>arn:aws:apigateway:{region}:{subdomain.service|service}:path|action/{service_api}</code>. Here, {Region} is the API Gateway region (e.g., us-east-1); {service} is the name of the integrated Amazon Web Services service (e.g., s3); and {subdomain} is a designated subdomain supported by certain Amazon Web Services service for fast host-name lookup. action can be used for an Amazon Web Services service action-based API, using an Action={name}&amp;{p1}={v1}&amp;p2={v2}... query string. The ensuing {service_api} refers to a supported action {name} plus any required input parameters. Alternatively, path can be used for an AWS service path-based API. The ensuing service_api refers to the path to an Amazon Web Services service resource, including the region of the integrated Amazon Web Services service, if applicable. For example, for integration with the S3 API of GetObject, the uri can be either <code>arn:aws:apigateway:us-west-2:s3:action/GetObject&amp;Bucket={bucket}&amp;Key={key}</code> or <code>arn:aws:apigateway:us-west-2:s3:path/{bucket}/{key}</code> </p>
-        connectionType:
-          allOf:
-          - $ref: '#/components/schemas/ConnectionType'
-          - description: The type of the network connection to the integration endpoint. The valid value is <code>INTERNET</code> for connections through the public routable internet or <code>VPC_LINK</code> for private connections between API Gateway and a network load balancer in a VPC. The default value is <code>INTERNET</code>.
-        connectionId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The ID of the VpcLink used for the integration when <code>connectionType=VPC_LINK</code> and undefined, otherwise.
-        credentials:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: Specifies the credentials required for the integration, if any. For AWS integrations, three options are available. To specify an IAM Role for API Gateway to assume, use the role's Amazon Resource Name (ARN). To require that the caller's identity be passed through from the request, specify the string <code>arn:aws:iam::\*:user/\*</code>. To use resource-based permissions on supported AWS services, specify null.
-        requestParameters:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: A key-value map specifying request parameters that are passed from the method request to the back end. The key is an integration request parameter name and the associated value is a method request parameter value or static value that must be enclosed within single quotes and pre-encoded as required by the back end. The method request parameter value must match the pattern of <code>method.request.{location}.{name}</code>, where <code>location</code> is <code>querystring</code>, <code>path</code>, or <code>header</code> and <code>name</code> must be a valid and unique method request parameter name.
-        requestTemplates:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: Represents a map of Velocity templates that are applied on the request payload based on the value of the Content-Type header sent by the client. The content type value is the key in this map, and the template (as a String) is the value.
-        passthroughBehavior:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'Specifies how the method request body of an unmapped content type will be passed through the integration request to the back end without transformation. A content type is unmapped if no mapping template is defined in the integration or the content type does not match any of the mapped content types, as specified in <code>requestTemplates</code>. The valid value is one of the following: <code>WHEN_NO_MATCH</code>: passes the method request body through the integration request to the back end without transformation when the method request content type does not match any content type associated with the mapping templates defined in the integration request. <code>WHEN_NO_TEMPLATES</code>: passes the method request body through the integration request to the back end without transformation when no mapping template is defined in the integration request. If a template is defined when this option is selected, the method request of an unmapped content-type will be rejected with an HTTP 415 Unsupported Media Type response. <code>NEVER</code>: rejects the method request with an HTTP 415 Unsupported Media Type response when either the method request content type does not match any content type associated with the mapping templates defined in the integration request or no mapping template is defined in the integration request.'
-        contentHandling:
-          allOf:
-          - $ref: '#/components/schemas/ContentHandlingStrategy'
-          - description: <p>Specifies how to handle request payload content type conversions. Supported values are <code>CONVERT_TO_BINARY</code> and <code>CONVERT_TO_TEXT</code>, with the following behaviors:</p> <p>If this property is not defined, the request payload will be passed through from the method request to integration request without modification, provided that the <code>passthroughBehavior</code> is configured to support payload pass-through.</p>
-        timeoutInMillis:
-          allOf:
-          - $ref: '#/components/schemas/Integer'
-          - description: Custom timeout between 50 and 29,000 milliseconds. The default value is 29,000 milliseconds or 29 seconds.
-        cacheNamespace:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: Specifies a group of related cached parameters. By default, API Gateway uses the resource ID as the <code>cacheNamespace</code>. You can specify the same <code>cacheNamespace</code> across resources to return the same cached data for requests to different resources.
-        cacheKeyParameters:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of request parameters whose values API Gateway caches. To be valid values for <code>cacheKeyParameters</code>, these parameters must also be specified for Method <code>requestParameters</code>.
-        integrationResponses:
-          allOf:
-          - $ref: '#/components/schemas/MapOfIntegrationResponse'
-          - description: Specifies the integration's responses.
-        tlsConfig:
-          allOf:
-          - $ref: '#/components/schemas/TlsConfig'
-          - description: Specifies the TLS configuration for an integration.
-      description: Represents an HTTP, HTTP_PROXY, AWS, AWS_PROXY, or Mock integration.
-    ServiceUnavailableException: {}
-    MapOfIntegrationResponse:
+          - $ref: '#/components/schemas/ListOfModel'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of Model resources.
+    ListOfGatewayResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/GatewayResponse'
+    ListOfDocumentationVersion:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentationVersion'
+    MapOfMethod:
       type: object
       additionalProperties:
-        $ref: '#/components/schemas/IntegrationResponse'
-    IntegrationType:
+        $ref: '#/components/schemas/Method'
+    ExportResponse:
+      type: object
+      properties:
+        body:
+          allOf:
+          - $ref: '#/components/schemas/Blob'
+          - description: The binary blob response to GetExport, which contains the export.
+      description: The binary blob response to GetExport, which contains the generated SDK.
+    RequestValidators:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfRequestValidator'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: A collection of RequestValidator resources of a given RestApi.
+    MapOfStringToString:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    UnauthorizedCacheControlHeaderStrategy:
       type: string
       enum:
-      - HTTP
-      - AWS
-      - MOCK
-      - HTTP_PROXY
-      - AWS_PROXY
-      description: 'The integration type. The valid value is <code>HTTP</code> for integrating an API method with an HTTP backend; <code>AWS</code> with any AWS service endpoints; <code>MOCK</code> for testing without actually invoking the backend; <code>HTTP_PROXY</code> for integrating with the HTTP proxy integration; <code>AWS_PROXY</code> for integrating with the Lambda proxy integration. '
-    Deployment:
+      - FAIL_WITH_403
+      - SUCCEED_WITH_RESPONSE_HEADER
+      - SUCCEED_WITHOUT_RESPONSE_HEADER
+    Authorizer:
       type: object
       properties:
         id:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The identifier for the deployment resource.
+          - description: The identifier for the authorizer resource.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The name of the authorizer.
+        type:
+          allOf:
+          - $ref: '#/components/schemas/AuthorizerType'
+          - description: The authorizer type. Valid values are <code>TOKEN</code> for a Lambda function using a single authorization token submitted in a custom header, <code>REQUEST</code> for a Lambda function using incoming request parameters, and <code>COGNITO_USER_POOLS</code> for using an Amazon Cognito user pool.
+        providerARNs:
+          allOf:
+          - $ref: '#/components/schemas/ListOfARNs'
+          - description: 'A list of the Amazon Cognito user pool ARNs for the <code>COGNITO_USER_POOLS</code> authorizer. Each element is of this format: <code>arn:aws:cognito-idp:{region}:{account_id}:userpool/{user_pool_id}</code>. For a <code>TOKEN</code> or <code>REQUEST</code> authorizer, this is not defined. '
+        authType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: Optional customer-defined field, used in OpenAPI imports and exports without functional impact.
+        authorizerUri:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: Specifies the authorizer's Uniform Resource Identifier (URI). For <code>TOKEN</code> or <code>REQUEST</code> authorizers, this must be a well-formed Lambda function URI, for example, <code>arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-west-2:{account_id}:function:{lambda_function_name}/invocations</code>. In general, the URI has this form <code>arn:aws:apigateway:{region}:lambda:path/{service_api}</code>, where <code>{region}</code> is the same as the region hosting the Lambda function, <code>path</code> indicates that the remaining substring in the URI should be treated as the path to the resource, including the initial <code>/</code>. For Lambda functions, this is usually of the form <code>/2015-03-31/functions/[FunctionARN]/invocations</code>.
+        authorizerCredentials:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: Specifies the required credentials as an IAM role for API Gateway to invoke the authorizer. To specify an IAM role for API Gateway to assume, use the role's Amazon Resource Name (ARN). To use resource-based permissions on the Lambda function, specify null.
+        identitySource:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The identity source for which authorization is requested. For a <code>TOKEN</code> or <code>COGNITO_USER_POOLS</code> authorizer, this is required and specifies the request header mapping expression for the custom header holding the authorization token submitted by the client. For example, if the token header name is <code>Auth</code>, the header mapping expression is <code>method.request.header.Auth</code>. For the <code>REQUEST</code> authorizer, this is required when authorization caching is enabled. The value is a comma-separated string of one or more mapping expressions of the specified request parameters. For example, if an <code>Auth</code> header, a <code>Name</code> query string parameter are defined as identity sources, this value is <code>method.request.header.Auth</code>, <code>method.request.querystring.Name</code>. These parameters will be used to derive the authorization caching key and to perform runtime validation of the <code>REQUEST</code> authorizer by verifying all of the identity-related request parameters are present, not null and non-empty. Only when this is true does the authorizer invoke the authorizer Lambda function, otherwise, it returns a 401 Unauthorized response without calling the Lambda function. The valid value is a string of comma-separated mapping expressions of the specified request parameters. When the authorization caching is not enabled, this property is optional. '
+        identityValidationExpression:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: A validation expression for the incoming identity token. For <code>TOKEN</code> authorizers, this value is a regular expression. For <code>COGNITO_USER_POOLS</code> authorizers, API Gateway will match the <code>aud</code> field of the incoming token from the client against the specified regular expression. It will invoke the authorizer's Lambda function when there is a match. Otherwise, it will return a 401 Unauthorized response without calling the Lambda function. The validation expression does not apply to the <code>REQUEST</code> authorizer.
+        authorizerResultTtlInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/NullableInteger'
+          - description: The TTL in seconds of cached authorizer results. If it equals 0, authorization caching is disabled. If it is greater than 0, API Gateway will cache authorizer responses. If this field is not set, the default value is 300. The maximum value is 3600, or 1 hour.
+      description: Represents an authorization layer for methods. If enabled on a method, API Gateway will activate the authorizer when a client calls the method.
+    Model:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The identifier for the model resource.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The name of the model. Must be an alphanumeric string.
         description:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The description for the deployment resource.
-        createdDate:
+          - description: The description of the model.
+        schema:
           allOf:
-          - $ref: '#/components/schemas/Timestamp'
-          - description: The date and time that the deployment resource was created.
-        apiSummary:
+          - $ref: '#/components/schemas/String'
+          - description: The schema for the model. For <code>application/json</code> models, this should be JSON schema draft 4 model. Do not include "\*/" characters in the description of any properties because such "\*/" characters may be interpreted as the closing marker for comments in some languages, such as Java or JavaScript, causing the installation of your API's SDK generated by API Gateway to fail.
+        contentType:
           allOf:
-          - $ref: '#/components/schemas/PathToMapOfMethodSnapshot'
-          - description: A summary of the RestApi at the date and time that the deployment resource was created.
-      description: An immutable representation of a RestApi resource that can be called by users using Stages. A deployment must be associated with a Stage for it to be callable over the Internet.
+          - $ref: '#/components/schemas/String'
+          - description: The content-type for the model.
+      description: Represents the data structure of a method's request or response payload.
+    Template:
+      type: object
+      properties:
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The Apache Velocity Template Language (VTL) template content used for the template resource.
+      description: Represents a mapping template used to transform a payload.
+    DocumentationPartLocationStatusCode:
+      type: string
+      pattern: ^([1-5]\d\d|\*|\s*)$
+    GatewayResponse:
+      type: object
+      properties:
+        responseType:
+          allOf:
+          - $ref: '#/components/schemas/GatewayResponseType'
+          - description: The response type of the associated GatewayResponse.
+        statusCode:
+          allOf:
+          - $ref: '#/components/schemas/StatusCode'
+          - description: The HTTP status code for this GatewayResponse.
+        responseParameters:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: Response parameters (paths, query strings and headers) of the GatewayResponse as a string-to-string map of key-value pairs.
+        responseTemplates:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: Response templates of the GatewayResponse as a string-to-string map of key-value pairs.
+        defaultResponse:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          - description: 'A Boolean flag to indicate whether this GatewayResponse is the default gateway response (<code>true</code>) or not (<code>false</code>). A default gateway response is one generated by API Gateway without any customization by an API developer. '
+      description: A gateway response of a given response type and status code, with optional response parameters and mapping templates.
+    ConnectionType:
+      type: string
+      enum:
+      - INTERNET
+      - VPC_LINK
+    NullableInteger:
+      type: integer
+    Authorizers:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfAuthorizer'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of Authorizer resources.
+    MapOfIntegrationResponse:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/IntegrationResponse'
+    DocumentationPartIds:
+      type: object
+      properties:
+        ids:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of the returned documentation part identifiers.
+        warnings:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of warning messages reported during import of documentation parts.
+      description: A collection of the imported DocumentationPart identifiers.
     Stage:
       type: object
       properties:
@@ -5800,367 +5889,106 @@ components:
           - $ref: '#/components/schemas/Timestamp'
           - description: The timestamp when the stage last updated.
       description: Represents a unique identifier for a version of a deployed RestApi that is callable by users.
-    RequestValidator:
+    ListOfString:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
+    DocumentationPart:
       type: object
       properties:
         id:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The identifier of this RequestValidator.
-        name:
+          - description: The DocumentationPart identifier, generated by API Gateway when the <code>DocumentationPart</code> is created.
+        location:
           allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The name of this RequestValidator
-        validateRequestBody:
-          allOf:
-          - $ref: '#/components/schemas/Boolean'
-          - description: A Boolean flag to indicate whether to validate a request body according to the configured Model schema.
-        validateRequestParameters:
-          allOf:
-          - $ref: '#/components/schemas/Boolean'
-          - description: A Boolean flag to indicate whether to validate request parameters (<code>true</code>) or not (<code>false</code>).
-      description: A set of validation rules for incoming Method requests.
-    Timestamp:
+          - $ref: '#/components/schemas/DocumentationPartLocation'
+          - description: The location of the API entity to which the documentation applies. Valid fields depend on the targeted API entity type. All the valid location fields are not required. If not explicitly specified, a valid location field is treated as a wildcard and associated documentation content may be inherited by matching entities, unless overridden.
+        properties:
+          description: 'A content map of API-specific key-value pairs describing the targeted API entity. The map must be encoded as a JSON string, e.g., <code>"{ \"description\": \"The API does ...\" }"</code>. Only OpenAPI-compliant documentation-related fields from the properties map are exported and, hence, published as part of the API entity definitions, while the original documentation parts are exported in a OpenAPI extension of <code>x-amazon-apigateway-documentation</code>.'
+      description: A documentation part for a targeted API entity.
+    DocumentationPartType:
       type: string
-      format: date-time
+      enum:
+      - API
+      - AUTHORIZER
+      - MODEL
+      - RESOURCE
+      - METHOD
+      - PATH_PARAMETER
+      - QUERY_PARAMETER
+      - REQUEST_HEADER
+      - REQUEST_BODY
+      - RESPONSE
+      - RESPONSE_HEADER
+      - RESPONSE_BODY
     MapOfMethodResponse:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/MethodResponse'
-    ListOfModel:
-      type: array
-      items:
-        $ref: '#/components/schemas/Model'
-    CanarySettings:
-      type: object
-      properties:
-        percentTraffic:
-          allOf:
-          - $ref: '#/components/schemas/Double'
-          - description: The percent (0-100) of traffic diverted to a canary deployment.
-        deploymentId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The ID of the canary deployment.
-        stageVariableOverrides:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: Stage variables overridden for a canary release deployment, including new stage variables introduced in the canary. These stage variables are represented as a string-to-string map between stage variable names and their values.
-        useStageCache:
-          allOf:
-          - $ref: '#/components/schemas/Boolean'
-          - description: A Boolean flag to indicate whether the canary deployment uses the stage cache or not.
-      description: Configuration settings of a canary deployment.
-    RequestValidators:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfRequestValidator'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: A collection of RequestValidator resources of a given RestApi.
-    Deployments:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfDeployment'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection resource that contains zero or more references to your existing deployments, and links that guide you on how to interact with your collection. The collection offers a paginated view of the contained deployments.
-    IntegrationResponse:
-      type: object
-      properties:
-        statusCode:
-          allOf:
-          - $ref: '#/components/schemas/StatusCode'
-          - description: Specifies the status code that is used to map the integration response to an existing MethodResponse.
-        selectionPattern:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: Specifies the regular expression (regex) pattern used to choose an integration response based on the response from the back end. For example, if the success response returns nothing and the error response returns some string, you could use the <code>.+</code> regex to match error response. However, make sure that the error response does not contain any newline (<code>\n</code>) character in such cases. If the back end is an AWS Lambda function, the AWS Lambda function error header is matched. For all other HTTP and AWS back ends, the HTTP status code is matched.
-        responseParameters:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: A key-value map specifying response parameters that are passed to the method response from the back end. The key is a method response header parameter name and the mapped value is an integration response header value, a static value enclosed within a pair of single quotes, or a JSON expression from the integration response body. The mapping key must match the pattern of <code>method.response.header.{name}</code>, where <code>name</code> is a valid and unique header name. The mapped non-static value must match the pattern of <code>integration.response.header.{name}</code> or <code>integration.response.body.{JSON-expression}</code>, where <code>name</code> is a valid and unique response header name and <code>JSON-expression</code> is a valid JSON expression without the <code>$</code> prefix.
-        responseTemplates:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: Specifies the templates used to transform the integration response body. Response templates are represented as a key/value map, with a content-type as the key and a template as the value.
-        contentHandling:
-          allOf:
-          - $ref: '#/components/schemas/ContentHandlingStrategy'
-          - description: <p>Specifies how to handle response payload content type conversions. Supported values are <code>CONVERT_TO_BINARY</code> and <code>CONVERT_TO_TEXT</code>, with the following behaviors:</p> <p>If this property is not defined, the response payload will be passed through from the integration response to the method response without modification.</p>
-      description: Represents an integration response. The status code must map to an existing MethodResponse, and parameters and templates can be used to transform the back-end response.
-    ListOfGatewayResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/GatewayResponse'
-    PathToMapOfMethodSnapshot:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/MapOfMethodSnapshot'
-    Models:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfModel'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of Model resources.
-    MapOfStringToString:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/String'
-    Resource:
-      type: object
-      properties:
-        id:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The resource's identifier.
-        parentId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The parent resource's identifier.
-        pathPart:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The last path segment for this resource.
-        path:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The full path for this resource.
-        resourceMethods:
-          allOf:
-          - $ref: '#/components/schemas/MapOfMethod'
-          - description: Gets an API resource's method of a given HTTP verb.
-      description: Represents an API resource.
-    TestInvokeAuthorizerResponse:
-      type: object
-      properties:
-        clientStatus:
-          allOf:
-          - $ref: '#/components/schemas/Integer'
-          - description: The HTTP status code that the client would have received. Value is 0 if the authorizer succeeded.
-        log:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The API Gateway execution log for the test authorizer request.
-        latency:
-          allOf:
-          - $ref: '#/components/schemas/Long'
-          - description: The execution latency of the test authorizer request.
-        principalId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The principal identity returned by the Authorizer
-        policy:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The JSON policy document returned by the Authorizer
-        authorization:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToList'
-          - description: The authorization response.
-        claims:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: The open identity claims, with any supported custom attributes, returned from the Cognito Your User Pool configured for the API.
-      description: Represents the response of the test invoke request for a custom Authorizer
-    DocumentationPartIds:
-      type: object
-      properties:
-        ids:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of the returned documentation part identifiers.
-        warnings:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of warning messages reported during import of documentation parts.
-      description: A collection of the imported DocumentationPart identifiers.
-    Stages:
-      type: object
-      properties:
-        item:
-          allOf:
-          - $ref: '#/components/schemas/ListOfStage'
-          - description: The current page of elements from this collection.
-      description: A list of Stage resources that are associated with the ApiKey resource.
-    ExportResponse:
-      type: object
-      properties:
-        body:
-          allOf:
-          - $ref: '#/components/schemas/Blob'
-          - description: The binary blob response to GetExport, which contains the export.
-      description: The binary blob response to GetExport, which contains the generated SDK.
-    MapOfMethodSettings:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/MethodSetting'
-    MapOfMethod:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/Method'
-    Double:
-      type: number
-      format: double
-    ConnectionType:
+    ProviderARN:
       type: string
-      enum:
-      - INTERNET
-      - VPC_LINK
-    GatewayResponse:
+    ListOfStage:
+      type: array
+      items:
+        $ref: '#/components/schemas/Stage'
+    Method:
       type: object
       properties:
-        responseType:
+        httpMethod:
           allOf:
-          - $ref: '#/components/schemas/GatewayResponseType'
-          - description: The response type of the associated GatewayResponse.
-        statusCode:
-          allOf:
-          - $ref: '#/components/schemas/StatusCode'
-          - description: The HTTP status code for this GatewayResponse.
-        responseParameters:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: Response parameters (paths, query strings and headers) of the GatewayResponse as a string-to-string map of key-value pairs.
-        responseTemplates:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: Response templates of the GatewayResponse as a string-to-string map of key-value pairs.
-        defaultResponse:
-          allOf:
-          - $ref: '#/components/schemas/Boolean'
-          - description: 'A Boolean flag to indicate whether this GatewayResponse is the default gateway response (<code>true</code>) or not (<code>false</code>). A default gateway response is one generated by API Gateway without any customization by an API developer. '
-      description: A gateway response of a given response type and status code, with optional response parameters and mapping templates.
-    Boolean:
-      type: boolean
-    ConflictException: {}
-    MethodSnapshot:
-      type: object
-      properties:
+          - $ref: '#/components/schemas/String'
+          - description: The method's HTTP verb.
         authorizationType:
           allOf:
           - $ref: '#/components/schemas/String'
           - description: The method's authorization type. Valid values are <code>NONE</code> for open access, <code>AWS_IAM</code> for using AWS IAM permissions, <code>CUSTOM</code> for using a custom authorizer, or <code>COGNITO_USER_POOLS</code> for using a Cognito user pool.
+        authorizerId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The identifier of an Authorizer to use on this method. The <code>authorizationType</code> must be <code>CUSTOM</code>.
         apiKeyRequired:
           allOf:
-          - $ref: '#/components/schemas/Boolean'
-          - description: Specifies whether the method requires a valid ApiKey.
-      description: Represents a summary of a Method resource, given a particular date and time.
-    CacheClusterStatus:
-      type: string
-      enum:
-      - CREATE_IN_PROGRESS
-      - AVAILABLE
-      - DELETE_IN_PROGRESS
-      - NOT_AVAILABLE
-      - FLUSH_IN_PROGRESS
-      description: Returns the status of the CacheCluster.
-    ListOfEndpointType:
-      type: array
-      items:
-        $ref: '#/components/schemas/EndpointType'
-    NullableBoolean:
-      type: boolean
-    GatewayResponseType:
-      type: string
-      enum:
-      - DEFAULT_4XX
-      - DEFAULT_5XX
-      - RESOURCE_NOT_FOUND
-      - UNAUTHORIZED
-      - INVALID_API_KEY
-      - ACCESS_DENIED
-      - AUTHORIZER_FAILURE
-      - AUTHORIZER_CONFIGURATION_ERROR
-      - INVALID_SIGNATURE
-      - EXPIRED_TOKEN
-      - MISSING_AUTHENTICATION_TOKEN
-      - INTEGRATION_FAILURE
-      - INTEGRATION_TIMEOUT
-      - API_CONFIGURATION_ERROR
-      - UNSUPPORTED_MEDIA_TYPE
-      - BAD_REQUEST_PARAMETERS
-      - BAD_REQUEST_BODY
-      - REQUEST_TOO_LARGE
-      - THROTTLED
-      - QUOTA_EXCEEDED
-      - WAF_FILTERED
-    MethodResponse:
-      type: object
-      properties:
-        statusCode:
+          - $ref: '#/components/schemas/NullableBoolean'
+          - description: A boolean flag specifying whether a valid ApiKey is required to invoke this method.
+        requestValidatorId:
           allOf:
-          - $ref: '#/components/schemas/StatusCode'
-          - description: The method response's status code.
-        responseParameters:
+          - $ref: '#/components/schemas/String'
+          - description: The identifier of a RequestValidator for request validation.
+        operationName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: A human-friendly operation identifier for the method. For example, you can assign the <code>operationName</code> of <code>ListPets</code> for the <code>GET /pets</code> method in the <code>PetStore</code> example.
+        requestParameters:
           allOf:
           - $ref: '#/components/schemas/MapOfStringToBoolean'
-          - description: A key-value map specifying required or optional response parameters that API Gateway can send back to the caller. A key defines a method response header and the value specifies whether the associated method response header is required or not. The expression of the key must match the pattern <code>method.response.header.{name}</code>, where <code>name</code> is a valid and unique header name. API Gateway passes certain integration response data to the method response headers specified here according to the mapping you prescribe in the API's IntegrationResponse. The integration response data that can be mapped include an integration response header expressed in <code>integration.response.header.{name}</code>, a static value enclosed within a pair of single quotes (e.g., <code>'application/json'</code>), or a JSON expression from the back-end response payload in the form of <code>integration.response.body.{JSON-expression}</code>, where <code>JSON-expression</code> is a valid JSON expression without the <code>$</code> prefix.)
-        responseModels:
+          - description: A key-value map defining required or optional method request parameters that can be accepted by API Gateway. A key is a method request parameter name matching the pattern of <code>method.request.{location}.{name}</code>, where <code>location</code> is <code>querystring</code>, <code>path</code>, or <code>header</code> and <code>name</code> is a valid and unique parameter name. The value associated with the key is a Boolean flag indicating whether the parameter is required (<code>true</code>) or optional (<code>false</code>). The method request parameter names defined here are available in Integration to be mapped to integration request parameters or templates.
+        requestModels:
           allOf:
           - $ref: '#/components/schemas/MapOfStringToString'
-          - description: Specifies the Model resources used for the response's content-type. Response models are represented as a key/value map, with a content-type as the key and a Model name as the value.
-      description: 'Represents a method response of a given HTTP status code returned to the client. The method response is passed from the back end through the associated integration response that can be transformed using a mapping template. '
-    ApiKeySourceType:
+          - description: A key-value map specifying data schemas, represented by Model resources, (as the mapped value) of the request payloads of given content types (as the mapping key).
+        methodResponses:
+          allOf:
+          - $ref: '#/components/schemas/MapOfMethodResponse'
+          - description: 'Gets a method response associated with a given HTTP status code. '
+        methodIntegration:
+          allOf:
+          - $ref: '#/components/schemas/Integration'
+          - description: Gets the method's integration responsible for passing the client-submitted request to the back end and performing necessary transformations to make the request compliant with the back end.
+        authorizationScopes:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of authorization scopes configured on the method. The scopes are used with a <code>COGNITO_USER_POOLS</code> authorizer to authorize the method invocation. The authorization works by matching the method scopes against the scopes parsed from the access token in the incoming request. The method invocation is authorized if any method scopes matches a claimed scope in the access token. Otherwise, the invocation is not authorized. When the method scope is configured, the client must provide an access token instead of an identity token for authorization purposes.
+      description: ' Represents a client-facing interface by which the client calls the API to access back-end resources. A Method resource is integrated with an Integration resource. Both consist of a request and one or more responses. The method request takes the client input that is passed to the back end through the integration request. A method response returns the output from the back end to the client through an integration response. A method request is embodied in a Method resource, whereas an integration request is embodied in an Integration resource. On the other hand, a method response is represented by a MethodResponse resource, whereas an integration response is represented by an IntegrationResponse resource. '
+    ListOfAuthorizer:
+      type: array
+      items:
+        $ref: '#/components/schemas/Authorizer'
+    ContentHandlingStrategy:
       type: string
       enum:
-      - HEADER
-      - AUTHORIZER
-    AccessLogSettings:
-      type: object
-      properties:
-        format:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: A single line format of the access logs of data, as specified by selected $context variables. The format must include at least <code>$context.requestId</code>.
-        destinationArn:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The Amazon Resource Name (ARN) of the CloudWatch Logs log group or Kinesis Data Firehose delivery stream to receive access logs. If you specify a Kinesis Data Firehose delivery stream, the stream name must begin with <code>amazon-apigateway-</code>.
-      description: Access log settings, including the access log format and access log destination ARN.
-    DocumentationPartLocationStatusCode:
-      type: string
-      pattern: ^([1-5]\d\d|\*|\s*)$
-    Model:
-      type: object
-      properties:
-        id:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The identifier for the model resource.
-        name:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The name of the model. Must be an alphanumeric string.
-        description:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The description of the model.
-        schema:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The schema for the model. For <code>application/json</code> models, this should be JSON schema draft 4 model. Do not include "\*/" characters in the description of any properties because such "\*/" characters may be interpreted as the closing marker for comments in some languages, such as Java or JavaScript, causing the installation of your API's SDK generated by API Gateway to fail.
-        contentType:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The content-type for the model.
-      description: Represents the data structure of a method's request or response payload.
+      - CONVERT_TO_BINARY
+      - CONVERT_TO_TEXT
     DocumentationPartLocation:
       type: object
       required:
@@ -6187,225 +6015,109 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The name of the targeted API entity. It is a valid and required field for the API entity types of <code>AUTHORIZER</code>, <code>MODEL</code>, <code>PATH_PARAMETER</code>, <code>QUERY_PARAMETER</code>, <code>REQUEST_HEADER</code>, <code>REQUEST_BODY</code> and <code>RESPONSE_HEADER</code>. It is an invalid field for any other entity type.
       description: Specifies the target API entity to which the documentation applies.
-    DocumentationParts:
+    TestInvokeMethodResponse:
       type: object
       properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
+        status:
           allOf:
-          - $ref: '#/components/schemas/ListOfDocumentationPart'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: The collection of documentation parts of an API.
-    AuthorizerType:
-      type: string
-      enum:
-      - TOKEN
-      - REQUEST
-      - COGNITO_USER_POOLS
-      description: The authorizer type. Valid values are <code>TOKEN</code> for a Lambda function using a single authorization token submitted in a custom header, <code>REQUEST</code> for a Lambda function using incoming request parameters, and <code>COGNITO_USER_POOLS</code> for using an Amazon Cognito user pool.
-    DocumentationVersions:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfDocumentationVersion'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: 'The collection of documentation snapshots of an API. '
-    NullableInteger:
-      type: integer
-    Op:
-      type: string
-      enum:
-      - add
-      - remove
-      - replace
-      - move
-      - copy
-      - test
-    UnauthorizedException: {}
-    SdkResponse:
-      type: object
-      properties:
+          - $ref: '#/components/schemas/Integer'
+          - description: The HTTP status code.
         body:
           allOf:
-          - $ref: '#/components/schemas/Blob'
-          - description: The binary blob response to GetSdk, which contains the generated SDK.
-      description: The binary blob response to GetSdk, which contains the generated SDK.
-    Long:
-      type: integer
-    ListOfARNs:
-      type: array
-      items:
-        $ref: '#/components/schemas/ProviderARN'
-    Authorizers:
+          - $ref: '#/components/schemas/String'
+          - description: The body of the HTTP response.
+        headers:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: The headers of the HTTP response.
+        multiValueHeaders:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToList'
+          - description: The headers of the HTTP response as a map from string to list of values.
+        log:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The API Gateway execution log for the test invoke request.
+        latency:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          - description: The execution latency of the test invoke request.
+      description: Represents the response of the test invoke request in the HTTP method.
+    Resource:
       type: object
       properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
+        id:
           allOf:
-          - $ref: '#/components/schemas/ListOfAuthorizer'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of Authorizer resources.
-    PatchOperation:
-      type: object
-      properties:
-        op:
+          - $ref: '#/components/schemas/String'
+          - description: The resource's identifier.
+        parentId:
           allOf:
-          - $ref: '#/components/schemas/Op'
-          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
+          - $ref: '#/components/schemas/String'
+          - description: The parent resource's identifier.
+        pathPart:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The last path segment for this resource.
         path:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
-        value:
+          - description: The full path for this resource.
+        resourceMethods:
           allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
-        from:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
-      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
-    ListOfDocumentationVersion:
-      type: array
-      items:
-        $ref: '#/components/schemas/DocumentationVersion'
-    Resources:
+          - $ref: '#/components/schemas/MapOfMethod'
+          - description: Gets an API resource's method of a given HTTP verb.
+      description: Represents an API resource.
+    CanarySettings:
       type: object
       properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
+        percentTraffic:
           allOf:
-          - $ref: '#/components/schemas/ListOfResource'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of Resource resources.
-    DocumentationPart:
-      type: object
-      properties:
-        id:
+          - $ref: '#/components/schemas/Double'
+          - description: The percent (0-100) of traffic diverted to a canary deployment.
+        deploymentId:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The DocumentationPart identifier, generated by API Gateway when the <code>DocumentationPart</code> is created.
-        location:
+          - description: The ID of the canary deployment.
+        stageVariableOverrides:
           allOf:
-          - $ref: '#/components/schemas/DocumentationPartLocation'
-          - description: The location of the API entity to which the documentation applies. Valid fields depend on the targeted API entity type. All the valid location fields are not required. If not explicitly specified, a valid location field is treated as a wildcard and associated documentation content may be inherited by matching entities, unless overridden.
-        properties:
-          description: 'A content map of API-specific key-value pairs describing the targeted API entity. The map must be encoded as a JSON string, e.g., <code>"{ \"description\": \"The API does ...\" }"</code>. Only OpenAPI-compliant documentation-related fields from the properties map are exported and, hence, published as part of the API entity definitions, while the original documentation parts are exported in a OpenAPI extension of <code>x-amazon-apigateway-documentation</code>.'
-      description: A documentation part for a targeted API entity.
-    EndpointType:
-      type: string
-      enum:
-      - REGIONAL
-      - EDGE
-      - PRIVATE
-      description: The endpoint type. The valid values are <code>EDGE</code> for edge-optimized API setup, most suitable for mobile applications; <code>REGIONAL</code> for regional API endpoint setup, most suitable for calling from AWS Region; and <code>PRIVATE</code> for private APIs.
-    String:
-      type: string
-    MapOfMethodSnapshot:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/MethodSnapshot'
-    CacheClusterSize:
-      type: string
-      enum:
-      - '0.5'
-      - '1.6'
-      - '6.1'
-      - '13.5'
-      - '28.4'
-      - '58.2'
-      - '118'
-      - '237'
-      description: Returns the size of the CacheCluster.
-    Authorizer:
-      type: object
-      properties:
-        id:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: Stage variables overridden for a canary release deployment, including new stage variables introduced in the canary. These stage variables are represented as a string-to-string map between stage variable names and their values.
+        useStageCache:
           allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The identifier for the authorizer resource.
-        name:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The name of the authorizer.
-        type:
-          allOf:
-          - $ref: '#/components/schemas/AuthorizerType'
-          - description: The authorizer type. Valid values are <code>TOKEN</code> for a Lambda function using a single authorization token submitted in a custom header, <code>REQUEST</code> for a Lambda function using incoming request parameters, and <code>COGNITO_USER_POOLS</code> for using an Amazon Cognito user pool.
-        providerARNs:
-          allOf:
-          - $ref: '#/components/schemas/ListOfARNs'
-          - description: 'A list of the Amazon Cognito user pool ARNs for the <code>COGNITO_USER_POOLS</code> authorizer. Each element is of this format: <code>arn:aws:cognito-idp:{region}:{account_id}:userpool/{user_pool_id}</code>. For a <code>TOKEN</code> or <code>REQUEST</code> authorizer, this is not defined. '
-        authType:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: Optional customer-defined field, used in OpenAPI imports and exports without functional impact.
-        authorizerUri:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: Specifies the authorizer's Uniform Resource Identifier (URI). For <code>TOKEN</code> or <code>REQUEST</code> authorizers, this must be a well-formed Lambda function URI, for example, <code>arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-west-2:{account_id}:function:{lambda_function_name}/invocations</code>. In general, the URI has this form <code>arn:aws:apigateway:{region}:lambda:path/{service_api}</code>, where <code>{region}</code> is the same as the region hosting the Lambda function, <code>path</code> indicates that the remaining substring in the URI should be treated as the path to the resource, including the initial <code>/</code>. For Lambda functions, this is usually of the form <code>/2015-03-31/functions/[FunctionARN]/invocations</code>.
-        authorizerCredentials:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: Specifies the required credentials as an IAM role for API Gateway to invoke the authorizer. To specify an IAM role for API Gateway to assume, use the role's Amazon Resource Name (ARN). To use resource-based permissions on the Lambda function, specify null.
-        identitySource:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The identity source for which authorization is requested. For a <code>TOKEN</code> or <code>COGNITO_USER_POOLS</code> authorizer, this is required and specifies the request header mapping expression for the custom header holding the authorization token submitted by the client. For example, if the token header name is <code>Auth</code>, the header mapping expression is <code>method.request.header.Auth</code>. For the <code>REQUEST</code> authorizer, this is required when authorization caching is enabled. The value is a comma-separated string of one or more mapping expressions of the specified request parameters. For example, if an <code>Auth</code> header, a <code>Name</code> query string parameter are defined as identity sources, this value is <code>method.request.header.Auth</code>, <code>method.request.querystring.Name</code>. These parameters will be used to derive the authorization caching key and to perform runtime validation of the <code>REQUEST</code> authorizer by verifying all of the identity-related request parameters are present, not null and non-empty. Only when this is true does the authorizer invoke the authorizer Lambda function, otherwise, it returns a 401 Unauthorized response without calling the Lambda function. The valid value is a string of comma-separated mapping expressions of the specified request parameters. When the authorization caching is not enabled, this property is optional. '
-        identityValidationExpression:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: A validation expression for the incoming identity token. For <code>TOKEN</code> authorizers, this value is a regular expression. For <code>COGNITO_USER_POOLS</code> authorizers, API Gateway will match the <code>aud</code> field of the incoming token from the client against the specified regular expression. It will invoke the authorizer's Lambda function when there is a match. Otherwise, it will return a 401 Unauthorized response without calling the Lambda function. The validation expression does not apply to the <code>REQUEST</code> authorizer.
-        authorizerResultTtlInSeconds:
-          allOf:
-          - $ref: '#/components/schemas/NullableInteger'
-          - description: The TTL in seconds of cached authorizer results. If it equals 0, authorization caching is disabled. If it is greater than 0, API Gateway will cache authorizer responses. If this field is not set, the default value is 300. The maximum value is 3600, or 1 hour.
-      description: Represents an authorization layer for methods. If enabled on a method, API Gateway will activate the authorizer when a client calls the method.
-    ContentHandlingStrategy:
-      type: string
-      enum:
-      - CONVERT_TO_BINARY
-      - CONVERT_TO_TEXT
-    MapOfStringToBoolean:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/NullableBoolean'
-    ListOfDocumentationPart:
-      type: array
-      items:
-        $ref: '#/components/schemas/DocumentationPart'
-    EndpointConfiguration:
-      type: object
-      properties:
-        types:
-          allOf:
-          - $ref: '#/components/schemas/ListOfEndpointType'
-          - description: A list of endpoint types of an API (RestApi) or its custom domain name (DomainName). For an edge-optimized API and its custom domain name, the endpoint type is <code>"EDGE"</code>. For a regional API and its custom domain name, the endpoint type is <code>REGIONAL</code>. For a private API, the endpoint type is <code>PRIVATE</code>.
-        vpcEndpointIds:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of VpcEndpointIds of an API (RestApi) against which to create Route53 ALIASes. It is only supported for <code>PRIVATE</code> endpoint type.
-      description: 'The endpoint configuration to indicate the types of endpoints an API (RestApi) or its custom domain name (DomainName) has. '
-    ProviderARN:
-      type: string
+          - $ref: '#/components/schemas/Boolean'
+          - description: A Boolean flag to indicate whether the canary deployment uses the stage cache or not.
+      description: Configuration settings of a canary deployment.
     StatusCode:
       type: string
       pattern: '[1-5]\d\d'
       description: The status code.
+    IntegrationResponse:
+      type: object
+      properties:
+        statusCode:
+          allOf:
+          - $ref: '#/components/schemas/StatusCode'
+          - description: Specifies the status code that is used to map the integration response to an existing MethodResponse.
+        selectionPattern:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: Specifies the regular expression (regex) pattern used to choose an integration response based on the response from the back end. For example, if the success response returns nothing and the error response returns some string, you could use the <code>.+</code> regex to match error response. However, make sure that the error response does not contain any newline (<code>\n</code>) character in such cases. If the back end is an AWS Lambda function, the AWS Lambda function error header is matched. For all other HTTP and AWS back ends, the HTTP status code is matched.
+        responseParameters:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: A key-value map specifying response parameters that are passed to the method response from the back end. The key is a method response header parameter name and the mapped value is an integration response header value, a static value enclosed within a pair of single quotes, or a JSON expression from the integration response body. The mapping key must match the pattern of <code>method.response.header.{name}</code>, where <code>name</code> is a valid and unique header name. The mapped non-static value must match the pattern of <code>integration.response.header.{name}</code> or <code>integration.response.body.{JSON-expression}</code>, where <code>name</code> is a valid and unique response header name and <code>JSON-expression</code> is a valid JSON expression without the <code>$</code> prefix.
+        responseTemplates:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: Specifies the templates used to transform the integration response body. Response templates are represented as a key/value map, with a content-type as the key and a template as the value.
+        contentHandling:
+          allOf:
+          - $ref: '#/components/schemas/ContentHandlingStrategy'
+          - description: <p>Specifies how to handle response payload content type conversions. Supported values are <code>CONVERT_TO_BINARY</code> and <code>CONVERT_TO_TEXT</code>, with the following behaviors:</p> <p>If this property is not defined, the response payload will be passed through from the integration response to the method response without modification.</p>
+      description: Represents an integration response. The status code must map to an existing MethodResponse, and parameters and templates can be used to transform the back-end response.
+    UnauthorizedException: {}
+    String:
+      type: string
     DocumentationVersion:
       type: object
       properties:
@@ -6422,28 +6134,44 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The description of the API documentation snapshot.
       description: A snapshot of the documentation of an API.
-    ListOfDeployment:
-      type: array
-      items:
-        $ref: '#/components/schemas/Deployment'
-    ListOfStage:
-      type: array
-      items:
-        $ref: '#/components/schemas/Stage'
-    Integer:
-      type: integer
-    GatewayResponses:
+    BadRequestException: {}
+    TooManyRequestsException: {}
+    Resources:
       type: object
       properties:
         position:
           $ref: '#/components/schemas/String'
         items:
           allOf:
-          - $ref: '#/components/schemas/ListOfGatewayResponse'
+          - $ref: '#/components/schemas/ListOfResource'
           - xml:
               name: item
-            description: Returns the entire collection, because of no pagination support.
-      description: The collection of the GatewayResponse instances of a RestApi as a <code>responseType</code>-to-GatewayResponse object map of key-value pairs. As such, pagination is not supported for querying this collection.
+            description: The current page of elements from this collection.
+      description: Represents a collection of Resource resources.
+    CacheClusterSize:
+      type: string
+      enum:
+      - '0.5'
+      - '1.6'
+      - '6.1'
+      - '13.5'
+      - '28.4'
+      - '58.2'
+      - '118'
+      - '237'
+      description: Returns the size of the CacheCluster.
+    Deployments:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfDeployment'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection resource that contains zero or more references to your existing deployments, and links that guide you on how to interact with your collection. The collection offers a paginated view of the contained deployments.
     RestApi:
       type: object
       properties:
@@ -6500,47 +6228,18 @@ components:
           - $ref: '#/components/schemas/Boolean'
           - description: Specifies whether clients can invoke your API by using the default <code>execute-api</code> endpoint. By default, clients can invoke your API with the default <code>https://{api_id}.execute-api.{region}.amazonaws.com</code> endpoint. To require that clients use a custom domain name to invoke your API, disable the default endpoint.
       description: Represents a REST API.
-    Template:
+    Stages:
       type: object
       properties:
-        value:
+        item:
           allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The Apache Velocity Template Language (VTL) template content used for the template resource.
-      description: Represents a mapping template used to transform a payload.
-    BadRequestException: {}
-    LimitExceededException: {}
-    DocumentationPartType:
-      type: string
-      enum:
-      - API
-      - AUTHORIZER
-      - MODEL
-      - RESOURCE
-      - METHOD
-      - PATH_PARAMETER
-      - QUERY_PARAMETER
-      - REQUEST_HEADER
-      - REQUEST_BODY
-      - RESPONSE
-      - RESPONSE_HEADER
-      - RESPONSE_BODY
-    ListOfResource:
-      type: array
-      items:
-        $ref: '#/components/schemas/Resource'
-    RestApis:
+          - $ref: '#/components/schemas/ListOfStage'
+          - description: The current page of elements from this collection.
+      description: A list of Stage resources that are associated with the ApiKey resource.
+    MapOfStringToList:
       type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfRestApi'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Contains references to your APIs and links that guide you in how to interact with your collection. A collection offers a paginated view of your APIs.
+      additionalProperties:
+        $ref: '#/components/schemas/ListOfString'
     MethodSetting:
       type: object
       properties:
@@ -6585,38 +6284,299 @@ components:
           - $ref: '#/components/schemas/UnauthorizedCacheControlHeaderStrategy'
           - description: Specifies how to handle unauthorized requests for cache invalidation. The PATCH path for this setting is <code>/{method_setting_key}/caching/unauthorizedCacheControlHeaderStrategy</code>, and the available values are <code>FAIL_WITH_403</code>, <code>SUCCEED_WITH_RESPONSE_HEADER</code>, <code>SUCCEED_WITHOUT_RESPONSE_HEADER</code>.
       description: Specifies the method setting properties.
-    ListOfString:
-      type: array
-      items:
-        $ref: '#/components/schemas/String'
-    TestInvokeMethodResponse:
+    MapOfMethodSettings:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/MethodSetting'
+    EndpointConfiguration:
       type: object
       properties:
-        status:
+        types:
+          allOf:
+          - $ref: '#/components/schemas/ListOfEndpointType'
+          - description: A list of endpoint types of an API (RestApi) or its custom domain name (DomainName). For an edge-optimized API and its custom domain name, the endpoint type is <code>"EDGE"</code>. For a regional API and its custom domain name, the endpoint type is <code>REGIONAL</code>. For a private API, the endpoint type is <code>PRIVATE</code>.
+        vpcEndpointIds:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of VpcEndpointIds of an API (RestApi) against which to create Route53 ALIASes. It is only supported for <code>PRIVATE</code> endpoint type.
+      description: 'The endpoint configuration to indicate the types of endpoints an API (RestApi) or its custom domain name (DomainName) has. '
+    TestInvokeAuthorizerResponse:
+      type: object
+      properties:
+        clientStatus:
           allOf:
           - $ref: '#/components/schemas/Integer'
-          - description: The HTTP status code.
-        body:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The body of the HTTP response.
-        headers:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToString'
-          - description: The headers of the HTTP response.
-        multiValueHeaders:
-          allOf:
-          - $ref: '#/components/schemas/MapOfStringToList'
-          - description: The headers of the HTTP response as a map from string to list of values.
+          - description: The HTTP status code that the client would have received. Value is 0 if the authorizer succeeded.
         log:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The API Gateway execution log for the test invoke request.
+          - description: The API Gateway execution log for the test authorizer request.
         latency:
           allOf:
           - $ref: '#/components/schemas/Long'
-          - description: The execution latency of the test invoke request.
-      description: Represents the response of the test invoke request in the HTTP method.
+          - description: The execution latency of the test authorizer request.
+        principalId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The principal identity returned by the Authorizer
+        policy:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The JSON policy document returned by the Authorizer
+        authorization:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToList'
+          - description: The authorization response.
+        claims:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: The open identity claims, with any supported custom attributes, returned from the Cognito Your User Pool configured for the API.
+      description: Represents the response of the test invoke request for a custom Authorizer
+    AccessLogSettings:
+      type: object
+      properties:
+        format:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: A single line format of the access logs of data, as specified by selected $context variables. The format must include at least <code>$context.requestId</code>.
+        destinationArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The Amazon Resource Name (ARN) of the CloudWatch Logs log group or Kinesis Data Firehose delivery stream to receive access logs. If you specify a Kinesis Data Firehose delivery stream, the stream name must begin with <code>amazon-apigateway-</code>.
+      description: Access log settings, including the access log format and access log destination ARN.
+    ApiKeySourceType:
+      type: string
+      enum:
+      - HEADER
+      - AUTHORIZER
+    Boolean:
+      type: boolean
+    LimitExceededException: {}
+    Timestamp:
+      type: string
+      format: date-time
+    NullableBoolean:
+      type: boolean
+    MethodSnapshot:
+      type: object
+      properties:
+        authorizationType:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The method's authorization type. Valid values are <code>NONE</code> for open access, <code>AWS_IAM</code> for using AWS IAM permissions, <code>CUSTOM</code> for using a custom authorizer, or <code>COGNITO_USER_POOLS</code> for using a Cognito user pool.
+        apiKeyRequired:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          - description: Specifies whether the method requires a valid ApiKey.
+      description: Represents a summary of a Method resource, given a particular date and time.
+    Integration:
+      type: object
+      properties:
+        type:
+          allOf:
+          - $ref: '#/components/schemas/IntegrationType'
+          - description: <p>Specifies an API method integration type. The valid value is one of the following:</p> <p>For the HTTP and HTTP proxy integrations, each integration can specify a protocol (<code>http/https</code>), port and path. Standard 80 and 443 ports are supported as well as custom ports above 1024. An HTTP or HTTP proxy integration with a <code>connectionType</code> of <code>VPC_LINK</code> is referred to as a private integration and uses a VpcLink to connect API Gateway to a network load balancer of a VPC.</p>
+        httpMethod:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: Specifies the integration's HTTP method type.
+        uri:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: <p>Specifies Uniform Resource Identifier (URI) of the integration endpoint.</p> <p>For <code>HTTP</code> or <code>HTTP_PROXY</code> integrations, the URI must be a fully formed, encoded HTTP(S) URL according to the RFC-3986 specification, for either standard integration, where <code>connectionType</code> is not <code>VPC_LINK</code>, or private integration, where <code>connectionType</code> is <code>VPC_LINK</code>. For a private HTTP integration, the URI is not used for routing. For <code>AWS</code> or <code>AWS_PROXY</code> integrations, the URI is of the form <code>arn:aws:apigateway:{region}:{subdomain.service|service}:path|action/{service_api}</code>. Here, {Region} is the API Gateway region (e.g., us-east-1); {service} is the name of the integrated Amazon Web Services service (e.g., s3); and {subdomain} is a designated subdomain supported by certain Amazon Web Services service for fast host-name lookup. action can be used for an Amazon Web Services service action-based API, using an Action={name}&amp;{p1}={v1}&amp;p2={v2}... query string. The ensuing {service_api} refers to a supported action {name} plus any required input parameters. Alternatively, path can be used for an AWS service path-based API. The ensuing service_api refers to the path to an Amazon Web Services service resource, including the region of the integrated Amazon Web Services service, if applicable. For example, for integration with the S3 API of GetObject, the uri can be either <code>arn:aws:apigateway:us-west-2:s3:action/GetObject&amp;Bucket={bucket}&amp;Key={key}</code> or <code>arn:aws:apigateway:us-west-2:s3:path/{bucket}/{key}</code> </p>
+        connectionType:
+          allOf:
+          - $ref: '#/components/schemas/ConnectionType'
+          - description: The type of the network connection to the integration endpoint. The valid value is <code>INTERNET</code> for connections through the public routable internet or <code>VPC_LINK</code> for private connections between API Gateway and a network load balancer in a VPC. The default value is <code>INTERNET</code>.
+        connectionId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The ID of the VpcLink used for the integration when <code>connectionType=VPC_LINK</code> and undefined, otherwise.
+        credentials:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: Specifies the credentials required for the integration, if any. For AWS integrations, three options are available. To specify an IAM Role for API Gateway to assume, use the role's Amazon Resource Name (ARN). To require that the caller's identity be passed through from the request, specify the string <code>arn:aws:iam::\*:user/\*</code>. To use resource-based permissions on supported AWS services, specify null.
+        requestParameters:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: A key-value map specifying request parameters that are passed from the method request to the back end. The key is an integration request parameter name and the associated value is a method request parameter value or static value that must be enclosed within single quotes and pre-encoded as required by the back end. The method request parameter value must match the pattern of <code>method.request.{location}.{name}</code>, where <code>location</code> is <code>querystring</code>, <code>path</code>, or <code>header</code> and <code>name</code> must be a valid and unique method request parameter name.
+        requestTemplates:
+          allOf:
+          - $ref: '#/components/schemas/MapOfStringToString'
+          - description: Represents a map of Velocity templates that are applied on the request payload based on the value of the Content-Type header sent by the client. The content type value is the key in this map, and the template (as a String) is the value.
+        passthroughBehavior:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'Specifies how the method request body of an unmapped content type will be passed through the integration request to the back end without transformation. A content type is unmapped if no mapping template is defined in the integration or the content type does not match any of the mapped content types, as specified in <code>requestTemplates</code>. The valid value is one of the following: <code>WHEN_NO_MATCH</code>: passes the method request body through the integration request to the back end without transformation when the method request content type does not match any content type associated with the mapping templates defined in the integration request. <code>WHEN_NO_TEMPLATES</code>: passes the method request body through the integration request to the back end without transformation when no mapping template is defined in the integration request. If a template is defined when this option is selected, the method request of an unmapped content-type will be rejected with an HTTP 415 Unsupported Media Type response. <code>NEVER</code>: rejects the method request with an HTTP 415 Unsupported Media Type response when either the method request content type does not match any content type associated with the mapping templates defined in the integration request or no mapping template is defined in the integration request.'
+        contentHandling:
+          allOf:
+          - $ref: '#/components/schemas/ContentHandlingStrategy'
+          - description: <p>Specifies how to handle request payload content type conversions. Supported values are <code>CONVERT_TO_BINARY</code> and <code>CONVERT_TO_TEXT</code>, with the following behaviors:</p> <p>If this property is not defined, the request payload will be passed through from the method request to integration request without modification, provided that the <code>passthroughBehavior</code> is configured to support payload pass-through.</p>
+        timeoutInMillis:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          - description: Custom timeout between 50 and 29,000 milliseconds. The default value is 29,000 milliseconds or 29 seconds.
+        cacheNamespace:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: Specifies a group of related cached parameters. By default, API Gateway uses the resource ID as the <code>cacheNamespace</code>. You can specify the same <code>cacheNamespace</code> across resources to return the same cached data for requests to different resources.
+        cacheKeyParameters:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of request parameters whose values API Gateway caches. To be valid values for <code>cacheKeyParameters</code>, these parameters must also be specified for Method <code>requestParameters</code>.
+        integrationResponses:
+          allOf:
+          - $ref: '#/components/schemas/MapOfIntegrationResponse'
+          - description: Specifies the integration's responses.
+        tlsConfig:
+          allOf:
+          - $ref: '#/components/schemas/TlsConfig'
+          - description: Specifies the TLS configuration for an integration.
+      description: Represents an HTTP, HTTP_PROXY, AWS, AWS_PROXY, or Mock integration.
+    GatewayResponseType:
+      type: string
+      enum:
+      - DEFAULT_4XX
+      - DEFAULT_5XX
+      - RESOURCE_NOT_FOUND
+      - UNAUTHORIZED
+      - INVALID_API_KEY
+      - ACCESS_DENIED
+      - AUTHORIZER_FAILURE
+      - AUTHORIZER_CONFIGURATION_ERROR
+      - INVALID_SIGNATURE
+      - EXPIRED_TOKEN
+      - MISSING_AUTHENTICATION_TOKEN
+      - INTEGRATION_FAILURE
+      - INTEGRATION_TIMEOUT
+      - API_CONFIGURATION_ERROR
+      - UNSUPPORTED_MEDIA_TYPE
+      - BAD_REQUEST_PARAMETERS
+      - BAD_REQUEST_BODY
+      - REQUEST_TOO_LARGE
+      - THROTTLED
+      - QUOTA_EXCEEDED
+      - WAF_FILTERED
+    CacheClusterStatus:
+      type: string
+      enum:
+      - CREATE_IN_PROGRESS
+      - AVAILABLE
+      - DELETE_IN_PROGRESS
+      - NOT_AVAILABLE
+      - FLUSH_IN_PROGRESS
+      description: Returns the status of the CacheCluster.
+    Op:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      - move
+      - copy
+      - test
+    DocumentationVersions:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfDocumentationVersion'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: 'The collection of documentation snapshots of an API. '
+    Integer:
+      type: integer
+    ListOfModel:
+      type: array
+      items:
+        $ref: '#/components/schemas/Model'
+    Deployment:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The identifier for the deployment resource.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The description for the deployment resource.
+        createdDate:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          - description: The date and time that the deployment resource was created.
+        apiSummary:
+          allOf:
+          - $ref: '#/components/schemas/PathToMapOfMethodSnapshot'
+          - description: A summary of the RestApi at the date and time that the deployment resource was created.
+      description: An immutable representation of a RestApi resource that can be called by users using Stages. A deployment must be associated with a Stage for it to be callable over the Internet.
+    PathToMapOfMethodSnapshot:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/MapOfMethodSnapshot'
+    ConflictException: {}
+    PatchOperation:
+      type: object
+      properties:
+        op:
+          allOf:
+          - $ref: '#/components/schemas/Op'
+          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
+        path:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
+        from:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
+      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
+    AuthorizerType:
+      type: string
+      enum:
+      - TOKEN
+      - REQUEST
+      - COGNITO_USER_POOLS
+      description: The authorizer type. Valid values are <code>TOKEN</code> for a Lambda function using a single authorization token submitted in a custom header, <code>REQUEST</code> for a Lambda function using incoming request parameters, and <code>COGNITO_USER_POOLS</code> for using an Amazon Cognito user pool.
+    ListOfRequestValidator:
+      type: array
+      items:
+        $ref: '#/components/schemas/RequestValidator'
+    RequestValidator:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The identifier of this RequestValidator.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The name of this RequestValidator
+        validateRequestBody:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          - description: A Boolean flag to indicate whether to validate a request body according to the configured Model schema.
+        validateRequestParameters:
+          allOf:
+          - $ref: '#/components/schemas/Boolean'
+          - description: A Boolean flag to indicate whether to validate request parameters (<code>true</code>) or not (<code>false</code>).
+      description: A set of validation rules for incoming Method requests.
+    SdkResponse:
+      type: object
+      properties:
+        body:
+          allOf:
+          - $ref: '#/components/schemas/Blob'
+          - description: The binary blob response to GetSdk, which contains the generated SDK.
+      description: The binary blob response to GetSdk, which contains the generated SDK.
     TlsConfig:
       type: object
       properties:
@@ -6625,95 +6585,124 @@ components:
           - $ref: '#/components/schemas/Boolean'
           - description: <p>Specifies whether or not API Gateway skips verification that the certificate for an integration endpoint is issued by a supported certificate authority. This isn't recommended, but it enables you to use certificates that are signed by private certificate authorities, or certificates that are self-signed. If enabled, API Gateway still performs basic certificate validation, which includes checking the certificate's expiration date, hostname, and presence of a root certificate authority. Supported only for <code>HTTP</code> and <code>HTTP_PROXY</code> integrations.</p> <important> <p>Enabling <code>insecureSkipVerification</code> isn't recommended, especially for integrations with public HTTPS endpoints. If you enable <code>insecureSkipVerification</code>, you increase the risk of man-in-the-middle attacks.</p> </important>
       description: Specifies the TLS configuration for an integration.
-    Method:
+    MapOfMethodSnapshot:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/MethodSnapshot'
+    MethodResponse:
       type: object
       properties:
-        httpMethod:
+        statusCode:
           allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The method's HTTP verb.
-        authorizationType:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The method's authorization type. Valid values are <code>NONE</code> for open access, <code>AWS_IAM</code> for using AWS IAM permissions, <code>CUSTOM</code> for using a custom authorizer, or <code>COGNITO_USER_POOLS</code> for using a Cognito user pool.
-        authorizerId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The identifier of an Authorizer to use on this method. The <code>authorizationType</code> must be <code>CUSTOM</code>.
-        apiKeyRequired:
-          allOf:
-          - $ref: '#/components/schemas/NullableBoolean'
-          - description: A boolean flag specifying whether a valid ApiKey is required to invoke this method.
-        requestValidatorId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The identifier of a RequestValidator for request validation.
-        operationName:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: A human-friendly operation identifier for the method. For example, you can assign the <code>operationName</code> of <code>ListPets</code> for the <code>GET /pets</code> method in the <code>PetStore</code> example.
-        requestParameters:
+          - $ref: '#/components/schemas/StatusCode'
+          - description: The method response's status code.
+        responseParameters:
           allOf:
           - $ref: '#/components/schemas/MapOfStringToBoolean'
-          - description: A key-value map defining required or optional method request parameters that can be accepted by API Gateway. A key is a method request parameter name matching the pattern of <code>method.request.{location}.{name}</code>, where <code>location</code> is <code>querystring</code>, <code>path</code>, or <code>header</code> and <code>name</code> is a valid and unique parameter name. The value associated with the key is a Boolean flag indicating whether the parameter is required (<code>true</code>) or optional (<code>false</code>). The method request parameter names defined here are available in Integration to be mapped to integration request parameters or templates.
-        requestModels:
+          - description: A key-value map specifying required or optional response parameters that API Gateway can send back to the caller. A key defines a method response header and the value specifies whether the associated method response header is required or not. The expression of the key must match the pattern <code>method.response.header.{name}</code>, where <code>name</code> is a valid and unique header name. API Gateway passes certain integration response data to the method response headers specified here according to the mapping you prescribe in the API's IntegrationResponse. The integration response data that can be mapped include an integration response header expressed in <code>integration.response.header.{name}</code>, a static value enclosed within a pair of single quotes (e.g., <code>'application/json'</code>), or a JSON expression from the back-end response payload in the form of <code>integration.response.body.{JSON-expression}</code>, where <code>JSON-expression</code> is a valid JSON expression without the <code>$</code> prefix.)
+        responseModels:
           allOf:
           - $ref: '#/components/schemas/MapOfStringToString'
-          - description: A key-value map specifying data schemas, represented by Model resources, (as the mapped value) of the request payloads of given content types (as the mapping key).
-        methodResponses:
+          - description: Specifies the Model resources used for the response's content-type. Response models are represented as a key/value map, with a content-type as the key and a Model name as the value.
+      description: 'Represents a method response of a given HTTP status code returned to the client. The method response is passed from the back end through the associated integration response that can be transformed using a mapping template. '
+    Long:
+      type: integer
+    DocumentationParts:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
           allOf:
-          - $ref: '#/components/schemas/MapOfMethodResponse'
-          - description: 'Gets a method response associated with a given HTTP status code. '
-        methodIntegration:
-          allOf:
-          - $ref: '#/components/schemas/Integration'
-          - description: Gets the method's integration responsible for passing the client-submitted request to the back end and performing necessary transformations to make the request compliant with the back end.
-        authorizationScopes:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of authorization scopes configured on the method. The scopes are used with a <code>COGNITO_USER_POOLS</code> authorizer to authorize the method invocation. The authorization works by matching the method scopes against the scopes parsed from the access token in the incoming request. The method invocation is authorized if any method scopes matches a claimed scope in the access token. Otherwise, the invocation is not authorized. When the method scope is configured, the client must provide an access token instead of an identity token for authorization purposes.
-      description: ' Represents a client-facing interface by which the client calls the API to access back-end resources. A Method resource is integrated with an Integration resource. Both consist of a request and one or more responses. The method request takes the client input that is passed to the back end through the integration request. A method response returns the output from the back end to the client through an integration response. A method request is embodied in a Method resource, whereas an integration request is embodied in an Integration resource. On the other hand, a method response is represented by a MethodResponse resource, whereas an integration response is represented by an IntegrationResponse resource. '
+          - $ref: '#/components/schemas/ListOfDocumentationPart'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: The collection of documentation parts of an API.
     ListOfRestApi:
       type: array
       items:
         $ref: '#/components/schemas/RestApi'
-    MapOfStringToList:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/ListOfString'
-    ListOfRequestValidator:
-      type: array
-      items:
-        $ref: '#/components/schemas/RequestValidator'
-    Blob:
-      type: string
-    UnauthorizedCacheControlHeaderStrategy:
+    EndpointType:
       type: string
       enum:
-      - FAIL_WITH_403
-      - SUCCEED_WITH_RESPONSE_HEADER
-      - SUCCEED_WITHOUT_RESPONSE_HEADER
+      - REGIONAL
+      - EDGE
+      - PRIVATE
+      description: The endpoint type. The valid values are <code>EDGE</code> for edge-optimized API setup, most suitable for mobile applications; <code>REGIONAL</code> for regional API endpoint setup, most suitable for calling from AWS Region; and <code>PRIVATE</code> for private APIs.
+    ListOfDocumentationPart:
+      type: array
+      items:
+        $ref: '#/components/schemas/DocumentationPart'
+    RestApis:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfRestApi'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Contains references to your APIs and links that guide you in how to interact with your collection. A collection offers a paginated view of your APIs.
+    ListOfARNs:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProviderARN'
+    Blob:
+      type: string
+    NotFoundException: {}
+    Double:
+      type: number
+      format: double
+    ListOfResource:
+      type: array
+      items:
+        $ref: '#/components/schemas/Resource'
+    MapOfStringToBoolean:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/NullableBoolean'
+    GatewayResponses:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfGatewayResponse'
+          - xml:
+              name: item
+            description: Returns the entire collection, because of no pagination support.
+      description: The collection of the GatewayResponse instances of a RestApi as a <code>responseType</code>-to-GatewayResponse object map of key-value pairs. As such, pagination is not supported for querying this collection.
+    ListOfEndpointType:
+      type: array
+      items:
+        $ref: '#/components/schemas/EndpointType'
+    ServiceUnavailableException: {}
+    ListOfDeployment:
+      type: array
+      items:
+        $ref: '#/components/schemas/Deployment'
+    IntegrationType:
+      type: string
+      enum:
+      - HTTP
+      - AWS
+      - MOCK
+      - HTTP_PROXY
+      - AWS_PROXY
+      description: 'The integration type. The valid value is <code>HTTP</code> for integrating an API method with an HTTP backend; <code>AWS</code> with any AWS service endpoints; <code>MOCK</code> for testing without actually invoking the backend; <code>HTTP_PROXY</code> for integrating with the HTTP proxy integration; <code>AWS_PROXY</code> for integrating with the Lambda proxy integration. '
   parameters:
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Date:
-      name: X-Amz-Date
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-Credential:
       name: X-Amz-Credential
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
       in: header
       schema:
         type: string
@@ -6730,8 +6719,20 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
       in: header
       schema:
         type: string
