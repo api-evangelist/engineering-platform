@@ -472,246 +472,6 @@ paths:
         pro: true
 components:
   schemas:
-    rum_snippet:
-      description: Encoded JavaScript snippet.
-      example: '<!-- Cloudflare Web Analytics --><script defer src=''https://static.cloudflareinsights.com/beacon.min.js'' data-cf-beacon=''{"token": "bc40a2d1b5834453aba85c1b9a3054da"}''></script><!-- End Cloudflare Web Analytics -->'
-      type: string
-    rum_result_info:
-      properties:
-        count:
-          description: The total number of items on the current page.
-          example: 10
-          type: integer
-        page:
-          description: Current page within the paginated list of results.
-          example: 1
-          type: integer
-        per_page:
-          description: The maximum number of items to return per page of results.
-          example: 10
-          type: integer
-        total_count:
-          description: The total number of items.
-          example: 25
-          type: integer
-        total_pages:
-          description: The total number of pages.
-          example: 3
-          type:
-          - integer
-          - 'null'
-      type: object
-    rum_per_page:
-      description: Number of items to return per page of results.
-      example: 10
-      type: number
-    rum_rules-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/rum_api-response-common'
-      - properties:
-          result:
-            properties:
-              rules:
-                $ref: '#/components/schemas/rum_rules'
-              ruleset:
-                $ref: '#/components/schemas/rum_ruleset'
-            type: object
-    rum_site:
-      properties:
-        auto_install:
-          $ref: '#/components/schemas/rum_auto_install'
-        created:
-          $ref: '#/components/schemas/rum_timestamp'
-        rules:
-          $ref: '#/components/schemas/rum_rules'
-        ruleset:
-          $ref: '#/components/schemas/rum_ruleset'
-        site_tag:
-          $ref: '#/components/schemas/rum_site_tag'
-        site_token:
-          $ref: '#/components/schemas/rum_site_token'
-        snippet:
-          $ref: '#/components/schemas/rum_snippet'
-      type: object
-    rum_site_tag:
-      description: The Web Analytics site identifier.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      type: string
-    rum_create-site-request:
-      properties:
-        auto_install:
-          $ref: '#/components/schemas/rum_auto_install'
-        host:
-          description: The hostname to use for gray-clouded sites.
-          example: example.com
-          type: string
-        zone_tag:
-          $ref: '#/components/schemas/rum_zone_tag'
-      type: object
-    rum_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/rum_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/rum_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    rum_rule-id-response-single:
-      allOf:
-      - $ref: '#/components/schemas/rum_api-response-common'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/rum_rule_identifier'
-            type: object
-    rum_site-response-single:
-      allOf:
-      - $ref: '#/components/schemas/rum_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/rum_site'
-    rum_rule-response-single:
-      allOf:
-      - $ref: '#/components/schemas/rum_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/rum_rule'
-    rum_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/rum_messages'
-        messages:
-          $ref: '#/components/schemas/rum_messages'
-        success:
-          description: Whether the API call was successful.
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    rum_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      readOnly: true
-      type: string
-    rum_rules:
-      description: A list of rules.
-      items:
-        $ref: '#/components/schemas/rum_rule'
-      type: array
-    rum_rule:
-      properties:
-        created:
-          $ref: '#/components/schemas/rum_timestamp'
-        host:
-          description: The hostname the rule will be applied to.
-          example: example.com
-          type: string
-        id:
-          $ref: '#/components/schemas/rum_rule_identifier'
-        inclusive:
-          description: Whether the rule includes or excludes traffic from being measured.
-          example: true
-          type: boolean
-        is_paused:
-          description: Whether the rule is paused or not.
-          example: false
-          type: boolean
-        paths:
-          description: The paths the rule will be applied to.
-          example:
-          - '*'
-          items:
-            type: string
-          type: array
-        priority:
-          example: 1000
-          type: number
-      type: object
-    rum_order_by:
-      description: The property used to sort the list of results.
-      enum:
-      - host
-      - created
-      example: host
-      type: string
-    rum_site-tag-response-single:
-      allOf:
-      - $ref: '#/components/schemas/rum_api-response-common'
-      - properties:
-          result:
-            properties:
-              site_tag:
-                $ref: '#/components/schemas/rum_site_tag'
-            type: object
-    rum_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    rum_ruleset_identifier:
-      description: The Web Analytics ruleset identifier.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      type: string
-    rum_ruleset:
-      properties:
-        enabled:
-          description: Whether the ruleset is enabled.
-          example: true
-          type: boolean
-        id:
-          $ref: '#/components/schemas/rum_ruleset_identifier'
-        zone_name:
-          example: example.com
-          type: string
-        zone_tag:
-          $ref: '#/components/schemas/rum_zone_tag'
-      type: object
-    rum_page:
-      description: Current page within the paginated list of results.
-      example: 1
-      type: number
-    rum_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     rum_create-rule-request:
       properties:
         host:
@@ -732,18 +492,72 @@ components:
             type: string
           type: array
       type: object
-    rum_site_token:
-      description: The Web Analytics site token.
+    rum_sites-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/rum_api-response-common'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/rum_site'
+            type: array
+          result_info:
+            $ref: '#/components/schemas/rum_result_info'
+    rum_rules-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/rum_api-response-common'
+      - properties:
+          result:
+            properties:
+              rules:
+                $ref: '#/components/schemas/rum_rules'
+              ruleset:
+                $ref: '#/components/schemas/rum_ruleset'
+            type: object
+    rum_order_by:
+      description: The property used to sort the list of results.
+      enum:
+      - host
+      - created
+      example: host
+      type: string
+    rum_site-tag-response-single:
+      allOf:
+      - $ref: '#/components/schemas/rum_api-response-common'
+      - properties:
+          result:
+            properties:
+              site_tag:
+                $ref: '#/components/schemas/rum_site_tag'
+            type: object
+    rum_rule-response-single:
+      allOf:
+      - $ref: '#/components/schemas/rum_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/rum_rule'
+    rum_ruleset:
+      properties:
+        enabled:
+          description: Whether the ruleset is enabled.
+          example: true
+          type: boolean
+        id:
+          $ref: '#/components/schemas/rum_ruleset_identifier'
+        zone_name:
+          example: example.com
+          type: string
+        zone_tag:
+          $ref: '#/components/schemas/rum_zone_tag'
+      type: object
+    rum_site_tag:
+      description: The Web Analytics site identifier.
       example: 023e105f4ecef8ad9ca31a8372d0c353
       type: string
-    rum_zone_tag:
-      description: The zone identifier.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      type: string
-    rum_rule_identifier:
-      description: The Web Analytics rule identifier.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      type: string
+    rum_rules:
+      description: A list of rules.
+      items:
+        $ref: '#/components/schemas/rum_rule'
+      type: array
     rum_modify-rules-request:
       properties:
         delete_rules:
@@ -775,20 +589,206 @@ components:
             type: object
           type: array
       type: object
-    rum_sites-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/rum_api-response-common'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/rum_site'
-            type: array
-          result_info:
-            $ref: '#/components/schemas/rum_result_info'
+    rum_create-site-request:
+      properties:
+        auto_install:
+          $ref: '#/components/schemas/rum_auto_install'
+        host:
+          description: The hostname to use for gray-clouded sites.
+          example: example.com
+          type: string
+        zone_tag:
+          $ref: '#/components/schemas/rum_zone_tag'
+      type: object
+    rum_per_page:
+      description: Number of items to return per page of results.
+      example: 10
+      type: number
+    rum_page:
+      description: Current page within the paginated list of results.
+      example: 1
+      type: number
+    rum_zone_tag:
+      description: The zone identifier.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      type: string
+    rum_rule:
+      properties:
+        created:
+          $ref: '#/components/schemas/rum_timestamp'
+        host:
+          description: The hostname the rule will be applied to.
+          example: example.com
+          type: string
+        id:
+          $ref: '#/components/schemas/rum_rule_identifier'
+        inclusive:
+          description: Whether the rule includes or excludes traffic from being measured.
+          example: true
+          type: boolean
+        is_paused:
+          description: Whether the rule is paused or not.
+          example: false
+          type: boolean
+        paths:
+          description: The paths the rule will be applied to.
+          example:
+          - '*'
+          items:
+            type: string
+          type: array
+        priority:
+          example: 1000
+          type: number
+      type: object
+    rum_rule_identifier:
+      description: The Web Analytics rule identifier.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      type: string
+    rum_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/rum_messages'
+        messages:
+          $ref: '#/components/schemas/rum_messages'
+        success:
+          description: Whether the API call was successful.
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    rum_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    rum_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     rum_auto_install:
       description: If enabled, the JavaScript snippet is automatically injected for orange-clouded sites.
       example: true
       type: boolean
+    rum_result_info:
+      properties:
+        count:
+          description: The total number of items on the current page.
+          example: 10
+          type: integer
+        page:
+          description: Current page within the paginated list of results.
+          example: 1
+          type: integer
+        per_page:
+          description: The maximum number of items to return per page of results.
+          example: 10
+          type: integer
+        total_count:
+          description: The total number of items.
+          example: 25
+          type: integer
+        total_pages:
+          description: The total number of pages.
+          example: 3
+          type:
+          - integer
+          - 'null'
+      type: object
+    rum_snippet:
+      description: Encoded JavaScript snippet.
+      example: '<!-- Cloudflare Web Analytics --><script defer src=''https://static.cloudflareinsights.com/beacon.min.js'' data-cf-beacon=''{"token": "bc40a2d1b5834453aba85c1b9a3054da"}''></script><!-- End Cloudflare Web Analytics -->'
+      type: string
+    rum_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      readOnly: true
+      type: string
+    rum_site-response-single:
+      allOf:
+      - $ref: '#/components/schemas/rum_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/rum_site'
+    rum_rule-id-response-single:
+      allOf:
+      - $ref: '#/components/schemas/rum_api-response-common'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/rum_rule_identifier'
+            type: object
+    rum_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/rum_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/rum_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    rum_site:
+      properties:
+        auto_install:
+          $ref: '#/components/schemas/rum_auto_install'
+        created:
+          $ref: '#/components/schemas/rum_timestamp'
+        rules:
+          $ref: '#/components/schemas/rum_rules'
+        ruleset:
+          $ref: '#/components/schemas/rum_ruleset'
+        site_tag:
+          $ref: '#/components/schemas/rum_site_tag'
+        site_token:
+          $ref: '#/components/schemas/rum_site_token'
+        snippet:
+          $ref: '#/components/schemas/rum_snippet'
+      type: object
+    rum_ruleset_identifier:
+      description: The Web Analytics ruleset identifier.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      type: string
+    rum_site_token:
+      description: The Web Analytics site token.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      type: string
   securitySchemes:
     api_email:
       in: header

@@ -372,121 +372,142 @@ paths:
       - Stream Live Inputs
 components:
   schemas:
-    stream_input_webrtc:
-      description: Details for streaming to a live input using WebRTC.
+    stream_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    stream_input_webrtc_url:
+      description: The WebRTC URL you provide to the broadcaster, which they stream live video to.
+      example: https://customer-m033z5x00ks6nunl.cloudflarestream.com/b236bde30eb07b9d01318940e5fc3edake34a3efb3896e18f2dc277ce6cc993ad/webRTC/publish
+      type: string
+    stream_api-response-common:
       properties:
-        url:
-          $ref: '#/components/schemas/stream_input_webrtc_url'
-      type: object
-    stream_live_input_modified:
-      description: The date and time the live input was last modified.
-      example: '2014-01-02T02:20:00Z'
-      format: date-time
-      type: string
-    stream_input_rtmps:
-      description: Details for streaming to an live input using RTMPS.
-      properties:
-        streamKey:
-          $ref: '#/components/schemas/stream_input_rtmps_stream_key'
-        url:
-          $ref: '#/components/schemas/stream_input_rtmps_url'
-      type: object
-    stream_input_srt_url:
-      description: The SRT URL you provide to the broadcaster, which they stream live video to.
-      example: srt://live.cloudflare.com:778
-      type: string
-    stream_output_url:
-      description: The URL an output uses to restream.
-      example: rtmp://a.rtmp.youtube.com/live2
-      type: string
-    stream_live_input_recording_deletion:
-      description: Indicates the number of days after which the live inputs recordings will be deleted. When a stream completes and the recording is ready, the value is used to calculate a scheduled deletion date for that recording. Omit the field to indicate no change, or include with a `null` value to remove an existing scheduled deletion.
-      example: 45
-      minimum: 30
-      type: number
-    stream_input_rtmps_stream_key:
-      description: The secret key to use when streaming via RTMPS to a live input.
-      example: 2fb3cb9f17e68a2568d6ebed8d5505eak3ceaf8c9b1f395e1b76b79332497cada
-      type: string
-    stream_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      type: object
-    stream_update_output_request:
-      properties:
-        enabled:
-          $ref: '#/components/schemas/stream_output_enabled'
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
       required:
-      - enabled
+      - success
+      - errors
+      - messages
+      type: object
+    stream_playback_webrtc_url:
+      description: The URL used to play live video over WebRTC.
+      example: https://customer-m033z5x00ks6nunl.cloudflarestream.com/b236bde30eb07b9d01318940e5fc3edake34a3efb3896e18f2dc277ce6cc993ad/webRTC/play
+      type: string
+    stream_input_rtmps_url:
+      description: The RTMPS URL you provide to the broadcaster, which they stream live video to.
+      example: rtmps://live.cloudflare.com:443/live/
+      type: string
     stream_live_input_response_single:
       allOf:
       - $ref: '#/components/schemas/stream_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/stream_live_input'
-    stream_live_input_recording_settings:
-      description: Records the input to a Cloudflare Stream video. Behavior depends on the mode. In most cases, the video will initially be viewable as a live video and transition to on-demand after a condition is satisfied.
-      example:
-        hideLiveViewerCount: false
-        mode: 'off'
-        requireSignedURLs: false
-        timeoutSeconds: 0
+    stream_input_webrtc:
+      description: Details for streaming to a live input using WebRTC.
       properties:
-        allowedOrigins:
-          $ref: '#/components/schemas/stream_live_input_recording_allowedOrigins'
-        hideLiveViewerCount:
-          $ref: '#/components/schemas/stream_live_input_recording_hideLiveViewerCount'
-        mode:
-          $ref: '#/components/schemas/stream_live_input_recording_mode'
-        requireSignedURLs:
-          $ref: '#/components/schemas/stream_live_input_recording_requireSignedURLs'
-        timeoutSeconds:
-          $ref: '#/components/schemas/stream_live_input_recording_timeoutSeconds'
+        url:
+          $ref: '#/components/schemas/stream_input_webrtc_url'
       type: object
-    stream_live_input_recording_requireSignedURLs:
-      default: false
-      description: Indicates if a video using the live input has the `requireSignedURLs` property set. Also enforces access controls on any video recording of the livestream with the live input.
-      example: true
-      type: boolean
-    stream_schemas-identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
+    stream_create_input_request:
+      properties:
+        defaultCreator:
+          $ref: '#/components/schemas/stream_live_input_default_creator'
+        deleteRecordingAfterDays:
+          $ref: '#/components/schemas/stream_live_input_recording_deletion'
+        meta:
+          $ref: '#/components/schemas/stream_live_input_metadata'
+        recording:
+          $ref: '#/components/schemas/stream_live_input_recording_settings'
+    stream_playback_srt:
+      description: Details for playback from an live input using SRT.
+      properties:
+        passphrase:
+          $ref: '#/components/schemas/stream_playback_srt_stream_passphrase'
+        streamId:
+          $ref: '#/components/schemas/stream_playback_srt_stream_id'
+        url:
+          $ref: '#/components/schemas/stream_playback_srt_url'
+      type: object
+    stream_output_identifier:
+      description: A unique identifier for the output.
+      example: baea4d9c515887b80289d5c33cf01145
       maxLength: 32
       type: string
-    stream_playback_rtmps:
-      description: Details for playback from an live input using RTMPS.
+    stream_playback_srt_stream_id:
+      description: The identifier of the live input to use for playback via SRT.
+      example: f256e6ea9341d51eea64c9454659e576
+      type: string
+    stream_output:
       properties:
+        enabled:
+          $ref: '#/components/schemas/stream_output_enabled'
         streamKey:
-          $ref: '#/components/schemas/stream_playback_rtmps_stream_key'
+          $ref: '#/components/schemas/stream_output_streamKey'
+        uid:
+          $ref: '#/components/schemas/stream_output_identifier'
         url:
-          $ref: '#/components/schemas/stream_playback_rtmps_url'
-      type: object
+          $ref: '#/components/schemas/stream_output_url'
+    stream_output_enabled:
+      default: true
+      description: When enabled, live video streamed to the associated live input will be sent to the output URL. When disabled, live video will not be sent to the output URL, even when streaming to the associated live input. Use this to control precisely when you start and stop simulcasting to specific destinations like YouTube and Twitch.
+      example: true
+      type: boolean
+    stream_live_input_recording_mode:
+      default: 'off'
+      description: Specifies the recording behavior for the live input. Set this value to `off` to prevent a recording. Set the value to `automatic` to begin a recording and transition to on-demand after Stream Live stops receiving input.
+      enum:
+      - 'off'
+      - automatic
+      example: automatic
+      type: string
     stream_live_input_recording_timeoutSeconds:
       default: 0
       description: Determines the amount of time a live input configured in `automatic` mode should wait before a recording transitions from live to on-demand. `0` is recommended for most use cases and indicates the platform default should be used.
       type: integer
-    stream_input_srt_stream_passphrase:
-      description: The secret key to use when streaming via SRT to a live input.
-      example: 2fb3cb9f17e68a2568d6ebed8d5505eak3ceaf8c9b1f395e1b76b79332497cada
-      type: string
-    stream_playback_rtmps_url:
-      description: The URL used to play live video over RTMPS.
-      example: rtmps://live.cloudflare.com:443/live/
-      type: string
-    stream_input_rtmps_url:
-      description: The RTMPS URL you provide to the broadcaster, which they stream live video to.
-      example: rtmps://live.cloudflare.com:443/live/
-      type: string
-    stream_output_response_single:
+    stream_live_input_response_collection:
       allOf:
-      - $ref: '#/components/schemas/stream_api-response-single'
+      - $ref: '#/components/schemas/stream_api-response-common'
       - properties:
           result:
-            $ref: '#/components/schemas/stream_output'
-    stream_input_srt_stream_id:
-      description: The identifier of the live input to use when streaming via SRT.
-      example: f256e6ea9341d51eea64c9454659e576
-      type: string
+            properties:
+              liveInputs:
+                items:
+                  $ref: '#/components/schemas/stream_live_input_object_without_url'
+                type: array
+              range:
+                description: The total number of remaining live inputs based on cursor position.
+                example: 1000
+                type: integer
+              total:
+                description: The total number of live inputs that match the provided filters.
+                example: 35586
+                type: integer
+            type: object
+    stream_include_counts:
+      default: false
+      description: Includes the total number of videos associated with the submitted query parameters.
+      example: true
+      type: boolean
     stream_live_input_recording_allowedOrigins:
       description: Lists the origins allowed to display videos created with this input. Enter allowed origin domains in an array and use `*` for wildcard subdomains. An empty array allows videos to be viewed on any origin.
       example:
@@ -502,68 +523,31 @@ components:
             items:
               $ref: '#/components/schemas/stream_output'
             type: array
-    stream_playback_srt_url:
-      description: The URL used to play live video over SRT.
-      example: rtmps://live.cloudflare.com:443/live/
+    stream_live_input_recording_deletion:
+      description: Indicates the number of days after which the live inputs recordings will be deleted. When a stream completes and the recording is ready, the value is used to calculate a scheduled deletion date for that recording. Omit the field to indicate no change, or include with a `null` value to remove an existing scheduled deletion.
+      example: 45
+      minimum: 30
+      type: number
+    stream_live_input_status:
+      description: The connection status of a live input.
+      enum:
+      - null
+      - connected
+      - reconnected
+      - reconnecting
+      - client_disconnect
+      - ttl_exceeded
+      - failed_to_connect
+      - failed_to_reconnect
+      - new_configuration_accepted
+      type:
+      - string
+      - 'null'
+    stream_live_input_modified:
+      description: The date and time the live input was last modified.
+      example: '2014-01-02T02:20:00Z'
+      format: date-time
       type: string
-    stream_playback_rtmps_stream_key:
-      description: The secret key to use for playback via RTMPS.
-      example: 2fb3cb9f17e68a2568d6ebed8d5505eak3ceaf8c9b1f395e1b76b79332497cada
-      type: string
-    stream_output_identifier:
-      description: A unique identifier for the output.
-      example: baea4d9c515887b80289d5c33cf01145
-      maxLength: 32
-      type: string
-    stream_output_enabled:
-      default: true
-      description: When enabled, live video streamed to the associated live input will be sent to the output URL. When disabled, live video will not be sent to the output URL, even when streaming to the associated live input. Use this to control precisely when you start and stop simulcasting to specific destinations like YouTube and Twitch.
-      example: true
-      type: boolean
-    stream_input_webrtc_url:
-      description: The WebRTC URL you provide to the broadcaster, which they stream live video to.
-      example: https://customer-m033z5x00ks6nunl.cloudflarestream.com/b236bde30eb07b9d01318940e5fc3edake34a3efb3896e18f2dc277ce6cc993ad/webRTC/publish
-      type: string
-    stream_create_input_request:
-      properties:
-        defaultCreator:
-          $ref: '#/components/schemas/stream_live_input_default_creator'
-        deleteRecordingAfterDays:
-          $ref: '#/components/schemas/stream_live_input_recording_deletion'
-        meta:
-          $ref: '#/components/schemas/stream_live_input_metadata'
-        recording:
-          $ref: '#/components/schemas/stream_live_input_recording_settings'
-    stream_live_input:
-      description: Details about a live input.
-      properties:
-        created:
-          $ref: '#/components/schemas/stream_live_input_created'
-        deleteRecordingAfterDays:
-          $ref: '#/components/schemas/stream_live_input_recording_deletion'
-        meta:
-          $ref: '#/components/schemas/stream_live_input_metadata'
-        modified:
-          $ref: '#/components/schemas/stream_live_input_modified'
-        recording:
-          $ref: '#/components/schemas/stream_live_input_recording_settings'
-        rtmps:
-          $ref: '#/components/schemas/stream_input_rtmps'
-        rtmpsPlayback:
-          $ref: '#/components/schemas/stream_playback_rtmps'
-        srt:
-          $ref: '#/components/schemas/stream_input_srt'
-        srtPlayback:
-          $ref: '#/components/schemas/stream_playback_srt'
-        status:
-          $ref: '#/components/schemas/stream_live_input_status'
-        uid:
-          $ref: '#/components/schemas/stream_live_input_identifier'
-        webRTC:
-          $ref: '#/components/schemas/stream_input_webrtc'
-        webRTCPlayback:
-          $ref: '#/components/schemas/stream_playback_webrtc'
-      type: object
     stream_api-response-common-failure:
       properties:
         errors:
@@ -595,25 +579,26 @@ components:
       - messages
       - result
       type: object
-    stream_live_input_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      - properties:
-          result:
-            properties:
-              liveInputs:
-                items:
-                  $ref: '#/components/schemas/stream_live_input_object_without_url'
-                type: array
-              range:
-                description: The total number of remaining live inputs based on cursor position.
-                example: 1000
-                type: integer
-              total:
-                description: The total number of live inputs that match the provided filters.
-                example: 35586
-                type: integer
-            type: object
+    stream_input_srt_stream_passphrase:
+      description: The secret key to use when streaming via SRT to a live input.
+      example: 2fb3cb9f17e68a2568d6ebed8d5505eak3ceaf8c9b1f395e1b76b79332497cada
+      type: string
+    stream_schemas-identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    stream_create_output_request:
+      properties:
+        enabled:
+          $ref: '#/components/schemas/stream_output_enabled'
+        streamKey:
+          $ref: '#/components/schemas/stream_output_streamKey'
+        url:
+          $ref: '#/components/schemas/stream_output_url'
+      required:
+      - url
+      - streamKey
     stream_input_srt:
       description: Details for streaming to a live input using SRT.
       properties:
@@ -624,44 +609,47 @@ components:
         url:
           $ref: '#/components/schemas/stream_input_srt_url'
       type: object
-    stream_live_input_recording_mode:
-      default: 'off'
-      description: Specifies the recording behavior for the live input. Set this value to `off` to prevent a recording. Set the value to `automatic` to begin a recording and transition to on-demand after Stream Live stops receiving input.
-      enum:
-      - 'off'
-      - automatic
-      example: automatic
+    stream_live_input_metadata:
+      description: A user modifiable key-value store used to reference other systems of record for managing live inputs.
+      example:
+        name: test stream 1
+      type: object
+    stream_input_rtmps_stream_key:
+      description: The secret key to use when streaming via RTMPS to a live input.
+      example: 2fb3cb9f17e68a2568d6ebed8d5505eak3ceaf8c9b1f395e1b76b79332497cada
       type: string
-    stream_live_input_status:
-      description: The connection status of a live input.
-      enum:
-      - null
-      - connected
-      - reconnected
-      - reconnecting
-      - client_disconnect
-      - ttl_exceeded
-      - failed_to_connect
-      - failed_to_reconnect
-      - new_configuration_accepted
-      type:
-      - string
-      - 'null'
-    stream_playback_srt_stream_id:
-      description: The identifier of the live input to use for playback via SRT.
-      example: f256e6ea9341d51eea64c9454659e576
+    stream_input_rtmps:
+      description: Details for streaming to an live input using RTMPS.
+      properties:
+        streamKey:
+          $ref: '#/components/schemas/stream_input_rtmps_stream_key'
+        url:
+          $ref: '#/components/schemas/stream_input_rtmps_url'
+      type: object
+    stream_output_url:
+      description: The URL an output uses to restream.
+      example: rtmp://a.rtmp.youtube.com/live2
       type: string
-    stream_live_input_identifier:
-      description: A unique identifier for a live input.
-      example: 66be4bf738797e01e1fca35a7bdecdcd
-      maxLength: 32
-      type: string
+    stream_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      type: object
+    stream_output_response_single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/stream_output'
     stream_playback_webrtc:
       description: Details for playback from a live input using WebRTC.
       properties:
         url:
           $ref: '#/components/schemas/stream_playback_webrtc_url'
       type: object
+    stream_playback_rtmps_stream_key:
+      description: The secret key to use for playback via RTMPS.
+      example: 2fb3cb9f17e68a2568d6ebed8d5505eak3ceaf8c9b1f395e1b76b79332497cada
+      type: string
     stream_live_input_object_without_url:
       properties:
         created:
@@ -674,41 +662,97 @@ components:
           $ref: '#/components/schemas/stream_live_input_modified'
         uid:
           $ref: '#/components/schemas/stream_live_input_identifier'
-    stream_create_output_request:
-      properties:
-        enabled:
-          $ref: '#/components/schemas/stream_output_enabled'
-        streamKey:
-          $ref: '#/components/schemas/stream_output_streamKey'
-        url:
-          $ref: '#/components/schemas/stream_output_url'
-      required:
-      - url
-      - streamKey
-    stream_output:
-      properties:
-        enabled:
-          $ref: '#/components/schemas/stream_output_enabled'
-        streamKey:
-          $ref: '#/components/schemas/stream_output_streamKey'
-        uid:
-          $ref: '#/components/schemas/stream_output_identifier'
-        url:
-          $ref: '#/components/schemas/stream_output_url'
+    stream_output_streamKey:
+      description: The streamKey used to authenticate against an output's target.
+      example: uzya-f19y-g2g9-a2ee-51j2
+      type: string
     stream_live_input_recording_hideLiveViewerCount:
       default: false
       description: Disables reporting the number of live viewers when this property is set to `true`.
       example: true
       type: boolean
-    stream_include_counts:
+    stream_live_input_identifier:
+      description: A unique identifier for a live input.
+      example: 66be4bf738797e01e1fca35a7bdecdcd
+      maxLength: 32
+      type: string
+    stream_live_input_recording_requireSignedURLs:
       default: false
-      description: Includes the total number of videos associated with the submitted query parameters.
+      description: Indicates if a video using the live input has the `requireSignedURLs` property set. Also enforces access controls on any video recording of the livestream with the live input.
       example: true
       type: boolean
-    stream_live_input_created:
-      description: The date and time the live input was created.
-      example: '2014-01-02T02:20:00Z'
-      format: date-time
+    stream_playback_srt_url:
+      description: The URL used to play live video over SRT.
+      example: rtmps://live.cloudflare.com:443/live/
+      type: string
+    stream_playback_rtmps_url:
+      description: The URL used to play live video over RTMPS.
+      example: rtmps://live.cloudflare.com:443/live/
+      type: string
+    stream_live_input_recording_settings:
+      description: Records the input to a Cloudflare Stream video. Behavior depends on the mode. In most cases, the video will initially be viewable as a live video and transition to on-demand after a condition is satisfied.
+      example:
+        hideLiveViewerCount: false
+        mode: 'off'
+        requireSignedURLs: false
+        timeoutSeconds: 0
+      properties:
+        allowedOrigins:
+          $ref: '#/components/schemas/stream_live_input_recording_allowedOrigins'
+        hideLiveViewerCount:
+          $ref: '#/components/schemas/stream_live_input_recording_hideLiveViewerCount'
+        mode:
+          $ref: '#/components/schemas/stream_live_input_recording_mode'
+        requireSignedURLs:
+          $ref: '#/components/schemas/stream_live_input_recording_requireSignedURLs'
+        timeoutSeconds:
+          $ref: '#/components/schemas/stream_live_input_recording_timeoutSeconds'
+      type: object
+    stream_live_input:
+      description: Details about a live input.
+      properties:
+        created:
+          $ref: '#/components/schemas/stream_live_input_created'
+        deleteRecordingAfterDays:
+          $ref: '#/components/schemas/stream_live_input_recording_deletion'
+        meta:
+          $ref: '#/components/schemas/stream_live_input_metadata'
+        modified:
+          $ref: '#/components/schemas/stream_live_input_modified'
+        recording:
+          $ref: '#/components/schemas/stream_live_input_recording_settings'
+        rtmps:
+          $ref: '#/components/schemas/stream_input_rtmps'
+        rtmpsPlayback:
+          $ref: '#/components/schemas/stream_playback_rtmps'
+        srt:
+          $ref: '#/components/schemas/stream_input_srt'
+        srtPlayback:
+          $ref: '#/components/schemas/stream_playback_srt'
+        status:
+          $ref: '#/components/schemas/stream_live_input_status'
+        uid:
+          $ref: '#/components/schemas/stream_live_input_identifier'
+        webRTC:
+          $ref: '#/components/schemas/stream_input_webrtc'
+        webRTCPlayback:
+          $ref: '#/components/schemas/stream_playback_webrtc'
+      type: object
+    stream_playback_rtmps:
+      description: Details for playback from an live input using RTMPS.
+      properties:
+        streamKey:
+          $ref: '#/components/schemas/stream_playback_rtmps_stream_key'
+        url:
+          $ref: '#/components/schemas/stream_playback_rtmps_url'
+      type: object
+    stream_playback_srt_stream_passphrase:
+      description: The secret key to use for playback via SRT.
+      example: 2fb3cb9f17e68a2568d6ebed8d5505eak3ceaf8c9b1f395e1b76b79332497cada
+      type: string
+    stream_input_srt_stream_id:
+      description: The identifier of the live input to use when streaming via SRT.
+      example: f256e6ea9341d51eea64c9454659e576
       type: string
     stream_update_input_request:
       properties:
@@ -720,67 +764,23 @@ components:
           $ref: '#/components/schemas/stream_live_input_metadata'
         recording:
           $ref: '#/components/schemas/stream_live_input_recording_settings'
-    stream_playback_srt_stream_passphrase:
-      description: The secret key to use for playback via SRT.
-      example: 2fb3cb9f17e68a2568d6ebed8d5505eak3ceaf8c9b1f395e1b76b79332497cada
-      type: string
-    stream_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    stream_output_streamKey:
-      description: The streamKey used to authenticate against an output's target.
-      example: uzya-f19y-g2g9-a2ee-51j2
-      type: string
-    stream_live_input_metadata:
-      description: A user modifiable key-value store used to reference other systems of record for managing live inputs.
-      example:
-        name: test stream 1
-      type: object
     stream_live_input_default_creator:
       description: Sets the creator ID asssociated with this live input.
       type: string
-    stream_api-response-common:
+    stream_live_input_created:
+      description: The date and time the live input was created.
+      example: '2014-01-02T02:20:00Z'
+      format: date-time
+      type: string
+    stream_update_output_request:
       properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
+        enabled:
+          $ref: '#/components/schemas/stream_output_enabled'
       required:
-      - success
-      - errors
-      - messages
-      type: object
-    stream_playback_srt:
-      description: Details for playback from an live input using SRT.
-      properties:
-        passphrase:
-          $ref: '#/components/schemas/stream_playback_srt_stream_passphrase'
-        streamId:
-          $ref: '#/components/schemas/stream_playback_srt_stream_id'
-        url:
-          $ref: '#/components/schemas/stream_playback_srt_url'
-      type: object
-    stream_playback_webrtc_url:
-      description: The URL used to play live video over WebRTC.
-      example: https://customer-m033z5x00ks6nunl.cloudflarestream.com/b236bde30eb07b9d01318940e5fc3edake34a3efb3896e18f2dc277ce6cc993ad/webRTC/play
+      - enabled
+    stream_input_srt_url:
+      description: The SRT URL you provide to the broadcaster, which they stream live video to.
+      example: srt://live.cloudflare.com:778
       type: string
   securitySchemes:
     api_email:

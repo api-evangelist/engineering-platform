@@ -149,68 +149,32 @@ paths:
         pro: true
 components:
   schemas:
-    bill-subs-api_current_period_end:
-      description: The end of the current period and also when the next billing is due.
-      example: '2014-03-31T12:20:00Z'
-      format: date-time
+    bill-subs-api_name:
+      description: The domain name
+      example: example.com
+      maxLength: 253
+      pattern: ^([a-zA-Z0-9][\-a-zA-Z0-9]*\.)+[\-a-zA-Z0-9]{2,20}$
       readOnly: true
       type: string
-    bill-subs-api_zone:
-      description: A simple zone object. May have null properties if not a zone subscription.
-      properties:
-        id:
-          $ref: '#/components/schemas/bill-subs-api_identifier'
-        name:
-          $ref: '#/components/schemas/bill-subs-api_name'
-      type: object
-    bill-subs-api_api-response-single:
+    bill-subs-api_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/bill-subs-api_api-response-common'
       - properties:
           result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/bill-subs-api_result_info'
       type: object
-    bill-subs-api_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
+    bill-subs-api_subscription:
+      allOf:
+      - $ref: '#/components/schemas/bill-subs-api_subscription-v2'
+      type: object
+    bill-subs-api_install_id:
+      description: app install id.
       type: string
-    bill-subs-api_currency:
-      description: The monetary unit in which pricing information is displayed.
-      example: USD
-      readOnly: true
-      type: string
-    bill-subs-api_frequency:
-      description: How often the subscription is renewed automatically.
-      enum:
-      - weekly
-      - monthly
-      - quarterly
-      - yearly
-      example: monthly
-      type: string
-    bill-subs-api_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     bill-subs-api_state:
       description: The state that the subscription is in.
       enum:
@@ -224,56 +188,26 @@ components:
       example: Paid
       readOnly: true
       type: string
-    bill-subs-api_install_id:
-      description: app install id.
-      type: string
-    bill-subs-api_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/bill-subs-api_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/bill-subs-api_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    bill-subs-api_subscription:
+    bill-subs-api_price:
+      description: The price of the subscription that will be billed, in US dollars.
+      example: 20
+      readOnly: true
+      type: number
+    bill-subs-api_user_subscription_response_collection:
       allOf:
-      - $ref: '#/components/schemas/bill-subs-api_subscription-v2'
-      type: object
-    bill-subs-api_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/bill-subs-api_api-response-common'
+      - $ref: '#/components/schemas/bill-subs-api_api-response-collection'
       - properties:
           result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/bill-subs-api_result_info'
-      type: object
+            items:
+              $ref: '#/components/schemas/bill-subs-api_subscription'
+            type: array
+        type: object
+    bill-subs-api_current_period_end:
+      description: The end of the current period and also when the next billing is due.
+      example: '2014-03-31T12:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
     bill-subs-api_user_subscription_response_single:
       allOf:
       - $ref: '#/components/schemas/bill-subs-api_api-response-single'
@@ -308,6 +242,158 @@ components:
         zone:
           $ref: '#/components/schemas/bill-subs-api_zone'
       type: object
+    bill-subs-api_current_period_start:
+      description: When the current billing period started. May match initial_period_start if this is the first period.
+      example: '2014-05-11T12:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    bill-subs-api_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/bill-subs-api_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
+    bill-subs-api_schemas-identifier:
+      description: Subscription identifier tag.
+      example: 506e3185e9c882d175a2d0cb0093d9f2
+      maxLength: 32
+      readOnly: true
+      type: string
+    bill-subs-api_zone:
+      description: A simple zone object. May have null properties if not a zone subscription.
+      properties:
+        id:
+          $ref: '#/components/schemas/bill-subs-api_identifier'
+        name:
+          $ref: '#/components/schemas/bill-subs-api_name'
+      type: object
+    bill-subs-api_component_values:
+      description: The list of add-ons subscribed to.
+      items:
+        $ref: '#/components/schemas/bill-subs-api_component_value'
+      type: array
+    bill-subs-api_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    bill-subs-api_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/bill-subs-api_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/bill-subs-api_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    bill-subs-api_component_value:
+      description: A component value for a subscription.
+      properties:
+        default:
+          description: The default amount assigned.
+          example: 5
+          type: number
+        name:
+          description: The name of the component value.
+          example: page_rules
+          type: string
+        price:
+          description: The unit price for the component value.
+          example: 5
+          type: number
+        value:
+          description: The amount of the component value assigned.
+          example: 20
+          type: number
+      type: object
+    bill-subs-api_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/bill-subs-api_messages'
+        messages:
+          $ref: '#/components/schemas/bill-subs-api_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    bill-subs-api_currency:
+      description: The monetary unit in which pricing information is displayed.
+      example: USD
+      readOnly: true
+      type: string
+    bill-subs-api_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
     bill-subs-api_rate_plan:
       description: The rate plan applied to the subscription.
       properties:
@@ -341,106 +427,20 @@ components:
             type: string
           type: array
       type: object
-    bill-subs-api_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/bill-subs-api_messages'
-        messages:
-          $ref: '#/components/schemas/bill-subs-api_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    bill-subs-api_price:
-      description: The price of the subscription that will be billed, in US dollars.
-      example: 20
-      readOnly: true
-      type: number
-    bill-subs-api_component_values:
-      description: The list of add-ons subscribed to.
-      items:
-        $ref: '#/components/schemas/bill-subs-api_component_value'
-      type: array
-    bill-subs-api_component_value:
-      description: A component value for a subscription.
-      properties:
-        default:
-          description: The default amount assigned.
-          example: 5
-          type: number
-        name:
-          description: The name of the component value.
-          example: page_rules
-          type: string
-        price:
-          description: The unit price for the component value.
-          example: 5
-          type: number
-        value:
-          description: The amount of the component value assigned.
-          example: 20
-          type: number
-      type: object
-    bill-subs-api_schemas-identifier:
-      description: Subscription identifier tag.
-      example: 506e3185e9c882d175a2d0cb0093d9f2
+    bill-subs-api_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       readOnly: true
       type: string
-    bill-subs-api_name:
-      description: The domain name
-      example: example.com
-      maxLength: 253
-      pattern: ^([a-zA-Z0-9][\-a-zA-Z0-9]*\.)+[\-a-zA-Z0-9]{2,20}$
-      readOnly: true
-      type: string
-    bill-subs-api_user_subscription_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/bill-subs-api_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/bill-subs-api_subscription'
-            type: array
-        type: object
-    bill-subs-api_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    bill-subs-api_current_period_start:
-      description: When the current billing period started. May match initial_period_start if this is the first period.
-      example: '2014-05-11T12:20:00Z'
-      format: date-time
-      readOnly: true
+    bill-subs-api_frequency:
+      description: How often the subscription is renewed automatically.
+      enum:
+      - weekly
+      - monthly
+      - quarterly
+      - yearly
+      example: monthly
       type: string
   securitySchemes:
     api_email:

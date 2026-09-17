@@ -181,11 +181,12 @@ paths:
         pro: false
 components:
   schemas:
-    iam_common_components-schemas-identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
+    iam_components-schemas-status:
+      description: Whether the user is a member of the organization or has an invitation pending.
+      enum:
+      - member
+      - invited
+      example: member
       type: string
     iam_api-response-collection:
       allOf:
@@ -199,111 +200,6 @@ components:
           result_info:
             $ref: '#/components/schemas/iam_result_info'
       type: object
-    iam_organization:
-      properties:
-        id:
-          $ref: '#/components/schemas/iam_common_components-schemas-identifier'
-        name:
-          $ref: '#/components/schemas/iam_schemas-name'
-        permissions:
-          $ref: '#/components/schemas/iam_schemas-permissions'
-        roles:
-          description: List of roles that a user has within an organization.
-          items:
-            example: All Privileges - Super Administrator
-            maxLength: 120
-            type: string
-          readOnly: true
-          type: array
-        status:
-          $ref: '#/components/schemas/iam_components-schemas-status'
-      type: object
-    iam_collection_organization_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/iam_organization'
-            type: array
-        type: object
-    iam_single_organization_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-single'
-      - properties:
-          result:
-            type: object
-        type: object
-    iam_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    iam_schemas-name:
-      description: Organization name.
-      example: Cloudflare, Inc.
-      maxLength: 100
-      type: string
-    iam_schemas-permissions:
-      description: Access permissions for this User.
-      items:
-        example: '#zones:read'
-        maxLength: 160
-        type: string
-      readOnly: true
-      type: array
-    iam_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/iam_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/iam_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    iam_components-schemas-status:
-      description: Whether the user is a member of the organization or has an invitation pending.
-      enum:
-      - member
-      - invited
-      example: member
-      type: string
     iam_api-response-common:
       properties:
         errors:
@@ -336,9 +232,113 @@ components:
         type: object
         uniqueItems: true
       type: array
+    iam_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    iam_schemas-permissions:
+      description: Access permissions for this User.
+      items:
+        example: '#zones:read'
+        maxLength: 160
+        type: string
+      readOnly: true
+      type: array
+    iam_common_components-schemas-identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    iam_single_organization_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-single'
+      - properties:
+          result:
+            type: object
+        type: object
     iam_api-response-single:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-common'
+      type: object
+    iam_organization:
+      properties:
+        id:
+          $ref: '#/components/schemas/iam_common_components-schemas-identifier'
+        name:
+          $ref: '#/components/schemas/iam_schemas-name'
+        permissions:
+          $ref: '#/components/schemas/iam_schemas-permissions'
+        roles:
+          description: List of roles that a user has within an organization.
+          items:
+            example: All Privileges - Super Administrator
+            maxLength: 120
+            type: string
+          readOnly: true
+          type: array
+        status:
+          $ref: '#/components/schemas/iam_components-schemas-status'
+      type: object
+    iam_collection_organization_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/iam_organization'
+            type: array
+        type: object
+    iam_schemas-name:
+      description: Organization name.
+      example: Cloudflare, Inc.
+      maxLength: 100
+      type: string
+    iam_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/iam_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/iam_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
       type: object
   securitySchemes:
     api_email:

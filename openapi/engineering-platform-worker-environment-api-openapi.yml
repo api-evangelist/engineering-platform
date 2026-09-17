@@ -248,78 +248,6 @@ paths:
         - com.cloudflare.edge.worker.script.create
 components:
   schemas:
-    workers_script-settings-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/workers_script-settings-item'
-    workers_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/workers_messages'
-        messages:
-          $ref: '#/components/schemas/workers_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    workers_modified_on:
-      description: When the script was last modified.
-      example: '2017-01-01T00:00:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    workers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    workers_usage_model:
-      description: Specifies the usage model for the Worker (e.g. 'bundled' or 'unbound').
-      example: unbound
-      pattern: ^(bundled|unbound)$
-      type: string
-    workers_tail_consumers_script:
-      description: A reference to a script that will consume logs from the attached Worker.
-      properties:
-        environment:
-          description: Optional environment if the Worker utilizes one.
-          example: production
-          type: string
-        namespace:
-          description: Optional dispatch namespace the script belongs to.
-          example: my-namespace
-          type: string
-        service:
-          description: Name of Worker that is to be the consumer.
-          example: my-log-consumer
-          type: string
-      required:
-      - service
-      type: object
     workers_api-response-common-failure:
       properties:
         errors:
@@ -351,21 +279,75 @@ components:
       - messages
       - result
       type: object
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    workers_script-settings-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_script-settings-item'
+    workers_tail_consumers:
+      description: List of Workers that will consume logs from the attached Worker.
+      items:
+        $ref: '#/components/schemas/workers_tail_consumers_script'
+      type: array
+    workers_usage_model:
+      description: Specifies the usage model for the Worker (e.g. 'bundled' or 'unbound').
+      example: unbound
+      pattern: ^(bundled|unbound)$
+      type: string
+    workers_service:
+      description: Name of Worker to bind to
+      example: my-worker
+      type: string
+    workers_etag:
+      description: Hashed script content, can be used in a If-None-Match header when updating.
+      example: ea95132c15732412d22c1476fa83f27a
+      readOnly: true
+      type: string
+    workers_placement_mode:
+      description: Specifies the placement mode for the Worker (e.g. 'smart').
+      example: smart
+      type: string
     workers_api-response-single:
       allOf:
       - $ref: '#/components/schemas/workers_api-response-common'
       type: object
-    workers_environment:
-      description: Optional environment if the Worker utilizes one.
-      example: production
-      type: string
-    workers_script-settings-item:
+    workers_script-response:
       properties:
+        created_on:
+          $ref: '#/components/schemas/workers_created_on'
+        etag:
+          $ref: '#/components/schemas/workers_etag'
+        id:
+          description: The id of the script in the Workers system. Usually the script name.
+          example: my-workers-script
+          readOnly: true
+          type: string
         logpush:
           $ref: '#/components/schemas/workers_logpush'
+        modified_on:
+          $ref: '#/components/schemas/workers_modified_on'
+        placement_mode:
+          $ref: '#/components/schemas/workers_placement_mode'
         tail_consumers:
           $ref: '#/components/schemas/workers_tail_consumers'
-      type: object
+        usage_model:
+          $ref: '#/components/schemas/workers_usage_model'
     workers_script-response-single:
       allOf:
       - $ref: '#/components/schemas/workers_api-response-single'
@@ -396,44 +378,62 @@ components:
       format: date-time
       readOnly: true
       type: string
-    workers_tail_consumers:
-      description: List of Workers that will consume logs from the attached Worker.
-      items:
-        $ref: '#/components/schemas/workers_tail_consumers_script'
-      type: array
-    workers_placement_mode:
-      description: Specifies the placement mode for the Worker (e.g. 'smart').
-      example: smart
-      type: string
-    workers_service:
-      description: Name of Worker to bind to
-      example: my-worker
-      type: string
-    workers_script-response:
+    workers_tail_consumers_script:
+      description: A reference to a script that will consume logs from the attached Worker.
       properties:
-        created_on:
-          $ref: '#/components/schemas/workers_created_on'
-        etag:
-          $ref: '#/components/schemas/workers_etag'
-        id:
-          description: The id of the script in the Workers system. Usually the script name.
-          example: my-workers-script
-          readOnly: true
+        environment:
+          description: Optional environment if the Worker utilizes one.
+          example: production
           type: string
+        namespace:
+          description: Optional dispatch namespace the script belongs to.
+          example: my-namespace
+          type: string
+        service:
+          description: Name of Worker that is to be the consumer.
+          example: my-log-consumer
+          type: string
+      required:
+      - service
+      type: object
+    workers_modified_on:
+      description: When the script was last modified.
+      example: '2017-01-01T00:00:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    workers_script-settings-item:
+      properties:
         logpush:
           $ref: '#/components/schemas/workers_logpush'
-        modified_on:
-          $ref: '#/components/schemas/workers_modified_on'
-        placement_mode:
-          $ref: '#/components/schemas/workers_placement_mode'
         tail_consumers:
           $ref: '#/components/schemas/workers_tail_consumers'
-        usage_model:
-          $ref: '#/components/schemas/workers_usage_model'
-    workers_etag:
-      description: Hashed script content, can be used in a If-None-Match header when updating.
-      example: ea95132c15732412d22c1476fa83f27a
-      readOnly: true
+      type: object
+    workers_environment:
+      description: Optional environment if the Worker utilizes one.
+      example: production
+      type: string
+    workers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers_messages'
+        messages:
+          $ref: '#/components/schemas/workers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
   securitySchemes:
     api_email:

@@ -237,6 +237,33 @@ paths:
         id: bookmarks_deprecation
 components:
   schemas:
+    access_bookmarks_components-schemas-name:
+      description: The name of the Bookmark application.
+      example: My Website
+      type: string
+    access_bookmarks_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_bookmarks'
+            type: array
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     access_result_info:
       properties:
         count:
@@ -256,23 +283,12 @@ components:
           example: 2000
           type: number
       type: object
-    access_bookmarks:
-      properties:
-        app_launcher_visible:
-          $ref: '#/components/schemas/access_schemas-app_launcher_visible'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        domain:
-          $ref: '#/components/schemas/access_schemas-domain'
-        id:
-          description: The unique identifier for the Bookmark application.
-          type: string
-        logo_url:
-          $ref: '#/components/schemas/access_logo_url'
-        name:
-          $ref: '#/components/schemas/access_bookmarks_components-schemas-name'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
+    access_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
       type: object
     access_id_response:
       allOf:
@@ -283,68 +299,10 @@ components:
               id:
                 $ref: '#/components/schemas/access_uuid'
             type: object
-    access_bookmarks_components-schemas-name:
-      description: The name of the Bookmark application.
-      example: My Website
+    access_schemas-domain:
+      description: The domain of the Bookmark application.
+      example: example.com
       type: string
-    access_components-schemas-identifier:
-      example: 699d98642c564d2e855e9661899b7252
-      type: string
-    access_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/access_messages'
-        messages:
-          $ref: '#/components/schemas/access_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
-    access_logo_url:
-      description: The image URL for the logo shown in the App Launcher dashboard.
-      example: https://www.cloudflare.com/img/logo-web-badges/cf-logo-on-white-bg.svg
-      type: string
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
-      type: object
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    access_bookmarks_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/access_bookmarks'
-    access_bookmarks_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_bookmarks'
-            type: array
     access_schemas-app_launcher_visible:
       description: Displays the application in the App Launcher.
       example: true
@@ -380,25 +338,67 @@ components:
       - messages
       - result
       type: object
-    access_schemas-domain:
-      description: The domain of the Bookmark application.
-      example: example.com
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
       type: string
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_components-schemas-identifier:
+      example: 699d98642c564d2e855e9661899b7252
+      type: string
+    access_logo_url:
+      description: The image URL for the logo shown in the App Launcher dashboard.
+      example: https://www.cloudflare.com/img/logo-web-badges/cf-logo-on-white-bg.svg
+      type: string
+    access_bookmarks_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/access_bookmarks'
+    access_bookmarks:
+      properties:
+        app_launcher_visible:
+          $ref: '#/components/schemas/access_schemas-app_launcher_visible'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        domain:
+          $ref: '#/components/schemas/access_schemas-domain'
+        id:
+          description: The unique identifier for the Bookmark application.
+          type: string
+        logo_url:
+          $ref: '#/components/schemas/access_logo_url'
+        name:
+          $ref: '#/components/schemas/access_bookmarks_components-schemas-name'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      type: object
   securitySchemes:
     api_email:
       in: header

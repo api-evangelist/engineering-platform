@@ -179,9 +179,78 @@ paths:
       - DLP Settings
 components:
   schemas:
+    dlp_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    dlp_RegexValidationResult:
+      properties:
+        valid:
+          type: boolean
+      required:
+      - valid
+      type: object
     dlp_api-response-single:
       allOf:
       - $ref: '#/components/schemas/dlp_api-response-common'
+      type: object
+    dlp_PayloadLogSettingUpdate:
+      properties:
+        public_key:
+          type:
+          - string
+          - 'null'
+      type: object
+    dlp_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dlp_Limits:
+      properties:
+        max_dataset_cells:
+          format: int64
+          minimum: 0
+          type: integer
+      required:
+      - max_dataset_cells
       type: object
     dlp_api-response-common:
       properties:
@@ -230,37 +299,6 @@ components:
       required:
       - regex
       type: object
-    dlp_RegexValidationResult:
-      properties:
-        valid:
-          type: boolean
-      required:
-      - valid
-      type: object
-    dlp_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    dlp_Limits:
-      properties:
-        max_dataset_cells:
-          format: int64
-          minimum: 0
-          type: integer
-      required:
-      - max_dataset_cells
-      type: object
     dlp_PayloadLogSetting:
       properties:
         public_key:
@@ -272,44 +310,6 @@ components:
           type: string
       required:
       - updated_at
-      type: object
-    dlp_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/dlp_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/dlp_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    dlp_PayloadLogSettingUpdate:
-      properties:
-        public_key:
-          type:
-          - string
-          - 'null'
       type: object
   securitySchemes:
     api_email:

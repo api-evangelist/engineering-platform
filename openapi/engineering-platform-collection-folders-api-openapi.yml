@@ -220,91 +220,85 @@ paths:
         '500':
           $ref: '#/components/responses/common500Error'
 components:
-  requestBodies:
-    commentCreateUpdate:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentCreateUpdate'
-          examples:
-            Create Comment:
-              value:
-                body: This is an example.
-            Tag User in Comment:
-              value:
-                body: This is an example. @alex-cruz
-                tags:
-                  '@alex-cruz':
-                    type: user
-                    id: 12345678
-    createCollectionFolder:
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties: true
-            description: 'Information about the collection folder. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
-
-
-              **Note:**
-
-
-              It is recommended that you pass the `name` property in the request body. If you do not, the system uses a null value. As a result, this creates a folder with a blank name.
-
-              '
-            properties:
-              name:
-                type: string
-                example: Test Folder
-                description: The folder's name. It is recommended that you pass the `name` property in the request body. If you do not, the system uses a null value. As a result, this creates a folder with a blank name.
-              folder:
-                type: string
-                format: uid
-                description: The ID of a folder in which to create the folder.
-                example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-          example:
-            name: Test Folder
-            description: This is a test collection folder.
-    updateCollectionFolder:
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties: true
-            description: The folder properties to update. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
-            properties:
-              name:
-                type: string
-                description: The folder's name.
-                example: Test Folder
-              description:
-                type: string
-                description: The folder's description.
-                example: This is a test folder.
-          example:
-            name: Test Folder
-            description: This is a test folder.
   responses:
-    getCollectionFolder:
+    collectionFolder400Error:
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: instanceFoundError
+                  details:
+                    type: object
+                    description: Information about the error.
+                    additionalProperties: true
+                    properties:
+                      model:
+                        type: string
+                        description: The resource name.
+                        example: folder
+                      owner:
+                        type: string
+                        description: The user ID of the folder's owner.
+                        example: '12345678'
+                      model_id:
+                        type: string
+                        description: The folder's ID.
+                        example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+                  message:
+                    type: string
+                    description: The error message.
+                    example: This folder already exists in the database.
+          example:
+            error:
+              name: instanceNotFoundError
+              details:
+                model: folder
+                owner: '12345678'
+                model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              message: We could not find the folder you are looking for
+    common500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
+    updateCollectionFolder:
       description: Successful Response
       content:
         application/json:
           schema:
             type: object
             properties:
-              model_id:
-                type: string
-                description: The folder's ID.
-                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
               data:
                 type: object
-                description: Information about the folder. For a complete list of properties, refer to the **Folders** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
                 additionalProperties: true
+                description: The folder's updated information, including the updated properties. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
                 properties:
                   id:
                     type: string
@@ -340,43 +334,64 @@ components:
                     type: integer
                     format: int64
                     description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                    example: 24994132707
+                    example: 24977100955
                   collection:
                     type: string
                     description: The collection ID that the folder belongs to.
                     example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+                  folder:
+                    type:
+                    - string
+                    - 'null'
+                    description: Information about the folder.
+                    example: null
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              model_id:
+                type: string
+                description: The folder's ID.
+                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              revision:
+                type: number
+                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                example: 24994132707
           example:
-            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-            meta:
-              model: folder
-              populate: false
-              changeset: false
-              action: find
             data:
-              owner: '12345678'
-              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-              folder: null
               id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              auth: null
               name: Test Folder
-              description: This is a test collection folder.
-              variables: null
-              auth:
-                type: apikey
-                apikey:
-                - key: value
-                  value: XXX
-                - key: key
-                  value: x-api-key
+              order: []
+              owner: '12345678'
               events: null
-              order:
-              - 81b49e05-0b87-4ca4-ac8c-091aaedafea3
-              - 929acf24-4234-45e1-59cf-dc2b27ea7603
-              - 3cfc2ac8-00a9-47d2-415d-049773f23268
-              folders_order:
-              - 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              - 5c341de9-5751-461f-b7bd-af86bbae740c
+              folder: null
               createdAt: '2022-08-29T16:49:19.964Z'
               updatedAt: '2022-08-29T16:49:19.964Z'
+              variables: null
+              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+              description: This is a test folder.
+              lastRevision: 24977100955
+              folders_order: []
+              lastUpdatedBy: '12345678'
+            meta:
+              model: folder
+              action: update
+            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+            revision: 24977103385
+    commentCreated:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentCreatedUpdated'
+          example:
+            data:
+              id: 46814
+              createdBy: 12345678
+              createdAt: '2024-01-18T11:30:40.000Z'
+              updatedAt: '2024-01-18T11:30:40.000Z'
+              body: This is an example.
     createCollectionFolder:
       description: Successful Response
       content:
@@ -486,88 +501,36 @@ components:
               action: import
             model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
             revision: 24994132707
-    collectionFolder401Error:
-      description: Unauthorized
+    comment500Error:
+      description: Internal Server Error
       content:
         application/problem+json:
           schema:
             type: object
             properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: Unauthorized
-                  message:
-                    type: string
-                    description: The error message.
-                    example: Unauthorized
-                  details:
-                    type: object
-                    description: Information about the error.
-                    properties:
-                      model:
-                        type: string
-                        description: The resource name.
-                        example: folder
-                      owner:
-                        type: string
-                        description: The user ID of the folder's owner.
-                        example: '12345678'
-                      model_id:
-                        type: string
-                        description: The folder's ID.
-                        example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 500
           example:
-            error:
-              name: Unauthorized
-              message: Unauthorized
-              details:
-                model: folder
-                model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-                owner: '12345678'
-    commentGet:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentResponse'
-          example:
-            data:
-            - id: 46818
-              threadId: 12345
-              createdBy: 12345678
-              createdAt: '2024-01-18T12:00:54.000Z'
-              updatedAt: '2024-01-18T12:00:54.000Z'
-              body: This is also an example.
-            - id: 46817
-              threadId: 67890
-              createdBy: 87654321
-              createdAt: '2024-01-18T11:48:01.000Z'
-              updatedAt: '2024-01-18T11:48:01.000Z'
-              body: Another example.
-            - id: 46814
-              threadId: 23456
-              createdBy: 12345678
-              createdAt: '2024-01-18T11:30:40.000Z'
-              updatedAt: '2024-01-18T11:30:40.000Z'
-              body: This is an example.
-    commentUpdated:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentCreatedUpdated'
-          example:
-            data:
-              id: 46814
-              threadId: 12345
-              createdBy: 12345678
-              createdAt: '2024-01-18T11:30:40.000Z'
-              updatedAt: '2024-01-18T11:30:40.000Z'
-              body: This is an updated example.
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
+            status: 500
     comment401Error:
       description: Unauthorized
       content:
@@ -598,73 +561,134 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
-    common500Error:
-      description: Internal Server Error
+    commentGet:
+      description: Successful Response
       content:
-        application/problem+json:
+        application/json:
           schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
+            $ref: '#/components/schemas/commentResponse'
           example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-    collectionFolder400Error:
-      description: Bad Request
+            data:
+            - id: 46818
+              threadId: 12345
+              createdBy: 12345678
+              createdAt: '2024-01-18T12:00:54.000Z'
+              updatedAt: '2024-01-18T12:00:54.000Z'
+              body: This is also an example.
+            - id: 46817
+              threadId: 67890
+              createdBy: 87654321
+              createdAt: '2024-01-18T11:48:01.000Z'
+              updatedAt: '2024-01-18T11:48:01.000Z'
+              body: Another example.
+            - id: 46814
+              threadId: 23456
+              createdBy: 12345678
+              createdAt: '2024-01-18T11:30:40.000Z'
+              updatedAt: '2024-01-18T11:30:40.000Z'
+              body: This is an example.
+    comment403Error:
+      description: Forbidden
       content:
         application/problem+json:
           schema:
+            $ref: '#/components/schemas/comment403Error'
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Forbidden
+            detail: Forbidden
+            status: 403
+    getCollectionFolder:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
             type: object
             properties:
-              error:
+              model_id:
+                type: string
+                description: The folder's ID.
+                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              meta:
                 type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              data:
+                type: object
+                description: Information about the folder. For a complete list of properties, refer to the **Folders** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
+                additionalProperties: true
                 properties:
+                  id:
+                    type: string
+                    description: The folder's ID.
+                    example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
                   name:
                     type: string
-                    description: The error name.
-                    example: instanceFoundError
-                  details:
-                    type: object
-                    description: Information about the error.
-                    additionalProperties: true
-                    properties:
-                      model:
-                        type: string
-                        description: The resource name.
-                        example: folder
-                      owner:
-                        type: string
-                        description: The user ID of the folder's owner.
-                        example: '12345678'
-                      model_id:
-                        type: string
-                        description: The folder's ID.
-                        example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-                  message:
+                    description: The folder's name.
+                    example: Test Folder
+                  description:
                     type: string
-                    description: The error message.
-                    example: This folder already exists in the database.
+                    description: The folder's description.
+                    example: This is a test collection folder.
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The folder's creation date and time.
+                    example: '2022-08-29T16:49:19.964Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the folder was last updated.
+                    example: '2022-08-29T16:49:19.964Z'
+                  owner:
+                    type: string
+                    description: The user ID of the folder's owner.
+                    example: '12345678'
+                  lastUpdatedBy:
+                    type: string
+                    description: The user ID of the user that last updated the folder.
+                    example: '12345678'
+                  lastRevision:
+                    type: integer
+                    format: int64
+                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                    example: 24994132707
+                  collection:
+                    type: string
+                    description: The collection ID that the folder belongs to.
+                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
           example:
-            error:
-              name: instanceNotFoundError
-              details:
-                model: folder
-                owner: '12345678'
-                model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              message: We could not find the folder you are looking for
+            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+            meta:
+              model: folder
+              populate: false
+              changeset: false
+              action: find
+            data:
+              owner: '12345678'
+              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+              folder: null
+              id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              name: Test Folder
+              description: This is a test collection folder.
+              variables: null
+              auth:
+                type: apikey
+                apikey:
+                - key: value
+                  value: XXX
+                - key: key
+                  value: x-api-key
+              events: null
+              order:
+              - 81b49e05-0b87-4ca4-ac8c-091aaedafea3
+              - 929acf24-4234-45e1-59cf-dc2b27ea7603
+              - 3cfc2ac8-00a9-47d2-415d-049773f23268
+              folders_order:
+              - 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              - 5c341de9-5751-461f-b7bd-af86bbae740c
+              createdAt: '2022-08-29T16:49:19.964Z'
+              updatedAt: '2022-08-29T16:49:19.964Z'
     deleteCollectionFolder:
       description: Successful Response
       content:
@@ -705,8 +729,8 @@ components:
               id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
               owner: '12345678'
             revision: 24994562696
-    commentCreated:
-      description: Created
+    commentUpdated:
+      description: Successful Response
       content:
         application/json:
           schema:
@@ -714,172 +738,11 @@ components:
           example:
             data:
               id: 46814
+              threadId: 12345
               createdBy: 12345678
               createdAt: '2024-01-18T11:30:40.000Z'
               updatedAt: '2024-01-18T11:30:40.000Z'
-              body: This is an example.
-    comment500Error:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 500
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-            status: 500
-    comment403Error:
-      description: Forbidden
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/comment403Error'
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Forbidden
-            detail: Forbidden
-            status: 403
-    comment404Error:
-      description: Not Found
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/not-found
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Not Found
-              detail:
-                type: string
-                description: Information about the error.
-                example: Not Found
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 404
-          example:
-            type: https://api.postman.com/problems/not-found
-            title: Not Found
-            detail: Not Found
-            status: 404
-    updateCollectionFolder:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                additionalProperties: true
-                description: The folder's updated information, including the updated properties. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
-                properties:
-                  id:
-                    type: string
-                    description: The folder's ID.
-                    example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-                  name:
-                    type: string
-                    description: The folder's name.
-                    example: Test Folder
-                  description:
-                    type: string
-                    description: The folder's description.
-                    example: This is a test collection folder.
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The folder's creation date and time.
-                    example: '2022-08-29T16:49:19.964Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the folder was last updated.
-                    example: '2022-08-29T16:49:19.964Z'
-                  owner:
-                    type: string
-                    description: The user ID of the folder's owner.
-                    example: '12345678'
-                  lastUpdatedBy:
-                    type: string
-                    description: The user ID of the user that last updated the folder.
-                    example: '12345678'
-                  lastRevision:
-                    type: integer
-                    format: int64
-                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                    example: 24977100955
-                  collection:
-                    type: string
-                    description: The collection ID that the folder belongs to.
-                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-                  folder:
-                    type:
-                    - string
-                    - 'null'
-                    description: Information about the folder.
-                    example: null
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              model_id:
-                type: string
-                description: The folder's ID.
-                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              revision:
-                type: number
-                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                example: 24994132707
-          example:
-            data:
-              id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              auth: null
-              name: Test Folder
-              order: []
-              owner: '12345678'
-              events: null
-              folder: null
-              createdAt: '2022-08-29T16:49:19.964Z'
-              updatedAt: '2022-08-29T16:49:19.964Z'
-              variables: null
-              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-              description: This is a test folder.
-              lastRevision: 24977100955
-              folders_order: []
-              lastUpdatedBy: '12345678'
-            meta:
-              model: folder
-              action: update
-            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-            revision: 24977103385
+              body: This is an updated example.
     collectionFolder404Error:
       description: Not Found
       content:
@@ -922,27 +785,83 @@ components:
                 model: folder
                 owner: '12345678'
                 model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+    comment404Error:
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/not-found
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Not Found
+              detail:
+                type: string
+                description: Information about the error.
+                example: Not Found
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 404
+          example:
+            type: https://api.postman.com/problems/not-found
+            title: Not Found
+            detail: Not Found
+            status: 404
+    collectionFolder401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: Unauthorized
+                  message:
+                    type: string
+                    description: The error message.
+                    example: Unauthorized
+                  details:
+                    type: object
+                    description: Information about the error.
+                    properties:
+                      model:
+                        type: string
+                        description: The resource name.
+                        example: folder
+                      owner:
+                        type: string
+                        description: The user ID of the folder's owner.
+                        example: '12345678'
+                      model_id:
+                        type: string
+                        description: The folder's ID.
+                        example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+          example:
+            error:
+              name: Unauthorized
+              message: Unauthorized
+              details:
+                model: folder
+                model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+                owner: '12345678'
   parameters:
-    collectionFolderId:
-      name: folderId
-      in: path
-      required: true
-      description: The folder's ID.
-      schema:
-        $ref: '#/components/schemas/collectionFolderId'
-    collectionFolderUid:
-      name: folderId
-      in: path
-      required: true
-      description: The folder's unique ID.
-      schema:
-        type: string
-        format: uid
-        example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-    collectionItemsPopulateQuery:
-      name: populate
+    collectionItemsIdQuery:
+      name: ids
       in: query
-      description: If true, returns all of the collection item's contents.
+      description: If true, returns only properties that contain ID values in the response.
       schema:
         $ref: '#/components/schemas/booleanQuery'
     collectionId:
@@ -953,20 +872,15 @@ components:
       schema:
         type: string
         example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-    commentId:
-      name: commentId
+    collectionFolderUid:
+      name: folderId
       in: path
       required: true
-      description: The comment's ID.
+      description: The folder's unique ID.
       schema:
-        type: integer
-        example: 46814
-    collectionItemsIdQuery:
-      name: ids
-      in: query
-      description: If true, returns only properties that contain ID values in the response.
-      schema:
-        $ref: '#/components/schemas/booleanQuery'
+        type: string
+        format: uid
+        example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
     collectionUid:
       name: collectionId
       in: path
@@ -976,13 +890,131 @@ components:
         type: string
         format: uid
         example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+    collectionItemsPopulateQuery:
+      name: populate
+      in: query
+      description: If true, returns all of the collection item's contents.
+      schema:
+        $ref: '#/components/schemas/booleanQuery'
     collectionItemsUidFormatQuery:
       name: uid
       in: query
       description: If true, returns all IDs in UID format (`userId`-`id`).
       schema:
         $ref: '#/components/schemas/booleanQuery'
+    collectionFolderId:
+      name: folderId
+      in: path
+      required: true
+      description: The folder's ID.
+      schema:
+        $ref: '#/components/schemas/collectionFolderId'
+    commentId:
+      name: commentId
+      in: path
+      required: true
+      description: The comment's ID.
+      schema:
+        type: integer
+        example: 46814
+  requestBodies:
+    updateCollectionFolder:
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: true
+            description: The folder properties to update. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
+            properties:
+              name:
+                type: string
+                description: The folder's name.
+                example: Test Folder
+              description:
+                type: string
+                description: The folder's description.
+                example: This is a test folder.
+          example:
+            name: Test Folder
+            description: This is a test folder.
+    createCollectionFolder:
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: true
+            description: 'Information about the collection folder. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
+
+
+              **Note:**
+
+
+              It is recommended that you pass the `name` property in the request body. If you do not, the system uses a null value. As a result, this creates a folder with a blank name.
+
+              '
+            properties:
+              name:
+                type: string
+                example: Test Folder
+                description: The folder's name. It is recommended that you pass the `name` property in the request body. If you do not, the system uses a null value. As a result, this creates a folder with a blank name.
+              folder:
+                type: string
+                format: uid
+                description: The ID of a folder in which to create the folder.
+                example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+          example:
+            name: Test Folder
+            description: This is a test collection folder.
+    commentCreateUpdate:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentCreateUpdate'
+          examples:
+            Create Comment:
+              value:
+                body: This is an example.
+            Tag User in Comment:
+              value:
+                body: This is an example. @alex-cruz
+                tags:
+                  '@alex-cruz':
+                    type: user
+                    id: 12345678
   schemas:
+    commentCreateUpdate:
+      title: Comment Payload Object
+      type: object
+      description: Information about the comment.
+      required:
+      - body
+      properties:
+        body:
+          type: string
+          description: The contents of the comment.
+          example: This is an example.
+        tags:
+          type: object
+          description: Information about users tagged in the `body` comment.
+          properties:
+            userName:
+              type: object
+              required:
+              - type
+              - id
+              description: An object that contains information about the tagged user. The object's name is the user's Postman username. For example, `@user-postman`.
+              properties:
+                type:
+                  type: string
+                  description: The `user` value.
+                  enum:
+                  - user
+                  example: user
+                id:
+                  type: integer
+                  description: The user's ID.
+                  example: 87654321
     commentCreatedUpdated:
       title: Comment Updated/Created Object
       type: object
@@ -1016,6 +1048,9 @@ components:
               type: string
               description: The contents of the comment.
               example: This is an example.
+    collectionFolderId:
+      type: string
+      example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
     booleanQuery:
       type: boolean
       example: true
@@ -1084,41 +1119,6 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 403
-    commentCreateUpdate:
-      title: Comment Payload Object
-      type: object
-      description: Information about the comment.
-      required:
-      - body
-      properties:
-        body:
-          type: string
-          description: The contents of the comment.
-          example: This is an example.
-        tags:
-          type: object
-          description: Information about users tagged in the `body` comment.
-          properties:
-            userName:
-              type: object
-              required:
-              - type
-              - id
-              description: An object that contains information about the tagged user. The object's name is the user's Postman username. For example, `@user-postman`.
-              properties:
-                type:
-                  type: string
-                  description: The `user` value.
-                  enum:
-                  - user
-                  example: user
-                id:
-                  type: integer
-                  description: The user's ID.
-                  example: 87654321
-    collectionFolderId:
-      type: string
-      example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
   securitySchemes:
     PostmanApiKey:
       type: apiKey

@@ -105,6 +105,30 @@ paths:
         pro: true
 components:
   schemas:
+    dns-settings_zone_mode:
+      description: Whether the zone mode is a regular or CDN/DNS only zone.
+      enum:
+      - standard
+      - cdn_only
+      - dns_only
+      example: dns_only
+      type: string
+    dns-settings_nameservers:
+      description: Settings determining the nameservers through which the zone should be available.
+      properties:
+        type:
+          description: Nameserver type
+          enum:
+          - cloudflare.standard
+          - cloudflare.standard.random
+          - custom.account
+          - custom.tenant
+          - custom.zone
+          example: cloudflare.standard
+          type: string
+      required:
+      - type
+      type: object
     dns-settings_soa:
       description: Components of the zone's SOA record.
       properties:
@@ -155,10 +179,55 @@ components:
       - min_ttl
       - ttl
       type: object
+    dns-settings_multi_provider:
+      description: Whether to enable multi-provider DNS, which causes Cloudflare to activate the zone even when non-Cloudflare NS records exist, and to respect NS records at the zone apex during outbound zone transfers.
+      example: false
+      type: boolean
+    dns-settings_secondary_overrides:
+      description: Allows a Secondary DNS zone to use (proxied) override records and CNAME flattening at the zone apex.
+      example: false
+      type: boolean
     dns-settings_flatten_all_cnames:
       description: Whether to flatten all CNAME records in the zone. Note that, due to DNS limitations, a CNAME record at the zone apex will always be flattened.
       example: false
       type: boolean
+    dns-settings_dns_response_single:
+      allOf:
+      - $ref: '#/components/schemas/dns-settings_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/dns-settings_account_settings'
+        type: object
+    dns-settings_ns_ttl:
+      description: The time to live (TTL) of the zone's nameserver (NS) records.
+      example: 86400
+      maximum: 86400
+      minimum: 30
+      type: number
+    dns-settings_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dns-settings_api-response-common'
+      type: object
+    dns-settings_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dns-settings_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     dns-settings_api-response-common-failure:
       properties:
         errors:
@@ -190,6 +259,32 @@ components:
       - messages
       - result
       type: object
+    dns-settings_account_settings:
+      properties:
+        zone_defaults:
+          $ref: '#/components/schemas/dns-settings_dns-settings'
+      type: object
+    dns-settings_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/dns-settings_messages'
+        messages:
+          $ref: '#/components/schemas/dns-settings_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    dns-settings_foundation_dns:
+      description: Whether to enable Foundation DNS Advanced Nameservers on the zone.
+      example: false
+      type: boolean
     dns-settings_dns-settings:
       properties:
         flatten_all_cnames:
@@ -209,101 +304,6 @@ components:
         zone_mode:
           $ref: '#/components/schemas/dns-settings_zone_mode'
       type: object
-    dns-settings_multi_provider:
-      description: Whether to enable multi-provider DNS, which causes Cloudflare to activate the zone even when non-Cloudflare NS records exist, and to respect NS records at the zone apex during outbound zone transfers.
-      example: false
-      type: boolean
-    dns-settings_secondary_overrides:
-      description: Allows a Secondary DNS zone to use (proxied) override records and CNAME flattening at the zone apex.
-      example: false
-      type: boolean
-    dns-settings_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    dns-settings_zone_mode:
-      description: Whether the zone mode is a regular or CDN/DNS only zone.
-      enum:
-      - standard
-      - cdn_only
-      - dns_only
-      example: dns_only
-      type: string
-    dns-settings_foundation_dns:
-      description: Whether to enable Foundation DNS Advanced Nameservers on the zone.
-      example: false
-      type: boolean
-    dns-settings_ns_ttl:
-      description: The time to live (TTL) of the zone's nameserver (NS) records.
-      example: 86400
-      maximum: 86400
-      minimum: 30
-      type: number
-    dns-settings_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dns-settings_api-response-common'
-      type: object
-    dns-settings_account_settings:
-      properties:
-        zone_defaults:
-          $ref: '#/components/schemas/dns-settings_dns-settings'
-      type: object
-    dns-settings_nameservers:
-      description: Settings determining the nameservers through which the zone should be available.
-      properties:
-        type:
-          description: Nameserver type
-          enum:
-          - cloudflare.standard
-          - cloudflare.standard.random
-          - custom.account
-          - custom.tenant
-          - custom.zone
-          example: cloudflare.standard
-          type: string
-      required:
-      - type
-      type: object
-    dns-settings_dns_response_single:
-      allOf:
-      - $ref: '#/components/schemas/dns-settings_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/dns-settings_account_settings'
-        type: object
-    dns-settings_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/dns-settings_messages'
-        messages:
-          $ref: '#/components/schemas/dns-settings_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    dns-settings_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
   securitySchemes:
     api_email:
       in: header

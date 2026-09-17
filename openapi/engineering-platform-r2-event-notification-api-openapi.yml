@@ -205,6 +205,105 @@ components:
       - queue
       - rules
       type: object
+    mq_config-detail:
+      additionalProperties:
+        $ref: '#/components/schemas/mq_detail'
+      type: object
+    mq_identifier:
+      description: Identifier.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    mq_bucket-config:
+      additionalProperties:
+        $ref: '#/components/schemas/mq_config-detail'
+      example:
+        my-bucket:
+          b588b5d5-0647-4e81-bb8c-800fad2239a0:
+            queue: 98fa6c35-dead-beef-a42b-8d12196e0000
+            rules:
+            - actions:
+              - PutObject
+              - DeleteObject
+              prefix: img/
+              suffix: .jpg
+          deadbeef-1234-4e81-5678-abadfeedbead:
+            queue: 11111111-dead-beef-0000-109238eeffff
+            rules:
+            - actions:
+              - CopyObject
+              suffix: .mov
+      type: object
+    mq_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    mq_r2-action:
+      enum:
+      - PutObject
+      - CopyObject
+      - DeleteObject
+      - CompleteMultipartUpload
+      - AbortMultipartUpload
+      type: string
+    mq_rule:
+      properties:
+        actions:
+          description: Array of R2 object actions that will trigger notifications
+          example:
+          - PutObject
+          - CopyObject
+          items:
+            $ref: '#/components/schemas/mq_r2-action'
+          type: array
+          uniqueItems: true
+        prefix:
+          description: Notifications will be sent only for objects with this prefix
+          example: img/
+          type: string
+        suffix:
+          description: Notifications will be sent only for objects with this suffix
+          example: .jpeg
+          type: string
+      required:
+      - actions
+      type: object
+    mq_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/mq_messages'
+        messages:
+          $ref: '#/components/schemas/mq_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     mq_api-response-common-failure:
       properties:
         errors:
@@ -236,105 +335,6 @@ components:
       - messages
       - result
       type: object
-    mq_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/mq_messages'
-        messages:
-          $ref: '#/components/schemas/mq_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    mq_bucket-config:
-      additionalProperties:
-        $ref: '#/components/schemas/mq_config-detail'
-      example:
-        my-bucket:
-          b588b5d5-0647-4e81-bb8c-800fad2239a0:
-            queue: 98fa6c35-dead-beef-a42b-8d12196e0000
-            rules:
-            - actions:
-              - PutObject
-              - DeleteObject
-              prefix: img/
-              suffix: .jpg
-          deadbeef-1234-4e81-5678-abadfeedbead:
-            queue: 11111111-dead-beef-0000-109238eeffff
-            rules:
-            - actions:
-              - CopyObject
-              suffix: .mov
-      type: object
-    mq_identifier:
-      description: Identifier.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    mq_config-detail:
-      additionalProperties:
-        $ref: '#/components/schemas/mq_detail'
-      type: object
-    mq_r2-action:
-      enum:
-      - PutObject
-      - CopyObject
-      - DeleteObject
-      - CompleteMultipartUpload
-      - AbortMultipartUpload
-      type: string
-    mq_rule:
-      properties:
-        actions:
-          description: Array of R2 object actions that will trigger notifications
-          example:
-          - PutObject
-          - CopyObject
-          items:
-            $ref: '#/components/schemas/mq_r2-action'
-          type: array
-          uniqueItems: true
-        prefix:
-          description: Notifications will be sent only for objects with this prefix
-          example: img/
-          type: string
-        suffix:
-          description: Notifications will be sent only for objects with this suffix
-          example: .jpeg
-          type: string
-      required:
-      - actions
-      type: object
-    mq_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
   securitySchemes:
     api_email:
       in: header

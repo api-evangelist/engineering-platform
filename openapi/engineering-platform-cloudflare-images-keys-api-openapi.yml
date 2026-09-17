@@ -134,19 +134,59 @@ paths:
       - Cloudflare Images Keys
 components:
   schemas:
-    images_image_keys:
-      properties:
-        name:
-          $ref: '#/components/schemas/images_image_key_name'
-        value:
-          $ref: '#/components/schemas/images_image_key_value'
-      type: object
+    images_image_key_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/images_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/images_image_keys_response'
+    images_image_key_value:
+      description: Key value.
+      example: Oix0bbNaT8Rge9PuyxUBrjI6zrgnsyJ5=
+      readOnly: true
+      type: string
     images_image_keys_response:
       properties:
         keys:
           items:
             $ref: '#/components/schemas/images_image_keys'
           type: array
+      type: object
+    images_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/images_messages'
+        messages:
+          $ref: '#/components/schemas/images_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    images_image_key_name:
+      description: Key name.
+      example: default
+      readOnly: true
+      type: string
+    images_image_keys:
+      properties:
+        name:
+          $ref: '#/components/schemas/images_image_key_name'
+        value:
+          $ref: '#/components/schemas/images_image_key_value'
       type: object
     images_messages:
       example: []
@@ -163,10 +203,16 @@ components:
         type: object
         uniqueItems: true
       type: array
-    images_image_key_value:
-      description: Key value.
-      example: Oix0bbNaT8Rge9PuyxUBrjI6zrgnsyJ5=
+    images_account_identifier:
+      description: Account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       readOnly: true
+      type: string
+    images_signing_key_identifier:
+      example: someKey
+      maxLength: 20
+      pattern: ^[a-zA-Z0-9]$
       type: string
     images_api-response-common-failure:
       properties:
@@ -192,52 +238,6 @@ components:
           enum:
           - false
           example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    images_account_identifier:
-      description: Account identifier tag.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    images_image_key_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/images_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/images_image_keys_response'
-    images_image_key_name:
-      description: Key name.
-      example: default
-      readOnly: true
-      type: string
-    images_signing_key_identifier:
-      example: someKey
-      maxLength: 20
-      pattern: ^[a-zA-Z0-9]$
-      type: string
-    images_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/images_messages'
-        messages:
-          $ref: '#/components/schemas/images_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
           type: boolean
       required:
       - success

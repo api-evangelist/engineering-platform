@@ -839,89 +839,45 @@ paths:
         - '#teams:report'
 components:
   schemas:
-    digital-experience-monitoring_page:
-      default: 1
-      description: Page number of paginated results
-      example: 1
-      minimum: 1
-      type: number
-    digital-experience-monitoring_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/digital-experience-monitoring_messages'
-        messages:
-          $ref: '#/components/schemas/digital-experience-monitoring_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
+    digital-experience-monitoring_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/digital-experience-monitoring_result_info'
       type: object
-    digital-experience-monitoring_unique_devices_response:
-      properties:
-        uniqueDevicesTotal:
-          description: total number of unique devices
-          type: integer
-      required:
-      - uniqueDevicesTotal
-      type: object
-    digital-experience-monitoring_test_stat_over_time:
-      properties:
-        avg:
-          description: average observed in the time period
-          type:
-          - integer
-          - 'null'
-        max:
-          description: highest observed in the time period
-          type:
-          - integer
-          - 'null'
-        min:
-          description: lowest observed in the time period
-          type:
-          - integer
-          - 'null'
-        slots:
-          items:
-            properties:
-              timestamp:
-                example: 2023-07-16 15:00:00+00:00
-                type: string
-              value:
-                type: integer
-            required:
-            - timestamp
-            - value
-            type: object
-          type: array
-      required:
-      - slots
-      type: object
-    digital-experience-monitoring_aggregate_stat:
-      properties:
-        avgMs:
-          type:
-          - integer
-          - 'null'
-        deltaPct:
-          format: float
-          type:
-          - number
-          - 'null'
-        timePeriod:
-          $ref: '#/components/schemas/digital-experience-monitoring_aggregate_time_period'
-      required:
-      - timePeriod
-      type: object
+    digital-experience-monitoring_uuid:
+      description: API Resource UUID tag.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
     digital-experience-monitoring_personEmail:
       description: User contact email address
       type: string
+    digital-experience-monitoring_account_identifier:
+      example: 01a7362d577a6c3019a474fd6f485823
+      maxLength: 32
+      readOnly: true
+      type: string
+    digital-experience-monitoring_mode:
+      description: The mode under which the WARP client is run
+      example: proxy
+      type: string
+    digital-experience-monitoring_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     digital-experience-monitoring_source:
       default: last_seen
       description: Specifies fleet status details source
@@ -930,6 +886,213 @@ components:
       - hourly
       - raw
       example: last_seen
+      type: string
+    digital-experience-monitoring_device:
+      properties:
+        colo:
+          $ref: '#/components/schemas/digital-experience-monitoring_colo'
+        deviceId:
+          description: Device identifier (UUID v4)
+          type: string
+        deviceName:
+          description: Device identifier (human readable)
+          type: string
+        personEmail:
+          $ref: '#/components/schemas/digital-experience-monitoring_personEmail'
+        platform:
+          $ref: '#/components/schemas/digital-experience-monitoring_platform'
+        status:
+          $ref: '#/components/schemas/digital-experience-monitoring_status'
+        version:
+          $ref: '#/components/schemas/digital-experience-monitoring_version'
+      required:
+      - colo
+      - deviceId
+      - mode
+      - platform
+      - status
+      - timestamp
+      - version
+      type: object
+    digital-experience-monitoring_fleet_status_live_response:
+      allOf:
+      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
+      - properties:
+          result:
+            properties:
+              deviceStats:
+                properties:
+                  byColo:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    type:
+                    - array
+                    - 'null'
+                  byMode:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    type:
+                    - array
+                    - 'null'
+                  byPlatform:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    type:
+                    - array
+                    - 'null'
+                  byStatus:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    type:
+                    - array
+                    - 'null'
+                  byVersion:
+                    items:
+                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
+                    type:
+                    - array
+                    - 'null'
+                  uniqueDevicesTotal:
+                    $ref: '#/components/schemas/digital-experience-monitoring_uniqueDevicesTotal'
+                type: object
+            type: object
+        type: object
+    digital-experience-monitoring_traceroute_details_percentiles_response:
+      properties:
+        hopsCount:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+        packetLossPct:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+        roundTripTimeMs:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+      type: object
+    digital-experience-monitoring_traceroute_details_response:
+      properties:
+        host:
+          description: The host of the Traceroute synthetic application test
+          example: 1.1.1.1
+          type: string
+        interval:
+          description: The interval at which the Traceroute synthetic application test is set to run.
+          example: 0h5m0s
+          type: string
+        kind:
+          enum:
+          - traceroute
+        name:
+          description: The name of the Traceroute synthetic application test
+          example: Atlassian Sign In Page
+          type: string
+        target_policies:
+          items:
+            properties:
+              default:
+                description: Whether the policy is the default for the account
+                type: boolean
+              id:
+                type: string
+              name:
+                type: string
+            required:
+            - id
+            - name
+            - default
+            type: object
+          type:
+          - array
+          - 'null'
+        targeted:
+          type: boolean
+        tracerouteStats:
+          properties:
+            availabilityPct:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+            hopsCount:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+            packetLossPct:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+            roundTripTimeMs:
+              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+            uniqueDevicesTotal:
+              description: Count of unique devices that have run this test in the given time period
+              example: 57
+              type: integer
+          required:
+          - uniqueDevicesTotal
+          - roundTripTimeMs
+          - hopsCount
+          - packetLossPct
+          - availabilityPct
+          type:
+          - object
+          - 'null'
+        tracerouteStatsByColo:
+          items:
+            properties:
+              availabilityPct:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+              colo:
+                example: DFW
+                type: string
+              hopsCount:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+              packetLossPct:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
+              roundTripTimeMs:
+                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
+              uniqueDevicesTotal:
+                description: Count of unique devices that have run this test in the given time period
+                example: 57
+                type: integer
+            required:
+            - colo
+            - uniqueDevicesTotal
+            - roundTripTimeMs
+            - hopsCount
+            - packetLossPct
+            - availabilityPct
+            type: object
+          type: array
+      required:
+      - kind
+      - name
+      - host
+      - interval
+      type: object
+    digital-experience-monitoring_colos_response:
+      description: array of colos.
+      items:
+        required:
+        - airportCode
+        - countryCode
+        - city
+        type: object
+      properties:
+        airportCode:
+          description: Airport code
+          example: SFO
+          type: string
+        city:
+          description: City
+          example: San Francisco
+          type: string
+        countryCode:
+          description: Country code
+          example: US
+          type: string
+      type: array
+    digital-experience-monitoring_fleet_status_devices_response:
+      allOf:
+      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/digital-experience-monitoring_device'
+            type: array
+        type: object
+    digital-experience-monitoring_colo:
+      description: Cloudflare colo
+      example: SJC
       type: string
     digital-experience-monitoring_timing_aggregates:
       properties:
@@ -958,114 +1121,33 @@ components:
       required:
       - history
       type: object
-    digital-experience-monitoring_traceroute_test_result_network_path_response:
-      properties:
-        deviceName:
-          description: name of the device associated with this network path response
-          type: string
-        hops:
-          description: an array of the hops taken by the device to reach the end destination
-          items:
-            properties:
-              asn:
-                type:
-                - integer
-                - 'null'
-              aso:
-                type:
-                - string
-                - 'null'
-              ipAddress:
-                type:
-                - string
-                - 'null'
-              location:
-                properties:
-                  city:
-                    type:
-                    - string
-                    - 'null'
-                  state:
-                    type:
-                    - string
-                    - 'null'
-                  zip:
-                    type:
-                    - string
-                    - 'null'
-                type:
-                - object
-                - 'null'
-              mile:
-                enum:
-                - client-to-app
-                - client-to-cf-egress
-                - client-to-cf-ingress
-                - client-to-isp
-                type:
-                - string
-                - 'null'
-              name:
-                type:
-                - string
-                - 'null'
-              packetLossPct:
-                format: float
-                type:
-                - number
-                - 'null'
-              rttMs:
-                type:
-                - integer
-                - 'null'
-              ttl:
-                type: integer
-            required:
-            - ttl
-            type: object
-          type: array
-        resultId:
-          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
-        testId:
-          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
-        testName:
-          description: name of the tracroute test
-          type: string
-      required:
-      - resultId
-      - hops
-      type: object
-    digital-experience-monitoring_colos_response:
-      description: array of colos.
-      items:
-        required:
-        - airportCode
-        - countryCode
-        - city
-        type: object
-      properties:
-        airportCode:
-          description: Airport code
-          example: SFO
-          type: string
-        city:
-          description: City
-          example: San Francisco
-          type: string
-        countryCode:
-          description: Country code
-          example: US
-          type: string
-      type: array
-    digital-experience-monitoring_aggregate_time_slot:
-      properties:
-        avgMs:
-          type: integer
-        timestamp:
-          type: string
-      required:
+    digital-experience-monitoring_sort_by:
+      default: timestamp
+      description: Dimension to sort results by
+      enum:
+      - colo
+      - device_id
+      - mode
+      - platform
+      - status
       - timestamp
-      - avgMs
+      - version
+      type: string
+    digital-experience-monitoring_http_details_percentiles_response:
+      properties:
+        dnsResponseTimeMs:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+        resourceFetchTimeMs:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+        serverResponseTimeMs:
+          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
+      type: object
+    digital-experience-monitoring_uniqueDevicesTotal:
+      description: Number of unique devices
+      type: number
+    digital-experience-monitoring_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common'
       type: object
     digital-experience-monitoring_http_details_response:
       properties:
@@ -1205,162 +1287,10 @@ components:
         targeted:
           type: boolean
       type: object
-    digital-experience-monitoring_uniqueDevicesTotal:
-      description: Number of unique devices
-      type: number
-    digital-experience-monitoring_version:
-      description: WARP client version
-      example: 1.0.0
-      type: string
-    digital-experience-monitoring_mode:
-      description: The mode under which the WARP client is run
-      example: proxy
-      type: string
-    digital-experience-monitoring_traceroute_test_network_path_response:
-      properties:
-        deviceName:
-          type: string
-        id:
-          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
-        interval:
-          description: The interval at which the Traceroute synthetic application test is set to run.
-          example: 0h5m0s
-          type: string
-        kind:
-          enum:
-          - traceroute
-        name:
-          type: string
-        networkPath:
-          properties:
-            sampling:
-              description: Specifies the sampling applied, if any, to the slots response. When sampled, results shown represent the first test run to the start of each sampling interval.
-              properties:
-                unit:
-                  enum:
-                  - hours
-                value:
-                  type: integer
-              required:
-              - value
-              - unit
-              type:
-              - object
-              - 'null'
-            slots:
-              items:
-                properties:
-                  clientToAppRttMs:
-                    description: Round trip time in ms of the client to app mile
-                    type:
-                    - integer
-                    - 'null'
-                  clientToCfEgressRttMs:
-                    description: Round trip time in ms of the client to Cloudflare egress mile
-                    type:
-                    - integer
-                    - 'null'
-                  clientToCfIngressRttMs:
-                    description: Round trip time in ms of the client to Cloudflare ingress mile
-                    type:
-                    - integer
-                    - 'null'
-                  clientToIspRttMs:
-                    description: Round trip time in ms of the client to ISP mile
-                    type:
-                    - integer
-                    - 'null'
-                  id:
-                    $ref: '#/components/schemas/digital-experience-monitoring_uuid'
-                  timestamp:
-                    example: 2023-07-16 15:00:00+00:00
-                    type: string
-                required:
-                - id
-                - timestamp
-                - clientToAppRttMs
-                - clientToCfIngressRttMs
-                - clientToCfEgressRttMs
-                type: object
-              type: array
-          required:
-          - slots
-          type:
-          - object
-          - 'null'
-        url:
-          description: The host of the Traceroute synthetic application test
-          example: 1.1.1.1
-          type: string
-      required:
-      - id
-      type: object
     digital-experience-monitoring_timestamp:
       description: Timestamp in ISO format
       example: '2023-10-11T00:00:00Z'
       type: string
-    digital-experience-monitoring_http_details_percentiles_response:
-      properties:
-        dnsResponseTimeMs:
-          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
-        resourceFetchTimeMs:
-          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
-        serverResponseTimeMs:
-          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
-      type: object
-    digital-experience-monitoring_fleet_status_devices_response:
-      allOf:
-      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/digital-experience-monitoring_device'
-            type: array
-        type: object
-    digital-experience-monitoring_live_stat:
-      properties:
-        uniqueDevicesTotal:
-          $ref: '#/components/schemas/digital-experience-monitoring_uniqueDevicesTotal'
-        value:
-          type: string
-      type: object
-    digital-experience-monitoring_test_stat_pct_over_time:
-      properties:
-        avg:
-          description: average observed in the time period
-          format: float
-          type:
-          - number
-          - 'null'
-        max:
-          description: highest observed in the time period
-          format: float
-          type:
-          - number
-          - 'null'
-        min:
-          description: lowest  observed in the time period
-          format: float
-          type:
-          - number
-          - 'null'
-        slots:
-          items:
-            properties:
-              timestamp:
-                example: 2023-07-16 15:00:00+00:00
-                type: string
-              value:
-                format: float
-                type: number
-            required:
-            - timestamp
-            - value
-            type: object
-          type: array
-      required:
-      - slots
-      type: object
     digital-experience-monitoring_tests_response:
       properties:
         overviewMetrics:
@@ -1499,114 +1429,99 @@ components:
       - overviewMetrics
       - tests
       type: object
-    digital-experience-monitoring_colo:
-      description: Cloudflare colo
-      example: SJC
-      type: string
-    digital-experience-monitoring_percentiles:
-      properties:
-        p50:
-          description: p50 observed in the time period
-          type:
-          - number
-          - 'null'
-        p90:
-          description: p90 observed in the time period
-          type:
-          - number
-          - 'null'
-        p95:
-          description: p95 observed in the time period
-          type:
-          - number
-          - 'null'
-        p99:
-          description: p99 observed in the time period
-          type:
-          - number
-          - 'null'
-      type: object
-    digital-experience-monitoring_uuid:
-      description: API Resource UUID tag.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    digital-experience-monitoring_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/digital-experience-monitoring_result_info'
-      type: object
     digital-experience-monitoring_status:
       description: Network status
       example: connected
       type: string
-    digital-experience-monitoring_since_minutes:
-      default: 10
-      description: Number of minutes before current time
-      example: 10
-      maximum: 60
+    digital-experience-monitoring_aggregate_stat:
+      properties:
+        avgMs:
+          type:
+          - integer
+          - 'null'
+        deltaPct:
+          format: float
+          type:
+          - number
+          - 'null'
+        timePeriod:
+          $ref: '#/components/schemas/digital-experience-monitoring_aggregate_time_period'
+      required:
+      - timePeriod
+      type: object
+    digital-experience-monitoring_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/digital-experience-monitoring_messages'
+        messages:
+          $ref: '#/components/schemas/digital-experience-monitoring_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    digital-experience-monitoring_test_stat_pct_over_time:
+      properties:
+        avg:
+          description: average observed in the time period
+          format: float
+          type:
+          - number
+          - 'null'
+        max:
+          description: highest observed in the time period
+          format: float
+          type:
+          - number
+          - 'null'
+        min:
+          description: lowest  observed in the time period
+          format: float
+          type:
+          - number
+          - 'null'
+        slots:
+          items:
+            properties:
+              timestamp:
+                example: 2023-07-16 15:00:00+00:00
+                type: string
+              value:
+                format: float
+                type: number
+            required:
+            - timestamp
+            - value
+            type: object
+          type: array
+      required:
+      - slots
+      type: object
+    digital-experience-monitoring_page:
+      default: 1
+      description: Page number of paginated results
+      example: 1
       minimum: 1
       type: number
-    digital-experience-monitoring_fleet_status_live_response:
-      allOf:
-      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-single'
-      - properties:
-          result:
-            properties:
-              deviceStats:
-                properties:
-                  byColo:
-                    items:
-                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
-                    type:
-                    - array
-                    - 'null'
-                  byMode:
-                    items:
-                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
-                    type:
-                    - array
-                    - 'null'
-                  byPlatform:
-                    items:
-                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
-                    type:
-                    - array
-                    - 'null'
-                  byStatus:
-                    items:
-                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
-                    type:
-                    - array
-                    - 'null'
-                  byVersion:
-                    items:
-                      $ref: '#/components/schemas/digital-experience-monitoring_live_stat'
-                    type:
-                    - array
-                    - 'null'
-                  uniqueDevicesTotal:
-                    $ref: '#/components/schemas/digital-experience-monitoring_uniqueDevicesTotal'
-                type: object
-            type: object
-        type: object
-    digital-experience-monitoring_platform:
-      description: Operating system
-      example: windows
-      type: string
-    digital-experience-monitoring_account_identifier:
-      example: 01a7362d577a6c3019a474fd6f485823
-      maxLength: 32
-      readOnly: true
-      type: string
-    digital-experience-monitoring_traceroute_details_response:
+    digital-experience-monitoring_live_stat:
       properties:
-        host:
-          description: The host of the Traceroute synthetic application test
-          example: 1.1.1.1
+        uniqueDevicesTotal:
+          $ref: '#/components/schemas/digital-experience-monitoring_uniqueDevicesTotal'
+        value:
           type: string
+      type: object
+    digital-experience-monitoring_traceroute_test_network_path_response:
+      properties:
+        deviceName:
+          type: string
+        id:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
         interval:
           description: The interval at which the Traceroute synthetic application test is set to run.
           example: 0h5m0s
@@ -1615,85 +1530,111 @@ components:
           enum:
           - traceroute
         name:
-          description: The name of the Traceroute synthetic application test
-          example: Atlassian Sign In Page
           type: string
-        target_policies:
-          items:
-            properties:
-              default:
-                description: Whether the policy is the default for the account
-                type: boolean
-              id:
-                type: string
-              name:
-                type: string
-            required:
-            - id
-            - name
-            - default
-            type: object
-          type:
-          - array
-          - 'null'
-        targeted:
-          type: boolean
-        tracerouteStats:
+        networkPath:
           properties:
-            availabilityPct:
-              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
-            hopsCount:
-              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
-            packetLossPct:
-              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
-            roundTripTimeMs:
-              $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
-            uniqueDevicesTotal:
-              description: Count of unique devices that have run this test in the given time period
-              example: 57
-              type: integer
+            sampling:
+              description: Specifies the sampling applied, if any, to the slots response. When sampled, results shown represent the first test run to the start of each sampling interval.
+              properties:
+                unit:
+                  enum:
+                  - hours
+                value:
+                  type: integer
+              required:
+              - value
+              - unit
+              type:
+              - object
+              - 'null'
+            slots:
+              items:
+                properties:
+                  clientToAppRttMs:
+                    description: Round trip time in ms of the client to app mile
+                    type:
+                    - integer
+                    - 'null'
+                  clientToCfEgressRttMs:
+                    description: Round trip time in ms of the client to Cloudflare egress mile
+                    type:
+                    - integer
+                    - 'null'
+                  clientToCfIngressRttMs:
+                    description: Round trip time in ms of the client to Cloudflare ingress mile
+                    type:
+                    - integer
+                    - 'null'
+                  clientToIspRttMs:
+                    description: Round trip time in ms of the client to ISP mile
+                    type:
+                    - integer
+                    - 'null'
+                  id:
+                    $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+                  timestamp:
+                    example: 2023-07-16 15:00:00+00:00
+                    type: string
+                required:
+                - id
+                - timestamp
+                - clientToAppRttMs
+                - clientToCfIngressRttMs
+                - clientToCfEgressRttMs
+                type: object
+              type: array
           required:
-          - uniqueDevicesTotal
-          - roundTripTimeMs
-          - hopsCount
-          - packetLossPct
-          - availabilityPct
+          - slots
           type:
           - object
           - 'null'
-        tracerouteStatsByColo:
-          items:
-            properties:
-              availabilityPct:
-                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
-              colo:
-                example: DFW
-                type: string
-              hopsCount:
-                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
-              packetLossPct:
-                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_pct_over_time'
-              roundTripTimeMs:
-                $ref: '#/components/schemas/digital-experience-monitoring_test_stat_over_time'
-              uniqueDevicesTotal:
-                description: Count of unique devices that have run this test in the given time period
-                example: 57
-                type: integer
-            required:
-            - colo
-            - uniqueDevicesTotal
-            - roundTripTimeMs
-            - hopsCount
-            - packetLossPct
-            - availabilityPct
-            type: object
-          type: array
+        url:
+          description: The host of the Traceroute synthetic application test
+          example: 1.1.1.1
+          type: string
       required:
-      - kind
-      - name
-      - host
-      - interval
+      - id
       type: object
+    digital-experience-monitoring_version:
+      description: WARP client version
+      example: 1.0.0
+      type: string
+    digital-experience-monitoring_aggregate_time_slot:
+      properties:
+        avgMs:
+          type: integer
+        timestamp:
+          type: string
+      required:
+      - timestamp
+      - avgMs
+      type: object
+    digital-experience-monitoring_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    digital-experience-monitoring_since_minutes:
+      default: 10
+      description: Number of minutes before current time
+      example: 10
+      maximum: 60
+      minimum: 1
+      type: number
     digital-experience-monitoring_api-response-common-failure:
       properties:
         errors:
@@ -1725,6 +1666,87 @@ components:
       - messages
       - result
       type: object
+    digital-experience-monitoring_traceroute_test_result_network_path_response:
+      properties:
+        deviceName:
+          description: name of the device associated with this network path response
+          type: string
+        hops:
+          description: an array of the hops taken by the device to reach the end destination
+          items:
+            properties:
+              asn:
+                type:
+                - integer
+                - 'null'
+              aso:
+                type:
+                - string
+                - 'null'
+              ipAddress:
+                type:
+                - string
+                - 'null'
+              location:
+                properties:
+                  city:
+                    type:
+                    - string
+                    - 'null'
+                  state:
+                    type:
+                    - string
+                    - 'null'
+                  zip:
+                    type:
+                    - string
+                    - 'null'
+                type:
+                - object
+                - 'null'
+              mile:
+                enum:
+                - client-to-app
+                - client-to-cf-egress
+                - client-to-cf-ingress
+                - client-to-isp
+                type:
+                - string
+                - 'null'
+              name:
+                type:
+                - string
+                - 'null'
+              packetLossPct:
+                format: float
+                type:
+                - number
+                - 'null'
+              rttMs:
+                type:
+                - integer
+                - 'null'
+              ttl:
+                type: integer
+            required:
+            - ttl
+            type: object
+          type: array
+        resultId:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+        testId:
+          $ref: '#/components/schemas/digital-experience-monitoring_uuid'
+        testName:
+          description: name of the tracroute test
+          type: string
+      required:
+      - resultId
+      - hops
+      type: object
+    digital-experience-monitoring_device_id:
+      description: Device-specific ID, given as UUID v4
+      example: cb49c27f-7f97-49c5-b6f3-f7c01ead0fd7
+      type: string
     digital-experience-monitoring_aggregate_time_period:
       properties:
         units:
@@ -1739,102 +1761,80 @@ components:
       - value
       - units
       type: object
-    digital-experience-monitoring_sort_by:
-      default: timestamp
-      description: Dimension to sort results by
-      enum:
-      - colo
-      - device_id
-      - mode
-      - platform
-      - status
-      - timestamp
-      - version
-      type: string
+    digital-experience-monitoring_unique_devices_response:
+      properties:
+        uniqueDevicesTotal:
+          description: total number of unique devices
+          type: integer
+      required:
+      - uniqueDevicesTotal
+      type: object
+    digital-experience-monitoring_test_stat_over_time:
+      properties:
+        avg:
+          description: average observed in the time period
+          type:
+          - integer
+          - 'null'
+        max:
+          description: highest observed in the time period
+          type:
+          - integer
+          - 'null'
+        min:
+          description: lowest observed in the time period
+          type:
+          - integer
+          - 'null'
+        slots:
+          items:
+            properties:
+              timestamp:
+                example: 2023-07-16 15:00:00+00:00
+                type: string
+              value:
+                type: integer
+            required:
+            - timestamp
+            - value
+            type: object
+          type: array
+      required:
+      - slots
+      type: object
     digital-experience-monitoring_per_page:
       description: Number of items per page
       example: 10
       maximum: 50
       minimum: 1
       type: number
-    digital-experience-monitoring_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    digital-experience-monitoring_device:
+    digital-experience-monitoring_percentiles:
       properties:
-        colo:
-          $ref: '#/components/schemas/digital-experience-monitoring_colo'
-        deviceId:
-          description: Device identifier (UUID v4)
-          type: string
-        deviceName:
-          description: Device identifier (human readable)
-          type: string
-        personEmail:
-          $ref: '#/components/schemas/digital-experience-monitoring_personEmail'
-        platform:
-          $ref: '#/components/schemas/digital-experience-monitoring_platform'
-        status:
-          $ref: '#/components/schemas/digital-experience-monitoring_status'
-        version:
-          $ref: '#/components/schemas/digital-experience-monitoring_version'
-      required:
-      - colo
-      - deviceId
-      - mode
-      - platform
-      - status
-      - timestamp
-      - version
+        p50:
+          description: p50 observed in the time period
+          type:
+          - number
+          - 'null'
+        p90:
+          description: p90 observed in the time period
+          type:
+          - number
+          - 'null'
+        p95:
+          description: p95 observed in the time period
+          type:
+          - number
+          - 'null'
+        p99:
+          description: p99 observed in the time period
+          type:
+          - number
+          - 'null'
       type: object
-    digital-experience-monitoring_device_id:
-      description: Device-specific ID, given as UUID v4
-      example: cb49c27f-7f97-49c5-b6f3-f7c01ead0fd7
+    digital-experience-monitoring_platform:
+      description: Operating system
+      example: windows
       type: string
-    digital-experience-monitoring_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/digital-experience-monitoring_api-response-common'
-      type: object
-    digital-experience-monitoring_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    digital-experience-monitoring_traceroute_details_percentiles_response:
-      properties:
-        hopsCount:
-          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
-        packetLossPct:
-          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
-        roundTripTimeMs:
-          $ref: '#/components/schemas/digital-experience-monitoring_percentiles'
-      type: object
   securitySchemes:
     api_email:
       in: header

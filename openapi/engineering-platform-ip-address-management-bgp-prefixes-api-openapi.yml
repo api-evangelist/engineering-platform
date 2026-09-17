@@ -163,75 +163,6 @@ paths:
       - 'IP Prefixes: BGP On Demand Write'
 components:
   schemas:
-    addressing_response_collection_bgp:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/addressing_ipam-bgp-prefixes'
-            type: array
-    addressing_bgp_signaling_enabled:
-      description: Whether control of advertisement of the prefix to the Internet is enabled to be performed via BGP signal
-      example: false
-      type: boolean
-    addressing_ipam-bgp-prefixes:
-      properties:
-        asn:
-          $ref: '#/components/schemas/addressing_asn'
-        bgp_signal_opts:
-          $ref: '#/components/schemas/addressing_bgp_signal_opts'
-        cidr:
-          $ref: '#/components/schemas/addressing_cidr'
-        created_at:
-          $ref: '#/components/schemas/addressing_timestamp'
-        id:
-          $ref: '#/components/schemas/addressing_identifier'
-        modified_at:
-          $ref: '#/components/schemas/addressing_timestamp'
-        on_demand:
-          $ref: '#/components/schemas/addressing_bgp_on_demand'
-      type: object
-    addressing_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    addressing_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    addressing_bgp_signal_opts:
-      properties:
-        enabled:
-          $ref: '#/components/schemas/addressing_bgp_signaling_enabled'
-        modified_at:
-          $ref: '#/components/schemas/addressing_bgp_signaling_modified_at'
-      type: object
-    addressing_asn:
-      description: Autonomous System Number (ASN) the prefix will be advertised under.
-      example: 209242
-      type:
-      - integer
-      - 'null'
-    addressing_bgp_on_demand:
-      properties:
-        advertised:
-          $ref: '#/components/schemas/addressing_advertised'
-        advertised_modified_at:
-          $ref: '#/components/schemas/addressing_modified_at_nullable'
-        on_demand_enabled:
-          $ref: '#/components/schemas/addressing_on_demand_enabled'
-        on_demand_locked:
-          $ref: '#/components/schemas/addressing_on_demand_locked'
-      type: object
-    addressing_modified_at_nullable:
-      description: Last time the advertisement status was changed. This field is only not 'null' if on demand is enabled.
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type:
-      - string
-      - 'null'
     addressing_bgp_signaling_modified_at:
       description: Last time BGP signaling control was toggled. This field is null if BGP signaling has never been enabled.
       example: '2014-01-01T05:20:00.12345Z'
@@ -239,14 +170,6 @@ components:
       type:
       - string
       - 'null'
-    addressing_bgp_prefix_update_advertisement:
-      properties:
-        on_demand:
-          properties:
-            advertised:
-              type: boolean
-          type: object
-      type: object
     addressing_api-response-common:
       properties:
         errors:
@@ -264,10 +187,52 @@ components:
       - errors
       - messages
       type: object
+    addressing_bgp_prefix_update_advertisement:
+      properties:
+        on_demand:
+          properties:
+            advertised:
+              type: boolean
+          type: object
+      type: object
+    addressing_bgp_signal_opts:
+      properties:
+        enabled:
+          $ref: '#/components/schemas/addressing_bgp_signaling_enabled'
+        modified_at:
+          $ref: '#/components/schemas/addressing_bgp_signaling_modified_at'
+      type: object
+    addressing_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     addressing_cidr:
       description: IP Prefix in Classless Inter-Domain Routing format.
       example: 192.0.2.0/24
       type: string
+    addressing_on_demand_locked:
+      description: Whether advertisement status of the prefix is locked, meaning it cannot be changed.
+      example: false
+      type: boolean
+    addressing_advertised:
+      description: Prefix advertisement status to the Internet. This field is only not 'null' if on demand is enabled.
+      example: true
+      type:
+      - boolean
+      - 'null'
+    addressing_response_collection_bgp:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/addressing_ipam-bgp-prefixes'
+            type: array
+    addressing_bgp_signaling_enabled:
+      description: Whether control of advertisement of the prefix to the Internet is enabled to be performed via BGP signal
+      example: false
+      type: boolean
     addressing_api-response-common-failure:
       properties:
         errors:
@@ -299,48 +264,18 @@ components:
       - messages
       - result
       type: object
-    addressing_advertised:
-      description: Prefix advertisement status to the Internet. This field is only not 'null' if on demand is enabled.
-      example: true
-      type:
-      - boolean
-      - 'null'
     addressing_on_demand_enabled:
       description: Whether advertisement of the prefix to the Internet may be dynamically enabled or disabled.
       example: true
       type: boolean
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    addressing_api-response-collection:
+    addressing_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    addressing_api-response-single:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/addressing_result_info'
       type: object
-    addressing_single_response_bgp:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/addressing_ipam-bgp-prefixes'
-    addressing_on_demand_locked:
-      description: Whether advertisement status of the prefix is locked, meaning it cannot be changed.
-      example: false
-      type: boolean
     addressing_result_info:
       properties:
         count:
@@ -360,9 +295,74 @@ components:
           example: 2000
           type: number
       type: object
-    addressing_api-response-single:
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_ipam-bgp-prefixes:
+      properties:
+        asn:
+          $ref: '#/components/schemas/addressing_asn'
+        bgp_signal_opts:
+          $ref: '#/components/schemas/addressing_bgp_signal_opts'
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        created_at:
+          $ref: '#/components/schemas/addressing_timestamp'
+        id:
+          $ref: '#/components/schemas/addressing_identifier'
+        modified_at:
+          $ref: '#/components/schemas/addressing_timestamp'
+        on_demand:
+          $ref: '#/components/schemas/addressing_bgp_on_demand'
+      type: object
+    addressing_single_response_bgp:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/addressing_ipam-bgp-prefixes'
+    addressing_modified_at_nullable:
+      description: Last time the advertisement status was changed. This field is only not 'null' if on demand is enabled.
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type:
+      - string
+      - 'null'
+    addressing_asn:
+      description: Autonomous System Number (ASN) the prefix will be advertised under.
+      example: 209242
+      type:
+      - integer
+      - 'null'
+    addressing_bgp_on_demand:
+      properties:
+        advertised:
+          $ref: '#/components/schemas/addressing_advertised'
+        advertised_modified_at:
+          $ref: '#/components/schemas/addressing_modified_at_nullable'
+        on_demand_enabled:
+          $ref: '#/components/schemas/addressing_on_demand_enabled'
+        on_demand_locked:
+          $ref: '#/components/schemas/addressing_on_demand_locked'
+      type: object
+    addressing_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/addressing_result_info'
       type: object
   securitySchemes:
     api_email:

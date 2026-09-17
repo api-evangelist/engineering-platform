@@ -690,10 +690,31 @@ paths:
         - com.cloudflare.edge.storage.kv.key.update
 components:
   schemas:
-    workers-kv_namespace_title:
-      description: A human-readable string name for a Namespace.
-      example: My Own Namespace
+    workers-kv_key_name_bulk:
+      description: A key's name. The name may be at most 512 bytes. All printable, non-whitespace characters are valid.
+      example: My-Key
+      maxLength: 512
       type: string
+    workers-kv_namespace_identifier:
+      description: Namespace identifier tag.
+      example: 0f2ac74b498b48028cb68387c421e279
+      maxLength: 32
+      readOnly: true
+      type: string
+    workers-kv_expiration:
+      description: The time, measured in number of seconds since the UNIX epoch, at which the key should expire.
+      example: 1578435000.0
+      type: number
+    workers-kv_bulk_delete:
+      items:
+        $ref: '#/components/schemas/workers-kv_key_name_bulk'
+      type: array
+    workers-kv_list_metadata:
+      additionalProperties: true
+      description: Arbitrary JSON that is associated with a key.
+      example:
+        someMetadataKey: someMetadataValue
+      type: object
     workers-kv_bulk_write:
       items:
         properties:
@@ -719,6 +740,10 @@ components:
       - key
       - value
       type: array
+    workers-kv_value:
+      description: A byte sequence to be stored, up to 25 MiB in length.
+      example: Some Value
+      type: string
     workers-kv_key:
       description: A name for a value. A value stored under a given key may be retrieved via the same key.
       properties:
@@ -733,72 +758,21 @@ components:
       required:
       - name
       type: object
-    workers-kv_expiration:
-      description: The time, measured in number of seconds since the UNIX epoch, at which the key should expire.
-      example: 1578435000.0
-      type: number
-    workers-kv_key_name_bulk:
-      description: A key's name. The name may be at most 512 bytes. All printable, non-whitespace characters are valid.
-      example: My-Key
-      maxLength: 512
-      type: string
-    workers-kv_expiration_ttl:
-      description: The number of seconds for which the key should be visible before it expires. At least 60.
-      example: 300
-      type: number
-    workers-kv_cursor:
-      description: Opaque token indicating the position from which to continue when requesting the next set of records if the amount of list results was limited by the limit parameter. A valid value for the cursor can be obtained from the cursors object in the result_info structure.
-      example: 6Ck1la0VxJ0djhidm1MdX2FyDGxLKVeeHZZmORS_8XeSuhz9SjIJRaSa2lnsF01tQOHrfTGAP3R5X1Kv5iVUuMbNKhWNAXHOl6ePB0TUL8nw
-      type: string
-    workers-kv_bulk_delete:
+    workers-kv_messages:
+      example: []
       items:
-        $ref: '#/components/schemas/workers-kv_key_name_bulk'
-      type: array
-    workers-kv_metadata:
-      description: Arbitrary JSON to be associated with a key/value pair.
-      example: '{"someMetadataKey": "someMetadataValue"}'
-      type: string
-    workers-kv_api-response-common-no-result:
-      allOf:
-      - $ref: '#/components/schemas/workers-kv_api-response-common'
-      - properties:
-          result:
-            type:
-            - object
-            - 'null'
-            x-stainless-empty-object: true
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
         type: object
-    workers-kv_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    workers-kv_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    workers-kv_namespace_identifier:
-      description: Namespace identifier tag.
-      example: 0f2ac74b498b48028cb68387c421e279
-      maxLength: 32
-      readOnly: true
-      type: string
+        uniqueItems: true
+      type: array
     workers-kv_api-response-common-failure:
       properties:
         errors:
@@ -828,19 +802,28 @@ components:
       - messages
       - result
       type: object
-    workers-kv_list_metadata:
-      additionalProperties: true
-      description: Arbitrary JSON that is associated with a key.
-      example:
-        someMetadataKey: someMetadataValue
-      type: object
-    workers-kv_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/workers-kv_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/workers-kv_result_info'
-        type: object
+    workers-kv_cursor:
+      description: Opaque token indicating the position from which to continue when requesting the next set of records if the amount of list results was limited by the limit parameter. A valid value for the cursor can be obtained from the cursors object in the result_info structure.
+      example: 6Ck1la0VxJ0djhidm1MdX2FyDGxLKVeeHZZmORS_8XeSuhz9SjIJRaSa2lnsF01tQOHrfTGAP3R5X1Kv5iVUuMbNKhWNAXHOl6ePB0TUL8nw
+      type: string
+    workers-kv_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
       type: object
     workers-kv_api-response-common:
       properties:
@@ -859,10 +842,35 @@ components:
       - errors
       - messages
       type: object
-    workers-kv_value:
-      description: A byte sequence to be stored, up to 25 MiB in length.
-      example: Some Value
+    workers-kv_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
       type: string
+    workers-kv_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/workers-kv_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/workers-kv_result_info'
+        type: object
+      type: object
+    workers-kv_metadata:
+      description: Arbitrary JSON to be associated with a key/value pair.
+      example: '{"someMetadataKey": "someMetadataValue"}'
+      type: string
+    workers-kv_create_rename_namespace_body:
+      properties:
+        title:
+          $ref: '#/components/schemas/workers-kv_namespace_title'
+      required:
+      - title
+      type: object
+    workers-kv_expiration_ttl:
+      description: The number of seconds for which the key should be visible before it expires. At least 60.
+      example: 300
+      type: number
     workers-kv_namespace:
       properties:
         id:
@@ -878,33 +886,25 @@ components:
       - id
       - title
       type: object
-    workers-kv_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
+    workers-kv_api-response-common-no-result:
+      allOf:
+      - $ref: '#/components/schemas/workers-kv_api-response-common'
+      - properties:
+          result:
+            type:
+            - object
+            - 'null'
+            x-stainless-empty-object: true
         type: object
-        uniqueItems: true
-      type: array
+    workers-kv_namespace_title:
+      description: A human-readable string name for a Namespace.
+      example: My Own Namespace
+      type: string
     workers-kv_key_name:
       description: A key's name. The name may be at most 512 bytes. All printable, non-whitespace characters are valid. Use percent-encoding to define key names as part of a URL.
       example: My-Key
       maxLength: 512
       type: string
-    workers-kv_create_rename_namespace_body:
-      properties:
-        title:
-          $ref: '#/components/schemas/workers-kv_namespace_title'
-      required:
-      - title
-      type: object
   securitySchemes:
     api_email:
       in: header

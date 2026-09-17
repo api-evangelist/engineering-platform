@@ -306,19 +306,13 @@ paths:
         pro: false
 components:
   schemas:
-    magic_port:
-      example: 1
-      type: integer
-    magic_acl_modified_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_acl'
     magic_cidr:
       description: A valid CIDR notation representing an IP range.
       example: 192.0.2.0/24
       type: string
+    magic_forward_locally:
+      description: The desired forwarding action for this ACL policy. If set to "false", the policy will forward traffic to Cloudflare. If set to "true", the policy will forward traffic locally on the Magic Connector. If not included in request, will default to false.
+      type: boolean
     magic_lan-acl-configuration:
       properties:
         lan_id:
@@ -340,9 +334,31 @@ components:
       required:
       - lan_id
       type: object
-    magic_forward_locally:
-      description: The desired forwarding action for this ACL policy. If set to "false", the policy will forward traffic to Cloudflare. If set to "true", the policy will forward traffic locally on the Magic Connector. If not included in request, will default to false.
-      type: boolean
+    magic_ip-address:
+      description: A valid IPv4 address.
+      example: 192.0.2.1
+      type: string
+    magic_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    magic_acl_modified_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_acl'
     magic_acls_add_single_request:
       description: Bidirectional ACL policy for local network traffic within a site.
       properties:
@@ -374,35 +390,9 @@ components:
       - lan_1
       - lan_2
       type: object
-    magic_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
-      type: object
-    magic_acl_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_acl'
-    magic_acl-subnet:
-      oneOf:
-      - $ref: '#/components/schemas/magic_ip-address'
-      - $ref: '#/components/schemas/magic_cidr'
-    magic_acl_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_acl'
+    magic_port:
+      example: 1
+      type: integer
     magic_api-response-common:
       properties:
         errors:
@@ -427,21 +417,25 @@ components:
       - messages
       - result
       type: object
-    magic_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    magic_acl_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_acl'
+    magic_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
     magic_acl_update_request:
       properties:
         description:
@@ -468,18 +462,6 @@ components:
             type: string
           type: array
       type: object
-    magic_ip-address:
-      description: A valid IPv4 address.
-      example: 192.0.2.1
-      type: string
-    magic_acls_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/magic_acl'
-            type: array
     magic_api-response-common-failure:
       properties:
         errors:
@@ -511,12 +493,6 @@ components:
       - messages
       - result
       type: object
-    magic_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
     magic_acl:
       description: Bidirectional ACL policy for network traffic within a site.
       properties:
@@ -546,6 +522,30 @@ components:
             type: string
           type: array
       type: object
+    magic_acl_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_acl'
+    magic_acl-subnet:
+      oneOf:
+      - $ref: '#/components/schemas/magic_ip-address'
+      - $ref: '#/components/schemas/magic_cidr'
+    magic_acls_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/magic_acl'
+            type: array
+    magic_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
   securitySchemes:
     api_email:
       in: header

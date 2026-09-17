@@ -201,6 +201,39 @@ paths:
       - 'Access: Custom Page Write'
 components:
   schemas:
+    access_custom_page_without_html:
+      properties:
+        app_count:
+          $ref: '#/components/schemas/access_schemas-app_count'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        name:
+          $ref: '#/components/schemas/access_custom-pages_components-schemas-name'
+        type:
+          $ref: '#/components/schemas/access_schemas-type'
+        uid:
+          $ref: '#/components/schemas/access_uuid'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      required:
+      - name
+      - type
+      type: object
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     access_result_info:
       properties:
         count:
@@ -223,78 +256,6 @@ components:
     access_custom-pages_components-schemas-name:
       description: Custom page name.
       type: string
-    access_single_response_without_html:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/access_custom_page_without_html'
-    access_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/access_messages'
-        messages:
-          $ref: '#/components/schemas/access_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    access_schemas-app_count:
-      description: Number of apps the custom page is assigned to.
-      type: integer
-    access_custom-pages_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/access_custom_page'
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    access_custom-pages_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_custom_page_without_html'
-            type: array
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    access_custom_page:
-      properties:
-        app_count:
-          $ref: '#/components/schemas/access_schemas-app_count'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        custom_html:
-          description: Custom page HTML.
-          example: <html><body><h1>Access Denied</h1></body></html>
-          type: string
-        name:
-          $ref: '#/components/schemas/access_custom-pages_components-schemas-name'
-        type:
-          $ref: '#/components/schemas/access_schemas-type'
-        uid:
-          $ref: '#/components/schemas/access_uuid'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      required:
-      - name
-      - custom_html
-      - type
-      type: object
     access_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/access_api-response-common'
@@ -302,42 +263,12 @@ components:
           result_info:
             $ref: '#/components/schemas/access_result_info'
       type: object
-    access_api-response-single:
+    access_custom-pages_components-schemas-single_response:
       allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
-    access_components-schemas-id_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
+      - $ref: '#/components/schemas/access_api-response-single'
       - properties:
           result:
-            properties:
-              id:
-                $ref: '#/components/schemas/access_uuid'
-            type: object
-    access_custom_page_without_html:
-      properties:
-        app_count:
-          $ref: '#/components/schemas/access_schemas-app_count'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        name:
-          $ref: '#/components/schemas/access_custom-pages_components-schemas-name'
-        type:
-          $ref: '#/components/schemas/access_schemas-type'
-        uid:
-          $ref: '#/components/schemas/access_uuid'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      required:
-      - name
-      - type
-      type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
+            $ref: '#/components/schemas/access_custom_page'
     access_api-response-common-failure:
       properties:
         errors:
@@ -369,27 +300,96 @@ components:
       - messages
       - result
       type: object
+    access_components-schemas-id_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/access_uuid'
+            type: object
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    access_schemas-app_count:
+      description: Number of apps the custom page is assigned to.
+      type: integer
+    access_custom_page:
+      properties:
+        app_count:
+          $ref: '#/components/schemas/access_schemas-app_count'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        custom_html:
+          description: Custom page HTML.
+          example: <html><body><h1>Access Denied</h1></body></html>
+          type: string
+        name:
+          $ref: '#/components/schemas/access_custom-pages_components-schemas-name'
+        type:
+          $ref: '#/components/schemas/access_schemas-type'
+        uid:
+          $ref: '#/components/schemas/access_uuid'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      required:
+      - name
+      - custom_html
+      - type
+      type: object
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_custom-pages_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_custom_page_without_html'
+            type: array
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    access_single_response_without_html:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/access_custom_page_without_html'
     access_schemas-type:
       description: Custom page type.
       enum:
       - identity_denied
       - forbidden
       type: string
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
   securitySchemes:
     api_email:
       in: header

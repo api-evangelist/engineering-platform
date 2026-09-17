@@ -216,6 +216,33 @@ paths:
       - Zero Trust Risk Scoring
 components:
   schemas:
+    dlp_Empty:
+      type:
+      - object
+      - 'null'
+    dlp_RiskEvents:
+      properties:
+        email:
+          type: string
+        events:
+          items:
+            $ref: '#/components/schemas/dlp_RiskEvent'
+          type: array
+        last_reset_time:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        name:
+          type: string
+        risk_level:
+          allOf:
+          - $ref: '#/components/schemas/dlp_RiskLevel'
+      required:
+      - name
+      - email
+      - events
+      type: object
     dlp_Behavior:
       properties:
         description:
@@ -232,9 +259,63 @@ components:
       - risk_level
       - enabled
       type: object
-    dlp_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dlp_api-response-common'
+    dlp_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    dlp_UpdateBehaviors:
+      properties:
+        behaviors:
+          additionalProperties:
+            $ref: '#/components/schemas/dlp_UpdateBehavior'
+          type: object
+      required:
+      - behaviors
+      type: object
+    dlp_RiskEvent:
+      properties:
+        event_details: {}
+        id:
+          type: string
+        name:
+          type: string
+        risk_level:
+          $ref: '#/components/schemas/dlp_RiskLevel'
+        timestamp:
+          format: date-time
+          type: string
+      required:
+      - id
+      - risk_level
+      - name
+      - timestamp
       type: object
     dlp_api-response-collection:
       allOf:
@@ -268,74 +349,26 @@ components:
       - event_count
       - last_event
       type: object
-    dlp_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/dlp_messages'
-        messages:
-          $ref: '#/components/schemas/dlp_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    dlp_RiskEvents:
-      properties:
-        email:
-          type: string
-        events:
-          items:
-            $ref: '#/components/schemas/dlp_RiskEvent'
-          type: array
-        last_reset_time:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        name:
-          type: string
-        risk_level:
-          allOf:
-          - $ref: '#/components/schemas/dlp_RiskLevel'
-      required:
-      - name
-      - email
-      - events
-      type: object
-    dlp_RiskEvent:
-      properties:
-        event_details: {}
-        id:
-          type: string
-        name:
-          type: string
-        risk_level:
-          $ref: '#/components/schemas/dlp_RiskLevel'
-        timestamp:
-          format: date-time
-          type: string
-      required:
-      - id
-      - risk_level
-      - name
-      - timestamp
-      type: object
-    dlp_Empty:
-      type:
-      - object
-      - 'null'
     dlp_RiskLevel:
       enum:
       - low
       - medium
       - high
       type: string
+    dlp_UpdateBehavior:
+      properties:
+        enabled:
+          type: boolean
+        risk_level:
+          $ref: '#/components/schemas/dlp_RiskLevel'
+      required:
+      - risk_level
+      - enabled
+      type: object
+    dlp_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dlp_api-response-common'
+      type: object
     dlp_result_info:
       properties:
         count:
@@ -370,16 +403,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    dlp_UpdateBehavior:
-      properties:
-        enabled:
-          type: boolean
-        risk_level:
-          $ref: '#/components/schemas/dlp_RiskLevel'
-      required:
-      - risk_level
-      - enabled
-      type: object
     dlp_RiskSummary:
       properties:
         users:
@@ -389,14 +412,22 @@ components:
       required:
       - users
       type: object
-    dlp_UpdateBehaviors:
+    dlp_api-response-common:
       properties:
-        behaviors:
-          additionalProperties:
-            $ref: '#/components/schemas/dlp_UpdateBehavior'
-          type: object
+        errors:
+          $ref: '#/components/schemas/dlp_messages'
+        messages:
+          $ref: '#/components/schemas/dlp_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
       required:
-      - behaviors
+      - success
+      - errors
+      - messages
       type: object
     dlp_Behaviors:
       properties:
@@ -406,37 +437,6 @@ components:
           type: object
       required:
       - behaviors
-      type: object
-    dlp_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/dlp_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/dlp_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
       type: object
   securitySchemes:
     api_email:

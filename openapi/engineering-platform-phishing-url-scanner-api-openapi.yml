@@ -61,30 +61,59 @@ paths:
       - Phishing URL Scanner
 components:
   schemas:
-    intel_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    intel_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    intel_api-response-single:
+    intel_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/intel_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/intel_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    intel_phishing-url-submit_components-schemas-single_response:
       allOf:
-      - $ref: '#/components/schemas/intel_schemas-api-response-common'
+      - $ref: '#/components/schemas/intel_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/intel_phishing-url-submit'
+    intel_schemas-api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/intel_messages'
+        messages:
+          $ref: '#/components/schemas/intel_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
       type: object
     intel_phishing-url-submit:
       properties:
@@ -126,70 +155,41 @@ components:
                 type: integer
             type: object
           type: array
-    intel_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/intel_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/intel_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    intel_url_param:
-      properties:
-        url:
-          $ref: '#/components/schemas/intel_url'
-      type: object
-    intel_schemas-api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/intel_messages'
-        messages:
-          $ref: '#/components/schemas/intel_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
+    intel_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     intel_url:
       description: URL(s) to filter submissions results by
       example: https://www.cloudflare.com
       format: uri
       type: string
-    intel_phishing-url-submit_components-schemas-single_response:
+    intel_url_param:
+      properties:
+        url:
+          $ref: '#/components/schemas/intel_url'
+      type: object
+    intel_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    intel_api-response-single:
       allOf:
-      - $ref: '#/components/schemas/intel_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/intel_phishing-url-submit'
+      - $ref: '#/components/schemas/intel_schemas-api-response-common'
+      type: object
   securitySchemes:
     api_email:
       in: header

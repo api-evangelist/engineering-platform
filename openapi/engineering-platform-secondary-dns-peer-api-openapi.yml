@@ -254,49 +254,6 @@ paths:
         pro: false
 components:
   schemas:
-    secondary-dns_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-common'
-      type: object
-    secondary-dns_components-schemas-identifier:
-      example: 23ff594956f20c2a721606e94745a8aa
-      readOnly: true
-      type: string
-    secondary-dns_port:
-      description: DNS port of primary or secondary nameserver, depending on what zone this peer is linked to.
-      example: 53
-      type: number
-    secondary-dns_tsig_id:
-      description: TSIG authentication will be used for zone transfer if configured.
-      example: 69cd1e104af3e6ed3cb344f263fd0d5a
-      type: string
-    secondary-dns_ixfr_enable:
-      description: Enable IXFR transfer protocol, default is AXFR. Only applicable to secondary zones.
-      example: false
-      type: boolean
-    secondary-dns_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    secondary-dns_schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/secondary-dns_peer'
-            type: array
     secondary-dns_peer:
       properties:
         id:
@@ -315,17 +272,29 @@ components:
       - id
       - name
       type: object
-    secondary-dns_ip:
-      description: IPv4/IPv6 address of primary or secondary nameserver, depending on what zone this peer is linked to. For primary zones this IP defines the IP of the secondary nameserver Cloudflare will NOTIFY upon zone changes. For secondary zones this IP defines the IP of the primary nameserver Cloudflare will send AXFR/IXFR requests to.
-      example: 192.0.2.53
-      type: string
-    secondary-dns_api-response-collection:
+    secondary-dns_api-response-single:
       allOf:
       - $ref: '#/components/schemas/secondary-dns_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/secondary-dns_result_info'
       type: object
+    secondary-dns_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    secondary-dns_account_identifier:
+      example: 01a7362d577a6c3019a474fd6f485823
+      readOnly: true
+      type: string
     secondary-dns_api-response-common:
       properties:
         errors:
@@ -343,10 +312,53 @@ components:
       - errors
       - messages
       type: object
+    secondary-dns_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    secondary-dns_ixfr_enable:
+      description: Enable IXFR transfer protocol, default is AXFR. Only applicable to secondary zones.
+      example: false
+      type: boolean
     secondary-dns_components-schemas-name:
       description: The name of the peer.
       example: my-peer-1
       type: string
+    secondary-dns_port:
+      description: DNS port of primary or secondary nameserver, depending on what zone this peer is linked to.
+      example: 53
+      type: number
+    secondary-dns_ip:
+      description: IPv4/IPv6 address of primary or secondary nameserver, depending on what zone this peer is linked to. For primary zones this IP defines the IP of the secondary nameserver Cloudflare will NOTIFY upon zone changes. For secondary zones this IP defines the IP of the primary nameserver Cloudflare will send AXFR/IXFR requests to.
+      example: 192.0.2.53
+      type: string
+    secondary-dns_tsig_id:
+      description: TSIG authentication will be used for zone transfer if configured.
+      example: 69cd1e104af3e6ed3cb344f263fd0d5a
+      type: string
+    secondary-dns_schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/secondary-dns_peer'
+            type: array
     secondary-dns_components-schemas-id_response:
       allOf:
       - $ref: '#/components/schemas/secondary-dns_api-response-single'
@@ -356,10 +368,17 @@ components:
               id:
                 $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
             type: object
-    secondary-dns_account_identifier:
-      example: 01a7362d577a6c3019a474fd6f485823
+    secondary-dns_components-schemas-identifier:
+      example: 23ff594956f20c2a721606e94745a8aa
       readOnly: true
       type: string
+    secondary-dns_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/secondary-dns_result_info'
+      type: object
     secondary-dns_api-response-common-failure:
       properties:
         errors:
@@ -390,25 +409,6 @@ components:
       - errors
       - messages
       - result
-      type: object
-    secondary-dns_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
       type: object
     secondary-dns_schemas-single_response:
       allOf:

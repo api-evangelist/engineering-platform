@@ -645,18 +645,15 @@ paths:
       - D1
 components:
   schemas:
-    d1_account-identifier:
-      description: Account identifier tag.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    d1_database-identifier:
+      example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
       readOnly: true
       type: string
-    d1_table-count:
-      example: 12
-      type: number
-    d1_sql:
-      description: Your SQL query. Supports multiple statements, joined by semicolons, which will be executed as a batch.
-      example: SELECT * FROM myTable WHERE field = ? OR field = ?;
+    d1_created-at:
+      description: Specifies the timestamp the resource was created as an ISO8601 string.
+      example: '2022-11-15T18:25:44.442097Z'
+      format: date-time
+      readOnly: true
       type: string
     d1_query-meta:
       properties:
@@ -675,135 +672,13 @@ components:
         size_after:
           type: number
       type: object
-    d1_query-result-response:
-      properties:
-        meta:
-          $ref: '#/components/schemas/d1_query-meta'
-        results:
-          items:
-            type: object
-          type: array
-        success:
-          type: boolean
-      type: object
-    d1_database-details-response:
-      properties:
-        created_at:
-          $ref: '#/components/schemas/d1_created-at'
-        file_size:
-          $ref: '#/components/schemas/d1_file-size'
-        name:
-          $ref: '#/components/schemas/d1_database-name'
-        num_tables:
-          $ref: '#/components/schemas/d1_table-count'
-        uuid:
-          $ref: '#/components/schemas/d1_database-identifier'
-        version:
-          $ref: '#/components/schemas/d1_database-version'
-      type: object
-    d1_database-identifier:
-      example: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-      readOnly: true
-      type: string
-    d1_database-name:
-      example: my-database
-      pattern: ^[a-z0-9][a-z0-9-_]*$
-      type: string
-    d1_primary-location-hint:
-      description: Specify the region to create the D1 primary, if available. If this option is omitted, the D1 will be created as close as possible to the current user.
-      enum:
-      - wnam
-      - enam
-      - weur
-      - eeur
-      - apac
-      - oc
-      example: wnam
-      type: string
+    d1_table-count:
+      example: 12
+      type: number
     d1_file-size:
       description: The D1 database's size, in bytes.
       example: 12
       type: number
-    d1_raw-result-response:
-      properties:
-        meta:
-          $ref: '#/components/schemas/d1_query-meta'
-        results:
-          properties:
-            columns:
-              items:
-                type: string
-              type: array
-            rows:
-              items:
-                items:
-                  anyOf:
-                  - type: number
-                  - type: string
-                  - type: object
-                type: array
-              type: array
-          type: object
-        success:
-          type: boolean
-      type: object
-    d1_database-version:
-      example: production
-      pattern: ^(alpha|beta|production)$
-      type: string
-    d1_database-response:
-      properties:
-        created_at:
-          $ref: '#/components/schemas/d1_created-at'
-        name:
-          $ref: '#/components/schemas/d1_database-name'
-        uuid:
-          $ref: '#/components/schemas/d1_database-identifier'
-        version:
-          $ref: '#/components/schemas/d1_database-version'
-      type: object
-    d1_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    d1_params:
-      example:
-      - firstParam
-      - secondParam
-      items:
-        type: string
-      type: array
-    d1_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/d1_messages'
-        messages:
-          $ref: '#/components/schemas/d1_messages'
-        result:
-          type: object
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     d1_api-response-common-failure:
       properties:
         errors:
@@ -835,11 +710,136 @@ components:
       - messages
       - result
       type: object
-    d1_created-at:
-      description: Specifies the timestamp the resource was created as an ISO8601 string.
-      example: '2022-11-15T18:25:44.442097Z'
-      format: date-time
+    d1_raw-result-response:
+      properties:
+        meta:
+          $ref: '#/components/schemas/d1_query-meta'
+        results:
+          properties:
+            columns:
+              items:
+                type: string
+              type: array
+            rows:
+              items:
+                items:
+                  anyOf:
+                  - type: number
+                  - type: string
+                  - type: object
+                type: array
+              type: array
+          type: object
+        success:
+          type: boolean
+      type: object
+    d1_database-name:
+      example: my-database
+      pattern: ^[a-z0-9][a-z0-9-_]*$
+      type: string
+    d1_query-result-response:
+      properties:
+        meta:
+          $ref: '#/components/schemas/d1_query-meta'
+        results:
+          items:
+            type: object
+          type: array
+        success:
+          type: boolean
+      type: object
+    d1_params:
+      example:
+      - firstParam
+      - secondParam
+      items:
+        type: string
+      type: array
+    d1_database-details-response:
+      properties:
+        created_at:
+          $ref: '#/components/schemas/d1_created-at'
+        file_size:
+          $ref: '#/components/schemas/d1_file-size'
+        name:
+          $ref: '#/components/schemas/d1_database-name'
+        num_tables:
+          $ref: '#/components/schemas/d1_table-count'
+        uuid:
+          $ref: '#/components/schemas/d1_database-identifier'
+        version:
+          $ref: '#/components/schemas/d1_database-version'
+      type: object
+    d1_primary-location-hint:
+      description: Specify the region to create the D1 primary, if available. If this option is omitted, the D1 will be created as close as possible to the current user.
+      enum:
+      - wnam
+      - enam
+      - weur
+      - eeur
+      - apac
+      - oc
+      example: wnam
+      type: string
+    d1_account-identifier:
+      description: Account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       readOnly: true
+      type: string
+    d1_sql:
+      description: Your SQL query. Supports multiple statements, joined by semicolons, which will be executed as a batch.
+      example: SELECT * FROM myTable WHERE field = ? OR field = ?;
+      type: string
+    d1_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/d1_messages'
+        messages:
+          $ref: '#/components/schemas/d1_messages'
+        result:
+          type: object
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    d1_database-response:
+      properties:
+        created_at:
+          $ref: '#/components/schemas/d1_created-at'
+        name:
+          $ref: '#/components/schemas/d1_database-name'
+        uuid:
+          $ref: '#/components/schemas/d1_database-identifier'
+        version:
+          $ref: '#/components/schemas/d1_database-version'
+      type: object
+    d1_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    d1_database-version:
+      example: production
+      pattern: ^(alpha|beta|production)$
       type: string
   securitySchemes:
     api_email:

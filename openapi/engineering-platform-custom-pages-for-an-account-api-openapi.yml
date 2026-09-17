@@ -170,12 +170,14 @@ paths:
         pro: true
 components:
   schemas:
-    custom-pages_custom_pages_response_single:
+    custom-pages_custom_pages_response_collection:
       allOf:
-      - $ref: '#/components/schemas/custom-pages_api-response-single'
+      - $ref: '#/components/schemas/custom-pages_api-response-collection'
       - properties:
           result:
-            type: object
+            items:
+              type: object
+            type: array
     custom-pages_api-response-single:
       allOf:
       - $ref: '#/components/schemas/custom-pages_api-response-common'
@@ -185,6 +187,76 @@ components:
             - type: object
             - type: string
       type: object
+    custom-pages_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/custom-pages_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/custom-pages_result_info'
+      type: object
+    custom-pages_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    custom-pages_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/custom-pages_messages'
+        messages:
+          $ref: '#/components/schemas/custom-pages_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    custom-pages_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    custom-pages_state:
+      description: The custom page state.
+      enum:
+      - default
+      - customized
+      example: default
+      type: string
+    custom-pages_custom_pages_response_single:
+      allOf:
+      - $ref: '#/components/schemas/custom-pages_api-response-single'
+      - properties:
+          result:
+            type: object
     custom-pages_api-response-common-failure:
       properties:
         errors:
@@ -235,83 +307,11 @@ components:
           example: 2000
           type: number
       type: object
-    custom-pages_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/custom-pages_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/custom-pages_result_info'
-      type: object
-    custom-pages_state:
-      description: The custom page state.
-      enum:
-      - default
-      - customized
-      example: default
-      type: string
-    custom-pages_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    custom-pages_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/custom-pages_messages'
-        messages:
-          $ref: '#/components/schemas/custom-pages_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    custom-pages_custom_pages_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/custom-pages_api-response-collection'
-      - properties:
-          result:
-            items:
-              type: object
-            type: array
     custom-pages_url:
       default: ''
       description: The URL associated with the custom page.
       example: http://www.example.com
       format: uri
-      type: string
-    custom-pages_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
       type: string
   securitySchemes:
     api_email:

@@ -277,6 +277,10 @@ paths:
       - Magic Network Monitoring Config Read
 components:
   schemas:
+    magic-visibility_mnm_config_router_ip:
+      description: IPv4 CIDR of the router sourcing flow data. Only /32 addresses are currently supported.
+      example: 203.0.113.1
+      type: string
     magic-visibility_mnm_config_warp_device:
       description: Object representing a warp device with an ID and name.
       properties:
@@ -297,6 +301,77 @@ components:
       - name
       - router_ip
       type: object
+    magic-visibility_mnm_config_default_sampling:
+      default: 1
+      description: Fallback sampling rate of flow messages being sent in packets per second. This should match the packet sampling rate configured on the router.
+      minimum: 1
+      type: number
+    magic-visibility_mnm_config_router_ips:
+      items:
+        $ref: '#/components/schemas/magic-visibility_mnm_config_router_ip'
+      type: array
+    magic-visibility_account_identifier:
+      example: 6f91088a406011ed95aed352566e8d4c
+      type: string
+    magic-visibility_mnm_config_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic-visibility_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic-visibility_mnm_config'
+        type: object
+    magic-visibility_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/magic-visibility_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
+    magic-visibility_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic-visibility_messages'
+        messages:
+          $ref: '#/components/schemas/magic-visibility_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic-visibility_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     magic-visibility_api-response-common-failure:
       properties:
         errors:
@@ -328,81 +403,10 @@ components:
       - messages
       - result
       type: object
-    magic-visibility_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/magic-visibility_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
-      type: object
-    magic-visibility_account_identifier:
-      example: 6f91088a406011ed95aed352566e8d4c
+    magic-visibility_mnm_config_name:
+      description: The account name.
+      example: cloudflare user's account
       type: string
-    magic-visibility_mnm_config_router_ips:
-      items:
-        $ref: '#/components/schemas/magic-visibility_mnm_config_router_ip'
-      type: array
-    magic-visibility_mnm_config_default_sampling:
-      default: 1
-      description: Fallback sampling rate of flow messages being sent in packets per second. This should match the packet sampling rate configured on the router.
-      minimum: 1
-      type: number
-    magic-visibility_mnm_config_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic-visibility_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic-visibility_mnm_config'
-        type: object
-    magic-visibility_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/magic-visibility_messages'
-        messages:
-          $ref: '#/components/schemas/magic-visibility_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    magic-visibility_mnm_config_router_ip:
-      description: IPv4 CIDR of the router sourcing flow data. Only /32 addresses are currently supported.
-      example: 203.0.113.1
-      type: string
-    magic-visibility_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     magic-visibility_mnm_config_warp_devices:
       items:
         $ref: '#/components/schemas/magic-visibility_mnm_config_warp_device'
@@ -423,10 +427,6 @@ components:
       - router_ips
       - warp_devices
       type: object
-    magic-visibility_mnm_config_name:
-      description: The account name.
-      example: cloudflare user's account
-      type: string
   securitySchemes:
     api_email:
       in: header

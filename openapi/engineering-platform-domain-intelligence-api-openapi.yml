@@ -92,76 +92,49 @@ paths:
       - Domain Intelligence
 components:
   schemas:
+    intel_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    intel_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/intel_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/intel_result_info'
+      type: object
+    intel_content_categories:
+      description: Current content categories.
+      example:
+      - id: 155
+        name: Technology
+        super_category_id: 26
+    intel_single_response:
+      allOf:
+      - $ref: '#/components/schemas/intel_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/intel_domain'
+    intel_additional_information:
+      description: Additional information related to the host name.
+      properties:
+        suspected_malware_family:
+          description: Suspected DGA malware family.
+          example: ''
+          type: string
+      type: object
     intel_resolves_to_refs:
       description: Specifies a list of references to one or more IP addresses or domain names that the domain name currently resolves to.
       items:
         $ref: '#/components/schemas/intel_resolves_to_ref'
       type: array
-    intel_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/intel_schemas-api-response-common'
-      type: object
-    intel_domain:
-      properties:
-        additional_information:
-          $ref: '#/components/schemas/intel_additional_information'
-        application:
-          $ref: '#/components/schemas/intel_application'
-        content_categories:
-          $ref: '#/components/schemas/intel_content_categories'
-        domain:
-          $ref: '#/components/schemas/intel_domain_name'
-        inherited_content_categories:
-          $ref: '#/components/schemas/intel_inherited_content_categories'
-        inherited_from:
-          $ref: '#/components/schemas/intel_inherited_from'
-        inherited_risk_types:
-          $ref: '#/components/schemas/intel_inherited_risk_types'
-        popularity_rank:
-          $ref: '#/components/schemas/intel_popularity_rank'
-        resolves_to_refs:
-          $ref: '#/components/schemas/intel_resolves_to_refs'
-        risk_score:
-          $ref: '#/components/schemas/intel_risk_score'
-        risk_types:
-          $ref: '#/components/schemas/intel_risk_types'
-    intel_inherited_content_categories:
-      $ref: '#/components/schemas/intel_categories_with_super_category_ids_example_empty'
-    intel_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/intel_messages'
-        messages:
-          $ref: '#/components/schemas/intel_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    intel_category_with_super_category_id:
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        super_category_id:
-          type: integer
-    intel_domain_name:
-      example: cloudflare.com
-      type: string
     intel_messages:
       example: []
       items:
@@ -177,139 +150,12 @@ components:
         type: object
         uniqueItems: true
       type: array
-    intel_risk_score:
-      description: Hostname risk score, which is a value between 0 (lowest risk) to 1 (highest risk).
-      type: number
-    intel_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/intel_api-response-collection'
-      - properties:
-          result:
-            items:
-              properties:
-                additional_information:
-                  $ref: '#/components/schemas/intel_additional_information'
-                application:
-                  $ref: '#/components/schemas/intel_application'
-                content_categories:
-                  $ref: '#/components/schemas/intel_content_categories'
-                domain:
-                  $ref: '#/components/schemas/intel_domain_name'
-                inherited_content_categories:
-                  $ref: '#/components/schemas/intel_inherited_content_categories'
-                inherited_from:
-                  $ref: '#/components/schemas/intel_inherited_from'
-                inherited_risk_types:
-                  $ref: '#/components/schemas/intel_inherited_risk_types'
-                popularity_rank:
-                  $ref: '#/components/schemas/intel_popularity_rank'
-                risk_score:
-                  $ref: '#/components/schemas/intel_risk_score'
-                risk_types:
-                  $ref: '#/components/schemas/intel_risk_types'
-            type: array
-    intel_inherited_from:
-      description: Domain from which `inherited_content_categories` and `inherited_risk_types` are inherited, if applicable.
-      type: string
-    intel_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    intel_schemas-api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/intel_messages'
-        messages:
-          $ref: '#/components/schemas/intel_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    intel_additional_information:
-      description: Additional information related to the host name.
-      properties:
-        suspected_malware_family:
-          description: Suspected DGA malware family.
-          example: ''
-          type: string
-      type: object
-    intel_single_response:
-      allOf:
-      - $ref: '#/components/schemas/intel_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/intel_domain'
-    intel_stix_identifier:
-      description: 'STIX 2.1 identifier: https://docs.oasis-open.org/cti/stix/v2.1/cs02/stix-v2.1-cs02.html#_64yvzeku5a5c'
-      example: ipv4-addr--baa568ec-6efe-5902-be55-0663833db537
+    intel_domain_name:
+      example: cloudflare.com
       type: string
     intel_popularity_rank:
       description: Global Cloudflare 100k ranking for the last 30 days, if available for the hostname. The top ranked domain is 1, the lowest ranked domain is 100,000.
       type: integer
-    intel_categories_with_super_category_ids_example_empty:
-      example: []
-      items:
-        $ref: '#/components/schemas/intel_category_with_super_category_id'
-      type: array
-    intel_risk_types:
-      example: []
-    intel_content_categories:
-      description: Current content categories.
-      example:
-      - id: 155
-        name: Technology
-        super_category_id: 26
-    intel_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    intel_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/intel_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/intel_result_info'
-      type: object
-    intel_application:
-      description: Application that the hostname belongs to.
-      properties:
-        id:
-          type: integer
-        name:
-          example: CLOUDFLARE
-          type: string
-      type: object
-    intel_inherited_risk_types:
-      $ref: '#/components/schemas/intel_categories_with_super_category_ids_example_empty'
     intel_resolves_to_ref:
       properties:
         id:
@@ -349,6 +195,160 @@ components:
       - errors
       - messages
       - result
+      type: object
+    intel_categories_with_super_category_ids_example_empty:
+      example: []
+      items:
+        $ref: '#/components/schemas/intel_category_with_super_category_id'
+      type: array
+    intel_inherited_risk_types:
+      $ref: '#/components/schemas/intel_categories_with_super_category_ids_example_empty'
+    intel_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/intel_api-response-collection'
+      - properties:
+          result:
+            items:
+              properties:
+                additional_information:
+                  $ref: '#/components/schemas/intel_additional_information'
+                application:
+                  $ref: '#/components/schemas/intel_application'
+                content_categories:
+                  $ref: '#/components/schemas/intel_content_categories'
+                domain:
+                  $ref: '#/components/schemas/intel_domain_name'
+                inherited_content_categories:
+                  $ref: '#/components/schemas/intel_inherited_content_categories'
+                inherited_from:
+                  $ref: '#/components/schemas/intel_inherited_from'
+                inherited_risk_types:
+                  $ref: '#/components/schemas/intel_inherited_risk_types'
+                popularity_rank:
+                  $ref: '#/components/schemas/intel_popularity_rank'
+                risk_score:
+                  $ref: '#/components/schemas/intel_risk_score'
+                risk_types:
+                  $ref: '#/components/schemas/intel_risk_types'
+            type: array
+    intel_risk_types:
+      example: []
+    intel_stix_identifier:
+      description: 'STIX 2.1 identifier: https://docs.oasis-open.org/cti/stix/v2.1/cs02/stix-v2.1-cs02.html#_64yvzeku5a5c'
+      example: ipv4-addr--baa568ec-6efe-5902-be55-0663833db537
+      type: string
+    intel_inherited_content_categories:
+      $ref: '#/components/schemas/intel_categories_with_super_category_ids_example_empty'
+    intel_schemas-api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/intel_messages'
+        messages:
+          $ref: '#/components/schemas/intel_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    intel_risk_score:
+      description: Hostname risk score, which is a value between 0 (lowest risk) to 1 (highest risk).
+      type: number
+    intel_domain:
+      properties:
+        additional_information:
+          $ref: '#/components/schemas/intel_additional_information'
+        application:
+          $ref: '#/components/schemas/intel_application'
+        content_categories:
+          $ref: '#/components/schemas/intel_content_categories'
+        domain:
+          $ref: '#/components/schemas/intel_domain_name'
+        inherited_content_categories:
+          $ref: '#/components/schemas/intel_inherited_content_categories'
+        inherited_from:
+          $ref: '#/components/schemas/intel_inherited_from'
+        inherited_risk_types:
+          $ref: '#/components/schemas/intel_inherited_risk_types'
+        popularity_rank:
+          $ref: '#/components/schemas/intel_popularity_rank'
+        resolves_to_refs:
+          $ref: '#/components/schemas/intel_resolves_to_refs'
+        risk_score:
+          $ref: '#/components/schemas/intel_risk_score'
+        risk_types:
+          $ref: '#/components/schemas/intel_risk_types'
+    intel_application:
+      description: Application that the hostname belongs to.
+      properties:
+        id:
+          type: integer
+        name:
+          example: CLOUDFLARE
+          type: string
+      type: object
+    intel_inherited_from:
+      description: Domain from which `inherited_content_categories` and `inherited_risk_types` are inherited, if applicable.
+      type: string
+    intel_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/intel_messages'
+        messages:
+          $ref: '#/components/schemas/intel_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    intel_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    intel_category_with_super_category_id:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        super_category_id:
+          type: integer
+    intel_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/intel_schemas-api-response-common'
       type: object
   securitySchemes:
     api_email:

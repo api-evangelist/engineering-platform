@@ -129,11 +129,54 @@ paths:
       - Stream MP4 Downloads
 components:
   schemas:
+    stream_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     stream_identifier:
       description: A Cloudflare-generated unique identifier for a media item.
       example: ea95132c15732412d22c1476fa83f27a
       maxLength: 32
       type: string
+    stream_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    stream_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-single'
+      - properties:
+          result:
+            example: ok
+            type: string
+    stream_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      type: object
     stream_api-response-common-failure:
       properties:
         errors:
@@ -165,42 +208,6 @@ components:
       - messages
       - result
       type: object
-    stream_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    stream_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      type: object
-    stream_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
     stream_downloads_response:
       allOf:
       - $ref: '#/components/schemas/stream_api-response-single'
@@ -212,13 +219,6 @@ components:
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       type: string
-    stream_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-single'
-      - properties:
-          result:
-            example: ok
-            type: string
   securitySchemes:
     api_email:
       in: header

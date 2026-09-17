@@ -571,201 +571,6 @@ paths:
       parameters:
       - $ref: '#/components/parameters/threadId'
 components:
-  requestBodies:
-    commentCreateUpdate:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentCreateUpdate'
-          examples:
-            Create Comment:
-              value:
-                body: This is an example.
-            Tag User in Comment:
-              value:
-                body: This is an example. @alex-cruz
-                tags:
-                  '@alex-cruz':
-                    type: user
-                    id: 12345678
-  responses:
-    comment403ErrorAndFeatureUnavailable:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            anyOf:
-            - $ref: '#/components/schemas/comment403Error'
-            - $ref: '#/components/schemas/featureUnavailable403Error'
-          examples:
-            Forbidden:
-              $ref: '#/components/examples/comment403Error'
-            Feature Unavailable:
-              $ref: '#/components/examples/featureUnavailable403Error'
-    v10HeaderMissing:
-      description: Missing v10 Accept Header
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/v10HeaderMissing'
-          examples:
-            Missing v10 Accept Header:
-              $ref: '#/components/examples/v10HeaderMissing'
-    commentGet:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentResponse'
-          example:
-            data:
-            - id: 46818
-              threadId: 12345
-              createdBy: 12345678
-              createdAt: '2024-01-18T12:00:54.000Z'
-              updatedAt: '2024-01-18T12:00:54.000Z'
-              body: This is also an example.
-            - id: 46817
-              threadId: 67890
-              createdBy: 87654321
-              createdAt: '2024-01-18T11:48:01.000Z'
-              updatedAt: '2024-01-18T11:48:01.000Z'
-              body: Another example.
-            - id: 46814
-              threadId: 23456
-              createdBy: 12345678
-              createdAt: '2024-01-18T11:30:40.000Z'
-              updatedAt: '2024-01-18T11:30:40.000Z'
-              body: This is an example.
-    commentUpdated:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentCreatedUpdated'
-          example:
-            data:
-              id: 46814
-              threadId: 12345
-              createdBy: 12345678
-              createdAt: '2024-01-18T11:30:40.000Z'
-              updatedAt: '2024-01-18T11:30:40.000Z'
-              body: This is an updated example.
-    comment401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
-    commentCreated:
-      description: Created
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentCreatedUpdated'
-          example:
-            data:
-              id: 46814
-              createdBy: 12345678
-              createdAt: '2024-01-18T11:30:40.000Z'
-              updatedAt: '2024-01-18T11:30:40.000Z'
-              body: This is an example.
-    comment500Error:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 500
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-            status: 500
-    comment403Error:
-      description: Forbidden
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/comment403Error'
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Forbidden
-            detail: Forbidden
-            status: 403
-    comment404Error:
-      description: Not Found
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/not-found
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Not Found
-              detail:
-                type: string
-                description: Information about the error.
-                example: Not Found
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 404
-          example:
-            type: https://api.postman.com/problems/not-found
-            title: Not Found
-            detail: Not Found
-            status: 404
   parameters:
     threadId:
       name: threadId
@@ -775,6 +580,14 @@ components:
       schema:
         type: integer
         example: 34567
+    apiId:
+      name: apiId
+      in: path
+      required: true
+      description: The API's ID.
+      schema:
+        type: string
+        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
     collectionRequestUid:
       name: requestId
       in: path
@@ -793,14 +606,15 @@ components:
         type: string
         format: uid
         example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-    apiId:
-      name: apiId
+    collectionUid:
+      name: collectionId
       in: path
       required: true
-      description: The API's ID.
+      description: The collection's unique ID.
       schema:
         type: string
-        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
+        format: uid
+        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
     collectionResponseUid:
       name: responseId
       in: path
@@ -818,33 +632,61 @@ components:
       schema:
         type: integer
         example: 46814
-    collectionUid:
-      name: collectionId
-      in: path
-      required: true
-      description: The collection's unique ID.
-      schema:
-        type: string
-        format: uid
-        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-  examples:
-    comment403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Forbidden
-        detail: Forbidden
-        status: 403
-    v10HeaderMissing:
-      value:
-        name: instanceNotFoundError
-        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
-    featureUnavailable403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Forbidden
-        detail: This feature isn't available in your region.
-        status: 403
   schemas:
+    featureUnavailable403Error:
+      title: Feature Unavailable
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Forbidden
+        detail:
+          type: string
+          description: Information about the error.
+          example: This feature isn't available in your region.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+    commentCreateUpdate:
+      title: Comment Payload Object
+      type: object
+      description: Information about the comment.
+      required:
+      - body
+      properties:
+        body:
+          type: string
+          description: The contents of the comment.
+          example: This is an example.
+        tags:
+          type: object
+          description: Information about users tagged in the `body` comment.
+          properties:
+            userName:
+              type: object
+              required:
+              - type
+              - id
+              description: An object that contains information about the tagged user. The object's name is the user's Postman username. For example, `@user-postman`.
+              properties:
+                type:
+                  type: string
+                  description: The `user` value.
+                  enum:
+                  - user
+                  example: user
+                id:
+                  type: integer
+                  description: The user's ID.
+                  example: 87654321
     commentCreatedUpdated:
       title: Comment Updated/Created Object
       type: object
@@ -943,60 +785,6 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 403
-    featureUnavailable403Error:
-      title: Feature Unavailable
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/forbidden
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Forbidden
-        detail:
-          type: string
-          description: Information about the error.
-          example: This feature isn't available in your region.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
-    commentCreateUpdate:
-      title: Comment Payload Object
-      type: object
-      description: Information about the comment.
-      required:
-      - body
-      properties:
-        body:
-          type: string
-          description: The contents of the comment.
-          example: This is an example.
-        tags:
-          type: object
-          description: Information about users tagged in the `body` comment.
-          properties:
-            userName:
-              type: object
-              required:
-              - type
-              - id
-              description: An object that contains information about the tagged user. The object's name is the user's Postman username. For example, `@user-postman`.
-              properties:
-                type:
-                  type: string
-                  description: The `user` value.
-                  enum:
-                  - user
-                  example: user
-                id:
-                  type: integer
-                  description: The user's ID.
-                  example: 87654321
     v10HeaderMissing:
       title: Missing v10 Accept Header
       type: object
@@ -1009,6 +797,218 @@ components:
           type: string
           description: The error message.
           example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+  examples:
+    v10HeaderMissing:
+      value:
+        name: instanceNotFoundError
+        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    comment403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: Forbidden
+        status: 403
+    featureUnavailable403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: This feature isn't available in your region.
+        status: 403
+  responses:
+    comment401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
+    commentCreated:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentCreatedUpdated'
+          example:
+            data:
+              id: 46814
+              createdBy: 12345678
+              createdAt: '2024-01-18T11:30:40.000Z'
+              updatedAt: '2024-01-18T11:30:40.000Z'
+              body: This is an example.
+    comment500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 500
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
+            status: 500
+    commentGet:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentResponse'
+          example:
+            data:
+            - id: 46818
+              threadId: 12345
+              createdBy: 12345678
+              createdAt: '2024-01-18T12:00:54.000Z'
+              updatedAt: '2024-01-18T12:00:54.000Z'
+              body: This is also an example.
+            - id: 46817
+              threadId: 67890
+              createdBy: 87654321
+              createdAt: '2024-01-18T11:48:01.000Z'
+              updatedAt: '2024-01-18T11:48:01.000Z'
+              body: Another example.
+            - id: 46814
+              threadId: 23456
+              createdBy: 12345678
+              createdAt: '2024-01-18T11:30:40.000Z'
+              updatedAt: '2024-01-18T11:30:40.000Z'
+              body: This is an example.
+    comment403Error:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/comment403Error'
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Forbidden
+            detail: Forbidden
+            status: 403
+    v10HeaderMissing:
+      description: Missing v10 Accept Header
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/v10HeaderMissing'
+          examples:
+            Missing v10 Accept Header:
+              $ref: '#/components/examples/v10HeaderMissing'
+    comment403ErrorAndFeatureUnavailable:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            anyOf:
+            - $ref: '#/components/schemas/comment403Error'
+            - $ref: '#/components/schemas/featureUnavailable403Error'
+          examples:
+            Forbidden:
+              $ref: '#/components/examples/comment403Error'
+            Feature Unavailable:
+              $ref: '#/components/examples/featureUnavailable403Error'
+    commentUpdated:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentCreatedUpdated'
+          example:
+            data:
+              id: 46814
+              threadId: 12345
+              createdBy: 12345678
+              createdAt: '2024-01-18T11:30:40.000Z'
+              updatedAt: '2024-01-18T11:30:40.000Z'
+              body: This is an updated example.
+    comment404Error:
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/not-found
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Not Found
+              detail:
+                type: string
+                description: Information about the error.
+                example: Not Found
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 404
+          example:
+            type: https://api.postman.com/problems/not-found
+            title: Not Found
+            detail: Not Found
+            status: 404
+  requestBodies:
+    commentCreateUpdate:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentCreateUpdate'
+          examples:
+            Create Comment:
+              value:
+                body: This is an example.
+            Tag User in Comment:
+              value:
+                body: This is an example. @alex-cruz
+                tags:
+                  '@alex-cruz':
+                    type: user
+                    id: 12345678
   securitySchemes:
     PostmanApiKey:
       type: apiKey

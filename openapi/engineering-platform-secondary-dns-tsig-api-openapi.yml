@@ -254,6 +254,53 @@ components:
       allOf:
       - $ref: '#/components/schemas/secondary-dns_api-response-common'
       type: object
+    secondary-dns_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    secondary-dns_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/secondary-dns_result_info'
+      type: object
+    secondary-dns_secret:
+      description: TSIG secret.
+      example: caf79a7804b04337c9c66ccd7bef9190a1e1679b5dd03d8aa10f7ad45e1a9dab92b417896c15d4d007c7c14194538d2a5d0feffdecc5a7f0e1c570cfa700837c
+      type: string
+    secondary-dns_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/secondary-dns_messages'
+        messages:
+          $ref: '#/components/schemas/secondary-dns_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    secondary-dns_account_identifier:
+      example: 01a7362d577a6c3019a474fd6f485823
+      readOnly: true
+      type: string
     secondary-dns_tsig:
       properties:
         algo:
@@ -270,25 +317,24 @@ components:
       - secret
       - algo
       type: object
-    secondary-dns_schemas-identifier:
-      example: 69cd1e104af3e6ed3cb344f263fd0d5a
-      readOnly: true
+    secondary-dns_single_response:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/secondary-dns_tsig'
+    secondary-dns_algo:
+      description: TSIG algorithm.
+      example: hmac-sha512.
       type: string
-    secondary-dns_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    secondary-dns_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/secondary-dns_tsig'
+            type: array
     secondary-dns_api-response-common-failure:
       properties:
         errors:
@@ -320,52 +366,6 @@ components:
       - messages
       - result
       type: object
-    secondary-dns_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/secondary-dns_tsig'
-            type: array
-    secondary-dns_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/secondary-dns_result_info'
-      type: object
-    secondary-dns_single_response:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/secondary-dns_tsig'
-    secondary-dns_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/secondary-dns_messages'
-        messages:
-          $ref: '#/components/schemas/secondary-dns_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    secondary-dns_algo:
-      description: TSIG algorithm.
-      example: hmac-sha512.
-      type: string
-    secondary-dns_account_identifier:
-      example: 01a7362d577a6c3019a474fd6f485823
-      readOnly: true
-      type: string
     secondary-dns_schemas-id_response:
       allOf:
       - $ref: '#/components/schemas/secondary-dns_api-response-single'
@@ -375,9 +375,9 @@ components:
               id:
                 $ref: '#/components/schemas/secondary-dns_schemas-identifier'
             type: object
-    secondary-dns_secret:
-      description: TSIG secret.
-      example: caf79a7804b04337c9c66ccd7bef9190a1e1679b5dd03d8aa10f7ad45e1a9dab92b417896c15d4d007c7c14194538d2a5d0feffdecc5a7f0e1c570cfa700837c
+    secondary-dns_schemas-identifier:
+      example: 69cd1e104af3e6ed3cb344f263fd0d5a
+      readOnly: true
       type: string
     secondary-dns_result_info:
       properties:

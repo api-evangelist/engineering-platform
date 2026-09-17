@@ -56,20 +56,45 @@ paths:
       parameters:
       - $ref: '#/components/parameters/workspaceQuery'
 components:
-  examples:
-    import400ErrorUnsupportedOASVersion:
-      value:
-        error:
-          name: invalidParamsError
-          message: 'Unsupported OpenAPI version: 3.2.0. Postman API only supports versions 3.0.0, 3.0.1, 3.0.2, 3.0.3, 3.1.0'
-    import400ErrorBadRequest:
-      value:
-        error:
-          name: invalidParamsError
-          message: The request body has invalid values for the type parameter. Value must be one of file, string, json
-          details:
-            param: type
+  requestBodies:
+    importOpenApiDefinition:
+      content:
+        application/json:
+          schema:
+            anyOf:
+            - $ref: '#/components/schemas/jsonSchema'
+            - $ref: '#/components/schemas/jsonStringified'
+          example:
+            type: string
+            input: "{\n  \"openapi\": \"3.0.0\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Test API\"\n  },\n  \"servers\": [\n    {\n      \"url\": \"http://locahost:3000\"\n    }\n  ],\n  \"paths\": {\n    \"/user\": {\n      \"get\": {\n        \"summary\": \"List all users\",\n        \"operationId\": \"listUser\",\n        \"parameters\": [\n          {\n            \"name\": \"id\",\n            \"in\": \"query\",\n            \"required\": true,\n            \"description\": \"The user's ID.\",\n            \"example\": 1234,\n            \"schema\": {\n              \"type\": \"integer\",\n              \"format\": \"int32\"\n            }\n          }\n        ],\n        \"responses\": {\n          \"200\": {\n            \"description\": \"Information about the user.\",\n            \"headers\": {\n              \"x-next\": {\n                \"description\": \"A link to the next page of responses.\",\n                \"schema\": {\n                  \"type\": \"string\"\n                }\n              }\n            },\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/User\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\": {\n      \"User\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"id\",\n          \"name\"\n        ],\n        \"properties\": {\n          \"id\": {\n            \"type\": \"integer\",\n            \"format\": \"int64\"\n          },\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"tag\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"Error\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"code\",\n          \"message\"\n        ],\n        \"properties\": {\n          \"code\": {\n            \"type\": \"integer\",\n            \"format\": \"int32\"\n          },\n          \"message\": {\n            \"type\": \"string\"\n          }\n        }\n      }\n    }\n  }\n}"
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/importExportFile'
+          examples:
+            Form-Data Request Body:
+              externalValue: https://www.postman.com/postman/workspace/postman-public-workspace/example/12959542-08d74ce2-8150-4f72-99a7-11e60492eb47
   schemas:
+    jsonStringified:
+      title: JSON Stringified
+      type: object
+      required:
+      - type
+      - input
+      properties:
+        type:
+          type: string
+          description: The `string` type value.
+          enum:
+          - string
+          example: string
+        input:
+          type: string
+          description: The stringified OpenAPI definition.
+          example: "{\n  \"openapi\": \"3.0.0\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Test API\"\n  },\n  \"servers\": [\n    {\n      \"url\": \"http://locahost:3000\"\n    }\n  ],\n  \"paths\": {\n    \"/user\": {\n      \"get\": {\n        \"summary\": \"List all users\",\n        \"operationId\": \"listUser\",\n        \"parameters\": [\n          {\n            \"name\": \"id\",\n            \"in\": \"query\",\n            \"required\": true,\n            \"description\": \"The user's ID.\",\n            \"example\": 1234,\n            \"schema\": {\n              \"type\": \"integer\",\n              \"format\": \"int32\"\n            }\n          }\n        ],\n        \"responses\": {\n          \"200\": {\n            \"description\": \"Information about the user.\",\n            \"headers\": {\n              \"x-next\": {\n                \"description\": \"A link to the next page of responses.\",\n                \"schema\": {\n                  \"type\": \"string\"\n                }\n              }\n            },\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/User\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\": {\n      \"User\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"id\",\n          \"name\"\n        ],\n        \"properties\": {\n          \"id\": {\n            \"type\": \"integer\",\n            \"format\": \"int64\"\n          },\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"tag\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"Error\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"code\",\n          \"message\"\n        ],\n        \"properties\": {\n          \"code\": {\n            \"type\": \"integer\",\n            \"format\": \"int32\"\n          },\n          \"message\": {\n            \"type\": \"string\"\n          }\n        }\n      }\n    }\n  }\n}"
+        options:
+          type: object
+          additionalProperties: true
+          description: An object that contains advanced creation options and their values. You can find a complete list of properties and their values in Postman's [OpenAPI to Postman Collection Converter OPTIONS documentation](https://github.com/postmanlabs/openapi-to-postman/blob/develop/OPTIONS.md). These properties are case-sensitive.
     import400ErrorUnsupportedOASVersion:
       title: Unsupported OpenAPI Version
       type: object
@@ -85,6 +110,69 @@ components:
               type: string
               description: The error message.
               example: 'Unsupported OpenAPI version: 3.2.0. Postman API only supports versions 3.0.0, 3.0.1, 3.0.2, 3.0.3, 3.1.0'
+    workspaceId:
+      type: string
+      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+    jsonSchema:
+      title: JSON Schema
+      type: object
+      required:
+      - type
+      - input
+      properties:
+        type:
+          type: string
+          description: The `json` type value.
+          enum:
+          - json
+          example: json
+        input:
+          type: object
+          description: An object that contains a valid JSON OpenAPI definition. For more information, read the [OpenAPI documentation](https://swagger.io/docs/specification/basic-structure/).
+        options:
+          type: object
+          additionalProperties: true
+          description: An object that contains advanced creation options and their values. You can find a complete list of properties and their values in Postman's [OpenAPI to Postman Collection Converter OPTIONS documentation](https://github.com/postmanlabs/openapi-to-postman/blob/develop/OPTIONS.md). These properties are case-sensitive.
+    importExportFile:
+      type: object
+      required:
+      - type
+      - input
+      properties:
+        type:
+          type: string
+          description: The `file` type value.
+          enum:
+          - file
+          example: file
+        input:
+          type: string
+          description: A .zip file containing the definition file.
+          format: binary
+    import400ErrorBadRequest:
+      title: Bad Request
+      anyOf:
+      - $ref: '#/components/schemas/import400ErrorInvalidParameters'
+      - $ref: '#/components/schemas/import400ErrorUnsupportedOASVersion'
+    import400ErrorInvalidParameters:
+      title: Invalid Parameters
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The error name.
+              example: invalidParamsError
+            message:
+              type: string
+              description: The error message.
+              example: The request body has invalid values for the type parameter. Value must be one of file, string, json
+            details:
+              type: object
+              description: Information about the error.
+              properties: {}
     importOpenApiDefinition:
       title: Successful Response
       type: object
@@ -107,98 +195,41 @@ components:
                 format: uid
                 description: The collection's unique ID.
                 example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-    import400ErrorInvalidParameters:
-      title: Invalid Parameters
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            name:
-              type: string
-              description: The error name.
-              example: invalidParamsError
-            message:
-              type: string
-              description: The error message.
-              example: The request body has invalid values for the type parameter. Value must be one of file, string, json
-            details:
-              type: object
-              description: Information about the error.
-              properties: {}
-    jsonStringified:
-      title: JSON Stringified
-      type: object
-      required:
-      - type
-      - input
-      properties:
-        type:
-          type: string
-          description: The `string` type value.
-          enum:
-          - string
-          example: string
-        input:
-          type: string
-          description: The stringified OpenAPI definition.
-          example: "{\n  \"openapi\": \"3.0.0\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Test API\"\n  },\n  \"servers\": [\n    {\n      \"url\": \"http://locahost:3000\"\n    }\n  ],\n  \"paths\": {\n    \"/user\": {\n      \"get\": {\n        \"summary\": \"List all users\",\n        \"operationId\": \"listUser\",\n        \"parameters\": [\n          {\n            \"name\": \"id\",\n            \"in\": \"query\",\n            \"required\": true,\n            \"description\": \"The user's ID.\",\n            \"example\": 1234,\n            \"schema\": {\n              \"type\": \"integer\",\n              \"format\": \"int32\"\n            }\n          }\n        ],\n        \"responses\": {\n          \"200\": {\n            \"description\": \"Information about the user.\",\n            \"headers\": {\n              \"x-next\": {\n                \"description\": \"A link to the next page of responses.\",\n                \"schema\": {\n                  \"type\": \"string\"\n                }\n              }\n            },\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/User\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\": {\n      \"User\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"id\",\n          \"name\"\n        ],\n        \"properties\": {\n          \"id\": {\n            \"type\": \"integer\",\n            \"format\": \"int64\"\n          },\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"tag\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"Error\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"code\",\n          \"message\"\n        ],\n        \"properties\": {\n          \"code\": {\n            \"type\": \"integer\",\n            \"format\": \"int32\"\n          },\n          \"message\": {\n            \"type\": \"string\"\n          }\n        }\n      }\n    }\n  }\n}"
-        options:
-          type: object
-          additionalProperties: true
-          description: An object that contains advanced creation options and their values. You can find a complete list of properties and their values in Postman's [OpenAPI to Postman Collection Converter OPTIONS documentation](https://github.com/postmanlabs/openapi-to-postman/blob/develop/OPTIONS.md). These properties are case-sensitive.
-    jsonSchema:
-      title: JSON Schema
-      type: object
-      required:
-      - type
-      - input
-      properties:
-        type:
-          type: string
-          description: The `json` type value.
-          enum:
-          - json
-          example: json
-        input:
-          type: object
-          description: An object that contains a valid JSON OpenAPI definition. For more information, read the [OpenAPI documentation](https://swagger.io/docs/specification/basic-structure/).
-        options:
-          type: object
-          additionalProperties: true
-          description: An object that contains advanced creation options and their values. You can find a complete list of properties and their values in Postman's [OpenAPI to Postman Collection Converter OPTIONS documentation](https://github.com/postmanlabs/openapi-to-postman/blob/develop/OPTIONS.md). These properties are case-sensitive.
-    import400ErrorBadRequest:
-      title: Bad Request
-      anyOf:
-      - $ref: '#/components/schemas/import400ErrorInvalidParameters'
-      - $ref: '#/components/schemas/import400ErrorUnsupportedOASVersion'
-    workspaceId:
-      type: string
-      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-    importExportFile:
-      type: object
-      required:
-      - type
-      - input
-      properties:
-        type:
-          type: string
-          description: The `file` type value.
-          enum:
-          - file
-          example: file
-        input:
-          type: string
-          description: A .zip file containing the definition file.
-          format: binary
-  parameters:
-    workspaceQuery:
-      name: workspace
-      in: query
-      description: The workspace's ID.
-      schema:
-        $ref: '#/components/schemas/workspaceId'
   responses:
+    importOpenApiDefinition:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/importOpenApiDefinition'
+          example:
+            collections:
+            - id: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+              name: Test Collection
+              uid: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+            environments: []
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
     common401Error:
       description: Unauthorized
       content:
@@ -229,57 +260,26 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    importOpenApiDefinition:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/importOpenApiDefinition'
-          example:
-            collections:
-            - id: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-              name: Test Collection
-              uid: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-            environments: []
-  requestBodies:
-    importOpenApiDefinition:
-      content:
-        application/json:
-          schema:
-            anyOf:
-            - $ref: '#/components/schemas/jsonSchema'
-            - $ref: '#/components/schemas/jsonStringified'
-          example:
-            type: string
-            input: "{\n  \"openapi\": \"3.0.0\",\n  \"info\": {\n    \"version\": \"1.0.0\",\n    \"title\": \"Test API\"\n  },\n  \"servers\": [\n    {\n      \"url\": \"http://locahost:3000\"\n    }\n  ],\n  \"paths\": {\n    \"/user\": {\n      \"get\": {\n        \"summary\": \"List all users\",\n        \"operationId\": \"listUser\",\n        \"parameters\": [\n          {\n            \"name\": \"id\",\n            \"in\": \"query\",\n            \"required\": true,\n            \"description\": \"The user's ID.\",\n            \"example\": 1234,\n            \"schema\": {\n              \"type\": \"integer\",\n              \"format\": \"int32\"\n            }\n          }\n        ],\n        \"responses\": {\n          \"200\": {\n            \"description\": \"Information about the user.\",\n            \"headers\": {\n              \"x-next\": {\n                \"description\": \"A link to the next page of responses.\",\n                \"schema\": {\n                  \"type\": \"string\"\n                }\n              }\n            },\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"$ref\": \"#/components/schemas/User\"\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  },\n  \"components\": {\n    \"schemas\": {\n      \"User\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"id\",\n          \"name\"\n        ],\n        \"properties\": {\n          \"id\": {\n            \"type\": \"integer\",\n            \"format\": \"int64\"\n          },\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"tag\": {\n            \"type\": \"string\"\n          }\n        }\n      },\n      \"Error\": {\n        \"type\": \"object\",\n        \"required\": [\n          \"code\",\n          \"message\"\n        ],\n        \"properties\": {\n          \"code\": {\n            \"type\": \"integer\",\n            \"format\": \"int32\"\n          },\n          \"message\": {\n            \"type\": \"string\"\n          }\n        }\n      }\n    }\n  }\n}"
-        multipart/form-data:
-          schema:
-            $ref: '#/components/schemas/importExportFile'
-          examples:
-            Form-Data Request Body:
-              externalValue: https://www.postman.com/postman/workspace/postman-public-workspace/example/12959542-08d74ce2-8150-4f72-99a7-11e60492eb47
+  parameters:
+    workspaceQuery:
+      name: workspace
+      in: query
+      description: The workspace's ID.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
+  examples:
+    import400ErrorUnsupportedOASVersion:
+      value:
+        error:
+          name: invalidParamsError
+          message: 'Unsupported OpenAPI version: 3.2.0. Postman API only supports versions 3.0.0, 3.0.1, 3.0.2, 3.0.3, 3.1.0'
+    import400ErrorBadRequest:
+      value:
+        error:
+          name: invalidParamsError
+          message: The request body has invalid values for the type parameter. Value must be one of file, string, json
+          details:
+            param: type
   securitySchemes:
     PostmanApiKey:
       type: apiKey

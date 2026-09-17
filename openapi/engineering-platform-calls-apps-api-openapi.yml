@@ -190,6 +190,39 @@ paths:
       - Calls Write
 components:
   schemas:
+    calls_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/calls_api-response-common'
+      type: object
+    calls_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    calls_turn_key:
+      description: Bearer token
+      example: 66bcf64aa8907b9f9d90ac17746a77ce394c393b92b3916633dc02846e608ad4
+      maxLength: 64
+      minLength: 64
+      type: string
+    calls_app_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/calls_api-response-common'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/calls_turn_key'
+            type: array
     calls_api-response-common:
       properties:
         errors:
@@ -207,32 +240,6 @@ components:
       - errors
       - messages
       type: object
-    calls_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/calls_api-response-common'
-      type: object
-    calls_app_response_single:
-      allOf:
-      - $ref: '#/components/schemas/calls_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/calls_app'
-    calls_app_response_single_with_secret:
-      allOf:
-      - $ref: '#/components/schemas/calls_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/calls_app_with_secret'
-    calls_app_editable_fields:
-      properties:
-        name:
-          $ref: '#/components/schemas/calls_name'
-      type: object
-    calls_created:
-      description: The date and time the item was created.
-      example: '2014-01-02T02:20:00Z'
-      format: date-time
-      type: string
     calls_api-response-common-failure:
       properties:
         errors:
@@ -264,50 +271,39 @@ components:
       - messages
       - result
       type: object
+    calls_name:
+      default: ''
+      description: A short description of Calls app, not shown to end users.
+      example: production-realtime-app
+      type: string
     calls_identifier:
       description: A Cloudflare-generated unique identifier for a item.
       example: 2a95132c15732412d22c1476fa83f27a
       maxLength: 32
       minLength: 32
       type: string
-    calls_turn_key:
+    calls_app_editable_fields:
+      properties:
+        name:
+          $ref: '#/components/schemas/calls_name'
+      type: object
+    calls_app_response_single:
+      allOf:
+      - $ref: '#/components/schemas/calls_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/calls_app'
+    calls_app_response_single_with_secret:
+      allOf:
+      - $ref: '#/components/schemas/calls_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/calls_app_with_secret'
+    calls_secret:
       description: Bearer token
       example: 66bcf64aa8907b9f9d90ac17746a77ce394c393b92b3916633dc02846e608ad4
       maxLength: 64
       minLength: 64
-      type: string
-    calls_app_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/calls_api-response-common'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/calls_turn_key'
-            type: array
-    calls_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    calls_modified:
-      description: The date and time the item was last modified.
-      example: '2014-01-02T02:20:00Z'
-      format: date-time
-      type: string
-    calls_account_identifier:
-      description: The account identifier tag.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
       type: string
     calls_app:
       properties:
@@ -320,16 +316,10 @@ components:
         uid:
           $ref: '#/components/schemas/calls_identifier'
       type: object
-    calls_name:
-      default: ''
-      description: A short description of Calls app, not shown to end users.
-      example: production-realtime-app
-      type: string
-    calls_secret:
-      description: Bearer token
-      example: 66bcf64aa8907b9f9d90ac17746a77ce394c393b92b3916633dc02846e608ad4
-      maxLength: 64
-      minLength: 64
+    calls_modified:
+      description: The date and time the item was last modified.
+      example: '2014-01-02T02:20:00Z'
+      format: date-time
       type: string
     calls_app_with_secret:
       properties:
@@ -344,6 +334,16 @@ components:
         uid:
           $ref: '#/components/schemas/calls_identifier'
       type: object
+    calls_created:
+      description: The date and time the item was created.
+      example: '2014-01-02T02:20:00Z'
+      format: date-time
+      type: string
+    calls_account_identifier:
+      description: The account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
   securitySchemes:
     api_email:
       in: header

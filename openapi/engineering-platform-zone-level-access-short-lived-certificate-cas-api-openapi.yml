@@ -169,6 +169,21 @@ components:
             items:
               $ref: '#/components/schemas/access_ca'
             type: array
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     access_result_info:
       properties:
         count:
@@ -188,31 +203,10 @@ components:
           example: 2000
           type: number
       type: object
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
-    access_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/access_messages'
-        messages:
-          $ref: '#/components/schemas/access_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
+    access_public_key:
+      description: The public key to add to your SSH server configuration.
+      example: ecdsa-sha2-nistp256 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx= open-ssh-ca@cloudflareaccess.org
+      readOnly: true
       type: string
     access_api-response-collection:
       allOf:
@@ -221,31 +215,11 @@ components:
           result_info:
             $ref: '#/components/schemas/access_result_info'
       type: object
-    access_ca_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            type: object
-    access_schemas-id_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/access_id'
-            type: object
-    access_aud:
-      description: The Application Audience (AUD) tag. Identifies the application associated with the CA.
-      example: 737646a56ab1df6ec9bddc7e5ca84eaf3b0768850f3ffb5d74f1534911fe3893
-      maxLength: 64
+    access_id:
+      description: The ID of the CA.
+      example: 7eddae4619b50ab1361ba8ae9bd72269a432fea041529ed9
+      maxLength: 48
       readOnly: true
-      type: string
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
       type: string
     access_api-response-common-failure:
       properties:
@@ -278,17 +252,58 @@ components:
       - messages
       - result
       type: object
-    access_public_key:
-      description: The public key to add to your SSH server configuration.
-      example: ecdsa-sha2-nistp256 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx= open-ssh-ca@cloudflareaccess.org
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    access_ca_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            type: object
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_aud:
+      description: The Application Audience (AUD) tag. Identifies the application associated with the CA.
+      example: 737646a56ab1df6ec9bddc7e5ca84eaf3b0768850f3ffb5d74f1534911fe3893
+      maxLength: 64
       readOnly: true
       type: string
-    access_id:
-      description: The ID of the CA.
-      example: 7eddae4619b50ab1361ba8ae9bd72269a432fea041529ed9
-      maxLength: 48
-      readOnly: true
-      type: string
+    access_schemas-id_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/access_id'
+            type: object
     access_ca:
       properties:
         aud:
@@ -298,21 +313,6 @@ components:
         public_key:
           $ref: '#/components/schemas/access_public_key'
       type: object
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
   securitySchemes:
     api_email:
       in: header

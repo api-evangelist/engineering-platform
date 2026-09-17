@@ -459,138 +459,7 @@ paths:
     - url: https://api.getpostman.com
     - url: https://api.eu.postman.com
 components:
-  parameters:
-    count:
-      name: count
-      description: 'Used for pagination: the number of results to return per page.'
-      in: query
-      required: false
-      schema:
-        type: integer
-        default: 30
-        format: int32
-        example: 1
-    enterprise:
-      name: enterprise
-      description: The slug version of the enterprise name. You can also substitute this value with the enterprise id.
-      in: path
-      required: true
-      schema:
-        type: string
-    start-index:
-      name: startIndex
-      description: 'Used for pagination: the starting index of the first result to return when paginating through values.'
-      in: query
-      required: false
-      schema:
-        type: integer
-        default: 1
-        format: int32
-        example: 1
-    excluded-attributes:
-      name: excludedAttributes
-      description: Excludes the specified attribute from being returned in the results. Using this parameter can speed up response time.
-      in: query
-      required: false
-      schema:
-        type: string
-        example: members
-    startIndex:
-      name: startIndex
-      in: query
-      description: The index entry by which to begin the list of returned results.
-      schema:
-        type: number
-        default: 1
-        example: 1
-    scimUserId:
-      name: userId
-      in: path
-      required: true
-      description: The user's SCIM ID.
-      schema:
-        $ref: '#/components/schemas/scimId'
-    scimUserFilter:
-      name: filter
-      in: query
-      description: 'Filter results by a specific word or phrase. This query parameter accepts the following:
-
-        - `userName` — Filter values are case-sensitive, and special characters and spaces must be URL encoded.
-
-        - `active` — Return only users who are active (`true`) or inactive (`false`).
-
-        '
-      schema:
-        type: string
-        example: userName eq "taylor-lee%40example.com"
-      examples:
-        Filter:
-          value: userName eq "taylor-lee%40example.com"
-        Filter with Encoding:
-          value: userName eq "taylor-lee%2Btest%40example.com"
-        Filter Active Users:
-          value: active eq "true"
-        Filter Inactive Users:
-          value: active eq "false"
-    scimGroupFilter:
-      name: filter
-      in: query
-      description: 'Filter results by a specific word or phrase. This query parameter only supports the `displayName` filter and has the following requirements:
-
-        - Filter values are case-sensitive.
-
-        - Special characters and spaces must be URL encoded.
-
-        '
-      schema:
-        type: string
-        example: displayName eq "Test-API"
-    count_2:
-      name: count
-      in: query
-      description: Limit the number of results returned in a single response.
-      schema:
-        type: number
-        default: 100
-        example: 2
-    scimGroupId:
-      name: groupId
-      in: path
-      required: true
-      description: The group's ID.
-      schema:
-        $ref: '#/components/schemas/scimId'
   schemas:
-    scim-enterprise-group-response:
-      allOf:
-      - $ref: '#/components/schemas/group-response'
-      - type: object
-        properties:
-          id:
-            type: string
-            description: The internally generated id for the group object.
-            example: 7fce0092-d52e-4f76-b727-3955bd72c939
-          members:
-            type: array
-            items:
-              type: object
-              properties:
-                value:
-                  type: string
-                $ref:
-                  type: string
-                display:
-                  type: string
-            description: The security group members.
-            example:
-            - value: 879db59-3bdf-4490-ad68-ab880a2694745
-              $+ref: https://api.github.localhost/scim/v2/Users/879db59-3bdf-4490-ad68-ab880a2694745
-              displayName: User 1
-            - value: 0db508eb-91e2-46e4-809c-30dcbda0c685
-              $+ref: https://api.github.localhost/scim/v2/Users/0db508eb-91e2-46e4-809c-30dcbda0c685
-              displayName: User 2
-          meta:
-            $ref: '#/components/schemas/meta'
     scim-error:
       title: Scim Error
       description: Scim Error
@@ -653,30 +522,36 @@ components:
           type: integer
           description: Number of objects per page
           example: 20
-    meta:
-      type: object
-      description: The metadata associated with the creation/updates to the user.
-      required:
-      - resourceType
-      properties:
-        resourceType:
-          type: string
-          description: A type of a resource
-          enum:
-          - User
-          - Group
-          example: User
-        created:
-          type: string
-          description: A date and time when the user was created.
-          example: '2022-03-27T19:59:26.000Z'
-        lastModified:
-          type: string
-          description: A data and time when the user was last modified.
-          example: '2022-03-27T19:59:26.000Z'
-        location:
-          type: string
-          description: A URL location of an object
+    scim-enterprise-group-response:
+      allOf:
+      - $ref: '#/components/schemas/group-response'
+      - type: object
+        properties:
+          id:
+            type: string
+            description: The internally generated id for the group object.
+            example: 7fce0092-d52e-4f76-b727-3955bd72c939
+          members:
+            type: array
+            items:
+              type: object
+              properties:
+                value:
+                  type: string
+                $ref:
+                  type: string
+                display:
+                  type: string
+            description: The security group members.
+            example:
+            - value: 879db59-3bdf-4490-ad68-ab880a2694745
+              $+ref: https://api.github.localhost/scim/v2/Users/879db59-3bdf-4490-ad68-ab880a2694745
+              displayName: User 1
+            - value: 0db508eb-91e2-46e4-809c-30dcbda0c685
+              $+ref: https://api.github.localhost/scim/v2/Users/0db508eb-91e2-46e4-809c-30dcbda0c685
+              displayName: User 2
+          meta:
+            $ref: '#/components/schemas/meta'
     group-response:
       type: object
       required:
@@ -723,6 +598,89 @@ components:
                 type: string
                 description: The display name associated with the member
                 example: Monalisa Octocat
+    meta:
+      type: object
+      description: The metadata associated with the creation/updates to the user.
+      required:
+      - resourceType
+      properties:
+        resourceType:
+          type: string
+          description: A type of a resource
+          enum:
+          - User
+          - Group
+          example: User
+        created:
+          type: string
+          description: A date and time when the user was created.
+          example: '2022-03-27T19:59:26.000Z'
+        lastModified:
+          type: string
+          description: A data and time when the user was last modified.
+          example: '2022-03-27T19:59:26.000Z'
+        location:
+          type: string
+          description: A URL location of an object
+    scimGroupResource:
+      title: SCIM Group Resource
+      description: The SCIM group resource object.
+      type: object
+      properties:
+        schemas:
+          type: array
+          description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+          items:
+            type: string
+            example: urn:ietf:params:scim:schemas:core:2.0:Group
+        id:
+          type: string
+          description: The group's SCIM ID.
+          example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+        displayName:
+          type: string
+          description: The group's display name.
+          example: Test SCIMv2
+        members:
+          type: array
+          description: A list of the group's members.
+          items:
+            type: object
+            description: Information about the group's members.
+            properties:
+              value:
+                type: string
+                description: The resource value.
+                example: 23a35c2723d34c03b4c56443c09e7173
+              display:
+                type: string
+                description: The resource's display name.
+                example: taylor.lee@example.com
+        externalId:
+          type: string
+          description: The group's external ID.
+          example: '1234'
+        meta:
+          type: object
+          description: The response's non-standard meta information.
+          properties:
+            resourceType:
+              type: string
+              description: The resource type.
+              example: Group
+            created:
+              type: string
+              format: date-time
+              description: The date and time at which the group was created.
+              example: '2022-02-22T04:24:13.000Z'
+            lastModified:
+              type: string
+              format: date-time
+              description: The date and time at which the group was last modified.
+              example: '2022-02-22T04:24:13.000Z'
+    scimId:
+      type: string
+      example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
     scimUserResource:
       title: SCIM User Resource
       description: The SCIM user resource object.
@@ -780,9 +738,6 @@ components:
               format: date-time
               description: The date and time at which the team member was last modified.
               example: '2021-02-22T04:24:13.000Z'
-    scimId:
-      type: string
-      example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
     scimUserResources:
       title: SCIM Users
       type: object
@@ -810,62 +765,6 @@ components:
           type: number
           description: The total number of results found.
           example: 1000
-    scimGroupResource:
-      title: SCIM Group Resource
-      description: The SCIM group resource object.
-      type: object
-      properties:
-        schemas:
-          type: array
-          description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-          items:
-            type: string
-            example: urn:ietf:params:scim:schemas:core:2.0:Group
-        id:
-          type: string
-          description: The group's SCIM ID.
-          example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-        displayName:
-          type: string
-          description: The group's display name.
-          example: Test SCIMv2
-        members:
-          type: array
-          description: A list of the group's members.
-          items:
-            type: object
-            description: Information about the group's members.
-            properties:
-              value:
-                type: string
-                description: The resource value.
-                example: 23a35c2723d34c03b4c56443c09e7173
-              display:
-                type: string
-                description: The resource's display name.
-                example: taylor.lee@example.com
-        externalId:
-          type: string
-          description: The group's external ID.
-          example: '1234'
-        meta:
-          type: object
-          description: The response's non-standard meta information.
-          properties:
-            resourceType:
-              type: string
-              description: The resource type.
-              example: Group
-            created:
-              type: string
-              format: date-time
-              description: The date and time at which the group was created.
-              example: '2022-02-22T04:24:13.000Z'
-            lastModified:
-              type: string
-              format: date-time
-              description: The date and time at which the group was last modified.
-              example: '2022-02-22T04:24:13.000Z'
   responses:
     scim_internal_error:
       description: Internal server error
@@ -876,6 +775,8 @@ components:
         application/scim+json:
           schema:
             $ref: '#/components/schemas/scim-error'
+    permission_denied:
+      description: Permission denied
     scim_too_many_requests:
       description: Too many requests
       content:
@@ -885,6 +786,8 @@ components:
         application/scim+json:
           schema:
             $ref: '#/components/schemas/scim-error'
+    authorization_failure:
+      description: Authorization failure
     scim_bad_request:
       description: Bad request
       content:
@@ -894,10 +797,146 @@ components:
         application/scim+json:
           schema:
             $ref: '#/components/schemas/scim-error'
-    permission_denied:
-      description: Permission denied
-    authorization_failure:
-      description: Authorization failure
+    scim409Error:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              scimType:
+                type: string
+                description: The SCIM error type.
+                example: uniqueness
+              detail:
+                type: string
+                description: Information about the error.
+                example: This person is already a member of the team.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '409'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            scimType: uniqueness
+            detail: This person is already a member of the team.
+            status: '409'
+    scimGroup404Error:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: This group isn't a member of the team.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '404'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            detail: This group isn't a member of the team.
+            status: '404'
+    scimUpdateGroup500Error:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Couldn't update this team member's information. Try again — it should work next time around.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '500'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            detail: Couldn't update this team member's information. Try again — it should work next time around.
+            status: '500'
+    scim500ErrorUser:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unable to fetch information about this team member.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '500'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            detail: Unable to fetch information about this team member.
+            status: '500'
+    scimGroup500Error:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Couldn't fetch members of the team.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '500'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            detail: Couldn't fetch members of the team.
+            status: '500'
     getScimServiceProviderConfig:
       description: Successful Response
       content:
@@ -1039,438 +1078,6 @@ components:
             meta:
               resourceType: ServiceProviderConfig
               location: https://api.getpostman.com/scim/v2/ServiceProviderConfig
-    scim401Error:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unable to access the team. Check if you have entered a valid API key.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '401'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            detail: Unable to access the team. Check if you have entered a valid API key.
-            status: '401'
-    getScimGroupResources:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              Resources:
-                type: array
-                description: A list of group resources.
-                items:
-                  $ref: '#/components/schemas/scimGroupResource'
-              itemsPerPage:
-                type: number
-                description: The number of items per response page.
-                example: 2
-              schemas:
-                type: array
-                items:
-                  type: string
-                  description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                  example: urn:ietf:params:scim:api:messages:2.0:ListResponse
-              startIndex:
-                type: number
-                description: The index entry by which the returned results begin.
-                example: 1
-              totalResults:
-                type: number
-                description: The total number of results found.
-                example: 2
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:ListResponse
-            totalResults: 2
-            startIndex: 1
-            itemsPerPage: 2
-            Resources:
-            - schemas:
-              - urn:ietf:params:scim:schemas:core:2.0:Group
-              id: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-              displayName: Test-API
-              members:
-              - value: 23a35c2723d34c03b4c56443c09e7173
-                display: Taylor Lee
-              externalId: '1234'
-              meta:
-                resourceType: Group
-                created: '2022-02-22T04:24:13.000Z'
-                lastModified: '2022-02-22T04:24:13.000Z'
-            - schemas:
-              - urn:ietf:params:scim:schemas:core:2.0:Group
-              id: 123775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-              displayName: Test Group
-              members:
-              - value: 23a35c2723d34c03b4c56443c09e7173
-                display: Taylor Lee
-              - value: b1c794f24f4c49f4b5d503a4cb2686ea
-                display: Alex Cruz
-              externalId: '4321'
-              meta:
-                resourceType: Group
-                created: '2022-02-22T04:24:13.000Z'
-                lastModified: '2022-02-22T04:24:13.000Z'
-    scimGroup500Error:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Couldn't fetch members of the team.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '500'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            detail: Couldn't fetch members of the team.
-            status: '500'
-    common401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
-    scim500ErrorUser:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unable to fetch information about this team member.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '500'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            detail: Unable to fetch information about this team member.
-            status: '500'
-    scim400ErrorInvalidSyntax:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              scimType:
-                type: string
-                description: The SCIM error type.
-                example: invalidSyntax
-              detail:
-                type: string
-                description: Information about the error.
-                example: The request body seems to be incomplete or have unsupported characters.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '400'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            scimType: invalidSyntax
-            detail: The request body seems to be incomplete or have unsupported characters.
-            status: '400'
-    scim409Error:
-      description: Conflict
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              scimType:
-                type: string
-                description: The SCIM error type.
-                example: uniqueness
-              detail:
-                type: string
-                description: Information about the error.
-                example: This person is already a member of the team.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '409'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            scimType: uniqueness
-            detail: This person is already a member of the team.
-            status: '409'
-    getScimResourceTypes:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              type: object
-              properties:
-                schemas:
-                  type: array
-                  description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                  items:
-                    type: string
-                    example: urn:ietf:params:scim:schemas:core:2.0:ResourceType
-                id:
-                  type: string
-                  description: The resource's ID.
-                  example: User
-                name:
-                  type: string
-                  description: The resource's friendly name.
-                  example: User
-                endpoint:
-                  type: string
-                  description: The resource's endpoint.
-                  example: /Users
-                description:
-                  type: string
-                  description: The resource's description.
-                  example: User Account
-                schema:
-                  type: string
-                  description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                  example: urn:ietf:params:scim:schemas:core:2.0:User
-                schemaExtensions:
-                  type: array
-                  description: Information about the resource's schema extensions.
-                  items:
-                    type: object
-                    properties:
-                      schema:
-                        type: string
-                        description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                        example: urn:ietf:params:scim:schemas:extension:enterprise:2.0:User
-                      required:
-                        type: boolean
-                        description: If true, the resource must include this schema extension.
-                        example: true
-          example:
-          - schemas:
-            - urn:ietf:params:scim:schemas:core:2.0:ResourceType
-            id: User
-            name: User
-            endpoint: /Users
-            description: User Account
-            schema: urn:ietf:params:scim:schemas:core:2.0:User
-            schemaExtensions:
-            - schema: urn:ietf:params:scim:schemas:extension:enterprise:2.0:User
-              required: true
-          - schemas:
-            - urn:ietf:params:scim:schemas:core:2.0:ResourceType
-            id: Group
-            name: Group
-            endpoint: /Groups
-            description: Group
-            schema: urn:ietf:params:scim:schemas:core:2.0:Group
-    scimUserResource:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:schemas:core:2.0:User
-              id:
-                type: string
-                description: The team member's SCIM ID.
-                example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-              userName:
-                type: string
-                description: The team member's SCIM username.
-                example: taylor.lee@example.com
-              name:
-                type: object
-                description: Information about the Postman team member.
-                properties:
-                  givenName:
-                    type: string
-                    description: The team member's first name.
-                    example: Taylor
-                  familyName:
-                    type: string
-                    description: The team member's last name.
-                    example: Lee
-              externalId:
-                type: string
-                description: The team member's external ID.
-                example: '12345678'
-              active:
-                type: boolean
-                description: If true, the team member is active.
-                example: true
-              meta:
-                type: object
-                description: The response's non-standard meta information.
-                properties:
-                  resourceType:
-                    type: string
-                    description: The resource type.
-                    example: User
-                  created:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the team member was created.
-                    example: '2021-02-22T04:24:13.000Z'
-                  lastModified:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the team member was last modified.
-                    example: '2021-02-22T04:24:13.000Z'
-          example:
-            schemas:
-            - urn:ietf:params:scim:schemas:core:2.0:User
-            id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-            userName: taylor.lee@example.com
-            name:
-              givenName: Taylor
-              familyName: Lee
-            externalId: '12345678'
-            active: true
-            meta:
-              resourceType: User
-              created: '2021-02-22T04:24:13.000Z'
-              lastModified: '2021-02-22T04:24:13.000Z'
-    scim403Error:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Your API key was generated by a Team Admin who is no longer on your team. Use an API key generated by a Team Admin.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '403'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            detail: Your API key was generated by a Team Admin who is no longer on your team. Use an API key generated by a Team Admin.
-            status: '403'
-    scim400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: This Postman team doesn't exist anymore.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '400'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            detail: This Postman team doesn't exist anymore.
-            status: '400'
     scimUpdateGroup:
       description: Successful Response
       content:
@@ -1527,7 +1134,77 @@ components:
               resourceType: Group
               created: '2022-02-22T04:24:13.000Z'
               lastModified: '2022-02-22T04:24:13.000Z'
-    scim400ErrorInvalidFilter:
+    getScimGroupResource:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:schemas:core:2.0:Group
+              id:
+                type: string
+                description: The group's SCIM ID.
+                example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+              userName:
+                type: string
+                description: The group's display name.
+                example: Test-API
+              members:
+                type: array
+                description: Information about the group's members.
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                      description: The member's SCIM ID.
+                      example: 23a35c2723d34c03b4c56443c09e7173
+                    display:
+                      type: string
+                      description: The member's display name.
+                      example: Taylor Lee
+              externalId:
+                type: string
+                description: The group's external ID.
+                example: '1234'
+              meta:
+                type: object
+                description: The response's non-standard meta information.
+                properties:
+                  resourceType:
+                    type: string
+                    description: The resource type.
+                    example: Group
+                  created:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the group was created.
+                    example: '2022-02-22T04:24:13.000Z'
+                  lastModified:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the group was last modified.
+                    example: '2022-02-22T04:24:13.000Z'
+          example:
+            schemas:
+            - urn:ietf:params:scim:schemas:core:2.0:Group
+            id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+            displayName: Test-API
+            members:
+            - value: 23a35c2723d34c03b4c56443c09e7173
+              display: Taylor Lee
+            externalId: '1234'
+            meta:
+              resourceType: Group
+              created: '2022-02-22T04:24:13.000Z'
+              lastModified: '2022-02-22T04:24:13.000Z'
+    scim400ErrorInvalidSyntax:
       description: Bad Request
       content:
         application/json:
@@ -1540,10 +1217,14 @@ components:
                 items:
                   type: string
                   example: urn:ietf:params:scim:api:messages:2.0:Error
+              scimType:
+                type: string
+                description: The SCIM error type.
+                example: invalidSyntax
               detail:
                 type: string
                 description: Information about the error.
-                example: You've used filter(s) that Postman doesn't support.
+                example: The request body seems to be incomplete or have unsupported characters.
               status:
                 type: string
                 format: http-status-code
@@ -1552,138 +1233,10 @@ components:
           example:
             schemas:
             - urn:ietf:params:scim:api:messages:2.0:Error
-            detail: You've used filter(s) that Postman doesn't support.
+            scimType: invalidSyntax
+            detail: The request body seems to be incomplete or have unsupported characters.
             status: '400'
     scim500Error:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Couldn't update this team member's information. Try again — it should work next time around.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '500'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            detail: Couldn't update this team member's information. Try again — it should work next time around.
-            status: '500'
-    createScimUser:
-      description: Created
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:schemas:core:2.0:User
-              id:
-                type: string
-                description: The user's SCIM ID.
-                example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-              userName:
-                type: string
-                format: email
-                description: The user's username.
-                example: taylor.lee@example.com
-              name:
-                type: object
-                properties:
-                  givenName:
-                    type: string
-                    description: The user's first name.
-                    example: Taylor
-                  familyName:
-                    type: string
-                    description: The user's last name.
-                    example: Lee
-              externalId:
-                type: string
-                description: The user's external ID.
-                example: '12345678'
-              active:
-                type: boolean
-                description: If true, the user is active.
-                example: true
-              meta:
-                type: object
-                description: The response's non-standard meta information.
-                properties:
-                  created:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the user was created.
-                    example: '2021-02-22T04:24:13.000Z'
-                  lastModified:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the user was last modified.
-                    example: '2021-02-22T04:24:13.000Z'
-                  resourceType:
-                    type: string
-                    description: The SCIM resource type.
-                    enum:
-                    - User
-                    example: User
-          example:
-            schemas:
-            - urn:ietf:params:scim:schemas:core:2.0:User
-            id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-            userName: taylor.lee@example.com
-            name:
-              givenName: Test
-              familyName: User
-            externalId: '12345678'
-            active: true
-            meta:
-              resourceType: User
-              created: '2021-02-22T04:24:13.000Z'
-              lastModified: '2021-02-22T04:24:13.000Z'
-    scimGroup404Error:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: This group isn't a member of the team.
-              status:
-                type: string
-                format: http-status-code
-                description: The HTTP status code.
-                example: '404'
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:Error
-            detail: This group isn't a member of the team.
-            status: '404'
-    scimUpdateGroup500Error:
       description: Internal Server Error
       content:
         application/json:
@@ -1807,7 +1360,154 @@ components:
             - urn:ietf:params:scim:api:messages:2.0:Error
             detail: This person isn't a member of the team.
             status: '404'
-    getScimGroupResource:
+    scim400ErrorInvalidFilter:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: You've used filter(s) that Postman doesn't support.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '400'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            detail: You've used filter(s) that Postman doesn't support.
+            status: '400'
+    scim401Error:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unable to access the team. Check if you have entered a valid API key.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '401'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            detail: Unable to access the team. Check if you have entered a valid API key.
+            status: '401'
+    getScimGroupResources:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              Resources:
+                type: array
+                description: A list of group resources.
+                items:
+                  $ref: '#/components/schemas/scimGroupResource'
+              itemsPerPage:
+                type: number
+                description: The number of items per response page.
+                example: 2
+              schemas:
+                type: array
+                items:
+                  type: string
+                  description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                  example: urn:ietf:params:scim:api:messages:2.0:ListResponse
+              startIndex:
+                type: number
+                description: The index entry by which the returned results begin.
+                example: 1
+              totalResults:
+                type: number
+                description: The total number of results found.
+                example: 2
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:ListResponse
+            totalResults: 2
+            startIndex: 1
+            itemsPerPage: 2
+            Resources:
+            - schemas:
+              - urn:ietf:params:scim:schemas:core:2.0:Group
+              id: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+              displayName: Test-API
+              members:
+              - value: 23a35c2723d34c03b4c56443c09e7173
+                display: Taylor Lee
+              externalId: '1234'
+              meta:
+                resourceType: Group
+                created: '2022-02-22T04:24:13.000Z'
+                lastModified: '2022-02-22T04:24:13.000Z'
+            - schemas:
+              - urn:ietf:params:scim:schemas:core:2.0:Group
+              id: 123775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+              displayName: Test Group
+              members:
+              - value: 23a35c2723d34c03b4c56443c09e7173
+                display: Taylor Lee
+              - value: b1c794f24f4c49f4b5d503a4cb2686ea
+                display: Alex Cruz
+              externalId: '4321'
+              meta:
+                resourceType: Group
+                created: '2022-02-22T04:24:13.000Z'
+                lastModified: '2022-02-22T04:24:13.000Z'
+    common401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
+    scimUserResource:
       description: Successful Response
       content:
         application/json:
@@ -1819,33 +1519,35 @@ components:
                 description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
                 items:
                   type: string
-                  example: urn:ietf:params:scim:schemas:core:2.0:Group
+                  example: urn:ietf:params:scim:schemas:core:2.0:User
               id:
                 type: string
-                description: The group's SCIM ID.
+                description: The team member's SCIM ID.
                 example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
               userName:
                 type: string
-                description: The group's display name.
-                example: Test-API
-              members:
-                type: array
-                description: Information about the group's members.
-                items:
-                  type: object
-                  properties:
-                    value:
-                      type: string
-                      description: The member's SCIM ID.
-                      example: 23a35c2723d34c03b4c56443c09e7173
-                    display:
-                      type: string
-                      description: The member's display name.
-                      example: Taylor Lee
+                description: The team member's SCIM username.
+                example: taylor.lee@example.com
+              name:
+                type: object
+                description: Information about the Postman team member.
+                properties:
+                  givenName:
+                    type: string
+                    description: The team member's first name.
+                    example: Taylor
+                  familyName:
+                    type: string
+                    description: The team member's last name.
+                    example: Lee
               externalId:
                 type: string
-                description: The group's external ID.
-                example: '1234'
+                description: The team member's external ID.
+                example: '12345678'
+              active:
+                type: boolean
+                description: If true, the team member is active.
+                example: true
               meta:
                 type: object
                 description: The response's non-standard meta information.
@@ -1853,30 +1555,328 @@ components:
                   resourceType:
                     type: string
                     description: The resource type.
-                    example: Group
+                    example: User
                   created:
                     type: string
                     format: date-time
-                    description: The date and time at which the group was created.
-                    example: '2022-02-22T04:24:13.000Z'
+                    description: The date and time at which the team member was created.
+                    example: '2021-02-22T04:24:13.000Z'
                   lastModified:
                     type: string
                     format: date-time
-                    description: The date and time at which the group was last modified.
-                    example: '2022-02-22T04:24:13.000Z'
+                    description: The date and time at which the team member was last modified.
+                    example: '2021-02-22T04:24:13.000Z'
           example:
             schemas:
-            - urn:ietf:params:scim:schemas:core:2.0:Group
+            - urn:ietf:params:scim:schemas:core:2.0:User
             id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-            displayName: Test-API
-            members:
-            - value: 23a35c2723d34c03b4c56443c09e7173
-              display: Taylor Lee
-            externalId: '1234'
+            userName: taylor.lee@example.com
+            name:
+              givenName: Taylor
+              familyName: Lee
+            externalId: '12345678'
+            active: true
             meta:
-              resourceType: Group
-              created: '2022-02-22T04:24:13.000Z'
-              lastModified: '2022-02-22T04:24:13.000Z'
+              resourceType: User
+              created: '2021-02-22T04:24:13.000Z'
+              lastModified: '2021-02-22T04:24:13.000Z'
+    scim400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: This Postman team doesn't exist anymore.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '400'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            detail: This Postman team doesn't exist anymore.
+            status: '400'
+    scim403Error:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Your API key was generated by a Team Admin who is no longer on your team. Use an API key generated by a Team Admin.
+              status:
+                type: string
+                format: http-status-code
+                description: The HTTP status code.
+                example: '403'
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:Error
+            detail: Your API key was generated by a Team Admin who is no longer on your team. Use an API key generated by a Team Admin.
+            status: '403'
+    createScimUser:
+      description: Created
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:schemas:core:2.0:User
+              id:
+                type: string
+                description: The user's SCIM ID.
+                example: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+              userName:
+                type: string
+                format: email
+                description: The user's username.
+                example: taylor.lee@example.com
+              name:
+                type: object
+                properties:
+                  givenName:
+                    type: string
+                    description: The user's first name.
+                    example: Taylor
+                  familyName:
+                    type: string
+                    description: The user's last name.
+                    example: Lee
+              externalId:
+                type: string
+                description: The user's external ID.
+                example: '12345678'
+              active:
+                type: boolean
+                description: If true, the user is active.
+                example: true
+              meta:
+                type: object
+                description: The response's non-standard meta information.
+                properties:
+                  created:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the user was created.
+                    example: '2021-02-22T04:24:13.000Z'
+                  lastModified:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the user was last modified.
+                    example: '2021-02-22T04:24:13.000Z'
+                  resourceType:
+                    type: string
+                    description: The SCIM resource type.
+                    enum:
+                    - User
+                    example: User
+          example:
+            schemas:
+            - urn:ietf:params:scim:schemas:core:2.0:User
+            id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+            userName: taylor.lee@example.com
+            name:
+              givenName: Test
+              familyName: User
+            externalId: '12345678'
+            active: true
+            meta:
+              resourceType: User
+              created: '2021-02-22T04:24:13.000Z'
+              lastModified: '2021-02-22T04:24:13.000Z'
+    getScimResourceTypes:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                schemas:
+                  type: array
+                  description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                  items:
+                    type: string
+                    example: urn:ietf:params:scim:schemas:core:2.0:ResourceType
+                id:
+                  type: string
+                  description: The resource's ID.
+                  example: User
+                name:
+                  type: string
+                  description: The resource's friendly name.
+                  example: User
+                endpoint:
+                  type: string
+                  description: The resource's endpoint.
+                  example: /Users
+                description:
+                  type: string
+                  description: The resource's description.
+                  example: User Account
+                schema:
+                  type: string
+                  description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                  example: urn:ietf:params:scim:schemas:core:2.0:User
+                schemaExtensions:
+                  type: array
+                  description: Information about the resource's schema extensions.
+                  items:
+                    type: object
+                    properties:
+                      schema:
+                        type: string
+                        description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                        example: urn:ietf:params:scim:schemas:extension:enterprise:2.0:User
+                      required:
+                        type: boolean
+                        description: If true, the resource must include this schema extension.
+                        example: true
+          example:
+          - schemas:
+            - urn:ietf:params:scim:schemas:core:2.0:ResourceType
+            id: User
+            name: User
+            endpoint: /Users
+            description: User Account
+            schema: urn:ietf:params:scim:schemas:core:2.0:User
+            schemaExtensions:
+            - schema: urn:ietf:params:scim:schemas:extension:enterprise:2.0:User
+              required: true
+          - schemas:
+            - urn:ietf:params:scim:schemas:core:2.0:ResourceType
+            id: Group
+            name: Group
+            endpoint: /Groups
+            description: Group
+            schema: urn:ietf:params:scim:schemas:core:2.0:Group
+  parameters:
+    enterprise:
+      name: enterprise
+      description: The slug version of the enterprise name. You can also substitute this value with the enterprise id.
+      in: path
+      required: true
+      schema:
+        type: string
+    start-index:
+      name: startIndex
+      description: 'Used for pagination: the starting index of the first result to return when paginating through values.'
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+        format: int32
+        example: 1
+    excluded-attributes:
+      name: excludedAttributes
+      description: Excludes the specified attribute from being returned in the results. Using this parameter can speed up response time.
+      in: query
+      required: false
+      schema:
+        type: string
+        example: members
+    count:
+      name: count
+      description: 'Used for pagination: the number of results to return per page.'
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 30
+        format: int32
+        example: 1
+    scimGroupId:
+      name: groupId
+      in: path
+      required: true
+      description: The group's ID.
+      schema:
+        $ref: '#/components/schemas/scimId'
+    count_2:
+      name: count
+      in: query
+      description: Limit the number of results returned in a single response.
+      schema:
+        type: number
+        default: 100
+        example: 2
+    startIndex:
+      name: startIndex
+      in: query
+      description: The index entry by which to begin the list of returned results.
+      schema:
+        type: number
+        default: 1
+        example: 1
+    scimGroupFilter:
+      name: filter
+      in: query
+      description: 'Filter results by a specific word or phrase. This query parameter only supports the `displayName` filter and has the following requirements:
+
+        - Filter values are case-sensitive.
+
+        - Special characters and spaces must be URL encoded.
+
+        '
+      schema:
+        type: string
+        example: displayName eq "Test-API"
+    scimUserFilter:
+      name: filter
+      in: query
+      description: 'Filter results by a specific word or phrase. This query parameter accepts the following:
+
+        - `userName` — Filter values are case-sensitive, and special characters and spaces must be URL encoded.
+
+        - `active` — Return only users who are active (`true`) or inactive (`false`).
+
+        '
+      schema:
+        type: string
+        example: userName eq "taylor-lee%40example.com"
+      examples:
+        Filter:
+          value: userName eq "taylor-lee%40example.com"
+        Filter with Encoding:
+          value: userName eq "taylor-lee%2Btest%40example.com"
+        Filter Active Users:
+          value: active eq "true"
+        Filter Inactive Users:
+          value: active eq "false"
+    scimUserId:
+      name: userId
+      in: path
+      required: true
+      description: The user's SCIM ID.
+      schema:
+        $ref: '#/components/schemas/scimId'
   examples:
     scim-enterprise-group-list:
       value:
@@ -1959,6 +1959,56 @@ components:
             created: '2021-02-22T04:24:13.000Z'
             lastModified: '2021-02-22T04:24:13.000Z'
   requestBodies:
+    scimUpdateGroup:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:api:messages:2.0:PatchOp
+              Operations:
+                type: array
+                description: Information about the group update operation.
+                items:
+                  type: object
+                  properties:
+                    op:
+                      type: string
+                      description: The operation to perform.
+                      enum:
+                      - replace
+                      - remove
+                      - add
+                      example: replace
+                    path:
+                      type: string
+                      description: The operation's path. Include this value when you update a group's members.
+                      example: members
+                    value:
+                      type: object
+                      description: The performed operation's value.
+                      properties:
+                        id:
+                          type: string
+                          description: The group's ID.
+                          example: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+                        displayName:
+                          type: string
+                          description: The group's name.
+                          example: Test-API
+          example:
+            schemas:
+            - urn:ietf:params:scim:api:messages:2.0:PatchOp
+            Operations:
+            - op: replace
+              value:
+                id: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+                displayName: Test-API
     createScimGroup:
       content:
         application/json:
@@ -1996,6 +2046,36 @@ components:
             members:
             - value: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
               displayName: Taylor Lee
+    updateScimUser:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              schemas:
+                type: array
+                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
+                items:
+                  type: string
+                  example: urn:ietf:params:scim:schemas:core:2.0:User
+              name:
+                type: object
+                description: Information about the user's name.
+                properties:
+                  givenName:
+                    type: string
+                    description: The user's first name.
+                    example: Taylor
+                  familyName:
+                    type: string
+                    description: The user's last name.
+                    example: Lee
+          example:
+            schemas:
+            - urn:ietf:params:scim:schemas:core:2.0:User
+            name:
+              givenName: Taylor
+              familyName: Lee
     createScimUser:
       content:
         application/json:
@@ -2054,56 +2134,6 @@ components:
             groups:
             - Test Group
             active: true
-    scimUpdateGroup:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:api:messages:2.0:PatchOp
-              Operations:
-                type: array
-                description: Information about the group update operation.
-                items:
-                  type: object
-                  properties:
-                    op:
-                      type: string
-                      description: The operation to perform.
-                      enum:
-                      - replace
-                      - remove
-                      - add
-                      example: replace
-                    path:
-                      type: string
-                      description: The operation's path. Include this value when you update a group's members.
-                      example: members
-                    value:
-                      type: object
-                      description: The performed operation's value.
-                      properties:
-                        id:
-                          type: string
-                          description: The group's ID.
-                          example: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-                        displayName:
-                          type: string
-                          description: The group's name.
-                          example: Test-API
-          example:
-            schemas:
-            - urn:ietf:params:scim:api:messages:2.0:PatchOp
-            Operations:
-            - op: replace
-              value:
-                id: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-                displayName: Test-API
     updateScimUserState:
       content:
         application/json:
@@ -2149,36 +2179,6 @@ components:
             - op: replace
               value:
                 active: true
-    updateScimUser:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              schemas:
-                type: array
-                description: The [SCIM schema URI](https://www.iana.org/assignments/scim/scim.xhtml).
-                items:
-                  type: string
-                  example: urn:ietf:params:scim:schemas:core:2.0:User
-              name:
-                type: object
-                description: Information about the user's name.
-                properties:
-                  givenName:
-                    type: string
-                    description: The user's first name.
-                    example: Taylor
-                  familyName:
-                    type: string
-                    description: The user's last name.
-                    example: Lee
-          example:
-            schemas:
-            - urn:ietf:params:scim:schemas:core:2.0:User
-            name:
-              givenName: Taylor
-              familyName: Lee
   securitySchemes:
     PostmanApiKey:
       type: apiKey

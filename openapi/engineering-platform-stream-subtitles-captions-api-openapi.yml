@@ -275,11 +275,75 @@ paths:
       - Stream Subtitles/Captions
 components:
   schemas:
+    stream_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    stream_label:
+      description: The language label displayed in the native language to users.
+      example: Türkçe
+      type: string
     stream_identifier:
       description: A Cloudflare-generated unique identifier for a media item.
       example: ea95132c15732412d22c1476fa83f27a
       maxLength: 32
       type: string
+    stream_captions:
+      properties:
+        generated:
+          $ref: '#/components/schemas/stream_generated_caption'
+        label:
+          $ref: '#/components/schemas/stream_label'
+        language:
+          $ref: '#/components/schemas/stream_language'
+        status:
+          $ref: '#/components/schemas/stream_caption_status'
+      type: object
+    stream_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    stream_caption_basic_upload:
+      properties:
+        file:
+          description: The WebVTT file containing the caption or subtitle content.
+          example: '@/Users/kyle/Desktop/tr.vtt'
+          type: string
+      required:
+      - file
+      type: object
+    stream_generated_caption:
+      description: Whether the caption was generated via AI.
+      example: true
+      type: boolean
+    stream_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      type: object
     stream_api-response-common-failure:
       properties:
         errors:
@@ -311,6 +375,22 @@ components:
       - messages
       - result
       type: object
+    stream_schemas-identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    stream_caption_status:
+      description: The status of a generated caption.
+      enum:
+      - ready
+      - inprogress
+      - error
+      type: string
+    stream_language:
+      description: The language tag in BCP 47 format.
+      example: tr
+      type: string
     stream_language_response_collection:
       allOf:
       - $ref: '#/components/schemas/stream_api-response-common'
@@ -319,92 +399,12 @@ components:
             items:
               $ref: '#/components/schemas/stream_captions'
             type: array
-    stream_caption_status:
-      description: The status of a generated caption.
-      enum:
-      - ready
-      - inprogress
-      - error
-      type: string
-    stream_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    stream_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      type: object
-    stream_captions:
-      properties:
-        generated:
-          $ref: '#/components/schemas/stream_generated_caption'
-        label:
-          $ref: '#/components/schemas/stream_label'
-        language:
-          $ref: '#/components/schemas/stream_language'
-        status:
-          $ref: '#/components/schemas/stream_caption_status'
-      type: object
-    stream_label:
-      description: The language label displayed in the native language to users.
-      example: Türkçe
-      type: string
-    stream_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    stream_schemas-identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    stream_caption_basic_upload:
-      properties:
-        file:
-          description: The WebVTT file containing the caption or subtitle content.
-          example: '@/Users/kyle/Desktop/tr.vtt'
-          type: string
-      required:
-      - file
-      type: object
-    stream_language:
-      description: The language tag in BCP 47 format.
-      example: tr
-      type: string
     stream_language_response_single:
       allOf:
       - $ref: '#/components/schemas/stream_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/stream_captions'
-    stream_generated_caption:
-      description: Whether the caption was generated via AI.
-      example: true
-      type: boolean
   securitySchemes:
     api_email:
       in: header

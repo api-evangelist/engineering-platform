@@ -196,89 +196,21 @@ paths:
       - Zero Trust Users
 components:
   schemas:
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    access_last_successful_login:
-      description: The time at which the user last successfully logged in.
-      example: '2020-07-01T05:20:00Z'
-      format: date-time
-      type: string
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
-      type: object
-    access_last_seen_identity_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            allOf:
-            - $ref: '#/components/schemas/access_identity'
-            type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    access_uid:
-      description: The unique API identifier for the user.
-      type: string
-    access_active_sessions_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              properties:
-                expiration:
-                  example: 1694813506.0
-                  type: integer
-                metadata:
-                  properties:
-                    apps:
-                      additionalProperties:
-                        properties:
-                          hostname:
-                            example: test.example.com
-                            type: string
-                          name:
-                            example: app name
-                            type: string
-                          type:
-                            example: self_hosted
-                            type: string
-                          uid:
-                            example: cc2a8145-0128-4429-87f3-872c4d380c4e
-                            type: string
-                        type: object
-                      type: object
-                    expires:
-                      example: 1694813506.0
-                      type: integer
-                    iat:
-                      example: 1694791905.0
-                      type: integer
-                    nonce:
-                      example: X1aXj1lFVcqqyoXF
-                      type: string
-                    ttl:
-                      example: 21600
-                      type: integer
-                  type: object
-                name:
-                  type: string
-              type: object
-            type: array
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     access_users_components-schemas-response_collection:
       allOf:
       - $ref: '#/components/schemas/access_api-response-collection'
@@ -299,14 +231,13 @@ components:
             items:
               $ref: '#/components/schemas/access_users'
             type: array
-    access_string_key_map_device_session:
-      additionalProperties:
-        $ref: '#/components/schemas/access_device_session'
-      type: object
-    access_schemas-access_seat:
-      description: True if the user has authenticated with Cloudflare Access.
-      example: false
-      type: boolean
+    access_nonce:
+      example: X1aXj1lFVcqqyoXF
+      type: string
+    access_users_components-schemas-name:
+      description: The name of the user.
+      example: Jane Doe
+      type: string
     access_api-response-common-failure:
       properties:
         errors:
@@ -338,83 +269,53 @@ components:
       - messages
       - result
       type: object
-    access_device_session:
-      example:
-        last_authenticated: 1638832687.0
-      properties:
-        last_authenticated:
-          type: number
+    access_string_key_map_device_session:
+      additionalProperties:
+        $ref: '#/components/schemas/access_device_session'
       type: object
-    access_active_session_response:
+    access_device_posture_check:
+      properties:
+        exists:
+          type: boolean
+        path:
+          type: string
+      type: object
+    access_users:
+      properties:
+        access_seat:
+          $ref: '#/components/schemas/access_schemas-access_seat'
+        active_device_count:
+          $ref: '#/components/schemas/access_active_device_count'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        email:
+          $ref: '#/components/schemas/access_email'
+        gateway_seat:
+          $ref: '#/components/schemas/access_schemas-gateway_seat'
+        id:
+          $ref: '#/components/schemas/access_uuid'
+        last_successful_login:
+          $ref: '#/components/schemas/access_last_successful_login'
+        name:
+          $ref: '#/components/schemas/access_users_components-schemas-name'
+        seat_uid:
+          $ref: '#/components/schemas/access_schemas-seat_uid'
+        uid:
+          $ref: '#/components/schemas/access_uid'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      type: object
+    access_uid:
+      description: The unique API identifier for the user.
+      type: string
+    access_last_seen_identity_response:
       allOf:
       - $ref: '#/components/schemas/access_api-response-single'
       - properties:
           result:
             allOf:
             - $ref: '#/components/schemas/access_identity'
-            - properties:
-                isActive:
-                  example: true
-                  type: boolean
-              type: object
             type: object
-    access_nonce:
-      example: X1aXj1lFVcqqyoXF
-      type: string
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    access_schemas-seat_uid:
-      description: The unique API identifier for the Zero Trust seat.
-      type: string
-    access_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    access_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/access_messages'
-        messages:
-          $ref: '#/components/schemas/access_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
     access_identity:
       properties:
         account_id:
@@ -485,35 +386,84 @@ components:
           example: 2
           type: number
       type: object
-    access_users:
+    access_geo:
+      example:
+        country: US
       properties:
-        access_seat:
-          $ref: '#/components/schemas/access_schemas-access_seat'
-        active_device_count:
-          $ref: '#/components/schemas/access_active_device_count'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        email:
-          $ref: '#/components/schemas/access_email'
-        gateway_seat:
-          $ref: '#/components/schemas/access_schemas-gateway_seat'
-        id:
-          $ref: '#/components/schemas/access_uuid'
-        last_successful_login:
-          $ref: '#/components/schemas/access_last_successful_login'
-        name:
-          $ref: '#/components/schemas/access_users_components-schemas-name'
-        seat_uid:
-          $ref: '#/components/schemas/access_schemas-seat_uid'
-        uid:
-          $ref: '#/components/schemas/access_uid'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
+        country:
+          type: string
       type: object
-    access_active_device_count:
-      description: The number of active devices registered to the user.
-      example: 2
-      type: number
+    access_device_session:
+      example:
+        last_authenticated: 1638832687.0
+      properties:
+        last_authenticated:
+          type: number
+      type: object
+    access_failed_login_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              properties:
+                expiration:
+                  type: integer
+                metadata:
+                  example:
+                    app_name: Test App
+                    aud: 39691c1480a2352a18ece567debc2b32552686cbd38eec0887aa18d5d3f00c04
+                    datetime: '2022-02-02T21:54:34.914Z'
+                    ray_id: 6d76a8a42ead4133
+                    user_email: test@cloudflare.com
+                    user_uuid: 57171132-e453-4ee8-b2a5-8cbaad333207
+                  type: object
+              type: object
+            type: array
+    access_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
     access_schemas-device_posture_rule:
       properties:
         check:
@@ -535,6 +485,9 @@ components:
         type:
           type: string
       type: object
+    access_schemas-seat_uid:
+      description: The unique API identifier for the Zero Trust seat.
+      type: string
     access_schemas-gateway_seat:
       description: True if the user has logged into the WARP client.
       example: false
@@ -544,7 +497,45 @@ components:
       example: jdoe@example.com
       format: email
       type: string
-    access_failed_login_response:
+    access_active_device_count:
+      description: The number of active devices registered to the user.
+      example: 2
+      type: number
+    access_schemas-access_seat:
+      description: True if the user has authenticated with Cloudflare Access.
+      example: false
+      type: boolean
+    access_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
+    access_active_session_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            allOf:
+            - $ref: '#/components/schemas/access_identity'
+            - properties:
+                isActive:
+                  example: true
+                  type: boolean
+              type: object
+            type: object
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    access_last_successful_login:
+      description: The time at which the user last successfully logged in.
+      example: '2020-07-01T05:20:00Z'
+      format: date-time
+      type: string
+    access_active_sessions_response:
       allOf:
       - $ref: '#/components/schemas/access_api-response-collection'
       - properties:
@@ -552,40 +543,49 @@ components:
             items:
               properties:
                 expiration:
+                  example: 1694813506.0
                   type: integer
                 metadata:
-                  example:
-                    app_name: Test App
-                    aud: 39691c1480a2352a18ece567debc2b32552686cbd38eec0887aa18d5d3f00c04
-                    datetime: '2022-02-02T21:54:34.914Z'
-                    ray_id: 6d76a8a42ead4133
-                    user_email: test@cloudflare.com
-                    user_uuid: 57171132-e453-4ee8-b2a5-8cbaad333207
+                  properties:
+                    apps:
+                      additionalProperties:
+                        properties:
+                          hostname:
+                            example: test.example.com
+                            type: string
+                          name:
+                            example: app name
+                            type: string
+                          type:
+                            example: self_hosted
+                            type: string
+                          uid:
+                            example: cc2a8145-0128-4429-87f3-872c4d380c4e
+                            type: string
+                        type: object
+                      type: object
+                    expires:
+                      example: 1694813506.0
+                      type: integer
+                    iat:
+                      example: 1694791905.0
+                      type: integer
+                    nonce:
+                      example: X1aXj1lFVcqqyoXF
+                      type: string
+                    ttl:
+                      example: 21600
+                      type: integer
                   type: object
+                name:
+                  type: string
               type: object
             type: array
-    access_users_components-schemas-name:
-      description: The name of the user.
-      example: Jane Doe
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
-    access_device_posture_check:
-      properties:
-        exists:
-          type: boolean
-        path:
-          type: string
-      type: object
-    access_geo:
-      example:
-        country: US
-      properties:
-        country:
-          type: string
-      type: object
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
   securitySchemes:
     api_email:
       in: header

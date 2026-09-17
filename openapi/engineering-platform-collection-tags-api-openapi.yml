@@ -58,33 +58,122 @@ paths:
         '500':
           $ref: '#/components/responses/tag500Error'
 components:
-  schemas:
+  responses:
+    tagGetPut:
+      description: Success Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/tagGetPut'
+          example:
+            tags:
+            - slug: needs-review
+            - slug: test-api
+    tag401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag401Error'
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: The request lacks valid credentials.
+            status: 401
+    tag400Error:
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag400Error'
+          example:
+            title: Bad Request
+            detail: body/tags/0/slug must NOT have more than 64 characters
+            status: 400
+    tag500Error:
+      description: Unexpected Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag500Error'
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Something went wrong
+            detail: Something went wrong while fetching entities having the provided slug.
+            status: 500
+            instance: /tags/needs-review/entities
     tag404Error:
-      title: Not Found
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag404Error'
+          example:
+            type: https://api.postman.com/problems/not-found
+            title: Resource Not Found
+            detail: Slug 'needs-review' does not exist.
+            status: 404
+            instance: /tags/needs-review/entities
+    tag403Error:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag403Error'
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Access Denied
+            detail: The tags feature is only available to enterprise teams
+            status: 403
+  schemas:
+    tag500Error:
+      title: Unexpected Error
       type: object
       properties:
         type:
           type: string
           format: uri-reference
           description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/not-found
+          example: https://api.postman.com/problems/internal-server-error
         title:
           type: string
           description: A short summary of the problem.
-          example: Resource Not Found
+          example: Something went wrong
         detail:
           type: string
           description: Information about the error.
-          example: Slug 'needs-review' does not exist.
+          example: Something went wrong while fetching entities having the provided slug.
         status:
           type: integer
           format: http-status-code
           description: The error's HTTP status code.
-          example: 404
+          example: 500
         instance:
           type: string
+          example: /tags/hello-world/entities
           description: The URI reference that identifies the specific occurrence of the problem.
-          example: /tags/needs-review/entities
+    tag401Error:
+      title: Unauthorized
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/unauthorized
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Unauthorized
+        detail:
+          type: string
+          description: Information about the error.
+          example: The request lacks valid credentials.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 401
     tagGetPut:
       title: Success Response
       type: object
@@ -127,54 +216,32 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 400
-    tag401Error:
-      title: Unauthorized
+    tag404Error:
+      title: Not Found
       type: object
       properties:
         type:
           type: string
           format: uri-reference
           description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/unauthorized
+          example: https://api.postman.com/problems/not-found
         title:
           type: string
           description: A short summary of the problem.
-          example: Unauthorized
+          example: Resource Not Found
         detail:
           type: string
           description: Information about the error.
-          example: The request lacks valid credentials.
+          example: Slug 'needs-review' does not exist.
         status:
           type: integer
           format: http-status-code
           description: The error's HTTP status code.
-          example: 401
-    tag500Error:
-      title: Unexpected Error
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/internal-server-error
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Something went wrong
-        detail:
-          type: string
-          description: Information about the error.
-          example: Something went wrong while fetching entities having the provided slug.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 500
+          example: 404
         instance:
           type: string
-          example: /tags/hello-world/entities
           description: The URI reference that identifies the specific occurrence of the problem.
+          example: /tags/needs-review/entities
     tag403Error:
       title: Forbidden
       type: object
@@ -207,73 +274,6 @@ components:
         type: string
         format: uid
         example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-  responses:
-    tagGetPut:
-      description: Success Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/tagGetPut'
-          example:
-            tags:
-            - slug: needs-review
-            - slug: test-api
-    tag404Error:
-      description: Not Found
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag404Error'
-          example:
-            type: https://api.postman.com/problems/not-found
-            title: Resource Not Found
-            detail: Slug 'needs-review' does not exist.
-            status: 404
-            instance: /tags/needs-review/entities
-    tag403Error:
-      description: Forbidden
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag403Error'
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Access Denied
-            detail: The tags feature is only available to enterprise teams
-            status: 403
-    tag500Error:
-      description: Unexpected Error
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag500Error'
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Something went wrong
-            detail: Something went wrong while fetching entities having the provided slug.
-            status: 500
-            instance: /tags/needs-review/entities
-    tag400Error:
-      description: Bad Request
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag400Error'
-          example:
-            title: Bad Request
-            detail: body/tags/0/slug must NOT have more than 64 characters
-            status: 400
-    tag401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag401Error'
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: The request lacks valid credentials.
-            status: 401
   requestBodies:
     tagUpdateTags:
       content:

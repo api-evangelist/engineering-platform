@@ -207,7 +207,31 @@ paths:
       - Restapis#mode=import
 components:
   schemas:
+    MapOfStringToString:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    ApiKeySourceType:
+      type: string
+      enum:
+      - HEADER
+      - AUTHORIZER
+    TooManyRequestsException: {}
+    NotFoundException: {}
+    UnauthorizedException: {}
+    NullableInteger:
+      type: integer
     ConflictException: {}
+    EndpointType:
+      type: string
+      enum:
+      - REGIONAL
+      - EDGE
+      - PRIVATE
+      description: The endpoint type. The valid values are <code>EDGE</code> for edge-optimized API setup, most suitable for mobile applications; <code>REGIONAL</code> for regional API endpoint setup, most suitable for calling from AWS Region; and <code>PRIVATE</code> for private APIs.
+    Timestamp:
+      type: string
+      format: date-time
     RestApi:
       type: object
       properties:
@@ -264,10 +288,15 @@ components:
           - $ref: '#/components/schemas/Boolean'
           - description: Specifies whether clients can invoke your API by using the default <code>execute-api</code> endpoint. By default, clients can invoke your API with the default <code>https://{api_id}.execute-api.{region}.amazonaws.com</code> endpoint. To require that clients use a custom domain name to invoke your API, disable the default endpoint.
       description: Represents a REST API.
-    MapOfStringToString:
-      type: object
-      additionalProperties:
+    ListOfString:
+      type: array
+      items:
         $ref: '#/components/schemas/String'
+    ListOfEndpointType:
+      type: array
+      items:
+        $ref: '#/components/schemas/EndpointType'
+    BadRequestException: {}
     EndpointConfiguration:
       type: object
       properties:
@@ -280,53 +309,12 @@ components:
           - $ref: '#/components/schemas/ListOfString'
           - description: A list of VpcEndpointIds of an API (RestApi) against which to create Route53 ALIASes. It is only supported for <code>PRIVATE</code> endpoint type.
       description: 'The endpoint configuration to indicate the types of endpoints an API (RestApi) or its custom domain name (DomainName) has. '
-    ApiKeySourceType:
-      type: string
-      enum:
-      - HEADER
-      - AUTHORIZER
-    Boolean:
-      type: boolean
     LimitExceededException: {}
-    EndpointType:
-      type: string
-      enum:
-      - REGIONAL
-      - EDGE
-      - PRIVATE
-      description: The endpoint type. The valid values are <code>EDGE</code> for edge-optimized API setup, most suitable for mobile applications; <code>REGIONAL</code> for regional API endpoint setup, most suitable for calling from AWS Region; and <code>PRIVATE</code> for private APIs.
-    Timestamp:
-      type: string
-      format: date-time
-    UnauthorizedException: {}
     String:
       type: string
-    NotFoundException: {}
-    NullableInteger:
-      type: integer
-    ListOfEndpointType:
-      type: array
-      items:
-        $ref: '#/components/schemas/EndpointType'
-    BadRequestException: {}
-    TooManyRequestsException: {}
-    ListOfString:
-      type: array
-      items:
-        $ref: '#/components/schemas/String'
+    Boolean:
+      type: boolean
   parameters:
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-Credential:
       name: X-Amz-Credential
       in: header
@@ -345,14 +333,26 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
       in: header
       schema:
         type: string
       required: false
     X-Amz-Content-Sha256:
       name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
       in: header
       schema:
         type: string

@@ -350,154 +350,38 @@ paths:
       - 'Load Balancing: Monitors and Pools Read'
 components:
   schemas:
-    load-balancing_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    load-balancing_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      readOnly: true
-      type: string
-    load-balancing_monitor:
-      allOf:
-      - $ref: '#/components/schemas/load-balancing_monitor-editable'
-      - properties:
-          created_on:
-            $ref: '#/components/schemas/load-balancing_timestamp'
-          id:
-            $ref: '#/components/schemas/load-balancing_identifier'
-          modified_on:
-            $ref: '#/components/schemas/load-balancing_timestamp'
-        type: object
-    load-balancing_follow_redirects:
-      default: false
-      description: Follow redirects if returned by the origin. This parameter is only valid for HTTP and HTTPS monitors.
-      example: true
-      type: boolean
-    load-balancing_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/load-balancing_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/load-balancing_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    load-balancing_retries:
-      default: 2
-      description: The number of retries to attempt in case of a timeout before marking the origin as unhealthy. Retries are attempted immediately.
-      type: integer
-    load-balancing_interval:
-      default: 60
-      description: The interval between each health check. Shorter intervals may improve failover time, but will increase load on the origins as we check from multiple locations.
-      type: integer
-    load-balancing_identifier:
-      example: f1aba936b94213e5b8dca0c0dbf1f9cc
-      type: string
-    load-balancing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    load-balancing_port:
-      default: 0
-      description: 'The port number to connect to for the health check. Required for TCP, UDP, and SMTP checks. HTTP and HTTPS checks should only define the port when using a non-standard port (HTTP: default 80, HTTPS: default 443).'
-      type: integer
-    load-balancing_consecutive_down:
-      default: 0
-      description: To be marked unhealthy the monitored origin must fail this healthcheck N consecutive times.
-      type: integer
-    load-balancing_expected_body:
-      description: A case-insensitive sub-string to look for in the response body. If this string is not found, the origin will be marked as unhealthy. This parameter is only valid for HTTP and HTTPS monitors.
-      example: alive
-      type: string
-    load-balancing_timeout:
-      default: 5
-      description: The timeout (in seconds) before marking the health check as failed.
-      type: integer
     load-balancing_path:
       default: /
       description: The endpoint path you want to conduct a health check against. This parameter is only valid for HTTP and HTTPS monitors.
       example: /health
       type: string
-    load-balancing_preview_response:
+    load-balancing_expected_body:
+      description: A case-insensitive sub-string to look for in the response body. If this string is not found, the origin will be marked as unhealthy. This parameter is only valid for HTTP and HTTPS monitors.
+      example: alive
+      type: string
+    load-balancing_port:
+      default: 0
+      description: 'The port number to connect to for the health check. Required for TCP, UDP, and SMTP checks. HTTP and HTTPS checks should only define the port when using a non-standard port (HTTP: default 80, HTTPS: default 443).'
+      type: integer
+    load-balancing_retries:
+      default: 2
+      description: The number of retries to attempt in case of a timeout before marking the origin as unhealthy. Retries are attempted immediately.
+      type: integer
+    load-balancing_allow_insecure:
+      default: false
+      description: Do not validate the certificate when monitor use HTTPS. This parameter is currently only valid for HTTP and HTTPS monitors.
+      example: true
+      type: boolean
+    load-balancing_consecutive_down:
+      default: 0
+      description: To be marked unhealthy the monitored origin must fail this healthcheck N consecutive times.
+      type: integer
+    load-balancing_preview_result_response:
       allOf:
       - $ref: '#/components/schemas/load-balancing_api-response-single'
       - properties:
           result:
-            properties:
-              pools:
-                additionalProperties:
-                  description: The pool name associated with the pool ID.
-                  type: string
-                description: Monitored pool IDs mapped to their respective names.
-                example:
-                  abwlnp5jbqn45ecgxd03erbgtxtqai0d: WNAM Datacenter
-                  ve8h9lrcip5n5bbga9yqmdws28ay5d0l: EEU Datacenter
-                type: object
-              preview_id:
-                $ref: '#/components/schemas/load-balancing_identifier'
-            type: object
-    load-balancing_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/load-balancing_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/load-balancing_result_info'
-      type: object
-    load-balancing_expected_codes:
-      default: '200'
-      description: The expected HTTP response code or code range of the health check. This parameter is only valid for HTTP and HTTPS monitors.
-      example: 2xx
-      type: string
+            $ref: '#/components/schemas/load-balancing_preview_result'
     load-balancing_preview_result:
       additionalProperties:
         properties:
@@ -523,12 +407,67 @@ components:
               response_code: 200
               rtt: 66ms
       type: object
-    load-balancing_description:
-      description: Object description.
-      example: Login page monitor
+    load-balancing_monitor-response-single:
+      allOf:
+      - $ref: '#/components/schemas/load-balancing_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/load-balancing_monitor'
+    load-balancing_expected_codes:
+      default: '200'
+      description: The expected HTTP response code or code range of the health check. This parameter is only valid for HTTP and HTTPS monitors.
+      example: 2xx
       type: string
+    load-balancing_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/load-balancing_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/load-balancing_result_info'
+      type: object
     load-balancing_preview_id:
       example: f1aba936b94213e5b8dca0c0dbf1f9cc
+    load-balancing_id_response:
+      allOf:
+      - $ref: '#/components/schemas/load-balancing_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/load-balancing_identifier'
+            type: object
+    load-balancing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    load-balancing_timeout:
+      default: 5
+      description: The timeout (in seconds) before marking the health check as failed.
+      type: integer
+    load-balancing_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/load-balancing_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
     load-balancing_header:
       additionalProperties:
         items:
@@ -541,73 +480,9 @@ components:
         X-App-ID:
         - abc123
       type: object
-    load-balancing_consecutive_up:
-      default: 0
-      description: To be marked healthy the monitored origin must pass this healthcheck N consecutive times.
-      type: integer
-    load-balancing_type:
-      default: http
-      description: The protocol to use for the health check. Currently supported protocols are 'HTTP','HTTPS', 'TCP', 'ICMP-PING', 'UDP-ICMP', and 'SMTP'.
-      enum:
-      - http
-      - https
-      - tcp
-      - udp_icmp
-      - icmp_ping
-      - smtp
-      example: https
+    load-balancing_identifier:
+      example: f1aba936b94213e5b8dca0c0dbf1f9cc
       type: string
-    load-balancing_id_response:
-      allOf:
-      - $ref: '#/components/schemas/load-balancing_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/load-balancing_identifier'
-            type: object
-    load-balancing_monitor-response-single:
-      allOf:
-      - $ref: '#/components/schemas/load-balancing_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/load-balancing_monitor'
-    load-balancing_preview_result_response:
-      allOf:
-      - $ref: '#/components/schemas/load-balancing_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/load-balancing_preview_result'
-    load-balancing_monitor-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/load-balancing_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/load-balancing_monitor'
-            type: array
-    load-balancing_origin_health_data:
-      description: The origin ipv4/ipv6 address or domain name mapped to it's health data.
-      example:
-        failure_reason: No failures
-        healthy: true
-        response_code: 200
-        rtt: 66ms
-      properties:
-        failure_reason:
-          type: string
-        healthy:
-          type: boolean
-        response_code:
-          type: number
-        rtt:
-          type: string
-      type: object
-    load-balancing_allow_insecure:
-      default: false
-      description: Do not validate the certificate when monitor use HTTPS. This parameter is currently only valid for HTTP and HTTPS monitors.
-      example: true
-      type: boolean
     load-balancing_monitor-editable:
       properties:
         allow_insecure:
@@ -643,18 +518,85 @@ components:
         type:
           $ref: '#/components/schemas/load-balancing_type'
       type: object
-    load-balancing_api-response-single:
+    load-balancing_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    load-balancing_consecutive_up:
+      default: 0
+      description: To be marked healthy the monitored origin must pass this healthcheck N consecutive times.
+      type: integer
+    load-balancing_description:
+      description: Object description.
+      example: Login page monitor
+      type: string
+    load-balancing_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/load-balancing_messages'
+        messages:
+          $ref: '#/components/schemas/load-balancing_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    load-balancing_preview_response:
       allOf:
-      - $ref: '#/components/schemas/load-balancing_api-response-common'
+      - $ref: '#/components/schemas/load-balancing_api-response-single'
       - properties:
           result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
+            properties:
+              pools:
+                additionalProperties:
+                  description: The pool name associated with the pool ID.
+                  type: string
+                description: Monitored pool IDs mapped to their respective names.
+                example:
+                  abwlnp5jbqn45ecgxd03erbgtxtqai0d: WNAM Datacenter
+                  ve8h9lrcip5n5bbga9yqmdws28ay5d0l: EEU Datacenter
+                type: object
+              preview_id:
+                $ref: '#/components/schemas/load-balancing_identifier'
+            type: object
+    load-balancing_origin_health_data:
+      description: The origin ipv4/ipv6 address or domain name mapped to it's health data.
+      example:
+        failure_reason: No failures
+        healthy: true
+        response_code: 200
+        rtt: 66ms
+      properties:
+        failure_reason:
+          type: string
+        healthy:
+          type: boolean
+        response_code:
+          type: number
+        rtt:
+          type: string
       type: object
     load-balancing_references_response:
       allOf:
@@ -683,17 +625,50 @@ components:
                   type: string
               type: object
             type: array
-    load-balancing_api-response-common:
+    load-balancing_interval:
+      default: 60
+      description: The interval between each health check. Shorter intervals may improve failover time, but will increase load on the origins as we check from multiple locations.
+      type: integer
+    load-balancing_follow_redirects:
+      default: false
+      description: Follow redirects if returned by the origin. This parameter is only valid for HTTP and HTTPS monitors.
+      example: true
+      type: boolean
+    load-balancing_monitor:
+      allOf:
+      - $ref: '#/components/schemas/load-balancing_monitor-editable'
+      - properties:
+          created_on:
+            $ref: '#/components/schemas/load-balancing_timestamp'
+          id:
+            $ref: '#/components/schemas/load-balancing_identifier'
+          modified_on:
+            $ref: '#/components/schemas/load-balancing_timestamp'
+        type: object
+    load-balancing_api-response-common-failure:
       properties:
         errors:
-          $ref: '#/components/schemas/load-balancing_messages'
+          allOf:
+          - $ref: '#/components/schemas/load-balancing_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
         messages:
-          $ref: '#/components/schemas/load-balancing_messages'
+          allOf:
+          - $ref: '#/components/schemas/load-balancing_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
         success:
           description: Whether the API call was successful
           enum:
-          - true
-          example: true
+          - false
+          example: false
           type: boolean
       required:
       - success
@@ -701,14 +676,39 @@ components:
       - messages
       - result
       type: object
+    load-balancing_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      readOnly: true
+      type: string
     load-balancing_probe_zone:
       description: Assign this monitor to emulate the specified zone while probing. This parameter is only valid for HTTP and HTTPS monitors.
       example: example.com
       type: string
+    load-balancing_monitor-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/load-balancing_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/load-balancing_monitor'
+            type: array
     load-balancing_method:
       default: GET
       description: The method to use for the health check. This defaults to 'GET' for HTTP/HTTPS based checks and 'connection_established' for TCP based health checks.
       example: GET
+      type: string
+    load-balancing_type:
+      default: http
+      description: The protocol to use for the health check. Currently supported protocols are 'HTTP','HTTPS', 'TCP', 'ICMP-PING', 'UDP-ICMP', and 'SMTP'.
+      enum:
+      - http
+      - https
+      - tcp
+      - udp_icmp
+      - icmp_ping
+      - smtp
+      example: https
       type: string
   securitySchemes:
     api_email:

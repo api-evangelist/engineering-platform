@@ -306,97 +306,14 @@ paths:
         pro: false
 components:
   schemas:
-    magic_port:
-      example: 1
-      type: integer
-    magic_vlan_tag:
-      description: VLAN port number.
-      example: 0
-      type: integer
-    magic_wan_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_wan'
     magic_cidr:
       description: A valid CIDR notation representing an IP range.
       example: 192.0.2.0/24
       type: string
-    magic_wan_update_request:
-      properties:
-        name:
-          type: string
-        physport:
-          $ref: '#/components/schemas/magic_port'
-        priority:
-          type: integer
-        static_addressing:
-          $ref: '#/components/schemas/magic_wan_static_addressing'
-        vlan_tag:
-          $ref: '#/components/schemas/magic_vlan_tag'
-      type: object
-    magic_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
-      type: object
-    magic_wans_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/magic_wan'
-            type: array
-    magic_wans_add_single_request:
-      properties:
-        name:
-          type: string
-        physport:
-          $ref: '#/components/schemas/magic_port'
-        priority:
-          type: integer
-        static_addressing:
-          $ref: '#/components/schemas/magic_wan_static_addressing'
-        vlan_tag:
-          $ref: '#/components/schemas/magic_vlan_tag'
-      required:
-      - physport
-      - vlan_tag
-      type: object
-    magic_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/magic_messages'
-        messages:
-          $ref: '#/components/schemas/magic_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
+    magic_ip-address:
+      description: A valid IPv4 address.
+      example: 192.0.2.1
+      type: string
     magic_messages:
       example: []
       items:
@@ -412,29 +329,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    magic_wan_modified_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_wan'
-    magic_wan_static_addressing:
-      description: (optional) if omitted, use DHCP. Submit secondary_address when site is in high availability mode.
-      properties:
-        address:
-          $ref: '#/components/schemas/magic_cidr'
-        gateway_address:
-          $ref: '#/components/schemas/magic_ip-address'
-        secondary_address:
-          $ref: '#/components/schemas/magic_cidr'
-      required:
-      - address
-      - gateway_address
-      type: object
-    magic_ip-address:
-      description: A valid IPv4 address.
-      example: 192.0.2.1
-      type: string
     magic_api-response-common-failure:
       properties:
         errors:
@@ -466,6 +360,100 @@ components:
       - messages
       - result
       type: object
+    magic_wan_static_addressing:
+      description: (optional) if omitted, use DHCP. Submit secondary_address when site is in high availability mode.
+      properties:
+        address:
+          $ref: '#/components/schemas/magic_cidr'
+        gateway_address:
+          $ref: '#/components/schemas/magic_ip-address'
+        secondary_address:
+          $ref: '#/components/schemas/magic_cidr'
+      required:
+      - address
+      - gateway_address
+      type: object
+    magic_wans_add_single_request:
+      properties:
+        name:
+          type: string
+        physport:
+          $ref: '#/components/schemas/magic_port'
+        priority:
+          type: integer
+        static_addressing:
+          $ref: '#/components/schemas/magic_wan_static_addressing'
+        vlan_tag:
+          $ref: '#/components/schemas/magic_vlan_tag'
+      required:
+      - physport
+      - vlan_tag
+      type: object
+    magic_port:
+      example: 1
+      type: integer
+    magic_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic_messages'
+        messages:
+          $ref: '#/components/schemas/magic_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
+    magic_wan_update_request:
+      properties:
+        name:
+          type: string
+        physport:
+          $ref: '#/components/schemas/magic_port'
+        priority:
+          type: integer
+        static_addressing:
+          $ref: '#/components/schemas/magic_wan_static_addressing'
+        vlan_tag:
+          $ref: '#/components/schemas/magic_vlan_tag'
+      type: object
+    magic_wan_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_wan'
+    magic_wan_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_wan'
     magic_wan:
       properties:
         id:
@@ -484,18 +472,30 @@ components:
         vlan_tag:
           $ref: '#/components/schemas/magic_vlan_tag'
       type: object
-    magic_wan_deleted_response:
+    magic_wan_modified_response:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/magic_wan'
+    magic_vlan_tag:
+      description: VLAN port number.
+      example: 0
+      type: integer
     magic_identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       readOnly: true
       type: string
+    magic_wans_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/magic_wan'
+            type: array
   securitySchemes:
     api_email:
       in: header

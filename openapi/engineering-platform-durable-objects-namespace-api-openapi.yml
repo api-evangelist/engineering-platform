@@ -165,10 +165,33 @@ components:
       description: Opaque token indicating the position from which to continue when requesting the next set of records. A valid value for the cursor can be obtained from the cursors object in the result_info structure.
       example: AAAAANuhDN7SjacTnSVsDu3WW1Lvst6dxJGTjRY5BhxPXdf6L6uTcpd_NVtjhn11OUYRsVEykxoUwF-JQU4dn6QylZSKTOJuG0indrdn_MlHpMRtsxgXjs-RPdHYIVm3odE_uvEQ_dTQGFm8oikZMohns34DLBgrQpc
       type: string
-    workers_schemas-id:
-      description: ID of the namespace.
-      example: 5fd1cafff895419c8bcc647fc64ab8f0
-      type: string
+    workers_object:
+      properties:
+        hasStoredData:
+          description: Whether the Durable Object has stored data.
+          example: true
+          readOnly: true
+          type: boolean
+        id:
+          description: ID of the Durable Object.
+          example: fe7803fc55b964e09d94666545aab688d360c6bda69ba349ced1e5f28d2fc2c8
+          readOnly: true
+          type: string
+      type: object
+    workers_namespace:
+      properties:
+        class:
+          type: string
+        id:
+          readOnly: true
+          type: string
+        name:
+          type: string
+        script:
+          type: string
+        use_sqlite:
+          type: boolean
+      type: object
     workers_api-response-common:
       properties:
         errors:
@@ -186,30 +209,6 @@ components:
       - errors
       - messages
       type: object
-    workers_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
     workers_api-response-common-failure:
       properties:
         errors:
@@ -241,26 +240,6 @@ components:
       - messages
       - result
       type: object
-    workers_object:
-      properties:
-        hasStoredData:
-          description: Whether the Durable Object has stored data.
-          example: true
-          readOnly: true
-          type: boolean
-        id:
-          description: ID of the Durable Object.
-          example: fe7803fc55b964e09d94666545aab688d360c6bda69ba349ced1e5f28d2fc2c8
-          readOnly: true
-          type: string
-      type: object
-    workers_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/workers_result_info'
-      type: object
     workers_messages:
       example: []
       items:
@@ -276,19 +255,40 @@ components:
         type: object
         uniqueItems: true
       type: array
-    workers_namespace:
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    workers_result_info:
       properties:
-        class:
-          type: string
-        id:
-          readOnly: true
-          type: string
-        name:
-          type: string
-        script:
-          type: string
-        use_sqlite:
-          type: boolean
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    workers_schemas-id:
+      description: ID of the namespace.
+      example: 5fd1cafff895419c8bcc647fc64ab8f0
+      type: string
+    workers_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/workers_result_info'
       type: object
   securitySchemes:
     api_email:

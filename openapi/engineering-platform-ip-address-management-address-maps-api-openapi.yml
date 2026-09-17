@@ -494,36 +494,73 @@ paths:
       - IP Address Management Address Maps
 components:
   schemas:
+    addressing_schemas-can_delete:
+      description: Controls whether the membership can be deleted via the API or not.
+      example: true
+      readOnly: true
+      type: boolean
+    addressing_address-maps-ip:
+      properties:
+        created_at:
+          $ref: '#/components/schemas/addressing_timestamp'
+        ip:
+          $ref: '#/components/schemas/addressing_ip'
+      type: object
+    addressing_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/addressing_messages'
+        messages:
+          $ref: '#/components/schemas/addressing_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     addressing_schemas-identifier:
       description: The identifier for the membership (eg. a zone or account tag).
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       type: string
-    addressing_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    addressing_ip_address:
+      description: An IPv4 or IPv6 address.
+      example: 192.0.2.1
       type: string
-    addressing_can_delete:
-      description: If set to false, then the Address Map cannot be deleted via API. This is true for Cloudflare-managed maps.
-      example: true
-      readOnly: true
-      type: boolean
     addressing_default_sni:
       description: If you have legacy TLS clients which do not send the TLS server name indicator, then you can specify one default SNI on the map. If Cloudflare receives a TLS handshake from a client without an SNI, it will respond with the default SNI on those IPs. The default SNI can be any valid zone or subdomain owned by the account.
       example: '*.example.com'
       type:
       - string
       - 'null'
-    addressing_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
+    addressing_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/addressing_address-maps'
+    addressing_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
-    addressing_schemas-can_delete:
-      description: Controls whether the membership can be deleted via the API or not.
-      example: true
-      readOnly: true
-      type: boolean
+    addressing_ip:
+      description: An IPv4 or IPv6 address.
+      example: 192.0.2.1
+      type: string
+    addressing_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/addressing_address-maps'
+            type: array
     addressing_address-maps:
       properties:
         can_delete:
@@ -543,34 +580,6 @@ components:
         modified_at:
           $ref: '#/components/schemas/addressing_timestamp'
       type: object
-    addressing_address-maps-ip:
-      properties:
-        created_at:
-          $ref: '#/components/schemas/addressing_timestamp'
-        ip:
-          $ref: '#/components/schemas/addressing_ip'
-      type: object
-    addressing_address-maps-membership:
-      properties:
-        can_delete:
-          $ref: '#/components/schemas/addressing_schemas-can_delete'
-        created_at:
-          $ref: '#/components/schemas/addressing_timestamp'
-        identifier:
-          $ref: '#/components/schemas/addressing_schemas-identifier'
-        kind:
-          $ref: '#/components/schemas/addressing_kind'
-      type: object
-    addressing_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/addressing_address-maps'
-    addressing_ip:
-      description: An IPv4 or IPv6 address.
-      example: 192.0.2.1
-      type: string
     addressing_full_response:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-single'
@@ -585,48 +594,10 @@ components:
                   $ref: '#/components/schemas/addressing_memberships'
               type: object
         type: object
-    addressing_kind:
-      description: The type of the membership.
-      enum:
-      - zone
-      - account
-      example: zone
+    addressing_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
       type: string
-    addressing_schemas-ips:
-      description: The set of IPs on the Address Map.
-      items:
-        $ref: '#/components/schemas/addressing_address-maps-ip'
-      type: array
-    addressing_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/addressing_messages'
-        messages:
-          $ref: '#/components/schemas/addressing_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    addressing_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/addressing_address-maps'
-            type: array
-    addressing_can_modify_ips:
-      description: If set to false, then the IPs on the Address Map cannot be modified via the API. This is true for Cloudflare-managed maps.
-      example: true
-      readOnly: true
-      type: boolean
     addressing_api-response-common-failure:
       properties:
         errors:
@@ -658,39 +629,33 @@ components:
       - messages
       - result
       type: object
-    addressing_schemas-description:
-      description: An optional description field which may be used to describe the types of IPs or zones on the map.
-      example: My Ecommerce zones
-      type:
-      - string
-      - 'null'
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    addressing_api-response-collection:
+    addressing_kind:
+      description: The type of the membership.
+      enum:
+      - zone
+      - account
+      example: zone
+      type: string
+    addressing_can_delete:
+      description: If set to false, then the Address Map cannot be deleted via API. This is true for Cloudflare-managed maps.
+      example: true
+      readOnly: true
+      type: boolean
+    addressing_address-maps-membership:
+      properties:
+        can_delete:
+          $ref: '#/components/schemas/addressing_schemas-can_delete'
+        created_at:
+          $ref: '#/components/schemas/addressing_timestamp'
+        identifier:
+          $ref: '#/components/schemas/addressing_schemas-identifier'
+        kind:
+          $ref: '#/components/schemas/addressing_kind'
+      type: object
+    addressing_api-response-single:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/addressing_result_info'
       type: object
-    addressing_memberships:
-      description: Zones and Accounts which will be assigned IPs on this Address Map. A zone membership will take priority over an account membership.
-      items:
-        $ref: '#/components/schemas/addressing_address-maps-membership'
-      type: array
     addressing_result_info:
       properties:
         count:
@@ -710,14 +675,49 @@ components:
           example: 2000
           type: number
       type: object
-    addressing_api-response-single:
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_schemas-description:
+      description: An optional description field which may be used to describe the types of IPs or zones on the map.
+      example: My Ecommerce zones
+      type:
+      - string
+      - 'null'
+    addressing_memberships:
+      description: Zones and Accounts which will be assigned IPs on this Address Map. A zone membership will take priority over an account membership.
+      items:
+        $ref: '#/components/schemas/addressing_address-maps-membership'
+      type: array
+    addressing_schemas-ips:
+      description: The set of IPs on the Address Map.
+      items:
+        $ref: '#/components/schemas/addressing_address-maps-ip'
+      type: array
+    addressing_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/addressing_result_info'
       type: object
-    addressing_ip_address:
-      description: An IPv4 or IPv6 address.
-      example: 192.0.2.1
-      type: string
+    addressing_can_modify_ips:
+      description: If set to false, then the IPs on the Address Map cannot be modified via the API. This is true for Cloudflare-managed maps.
+      example: true
+      readOnly: true
+      type: boolean
     addressing_enabled:
       default: false
       description: Whether the Address Map is enabled or not. Cloudflare's DNS will not respond with IP addresses on an Address Map until the map is enabled.

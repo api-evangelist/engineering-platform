@@ -297,39 +297,34 @@ paths:
         pro: true
 components:
   schemas:
+    iam_value:
+      description: The token value.
+      example: 8M7wS6hCpXVc-DoRnPPY_UCWPgy8aea4Wy6kCe5T
+      maxLength: 80
+      minLength: 40
+      readOnly: true
+      type: string
+      x-sensitive: true
+    iam_request_ip:
+      description: Client IP restrictions.
+      example:
+        in:
+        - 123.123.123.0/24
+        - 2606:4700::/32
+        not_in:
+        - 123.123.123.100/24
+        - 2606:4700:4700::/48
+      properties:
+        in:
+          $ref: '#/components/schemas/iam_cidr_list'
+        not_in:
+          $ref: '#/components/schemas/iam_cidr_list'
+      type: object
     iam_common_components-schemas-identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       readOnly: true
-      type: string
-    iam_token_base:
-      properties:
-        condition:
-          $ref: '#/components/schemas/iam_condition'
-        expires_on:
-          $ref: '#/components/schemas/iam_expires_on'
-        id:
-          $ref: '#/components/schemas/iam_token_identifier'
-        issued_on:
-          $ref: '#/components/schemas/iam_issued_on'
-        last_used_on:
-          $ref: '#/components/schemas/iam_last_used_on'
-        modified_on:
-          $ref: '#/components/schemas/iam_modified_on'
-        name:
-          $ref: '#/components/schemas/iam_name'
-        not_before:
-          $ref: '#/components/schemas/iam_not_before'
-        policies:
-          $ref: '#/components/schemas/iam_token_policies'
-        status:
-          $ref: '#/components/schemas/iam_status'
-      type: object
-    iam_name:
-      description: Token name.
-      example: readonly token
-      maxLength: 120
       type: string
     iam_create_payload:
       properties:
@@ -347,165 +342,6 @@ components:
       - name
       - policies
       type: object
-    iam_identifier:
-      description: Policy identifier.
-      example: f267e341f3dd4697bd3b9f71dd96247f
-      readOnly: true
-      type: string
-    iam_last_used_on:
-      description: Last time the token was used.
-      example: '2020-01-02T12:34:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    iam_status:
-      description: Status of the token.
-      enum:
-      - active
-      - disabled
-      - expired
-      example: active
-      type: string
-    iam_collection_tokens_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/iam_token_base'
-            type: array
-        type: object
-      title: Response with a list of tokens
-    iam_permission_group:
-      description: A named group of permissions that map to a group of operations against resources.
-      properties:
-        id:
-          description: Identifier of the group.
-          example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
-          readOnly: true
-          type: string
-        meta:
-          description: Attributes associated to the permission group.
-          example:
-            label: load_balancer_admin
-            scopes: com.cloudflare.api.account
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-          type: object
-        name:
-          description: Name of the group.
-          example: Load Balancer
-          readOnly: true
-          type: string
-      required:
-      - id
-      type: object
-    iam_cidr_list:
-      description: List of IPv4/IPv6 CIDR addresses.
-      example:
-      - 199.27.128.0/21
-      - 2400:cb00::/32
-      items:
-        description: IPv4/IPv6 CIDR.
-        example: 199.27.128.0/21
-        type: string
-      type: array
-    iam_policy_with_permission_groups_and_resources:
-      properties:
-        effect:
-          $ref: '#/components/schemas/iam_effect'
-        id:
-          $ref: '#/components/schemas/iam_identifier'
-        permission_groups:
-          $ref: '#/components/schemas/iam_permission_groups'
-        resources:
-          $ref: '#/components/schemas/iam_resources'
-      required:
-      - id
-      - effect
-      - permission_groups
-      - resources
-      title: Policy with Permission Groups and Resources
-      type: object
-    iam_token_body:
-      allOf:
-      - $ref: '#/components/schemas/iam_token_base'
-      - type: object
-      - required:
-        - name
-        - status
-        - policies
-      title: Token defined in a request body
-    iam_request_ip:
-      description: Client IP restrictions.
-      example:
-        in:
-        - 123.123.123.0/24
-        - 2606:4700::/32
-        not_in:
-        - 123.123.123.100/24
-        - 2606:4700:4700::/48
-      properties:
-        in:
-          $ref: '#/components/schemas/iam_cidr_list'
-        not_in:
-          $ref: '#/components/schemas/iam_cidr_list'
-      type: object
-    iam_response_single_segment:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-single'
-      - properties:
-          result:
-            properties:
-              expires_on:
-                $ref: '#/components/schemas/iam_expires_on'
-              id:
-                $ref: '#/components/schemas/iam_token_identifier'
-              not_before:
-                $ref: '#/components/schemas/iam_not_before'
-              status:
-                $ref: '#/components/schemas/iam_status'
-            required:
-            - id
-            - status
-        type: object
-    iam_api-response-single-id:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-common'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/iam_common_components-schemas-identifier'
-            required:
-            - id
-            type:
-            - object
-            - 'null'
-      type: object
-    iam_single_token_create_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/iam_token_with_value'
-        type: object
-      title: Response of a create request with a single token
-    iam_token_with_value:
-      allOf:
-      - $ref: '#/components/schemas/iam_token_base'
-      - properties:
-          value:
-            $ref: '#/components/schemas/iam_value'
-      title: Create token response, with the token value
-    iam_not_before:
-      description: The time before which the token MUST NOT be accepted for processing.
-      example: '2018-07-01T05:20:00Z'
-      format: date-time
-      type: string
     iam_resources:
       description: A list of resource names that the policy applies to.
       example:
@@ -517,6 +353,47 @@ components:
         scope:
           type: string
       type: object
+    iam_collection_tokens_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/iam_token_base'
+            type: array
+        type: object
+      title: Response with a list of tokens
+    iam_name:
+      description: Token name.
+      example: readonly token
+      maxLength: 120
+      type: string
+    iam_cidr_list:
+      description: List of IPv4/IPv6 CIDR addresses.
+      example:
+      - 199.27.128.0/21
+      - 2400:cb00::/32
+      items:
+        description: IPv4/IPv6 CIDR.
+        example: 199.27.128.0/21
+        type: string
+      type: array
+    iam_permission_groups:
+      description: A set of permission groups that are specified to the policy.
+      example:
+      - id: c8fed203ed3043cba015a93ad1616f1f
+        meta:
+          label: load_balancer_admin
+          scopes: com.cloudflare.api.account
+        name: Zone Read
+      - id: 82e64a83756745bbbb1c9c2701bf816b
+        meta:
+          label: fbm_user
+          scopes: com.cloudflare.api.account
+        name: Magic Network Monitoring
+      items:
+        $ref: '#/components/schemas/iam_permission_group'
+      type: array
     iam_api-response-common:
       properties:
         errors:
@@ -534,61 +411,6 @@ components:
       - errors
       - messages
       type: object
-    iam_response_single_value:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/iam_value'
-        type: object
-    iam_value:
-      description: The token value.
-      example: 8M7wS6hCpXVc-DoRnPPY_UCWPgy8aea4Wy6kCe5T
-      maxLength: 80
-      minLength: 40
-      readOnly: true
-      type: string
-      x-sensitive: true
-    iam_token_identifier:
-      description: Token identifier tag.
-      example: ed17574386854bf78a67040be0a770b0
-      maxLength: 32
-      readOnly: true
-      type: string
-    iam_token_policies:
-      description: List of access policies assigned to the token.
-      items:
-        $ref: '#/components/schemas/iam_policy_with_permission_groups_and_resources'
-      type: array
-    iam_single_token_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/iam_token_base'
-        type: object
-      title: Response with a single token
-    iam_permission_groups:
-      description: A set of permission groups that are specified to the policy.
-      example:
-      - id: c8fed203ed3043cba015a93ad1616f1f
-        meta:
-          label: load_balancer_admin
-          scopes: com.cloudflare.api.account
-        name: Zone Read
-      - id: 82e64a83756745bbbb1c9c2701bf816b
-        meta:
-          label: fbm_user
-          scopes: com.cloudflare.api.account
-        name: Magic Network Monitoring
-      items:
-        $ref: '#/components/schemas/iam_permission_group'
-      type: array
-    iam_condition:
-      properties:
-        request.ip:
-          $ref: '#/components/schemas/iam_request_ip'
-      type: object
     iam_messages:
       example: []
       items:
@@ -604,6 +426,11 @@ components:
         type: object
         uniqueItems: true
       type: array
+    iam_identifier:
+      description: Policy identifier.
+      example: f267e341f3dd4697bd3b9f71dd96247f
+      readOnly: true
+      type: string
     iam_api-response-common-failure:
       properties:
         errors:
@@ -635,10 +462,26 @@ components:
       - messages
       - result
       type: object
-    iam_expires_on:
-      description: The expiration time on or after which the JWT MUST NOT be accepted for processing.
-      example: '2020-01-01T00:00:00Z'
-      format: date-time
+    iam_single_token_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/iam_token_base'
+        type: object
+      title: Response with a single token
+    iam_effect:
+      description: Allow or deny operations against the resources.
+      enum:
+      - allow
+      - deny
+      example: allow
+      type: string
+    iam_token_identifier:
+      description: Token identifier tag.
+      example: ed17574386854bf78a67040be0a770b0
+      maxLength: 32
+      readOnly: true
       type: string
     iam_api-response-collection:
       allOf:
@@ -652,18 +495,11 @@ components:
           result_info:
             $ref: '#/components/schemas/iam_result_info'
       type: object
-    iam_issued_on:
-      description: The time on which the token was created.
-      example: '2018-07-01T05:20:00Z'
+    iam_last_used_on:
+      description: Last time the token was used.
+      example: '2020-01-02T12:34:00Z'
       format: date-time
       readOnly: true
-      type: string
-    iam_effect:
-      description: Allow or deny operations against the resources.
-      enum:
-      - allow
-      - deny
-      example: allow
       type: string
     iam_result_info:
       properties:
@@ -684,16 +520,180 @@ components:
           example: 2000
           type: number
       type: object
+    iam_policy_with_permission_groups_and_resources:
+      properties:
+        effect:
+          $ref: '#/components/schemas/iam_effect'
+        id:
+          $ref: '#/components/schemas/iam_identifier'
+        permission_groups:
+          $ref: '#/components/schemas/iam_permission_groups'
+        resources:
+          $ref: '#/components/schemas/iam_resources'
+      required:
+      - id
+      - effect
+      - permission_groups
+      - resources
+      title: Policy with Permission Groups and Resources
+      type: object
+    iam_issued_on:
+      description: The time on which the token was created.
+      example: '2018-07-01T05:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    iam_token_policies:
+      description: List of access policies assigned to the token.
+      items:
+        $ref: '#/components/schemas/iam_policy_with_permission_groups_and_resources'
+      type: array
+    iam_token_body:
+      allOf:
+      - $ref: '#/components/schemas/iam_token_base'
+      - type: object
+      - required:
+        - name
+        - status
+        - policies
+      title: Token defined in a request body
+    iam_single_token_create_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/iam_token_with_value'
+        type: object
+      title: Response of a create request with a single token
+    iam_api-response-single-id:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-common'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/iam_common_components-schemas-identifier'
+            required:
+            - id
+            type:
+            - object
+            - 'null'
+      type: object
+    iam_not_before:
+      description: The time before which the token MUST NOT be accepted for processing.
+      example: '2018-07-01T05:20:00Z'
+      format: date-time
+      type: string
+    iam_token_base:
+      properties:
+        condition:
+          $ref: '#/components/schemas/iam_condition'
+        expires_on:
+          $ref: '#/components/schemas/iam_expires_on'
+        id:
+          $ref: '#/components/schemas/iam_token_identifier'
+        issued_on:
+          $ref: '#/components/schemas/iam_issued_on'
+        last_used_on:
+          $ref: '#/components/schemas/iam_last_used_on'
+        modified_on:
+          $ref: '#/components/schemas/iam_modified_on'
+        name:
+          $ref: '#/components/schemas/iam_name'
+        not_before:
+          $ref: '#/components/schemas/iam_not_before'
+        policies:
+          $ref: '#/components/schemas/iam_token_policies'
+        status:
+          $ref: '#/components/schemas/iam_status'
+      type: object
+    iam_status:
+      description: Status of the token.
+      enum:
+      - active
+      - disabled
+      - expired
+      example: active
+      type: string
     iam_modified_on:
       description: Last time the token was modified.
       example: '2018-07-02T05:20:00Z'
       format: date-time
       readOnly: true
       type: string
+    iam_permission_group:
+      description: A named group of permissions that map to a group of operations against resources.
+      properties:
+        id:
+          description: Identifier of the group.
+          example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
+          readOnly: true
+          type: string
+        meta:
+          description: Attributes associated to the permission group.
+          example:
+            label: load_balancer_admin
+            scopes: com.cloudflare.api.account
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+          type: object
+        name:
+          description: Name of the group.
+          example: Load Balancer
+          readOnly: true
+          type: string
+      required:
+      - id
+      type: object
+    iam_expires_on:
+      description: The expiration time on or after which the JWT MUST NOT be accepted for processing.
+      example: '2020-01-01T00:00:00Z'
+      format: date-time
+      type: string
+    iam_token_with_value:
+      allOf:
+      - $ref: '#/components/schemas/iam_token_base'
+      - properties:
+          value:
+            $ref: '#/components/schemas/iam_value'
+      title: Create token response, with the token value
     iam_api-response-single:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-common'
       type: object
+    iam_condition:
+      properties:
+        request.ip:
+          $ref: '#/components/schemas/iam_request_ip'
+      type: object
+    iam_response_single_segment:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-single'
+      - properties:
+          result:
+            properties:
+              expires_on:
+                $ref: '#/components/schemas/iam_expires_on'
+              id:
+                $ref: '#/components/schemas/iam_token_identifier'
+              not_before:
+                $ref: '#/components/schemas/iam_not_before'
+              status:
+                $ref: '#/components/schemas/iam_status'
+            required:
+            - id
+            - status
+        type: object
+    iam_response_single_value:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/iam_value'
+        type: object
   securitySchemes:
     api_email:
       in: header

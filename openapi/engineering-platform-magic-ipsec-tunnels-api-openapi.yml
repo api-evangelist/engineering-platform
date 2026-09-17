@@ -317,52 +317,145 @@ paths:
         pro: false
 components:
   schemas:
-    magic_schemas-tunnel_add_request:
+    magic_schemas-tunnel_update_request:
       allOf:
       - $ref: '#/components/schemas/magic_schemas-tunnel_add_single_request'
-    magic_cloudflare_ipsec_endpoint:
-      description: The IP address assigned to the Cloudflare side of the IPsec tunnel.
-      example: 203.0.113.1
-      type: string
-    magic_schemas-tunnel_add_single_request:
-      properties:
-        cloudflare_endpoint:
-          $ref: '#/components/schemas/magic_cloudflare_ipsec_endpoint'
-        customer_endpoint:
-          $ref: '#/components/schemas/magic_customer_ipsec_endpoint'
-        description:
-          $ref: '#/components/schemas/magic_components-schemas-description'
-        health_check:
-          $ref: '#/components/schemas/magic_health_check'
-        interface_address:
-          $ref: '#/components/schemas/magic_interface_address'
-        name:
-          $ref: '#/components/schemas/magic_schemas-name'
-        psk:
-          $ref: '#/components/schemas/magic_psk'
-        replay_protection:
-          $ref: '#/components/schemas/magic_replay_protection'
-      required:
-      - name
-      - cloudflare_endpoint
-      - interface_address
-      type: object
-    magic_schemas-created_on:
-      description: The date and time the tunnel was created.
-      example: '2017-06-14T00:00:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    magic_components-schemas-description:
-      description: An optional description forthe IPsec tunnel.
-      example: Tunnel for ISP X
-      type: string
     magic_psk_metadata:
       description: The PSK metadata that includes when the PSK was generated.
       properties:
         last_generated_on:
           $ref: '#/components/schemas/magic_schemas-modified_on'
       type: object
+    magic_psk_generation_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              ipsec_tunnel_id:
+                $ref: '#/components/schemas/magic_identifier'
+              psk:
+                $ref: '#/components/schemas/magic_psk'
+              psk_metadata:
+                $ref: '#/components/schemas/magic_psk_metadata'
+    magic_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    magic_schemas-tunnel_add_request:
+      allOf:
+      - $ref: '#/components/schemas/magic_schemas-tunnel_add_single_request'
+    magic_schemas-created_on:
+      description: The date and time the tunnel was created.
+      example: '2017-06-14T00:00:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    magic_psk:
+      description: A randomly generated or provided string for use in the IPsec tunnel.
+      example: O3bwKSjnaoCxDoUxjcq4Rk8ZKkezQUiy
+      type: string
+    magic_schemas-tunnels_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              ipsec_tunnels:
+                items:
+                  $ref: '#/components/schemas/magic_ipsec-tunnel'
+                type: array
+    magic_schemas-modified_on:
+      description: The date and time the tunnel was last modified.
+      example: '2017-06-14T05:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    magic_schemas-identifier:
+      description: Tunnel identifier tag.
+      example: c4a7362d577a6c3019a474fd6f485821
+      maxLength: 32
+      readOnly: true
+      type: string
+    magic_cloudflare_ipsec_endpoint:
+      description: The IP address assigned to the Cloudflare side of the IPsec tunnel.
+      example: 203.0.113.1
+      type: string
+    magic_schemas-tunnel_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              deleted:
+                example: true
+                type: boolean
+              deleted_ipsec_tunnel:
+                $ref: '#/components/schemas/magic_ipsec-tunnel'
+            type: object
+    magic_components-schemas-description:
+      description: An optional description forthe IPsec tunnel.
+      example: Tunnel for ISP X
+      type: string
+    magic_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic_messages'
+        messages:
+          $ref: '#/components/schemas/magic_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic_tunnel_health_check:
+      properties:
+        enabled:
+          default: true
+          description: Determines whether to run healthchecks for a tunnel.
+          example: true
+          type: boolean
+        rate:
+          default: mid
+          description: How frequent the health check is run. The default value is `mid`.
+          enum:
+          - low
+          - mid
+          - high
+          example: low
+          type: string
+        target:
+          description: The destination address in a request type health check. After the healthcheck is decapsulated at the customer end of the tunnel, the ICMP echo will be forwarded to this address. This field defaults to `customer_gre_endpoint address`.
+          example: 203.0.113.1
+          type: string
+        type:
+          default: reply
+          description: The type of healthcheck to run, reply or request. The default value is `reply`.
+          enum:
+          - reply
+          - request
+          example: request
+          type: string
+      type: object
+    magic_customer_ipsec_endpoint:
+      description: The IP address assigned to the customer side of the IPsec tunnel. Not required, but must be set for proactive traceroutes to work.
+      example: 203.0.113.1
+      type: string
     magic_health_check:
       properties:
         direction:
@@ -400,14 +493,47 @@ components:
           example: request
           type: string
       type: object
-    magic_schemas-name:
-      description: The name of the IPsec tunnel. The name cannot share a name with other tunnels.
-      example: IPsec_1
-      type: string
     magic_allow_null_cipher:
       description: When `true`, the tunnel can use a null-cipher (`ENCR_NULL`) in the ESP tunnel (Phase 2).
       example: true
       type: boolean
+    magic_schemas-tunnel_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              ipsec_tunnel:
+                $ref: '#/components/schemas/magic_ipsec-tunnel'
+            type: object
+    magic_interface_address:
+      description: 'A 31-bit prefix (/31 in CIDR notation) supporting two hosts, one for each side of the tunnel. Select the subnet from the following private IP space: 10.0.0.0–10.255.255.255, 172.16.0.0–172.31.255.255, 192.168.0.0–192.168.255.255.'
+      example: 192.0.2.0/31
+      type: string
+    magic_replay_protection:
+      default: false
+      description: If `true`, then IPsec replay protection will be supported in the Cloudflare-to-customer direction.
+      example: false
+      type: boolean
+    magic_schemas-name:
+      description: The name of the IPsec tunnel. The name cannot share a name with other tunnels.
+      example: IPsec_1
+      type: string
+    magic_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     magic_api-response-common-failure:
       properties:
         errors:
@@ -452,35 +578,6 @@ components:
                 items:
                   $ref: '#/components/schemas/magic_ipsec-tunnel'
                 type: array
-    magic_tunnel_health_check:
-      properties:
-        enabled:
-          default: true
-          description: Determines whether to run healthchecks for a tunnel.
-          example: true
-          type: boolean
-        rate:
-          default: mid
-          description: How frequent the health check is run. The default value is `mid`.
-          enum:
-          - low
-          - mid
-          - high
-          example: low
-          type: string
-        target:
-          description: The destination address in a request type health check. After the healthcheck is decapsulated at the customer end of the tunnel, the ICMP echo will be forwarded to this address. This field defaults to `customer_gre_endpoint address`.
-          example: 203.0.113.1
-          type: string
-        type:
-          default: reply
-          description: The type of healthcheck to run, reply or request. The default value is `reply`.
-          enum:
-          - reply
-          - request
-          example: request
-          type: string
-      type: object
     magic_schemas-tunnel_modified_response:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-single'
@@ -493,83 +590,6 @@ components:
               modified_ipsec_tunnel:
                 $ref: '#/components/schemas/magic_ipsec-tunnel'
             type: object
-    magic_schemas-modified_on:
-      description: The date and time the tunnel was last modified.
-      example: '2017-06-14T05:20:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    magic_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    magic_interface_address:
-      description: 'A 31-bit prefix (/31 in CIDR notation) supporting two hosts, one for each side of the tunnel. Select the subnet from the following private IP space: 10.0.0.0–10.255.255.255, 172.16.0.0–172.31.255.255, 192.168.0.0–192.168.255.255.'
-      example: 192.0.2.0/31
-      type: string
-    magic_psk_generation_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              ipsec_tunnel_id:
-                $ref: '#/components/schemas/magic_identifier'
-              psk:
-                $ref: '#/components/schemas/magic_psk'
-              psk_metadata:
-                $ref: '#/components/schemas/magic_psk_metadata'
-    magic_replay_protection:
-      default: false
-      description: If `true`, then IPsec replay protection will be supported in the Cloudflare-to-customer direction.
-      example: false
-      type: boolean
-    magic_schemas-tunnel_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              deleted:
-                example: true
-                type: boolean
-              deleted_ipsec_tunnel:
-                $ref: '#/components/schemas/magic_ipsec-tunnel'
-            type: object
-    magic_schemas-tunnel_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              ipsec_tunnel:
-                $ref: '#/components/schemas/magic_ipsec-tunnel'
-            type: object
-    magic_psk:
-      description: A randomly generated or provided string for use in the IPsec tunnel.
-      example: O3bwKSjnaoCxDoUxjcq4Rk8ZKkezQUiy
-      type: string
-    magic_schemas-tunnels_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              ipsec_tunnels:
-                items:
-                  $ref: '#/components/schemas/magic_ipsec-tunnel'
-                type: array
     magic_api-response-single:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-common'
@@ -582,6 +602,29 @@ components:
             - type:
               - string
               - 'null'
+      type: object
+    magic_schemas-tunnel_add_single_request:
+      properties:
+        cloudflare_endpoint:
+          $ref: '#/components/schemas/magic_cloudflare_ipsec_endpoint'
+        customer_endpoint:
+          $ref: '#/components/schemas/magic_customer_ipsec_endpoint'
+        description:
+          $ref: '#/components/schemas/magic_components-schemas-description'
+        health_check:
+          $ref: '#/components/schemas/magic_health_check'
+        interface_address:
+          $ref: '#/components/schemas/magic_interface_address'
+        name:
+          $ref: '#/components/schemas/magic_schemas-name'
+        psk:
+          $ref: '#/components/schemas/magic_psk'
+        replay_protection:
+          $ref: '#/components/schemas/magic_replay_protection'
+      required:
+      - name
+      - cloudflare_endpoint
+      - interface_address
       type: object
     magic_ipsec-tunnel:
       properties:
@@ -614,49 +657,6 @@ components:
       - cloudflare_endpoint
       - interface_address
       type: object
-    magic_customer_ipsec_endpoint:
-      description: The IP address assigned to the customer side of the IPsec tunnel. Not required, but must be set for proactive traceroutes to work.
-      example: 203.0.113.1
-      type: string
-    magic_schemas-identifier:
-      description: Tunnel identifier tag.
-      example: c4a7362d577a6c3019a474fd6f485821
-      maxLength: 32
-      readOnly: true
-      type: string
-    magic_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/magic_messages'
-        messages:
-          $ref: '#/components/schemas/magic_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    magic_schemas-tunnel_update_request:
-      allOf:
-      - $ref: '#/components/schemas/magic_schemas-tunnel_add_single_request'
-    magic_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
   securitySchemes:
     api_email:
       in: header

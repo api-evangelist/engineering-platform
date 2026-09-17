@@ -54,13 +54,49 @@ paths:
       - Notification Mechanism Eligibility
 components:
   schemas:
-    aaa_schemas-type:
-      description: Determines type of delivery mechanism.
-      enum:
-      - email
-      - pagerduty
-      - webhook
-      example: email
+    aaa_schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-collection'
+      - properties:
+          result:
+            additionalProperties:
+              items:
+                $ref: '#/components/schemas/aaa_eligibility'
+              type: array
+            example:
+              email:
+                eligible: true
+                ready: true
+                type: email
+            type: object
+    aaa_eligible:
+      description: Determines whether or not the account is eligible for the delivery mechanism.
+      example: true
+      type: boolean
+    aaa_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    aaa_account-id:
+      description: The account id
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
       type: string
     aaa_schemas-api-response-common-failure:
       properties:
@@ -86,16 +122,13 @@ components:
       - errors
       - messages
       type: object
-    aaa_eligible:
-      description: Determines whether or not the account is eligible for the delivery mechanism.
-      example: true
-      type: boolean
-    aaa_account-id:
-      description: The account id
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
+    aaa_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/aaa_result_info'
+      type: object
     aaa_api-response-common:
       properties:
         errors:
@@ -113,25 +146,18 @@ components:
       - errors
       - messages
       type: object
-    aaa_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
+    aaa_schemas-type:
+      description: Determines type of delivery mechanism.
+      enum:
+      - email
+      - pagerduty
+      - webhook
+      example: email
+      type: string
+    aaa_ready:
+      description: Beta flag. Users can create a policy with a mechanism that is not ready, but we cannot guarantee successful delivery of notifications.
+      example: true
+      type: boolean
     aaa_eligibility:
       properties:
         eligible:
@@ -141,17 +167,6 @@ components:
         type:
           $ref: '#/components/schemas/aaa_schemas-type'
       type: object
-    aaa_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/aaa_result_info'
-      type: object
-    aaa_ready:
-      description: Beta flag. Users can create a policy with a mechanism that is not ready, but we cannot guarantee successful delivery of notifications.
-      example: true
-      type: boolean
     aaa_messages:
       example: []
       items:
@@ -167,21 +182,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    aaa_schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-collection'
-      - properties:
-          result:
-            additionalProperties:
-              items:
-                $ref: '#/components/schemas/aaa_eligibility'
-              type: array
-            example:
-              email:
-                eligible: true
-                ready: true
-                type: email
-            type: object
   securitySchemes:
     api_email:
       in: header

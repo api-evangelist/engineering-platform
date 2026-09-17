@@ -771,109 +771,20 @@ paths:
       - Domainnames
 components:
   schemas:
-    ConflictException: {}
-    PatchOperation:
-      type: object
-      properties:
-        op:
-          allOf:
-          - $ref: '#/components/schemas/Op'
-          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
-        path:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
-        value:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
-        from:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
-      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
     MapOfStringToString:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
-    ListOfDomainName:
+    SecurityPolicy:
+      type: string
+      enum:
+      - TLS_1_0
+      - TLS_1_2
+    ListOfBasePathMapping:
       type: array
       items:
-        $ref: '#/components/schemas/DomainName'
-    MutualTlsAuthentication:
-      type: object
-      properties:
-        truststoreUri:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: An Amazon S3 URL that specifies the truststore for mutual TLS authentication, for example <code>s3://bucket-name/key-name</code>. The truststore can contain certificates from public or private certificate authorities. To update the truststore, upload a new version to S3, and then update your custom domain name to use the new version. To update the truststore, you must have permissions to access the S3 object.
-        truststoreVersion:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The version of the S3 object that contains your truststore. To specify a version, you must have versioning enabled for the S3 bucket.
-        truststoreWarnings:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of warnings that API Gateway returns while processing your truststore. Invalid certificates produce warnings. Mutual TLS is still enabled, but some clients might not be able to access your API. To resolve warnings, upload a new truststore to S3, and then update you domain name to use the new version.
-      description: The mutual TLS authentication configuration for a custom domain name. If specified, API Gateway performs two-way authentication between the client and the server. Clients must present a trusted certificate to access your API.
-    EndpointConfiguration:
-      type: object
-      properties:
-        types:
-          allOf:
-          - $ref: '#/components/schemas/ListOfEndpointType'
-          - description: A list of endpoint types of an API (RestApi) or its custom domain name (DomainName). For an edge-optimized API and its custom domain name, the endpoint type is <code>"EDGE"</code>. For a regional API and its custom domain name, the endpoint type is <code>REGIONAL</code>. For a private API, the endpoint type is <code>PRIVATE</code>.
-        vpcEndpointIds:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of VpcEndpointIds of an API (RestApi) against which to create Route53 ALIASes. It is only supported for <code>PRIVATE</code> endpoint type.
-      description: 'The endpoint configuration to indicate the types of endpoints an API (RestApi) or its custom domain name (DomainName) has. '
-    BasePathMappings:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfBasePathMapping'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of BasePathMapping resources.
-    DomainNames:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfDomainName'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of DomainName resources.
-    EndpointType:
-      type: string
-      enum:
-      - REGIONAL
-      - EDGE
-      - PRIVATE
-      description: The endpoint type. The valid values are <code>EDGE</code> for edge-optimized API setup, most suitable for mobile applications; <code>REGIONAL</code> for regional API endpoint setup, most suitable for calling from AWS Region; and <code>PRIVATE</code> for private APIs.
-    LimitExceededException: {}
-    Timestamp:
-      type: string
-      format: date-time
-    DomainNameStatus:
-      type: string
-      enum:
-      - AVAILABLE
-      - UPDATING
-      - PENDING
-      - PENDING_CERTIFICATE_REIMPORT
-      - PENDING_OWNERSHIP_VERIFICATION
-    UnauthorizedException: {}
-    String:
-      type: string
+        $ref: '#/components/schemas/BasePathMapping'
+    TooManyRequestsException: {}
     NotFoundException: {}
     DomainName:
       type: object
@@ -947,34 +858,80 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The ARN of the public certificate issued by ACM to validate ownership of your custom domain. Only required when configuring mutual TLS and using an ACM imported or private CA certificate ARN as the regionalCertificateArn.
       description: Represents a custom domain name as a user-friendly host name of an API (RestApi).
-    SecurityPolicy:
+    BasePathMappings:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfBasePathMapping'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of BasePathMapping resources.
+    UnauthorizedException: {}
+    MutualTlsAuthentication:
+      type: object
+      properties:
+        truststoreUri:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: An Amazon S3 URL that specifies the truststore for mutual TLS authentication, for example <code>s3://bucket-name/key-name</code>. The truststore can contain certificates from public or private certificate authorities. To update the truststore, upload a new version to S3, and then update your custom domain name to use the new version. To update the truststore, you must have permissions to access the S3 object.
+        truststoreVersion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The version of the S3 object that contains your truststore. To specify a version, you must have versioning enabled for the S3 bucket.
+        truststoreWarnings:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of warnings that API Gateway returns while processing your truststore. Invalid certificates produce warnings. Mutual TLS is still enabled, but some clients might not be able to access your API. To resolve warnings, upload a new truststore to S3, and then update you domain name to use the new version.
+      description: The mutual TLS authentication configuration for a custom domain name. If specified, API Gateway performs two-way authentication between the client and the server. Clients must present a trusted certificate to access your API.
+    ConflictException: {}
+    EndpointType:
       type: string
       enum:
-      - TLS_1_0
-      - TLS_1_2
-    Op:
+      - REGIONAL
+      - EDGE
+      - PRIVATE
+      description: The endpoint type. The valid values are <code>EDGE</code> for edge-optimized API setup, most suitable for mobile applications; <code>REGIONAL</code> for regional API endpoint setup, most suitable for calling from AWS Region; and <code>PRIVATE</code> for private APIs.
+    Timestamp:
       type: string
-      enum:
-      - add
-      - remove
-      - replace
-      - move
-      - copy
-      - test
-    ListOfBasePathMapping:
+      format: date-time
+    ListOfDomainName:
       type: array
       items:
-        $ref: '#/components/schemas/BasePathMapping'
-    ListOfEndpointType:
-      type: array
-      items:
-        $ref: '#/components/schemas/EndpointType'
-    BadRequestException: {}
-    TooManyRequestsException: {}
+        $ref: '#/components/schemas/DomainName'
     ListOfString:
       type: array
       items:
         $ref: '#/components/schemas/String'
+    DomainNameStatus:
+      type: string
+      enum:
+      - AVAILABLE
+      - UPDATING
+      - PENDING
+      - PENDING_CERTIFICATE_REIMPORT
+      - PENDING_OWNERSHIP_VERIFICATION
+    ListOfEndpointType:
+      type: array
+      items:
+        $ref: '#/components/schemas/EndpointType'
+    EndpointConfiguration:
+      type: object
+      properties:
+        types:
+          allOf:
+          - $ref: '#/components/schemas/ListOfEndpointType'
+          - description: A list of endpoint types of an API (RestApi) or its custom domain name (DomainName). For an edge-optimized API and its custom domain name, the endpoint type is <code>"EDGE"</code>. For a regional API and its custom domain name, the endpoint type is <code>REGIONAL</code>. For a private API, the endpoint type is <code>PRIVATE</code>.
+        vpcEndpointIds:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of VpcEndpointIds of an API (RestApi) against which to create Route53 ALIASes. It is only supported for <code>PRIVATE</code> endpoint type.
+      description: 'The endpoint configuration to indicate the types of endpoints an API (RestApi) or its custom domain name (DomainName) has. '
+    BadRequestException: {}
+    LimitExceededException: {}
     BasePathMapping:
       type: object
       properties:
@@ -991,19 +948,50 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The name of the associated stage.
       description: Represents the base path that callers of the API must provide as part of the URL after the domain name.
+    String:
+      type: string
+    PatchOperation:
+      type: object
+      properties:
+        op:
+          allOf:
+          - $ref: '#/components/schemas/Op'
+          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
+        path:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
+        from:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
+      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
+    DomainNames:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfDomainName'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of DomainName resources.
+    Op:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      - move
+      - copy
+      - test
   parameters:
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-Credential:
       name: X-Amz-Credential
       in: header
@@ -1022,14 +1010,26 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
       in: header
       schema:
         type: string
       required: false
     X-Amz-Content-Sha256:
       name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
       in: header
       schema:
         type: string

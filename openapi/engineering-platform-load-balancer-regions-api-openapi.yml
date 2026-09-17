@@ -107,12 +107,6 @@ paths:
       - Load Balancer Regions
 components:
   schemas:
-    load-balancing_components-schemas-identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
     load-balancing_messages:
       example: []
       items:
@@ -128,12 +122,84 @@ components:
         type: object
         uniqueItems: true
       type: array
+    load-balancing_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/load-balancing_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
+    load-balancing_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/load-balancing_messages'
+        messages:
+          $ref: '#/components/schemas/load-balancing_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    load-balancing_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/load-balancing_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/load-balancing_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     load-balancing_region_components-schemas-response_collection:
       allOf:
       - $ref: '#/components/schemas/load-balancing_api-response-single'
       - properties:
           result:
             type: object
+    load-balancing_components-schemas-identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    load-balancing_subdivision_code_a2:
+      description: Two-letter subdivision code followed in ISO 3166-2.
+      example: CA
+      type: string
     load-balancing_components-schemas-single_response:
       allOf:
       - $ref: '#/components/schemas/load-balancing_api-response-single'
@@ -182,54 +248,6 @@ components:
                     subdivision_name: Washington
                 region_code: WNAM
             type: object
-    load-balancing_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/load-balancing_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/load-balancing_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    load-balancing_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/load-balancing_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
-      type: object
-    load-balancing_subdivision_code_a2:
-      description: Two-letter subdivision code followed in ISO 3166-2.
-      example: CA
-      type: string
     load-balancing_region_code:
       description: 'A list of Cloudflare regions. WNAM: Western North America, ENAM: Eastern North America, WEU: Western Europe, EEU: Eastern Europe, NSAM: Northern South America, SSAM: Southern South America, OC: Oceania, ME: Middle East, NAF: North Africa, SAF: South Africa, SAS: Southern Asia, SEAS: South East Asia, NEAS: North East Asia).'
       enum:
@@ -248,24 +266,6 @@ components:
       - NEAS
       example: WNAM
       type: string
-    load-balancing_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/load-balancing_messages'
-        messages:
-          $ref: '#/components/schemas/load-balancing_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
   securitySchemes:
     api_email:
       in: header

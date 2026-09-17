@@ -53,12 +53,37 @@ paths:
       - Zero Trust Gateway Application and Application Type Mappings
 components:
   schemas:
-    zero-trust-gateway_app_id:
-      description: The identifier for this application. There is only one application per ID.
-      type: integer
-    zero-trust-gateway_app_type_id:
-      description: The identifier for the type of this application. There can be many applications with the same type. This refers to the `id` of a returned application type.
-      type: integer
+    zero-trust-gateway_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/zero-trust-gateway_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/zero-trust-gateway_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     zero-trust-gateway_app-types_components-schemas-response_collection:
       allOf:
       - $ref: '#/components/schemas/zero-trust-gateway_api-response-collection'
@@ -67,6 +92,13 @@ components:
             items:
               $ref: '#/components/schemas/zero-trust-gateway_app-types'
             type: array
+    zero-trust-gateway_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/zero-trust-gateway_result_info'
+      type: object
     zero-trust-gateway_api-response-common:
       properties:
         errors:
@@ -84,17 +116,16 @@ components:
       - errors
       - messages
       type: object
-    zero-trust-gateway_application:
-      properties:
-        application_type_id:
-          $ref: '#/components/schemas/zero-trust-gateway_app_type_id'
-        created_at:
-          $ref: '#/components/schemas/zero-trust-gateway_timestamp'
-        id:
-          $ref: '#/components/schemas/zero-trust-gateway_app_id'
-        name:
-          $ref: '#/components/schemas/zero-trust-gateway_app-types_components-schemas-name'
-      type: object
+    zero-trust-gateway_app-types_components-schemas-name:
+      description: The name of the application or application type.
+      example: Facebook
+      type: string
+    zero-trust-gateway_app_type_id:
+      description: The identifier for the type of this application. There can be many applications with the same type. This refers to the `id` of a returned application type.
+      type: integer
+    zero-trust-gateway_app_id:
+      description: The identifier for this application. There is only one application per ID.
+      type: integer
     zero-trust-gateway_result_info:
       properties:
         count:
@@ -127,6 +158,15 @@ components:
         name:
           $ref: '#/components/schemas/zero-trust-gateway_app-types_components-schemas-name'
       type: object
+    zero-trust-gateway_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    zero-trust-gateway_schemas-identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     zero-trust-gateway_messages:
       example: []
       items:
@@ -142,63 +182,23 @@ components:
         type: object
         uniqueItems: true
       type: array
-    zero-trust-gateway_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/zero-trust-gateway_result_info'
-      type: object
-    zero-trust-gateway_app-types_components-schemas-name:
-      description: The name of the application or application type.
-      example: Facebook
-      type: string
-    zero-trust-gateway_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    zero-trust-gateway_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/zero-trust-gateway_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/zero-trust-gateway_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     zero-trust-gateway_app-types:
       oneOf:
       - $ref: '#/components/schemas/zero-trust-gateway_application'
       - $ref: '#/components/schemas/zero-trust-gateway_application_type'
       readOnly: true
       type: object
-    zero-trust-gateway_schemas-identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
+    zero-trust-gateway_application:
+      properties:
+        application_type_id:
+          $ref: '#/components/schemas/zero-trust-gateway_app_type_id'
+        created_at:
+          $ref: '#/components/schemas/zero-trust-gateway_timestamp'
+        id:
+          $ref: '#/components/schemas/zero-trust-gateway_app_id'
+        name:
+          $ref: '#/components/schemas/zero-trust-gateway_app-types_components-schemas-name'
+      type: object
   securitySchemes:
     api_email:
       in: header

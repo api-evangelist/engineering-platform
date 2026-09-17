@@ -11,7 +11,7 @@ info:
   - x-release differs across the merged source definitions and was not carried
   - x-serviceName differs across the merged source definitions and was not carried
   version: '1.0'
-  description: 'Operations tagged Tags across 2 of this provider''s published API definitions: aws-api-gateway-openapi-original.yml, postman-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Tags across 3 of this provider''s published API definitions: aws-api-gateway-openapi-original.yml, aws-lambda-openapi-original.yml, postman-openapi-original.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: http://apigateway.{region}.amazonaws.com
   variables:
@@ -91,6 +91,84 @@ servers:
       - cn-northwest-1
       default: cn-north-1
   description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+- url: http://lambda.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The AWS Lambda multi-region endpoint
+- url: https://lambda.{region}.amazonaws.com
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+      - us-west-2
+      - us-gov-west-1
+      - us-gov-east-1
+      - ca-central-1
+      - eu-north-1
+      - eu-west-1
+      - eu-west-2
+      - eu-west-3
+      - eu-central-1
+      - eu-south-1
+      - af-south-1
+      - ap-northeast-1
+      - ap-northeast-2
+      - ap-northeast-3
+      - ap-southeast-1
+      - ap-southeast-2
+      - ap-east-1
+      - ap-south-1
+      - sa-east-1
+      - me-south-1
+      default: us-east-1
+  description: The AWS Lambda multi-region endpoint
+- url: http://lambda.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The AWS Lambda endpoint for China (Beijing) and China (Ningxia)
+- url: https://lambda.{region}.amazonaws.com.cn
+  variables:
+    region:
+      description: The AWS region
+      enum:
+      - cn-north-1
+      - cn-northwest-1
+      default: cn-north-1
+  description: The AWS Lambda endpoint for China (Beijing) and China (Ningxia)
 - url: https://api.getpostman.com
 - url: https://api.eu.postman.com
 tags:
@@ -457,6 +535,346 @@ paths:
           - cn-northwest-1
           default: cn-north-1
       description: The Amazon API Gateway endpoint for China (Beijing) and China (Ningxia)
+  /2017-03-31/tags/{ARN}:
+    parameters:
+    - $ref: '#/components/parameters/X-Amz-Content-Sha256'
+    - $ref: '#/components/parameters/X-Amz-Date'
+    - $ref: '#/components/parameters/X-Amz-Algorithm'
+    - $ref: '#/components/parameters/X-Amz-Credential'
+    - $ref: '#/components/parameters/X-Amz-Security-Token'
+    - $ref: '#/components/parameters/X-Amz-Signature'
+    - $ref: '#/components/parameters/X-Amz-SignedHeaders'
+    get:
+      operationId: ListTags
+      description: Returns a function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a>. You can also view tags with <a>GetFunction</a>.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTagsResponse'
+        '480':
+          description: ServiceException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '481':
+          description: ResourceNotFoundException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '482':
+          description: InvalidParameterValueException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterValueException'
+        '483':
+          description: TooManyRequestsException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+      parameters:
+      - name: ARN
+        in: path
+        required: true
+        description: 'The function''s Amazon Resource Name (ARN). Note: Lambda does not support adding tags to aliases or versions.'
+        schema:
+          type: string
+          pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_]+(:(\$LATEST|[a-zA-Z0-9-_]+))?
+      tags:
+      - Tags
+      security:
+      - hmac: []
+    post:
+      operationId: TagResource
+      description: Adds <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a> to a function.
+      responses:
+        '204':
+          description: Success
+        '480':
+          description: ServiceException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '481':
+          description: ResourceNotFoundException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '482':
+          description: InvalidParameterValueException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterValueException'
+        '483':
+          description: TooManyRequestsException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '484':
+          description: ResourceConflictException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceConflictException'
+      parameters:
+      - name: ARN
+        in: path
+        required: true
+        description: The function's Amazon Resource Name (ARN).
+        schema:
+          type: string
+          pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_]+(:(\$LATEST|[a-zA-Z0-9-_]+))?
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - Tags
+              properties:
+                Tags:
+                  description: A list of tags to apply to the function.
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/TagValue'
+      tags:
+      - Tags
+      security:
+      - hmac: []
+    servers:
+    - url: http://lambda.{region}.amazonaws.com
+      variables:
+        region:
+          description: The AWS region
+          enum:
+          - us-east-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+          - us-gov-west-1
+          - us-gov-east-1
+          - ca-central-1
+          - eu-north-1
+          - eu-west-1
+          - eu-west-2
+          - eu-west-3
+          - eu-central-1
+          - eu-south-1
+          - af-south-1
+          - ap-northeast-1
+          - ap-northeast-2
+          - ap-northeast-3
+          - ap-southeast-1
+          - ap-southeast-2
+          - ap-east-1
+          - ap-south-1
+          - sa-east-1
+          - me-south-1
+          default: us-east-1
+      description: The AWS Lambda multi-region endpoint
+    - url: https://lambda.{region}.amazonaws.com
+      variables:
+        region:
+          description: The AWS region
+          enum:
+          - us-east-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+          - us-gov-west-1
+          - us-gov-east-1
+          - ca-central-1
+          - eu-north-1
+          - eu-west-1
+          - eu-west-2
+          - eu-west-3
+          - eu-central-1
+          - eu-south-1
+          - af-south-1
+          - ap-northeast-1
+          - ap-northeast-2
+          - ap-northeast-3
+          - ap-southeast-1
+          - ap-southeast-2
+          - ap-east-1
+          - ap-south-1
+          - sa-east-1
+          - me-south-1
+          default: us-east-1
+      description: The AWS Lambda multi-region endpoint
+    - url: http://lambda.{region}.amazonaws.com.cn
+      variables:
+        region:
+          description: The AWS region
+          enum:
+          - cn-north-1
+          - cn-northwest-1
+          default: cn-north-1
+      description: The AWS Lambda endpoint for China (Beijing) and China (Ningxia)
+    - url: https://lambda.{region}.amazonaws.com.cn
+      variables:
+        region:
+          description: The AWS region
+          enum:
+          - cn-north-1
+          - cn-northwest-1
+          default: cn-north-1
+      description: The AWS Lambda endpoint for China (Beijing) and China (Ningxia)
+  /2017-03-31/tags/{ARN}#tagKeys:
+    parameters:
+    - $ref: '#/components/parameters/X-Amz-Content-Sha256'
+    - $ref: '#/components/parameters/X-Amz-Date'
+    - $ref: '#/components/parameters/X-Amz-Algorithm'
+    - $ref: '#/components/parameters/X-Amz-Credential'
+    - $ref: '#/components/parameters/X-Amz-Security-Token'
+    - $ref: '#/components/parameters/X-Amz-Signature'
+    - $ref: '#/components/parameters/X-Amz-SignedHeaders'
+    delete:
+      operationId: UntagResource
+      description: Removes <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a> from a function.
+      responses:
+        '204':
+          description: Success
+        '480':
+          description: ServiceException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '481':
+          description: ResourceNotFoundException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNotFoundException'
+        '482':
+          description: InvalidParameterValueException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidParameterValueException'
+        '483':
+          description: TooManyRequestsException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TooManyRequestsException'
+        '484':
+          description: ResourceConflictException
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceConflictException'
+      parameters:
+      - name: ARN
+        in: path
+        required: true
+        description: The function's Amazon Resource Name (ARN).
+        schema:
+          type: string
+          pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_]+(:(\$LATEST|[a-zA-Z0-9-_]+))?
+      - name: tagKeys
+        in: query
+        required: true
+        description: A list of tag keys to remove from the function.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagKey'
+      tags:
+      - Tags
+      security:
+      - hmac: []
+    servers:
+    - url: http://lambda.{region}.amazonaws.com
+      variables:
+        region:
+          description: The AWS region
+          enum:
+          - us-east-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+          - us-gov-west-1
+          - us-gov-east-1
+          - ca-central-1
+          - eu-north-1
+          - eu-west-1
+          - eu-west-2
+          - eu-west-3
+          - eu-central-1
+          - eu-south-1
+          - af-south-1
+          - ap-northeast-1
+          - ap-northeast-2
+          - ap-northeast-3
+          - ap-southeast-1
+          - ap-southeast-2
+          - ap-east-1
+          - ap-south-1
+          - sa-east-1
+          - me-south-1
+          default: us-east-1
+      description: The AWS Lambda multi-region endpoint
+    - url: https://lambda.{region}.amazonaws.com
+      variables:
+        region:
+          description: The AWS region
+          enum:
+          - us-east-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+          - us-gov-west-1
+          - us-gov-east-1
+          - ca-central-1
+          - eu-north-1
+          - eu-west-1
+          - eu-west-2
+          - eu-west-3
+          - eu-central-1
+          - eu-south-1
+          - af-south-1
+          - ap-northeast-1
+          - ap-northeast-2
+          - ap-northeast-3
+          - ap-southeast-1
+          - ap-southeast-2
+          - ap-east-1
+          - ap-south-1
+          - sa-east-1
+          - me-south-1
+          default: us-east-1
+      description: The AWS Lambda multi-region endpoint
+    - url: http://lambda.{region}.amazonaws.com.cn
+      variables:
+        region:
+          description: The AWS region
+          enum:
+          - cn-north-1
+          - cn-northwest-1
+          default: cn-north-1
+      description: The AWS Lambda endpoint for China (Beijing) and China (Ningxia)
+    - url: https://lambda.{region}.amazonaws.com.cn
+      variables:
+        region:
+          description: The AWS region
+          enum:
+          - cn-north-1
+          - cn-northwest-1
+          default: cn-north-1
+      description: The AWS Lambda endpoint for China (Beijing) and China (Ningxia)
   /tags/{slug}/entities:
     get:
       summary: APIs.io Engineering Platform Get elements by tag
@@ -500,16 +918,8 @@ paths:
     - url: https://api.eu.postman.com
 components:
   schemas:
-    ConflictException: {}
-    TooManyRequestsException: {}
-    UnauthorizedException: {}
-    String:
-      type: string
+    LimitExceededException: {}
     NotFoundException: {}
-    MapOfStringToString:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/String'
     Tags:
       type: object
       properties:
@@ -518,80 +928,57 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: The collection of tags. Each tag element is associated with a given resource.
-    LimitExceededException: {}
-    BadRequestException: {}
-    tag404Error:
-      title: Not Found
+    MapOfStringToString:
       type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/not-found
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Resource Not Found
-        detail:
-          type: string
-          description: Information about the error.
-          example: Slug 'needs-review' does not exist.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 404
-        instance:
-          type: string
-          description: The URI reference that identifies the specific occurrence of the problem.
-          example: /tags/needs-review/entities
-    tagElement400Error:
-      title: Bad Request
-      type: object
-      properties:
-        error:
-          type: string
-          description: A short summary of the problem.
-          example: Bad Request
-        message:
-          type: string
-          description: The error message.
-          example: params/slug must match pattern \"^[a-z][a-z0-9-]*[a-z0-9]+$\"
-        statusCode:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 400
-    tag401Error:
-      title: Unauthorized
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/unauthorized
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Unauthorized
-        detail:
-          type: string
-          description: Information about the error.
-          example: The request lacks valid credentials.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 401
-    ascDescDefaultDesc:
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    UnauthorizedException: {}
+    ConflictException: {}
+    String:
       type: string
-      default: desc
-      enum:
-      - asc
-      - desc
-      example: desc
+    TooManyRequestsException: {}
+    BadRequestException: {}
+    ResourceConflictException: {}
+    Tags_2:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+    TagKey:
+      type: string
+    ResourceNotFoundException: {}
+    ServiceException: {}
+    InvalidParameterValueException: {}
+    ListTagsResponse:
+      type: object
+      properties:
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags_2'
+          - description: The function's tags.
+    TagValue:
+      type: string
+    tag403Error:
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Access Denied
+        detail:
+          type: string
+          description: Information about the error.
+          example: The tags feature is only available to enterprise teams
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
     getTaggedEntities:
       title: Successful Response
       type: object
@@ -636,6 +1023,23 @@ components:
               format: base64
               description: The pagination cursor that points to the next record in the results set.
               example: eyJpZCI6ODYsImVudGl0eVR5cGUiOiJhcGkifQ==
+    tagElement400Error:
+      title: Bad Request
+      type: object
+      properties:
+        error:
+          type: string
+          description: A short summary of the problem.
+          example: Bad Request
+        message:
+          type: string
+          description: The error message.
+          example: params/slug must match pattern \"^[a-z][a-z0-9-]*[a-z0-9]+$\"
+        statusCode:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 400
     tag500Error:
       title: Unexpected Error
       type: object
@@ -662,37 +1066,70 @@ components:
           type: string
           example: /tags/hello-world/entities
           description: The URI reference that identifies the specific occurrence of the problem.
-    tag403Error:
-      title: Forbidden
+    tag401Error:
+      title: Unauthorized
       type: object
       properties:
         type:
           type: string
           format: uri-reference
           description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/forbidden
+          example: https://api.postman.com/problems/unauthorized
         title:
           type: string
           description: A short summary of the problem.
-          example: Access Denied
+          example: Unauthorized
         detail:
           type: string
           description: Information about the error.
-          example: The tags feature is only available to enterprise teams
+          example: The request lacks valid credentials.
         status:
           type: integer
           format: http-status-code
           description: The error's HTTP status code.
-          example: 403
+          example: 401
+    ascDescDefaultDesc:
+      type: string
+      default: desc
+      enum:
+      - asc
+      - desc
+      example: desc
+    tag404Error:
+      title: Not Found
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/not-found
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Resource Not Found
+        detail:
+          type: string
+          description: Information about the error.
+          example: Slug 'needs-review' does not exist.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 404
+        instance:
+          type: string
+          description: The URI reference that identifies the specific occurrence of the problem.
+          example: /tags/needs-review/entities
   parameters:
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
       in: header
       schema:
         type: string
       required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
+    X-Amz-Credential:
+      name: X-Amz-Credential
       in: header
       schema:
         type: string
@@ -709,30 +1146,32 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-Date:
       name: X-Amz-Date
       in: header
       schema:
         type: string
       required: false
-    X-Amz-Credential:
-      name: X-Amz-Credential
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
       in: header
       schema:
         type: string
       required: false
-    tagsEntitiesDirection:
-      name: direction
-      in: query
-      description: The ascending (`asc`) or descending (`desc`) order to sort the results by, based on the time of the entity's tagging.
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
       schema:
-        $ref: '#/components/schemas/ascDescDefaultDesc'
+        type: string
+      required: false
+    tagsCursor:
+      name: cursor
+      in: query
+      description: The cursor to get the next set of results in the paginated response. If you pass an invalid value, the API only returns the first set of results.
+      schema:
+        type: string
+        format: base64
+        example: eyJpZCI6ODYsImVudGl0eVR5cGUiOiJhcGkifQ==
     tagsSlug:
       name: slug
       in: path
@@ -744,15 +1183,6 @@ components:
         maxLength: 64
         minLength: 2
         example: needs-review
-    tagsEntitiesLimit:
-      name: limit
-      in: query
-      description: The maximum number of tagged elements to return in a single call.
-      schema:
-        type: integer
-        default: 10
-        maximum: 50
-        example: 2
     tagsEntityType:
       name: entityType
       in: query
@@ -764,50 +1194,22 @@ components:
         - collection
         - workspace
         example: collection
-    tagsCursor:
-      name: cursor
+    tagsEntitiesLimit:
+      name: limit
       in: query
-      description: The cursor to get the next set of results in the paginated response. If you pass an invalid value, the API only returns the first set of results.
+      description: The maximum number of tagged elements to return in a single call.
       schema:
-        type: string
-        format: base64
-        example: eyJpZCI6ODYsImVudGl0eVR5cGUiOiJhcGkifQ==
+        type: integer
+        default: 10
+        maximum: 50
+        example: 2
+    tagsEntitiesDirection:
+      name: direction
+      in: query
+      description: The ascending (`asc`) or descending (`desc`) order to sort the results by, based on the time of the entity's tagging.
+      schema:
+        $ref: '#/components/schemas/ascDescDefaultDesc'
   responses:
-    tag404Error:
-      description: Not Found
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag404Error'
-          example:
-            type: https://api.postman.com/problems/not-found
-            title: Resource Not Found
-            detail: Slug 'needs-review' does not exist.
-            status: 404
-            instance: /tags/needs-review/entities
-    tag403Error:
-      description: Forbidden
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag403Error'
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Access Denied
-            detail: The tags feature is only available to enterprise teams
-            status: 403
-    tag500Error:
-      description: Unexpected Error
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag500Error'
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Something went wrong
-            detail: Something went wrong while fetching entities having the provided slug.
-            status: 500
-            instance: /tags/needs-review/entities
     getTaggedEntities:
       description: Successful Response
       content:
@@ -832,6 +1234,41 @@ components:
             title: Unauthorized
             detail: The request lacks valid credentials.
             status: 401
+    tag500Error:
+      description: Unexpected Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag500Error'
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Something went wrong
+            detail: Something went wrong while fetching entities having the provided slug.
+            status: 500
+            instance: /tags/needs-review/entities
+    tag403Error:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag403Error'
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Access Denied
+            detail: The tags feature is only available to enterprise teams
+            status: 403
+    tag404Error:
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag404Error'
+          example:
+            type: https://api.postman.com/problems/not-found
+            title: Resource Not Found
+            detail: Slug 'needs-review' does not exist.
+            status: 404
+            instance: /tags/needs-review/entities
     tagElement400Error:
       description: Bad Request
       content:
@@ -858,10 +1295,8 @@ components:
       in: header
       name: Authorization
       description: A valid [SCIM API key](https://learning.postman.com/docs/administration/scim-provisioning/scim-provisioning-overview/#generating-scim-api-key) for calls to SCIM endpoints.
-externalDocs:
-  description: Amazon Web Services documentation
-  url: https://docs.aws.amazon.com/apigateway/
 x-refined-from:
 - aws-api-gateway-openapi-original.yml
+- aws-lambda-openapi-original.yml
 - postman-openapi-original.yml
 x-hasEquivalentPaths: true

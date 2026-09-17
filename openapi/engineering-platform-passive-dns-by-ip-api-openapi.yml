@@ -73,6 +73,94 @@ paths:
       - Passive DNS by IP
 components:
   schemas:
+    intel_schemas-api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/intel_messages'
+        messages:
+          $ref: '#/components/schemas/intel_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    intel_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/intel_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/intel_passive-dns-by-ip'
+    intel_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/intel_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/intel_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    intel_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    intel_start_end_params:
+      properties:
+        end:
+          description: Defaults to the current date.
+          example: '2021-04-30'
+          format: date
+          type: string
+        start:
+          description: Defaults to 30 days before the end parameter value.
+          example: '2021-04-01'
+          format: date
+          type: string
+      type: object
+    intel_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     intel_passive-dns-by-ip:
       properties:
         count:
@@ -105,97 +193,9 @@ components:
                 type: string
             type: object
           type: array
-    intel_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    intel_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     intel_api-response-single:
       allOf:
       - $ref: '#/components/schemas/intel_schemas-api-response-common'
-      type: object
-    intel_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/intel_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/intel_passive-dns-by-ip'
-    intel_schemas-api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/intel_messages'
-        messages:
-          $ref: '#/components/schemas/intel_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    intel_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/intel_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/intel_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    intel_start_end_params:
-      properties:
-        end:
-          description: Defaults to the current date.
-          example: '2021-04-30'
-          format: date
-          type: string
-        start:
-          description: Defaults to 30 days before the end parameter value.
-          example: '2021-04-01'
-          format: date
-          type: string
       type: object
   securitySchemes:
     api_email:

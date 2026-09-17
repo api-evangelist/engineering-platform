@@ -64,6 +64,26 @@ paths:
       - Cloudflare IPs
 components:
   schemas:
+    addressing_ips:
+      properties:
+        etag:
+          $ref: '#/components/schemas/addressing_etag'
+        ipv4_cidrs:
+          $ref: '#/components/schemas/addressing_ipv4_cidrs'
+        ipv6_cidrs:
+          $ref: '#/components/schemas/addressing_ipv6_cidrs'
+      type: object
+    addressing_ips_jdcloud:
+      properties:
+        etag:
+          $ref: '#/components/schemas/addressing_etag'
+        ipv4_cidrs:
+          $ref: '#/components/schemas/addressing_ipv4_cidrs'
+        ipv6_cidrs:
+          $ref: '#/components/schemas/addressing_ipv6_cidrs'
+        jdcloud_cidrs:
+          $ref: '#/components/schemas/addressing_jdcloud_cidrs'
+      type: object
     addressing_jdcloud_cidrs:
       description: List IPv4 and IPv6 CIDRs, only populated if `?networks=jdcloud` is used.
       items:
@@ -71,6 +91,48 @@ components:
         example: 199.27.128.0/21
         type: string
       type: array
+    addressing_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/addressing_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/addressing_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    addressing_ipv4_cidrs:
+      description: List of Cloudflare IPv4 CIDR addresses.
+      items:
+        description: IPv4 CIDR.
+        example: 199.27.128.0/21
+        type: string
+      type: array
+    addressing_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-common'
+      type: object
     addressing_ipv6_cidrs:
       description: List of Cloudflare IPv6 CIDR addresses.
       items:
@@ -78,6 +140,10 @@ components:
         example: 2400:cb00::/32
         type: string
       type: array
+    addressing_etag:
+      description: A digest of the IP data. Useful for determining if the data has changed.
+      example: a8e453d9d129a3769407127936edfdb0
+      type: string
     addressing_messages:
       example: []
       items:
@@ -110,72 +176,6 @@ components:
       - errors
       - messages
       type: object
-    addressing_ips:
-      properties:
-        etag:
-          $ref: '#/components/schemas/addressing_etag'
-        ipv4_cidrs:
-          $ref: '#/components/schemas/addressing_ipv4_cidrs'
-        ipv6_cidrs:
-          $ref: '#/components/schemas/addressing_ipv6_cidrs'
-      type: object
-    addressing_ipv4_cidrs:
-      description: List of Cloudflare IPv4 CIDR addresses.
-      items:
-        description: IPv4 CIDR.
-        example: 199.27.128.0/21
-        type: string
-      type: array
-    addressing_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-common'
-      type: object
-    addressing_ips_jdcloud:
-      properties:
-        etag:
-          $ref: '#/components/schemas/addressing_etag'
-        ipv4_cidrs:
-          $ref: '#/components/schemas/addressing_ipv4_cidrs'
-        ipv6_cidrs:
-          $ref: '#/components/schemas/addressing_ipv6_cidrs'
-        jdcloud_cidrs:
-          $ref: '#/components/schemas/addressing_jdcloud_cidrs'
-      type: object
-    addressing_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/addressing_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/addressing_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    addressing_etag:
-      description: A digest of the IP data. Useful for determining if the data has changed.
-      example: a8e453d9d129a3769407127936edfdb0
-      type: string
   securitySchemes:
     api_email:
       in: header

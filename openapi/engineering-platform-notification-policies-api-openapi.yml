@@ -260,116 +260,6 @@ paths:
       - Account Settings Write
 components:
   schemas:
-    aaa_single_response:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/aaa_policies'
-    aaa_policy-id:
-      description: The unique identifier of a notification policy
-      example: 0da2b59e-f118-439d-8097-bdfb215203c9
-      maxLength: 36
-      readOnly: true
-      type: string
-    aaa_schemas-description:
-      description: Optional description for the Notification policy.
-      example: Something describing the policy.
-      type: string
-    aaa_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/aaa_result_info'
-      type: object
-    aaa_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    aaa_policies:
-      properties:
-        alert_interval:
-          $ref: '#/components/schemas/aaa_alert_interval'
-        alert_type:
-          $ref: '#/components/schemas/aaa_alert_type'
-        created:
-          $ref: '#/components/schemas/aaa_timestamp'
-        description:
-          $ref: '#/components/schemas/aaa_schemas-description'
-        enabled:
-          $ref: '#/components/schemas/aaa_enabled'
-        filters:
-          $ref: '#/components/schemas/aaa_filters'
-        id:
-          $ref: '#/components/schemas/aaa_policy-id'
-        mechanisms:
-          $ref: '#/components/schemas/aaa_mechanisms'
-        modified:
-          $ref: '#/components/schemas/aaa_timestamp'
-        name:
-          $ref: '#/components/schemas/aaa_schemas-name'
-      type: object
-    aaa_enabled:
-      default: true
-      description: Whether or not the Notification policy is enabled.
-      example: true
-      type: boolean
-    aaa_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      readOnly: true
-      type: string
-      x-auditable: true
-    aaa_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      readOnly: true
-      type: string
-    aaa_schemas-name:
-      description: Name of the policy.
-      example: SSL Notification Event Policy
-      type: string
-    aaa_alert_interval:
-      description: Optional specification of how often to re-alert from the same incident, not support on all alert types.
-      example: 30m
-      type: string
-    aaa_schemas-api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/aaa_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/aaa_messages'
-          example: []
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
     aaa_alert_type:
       description: Refers to which event will trigger a Notification dispatch. You can use the endpoint to get available alert types which then will give you a list of possible values.
       enum:
@@ -438,88 +328,46 @@ components:
       - zone_aop_custom_certificate_expiration_type
       example: universal_ssl_event_type
       type: string
-    aaa_account-id:
-      description: The account id
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    aaa_alert_interval:
+      description: Optional specification of how often to re-alert from the same incident, not support on all alert types.
+      example: 30m
+      type: string
+    aaa_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
       readOnly: true
       type: string
-    aaa_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/aaa_messages'
-        messages:
-          $ref: '#/components/schemas/aaa_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    aaa_id_response:
+    aaa_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    aaa_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      readOnly: true
+      type: string
+      x-auditable: true
+    aaa_single_response:
       allOf:
       - $ref: '#/components/schemas/aaa_api-response-single'
       - properties:
           result:
-            properties:
-              id:
-                $ref: '#/components/schemas/aaa_uuid'
-            type: object
-    aaa_policies_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/aaa_policies'
-            type: array
-    aaa_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
+            $ref: '#/components/schemas/aaa_policies'
     aaa_api-response-single:
       allOf:
       - $ref: '#/components/schemas/aaa_api-response-common'
-      type: object
-    aaa_mechanisms:
-      additionalProperties:
-        items:
-          properties:
-            id:
-              oneOf:
-              - $ref: '#/components/schemas/aaa_uuid'
-              - description: The email address
-                type: string
-          type: object
-        type: array
-      description: List of IDs that will be used when dispatching a notification. IDs for email type will be the email address.
-      example:
-        email:
-        - id: test@example.com
-        pagerduty:
-        - id: e8133a15-00a4-4d69-aec1-32f70c51f6e5
-        webhooks:
-        - id: 14cc1190-5d2b-4b98-a696-c424cb2ad05f
       type: object
     aaa_filters:
       description: Optional filters that allow you to be alerted only on a subset of events for that alert type based on some criteria. This is only available for select alert types. See alert type documentation for more details.
@@ -750,6 +598,158 @@ components:
             type: string
           type: array
       type: object
+    aaa_policy-id:
+      description: The unique identifier of a notification policy
+      example: 0da2b59e-f118-439d-8097-bdfb215203c9
+      maxLength: 36
+      readOnly: true
+      type: string
+    aaa_enabled:
+      default: true
+      description: Whether or not the Notification policy is enabled.
+      example: true
+      type: boolean
+    aaa_schemas-name:
+      description: Name of the policy.
+      example: SSL Notification Event Policy
+      type: string
+    aaa_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/aaa_messages'
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_policies:
+      properties:
+        alert_interval:
+          $ref: '#/components/schemas/aaa_alert_interval'
+        alert_type:
+          $ref: '#/components/schemas/aaa_alert_type'
+        created:
+          $ref: '#/components/schemas/aaa_timestamp'
+        description:
+          $ref: '#/components/schemas/aaa_schemas-description'
+        enabled:
+          $ref: '#/components/schemas/aaa_enabled'
+        filters:
+          $ref: '#/components/schemas/aaa_filters'
+        id:
+          $ref: '#/components/schemas/aaa_policy-id'
+        mechanisms:
+          $ref: '#/components/schemas/aaa_mechanisms'
+        modified:
+          $ref: '#/components/schemas/aaa_timestamp'
+        name:
+          $ref: '#/components/schemas/aaa_schemas-name'
+      type: object
+    aaa_policies_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/aaa_policies'
+            type: array
+    aaa_id_response:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/aaa_uuid'
+            type: object
+    aaa_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    aaa_account-id:
+      description: The account id
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    aaa_schemas-api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example: []
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/aaa_result_info'
+      type: object
+    aaa_mechanisms:
+      additionalProperties:
+        items:
+          properties:
+            id:
+              oneOf:
+              - $ref: '#/components/schemas/aaa_uuid'
+              - description: The email address
+                type: string
+          type: object
+        type: array
+      description: List of IDs that will be used when dispatching a notification. IDs for email type will be the email address.
+      example:
+        email:
+        - id: test@example.com
+        pagerduty:
+        - id: e8133a15-00a4-4d69-aec1-32f70c51f6e5
+        webhooks:
+        - id: 14cc1190-5d2b-4b98-a696-c424cb2ad05f
+      type: object
+    aaa_schemas-description:
+      description: Optional description for the Notification policy.
+      example: Something describing the policy.
+      type: string
   securitySchemes:
     api_email:
       in: header

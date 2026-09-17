@@ -54,6 +54,25 @@ paths:
       - 'Access: Certificates Read'
 components:
   schemas:
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    access_fingerprint:
+      description: The MD5 fingerprint of the certificate.
+      example: MD5 Fingerprint=1E:80:0F:7A:FD:31:55:96:DE:D5:CB:E2:F0:91:F6:91
+      type: string
     access_result_info:
       properties:
         count:
@@ -73,33 +92,9 @@ components:
           example: 2000
           type: number
       type: object
-    access_associated_hostnames:
-      description: The hostnames of the applications that will use this certificate.
-      items:
-        description: A fully-qualified domain name (FQDN).
-        example: admin.example.com
-        type: string
-      type: array
-    access_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/access_messages'
-        messages:
-          $ref: '#/components/schemas/access_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
+    access_certificates_components-schemas-name:
+      description: The name of the certificate.
+      example: Allow devs
       type: string
     access_api-response-collection:
       allOf:
@@ -108,28 +103,14 @@ components:
           result_info:
             $ref: '#/components/schemas/access_result_info'
       type: object
-    access_schemas-certificates:
-      properties:
-        associated_hostnames:
-          $ref: '#/components/schemas/access_associated_hostnames'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        expires_on:
-          $ref: '#/components/schemas/access_timestamp'
-        fingerprint:
-          $ref: '#/components/schemas/access_fingerprint'
-        id:
-          description: The ID of the application that will use this certificate.
-        name:
-          $ref: '#/components/schemas/access_certificates_components-schemas-name'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
+    access_certificates_components-schemas-response_collection-2:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_schemas-certificates'
+            type: array
     access_api-response-common-failure:
       properties:
         errors:
@@ -161,36 +142,55 @@ components:
       - messages
       - result
       type: object
-    access_certificates_components-schemas-response_collection-2:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_schemas-certificates'
-            type: array
-    access_certificates_components-schemas-name:
-      description: The name of the certificate.
-      example: Allow devs
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
-    access_fingerprint:
-      description: The MD5 fingerprint of the certificate.
-      example: MD5 Fingerprint=1E:80:0F:7A:FD:31:55:96:DE:D5:CB:E2:F0:91:F6:91
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
       type: string
-    access_messages:
-      example: []
+    access_schemas-certificates:
+      properties:
+        associated_hostnames:
+          $ref: '#/components/schemas/access_associated_hostnames'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        expires_on:
+          $ref: '#/components/schemas/access_timestamp'
+        fingerprint:
+          $ref: '#/components/schemas/access_fingerprint'
+        id:
+          description: The ID of the application that will use this certificate.
+        name:
+          $ref: '#/components/schemas/access_certificates_components-schemas-name'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      type: object
+    access_associated_hostnames:
+      description: The hostnames of the applications that will use this certificate.
       items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
+        description: A fully-qualified domain name (FQDN).
+        example: admin.example.com
+        type: string
       type: array
   securitySchemes:
     api_email:

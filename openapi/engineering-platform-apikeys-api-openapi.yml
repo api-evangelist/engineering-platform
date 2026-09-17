@@ -446,56 +446,10 @@ paths:
       - Apikeys
 components:
   schemas:
-    ConflictException: {}
-    PatchOperation:
-      type: object
-      properties:
-        op:
-          allOf:
-          - $ref: '#/components/schemas/Op'
-          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
-        path:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
-        value:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
-        from:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
-      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
-    ApiKeys:
-      type: object
-      properties:
-        warnings:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of warning messages logged during the import of API keys when the <code>failOnWarnings</code> option is set to true.
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfApiKey'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of API keys as represented by an ApiKeys resource.
     MapOfStringToString:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
-    Boolean:
-      type: boolean
-    LimitExceededException: {}
-    Timestamp:
-      type: string
-      format: date-time
-    UnauthorizedException: {}
-    String:
-      type: string
     ApiKey:
       type: object
       properties:
@@ -540,26 +494,17 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: A resource that can be distributed to callers for executing Method resources that require an API key. API keys can be mapped to any Stage on any RestApi, which indicates that the callers with the API key can make requests to that stage.
-    NotFoundException: {}
-    Op:
-      type: string
-      enum:
-      - add
-      - remove
-      - replace
-      - move
-      - copy
-      - test
-    BadRequestException: {}
-    TooManyRequestsException: {}
-    ListOfString:
-      type: array
-      items:
-        $ref: '#/components/schemas/String'
     ListOfApiKey:
       type: array
       items:
         $ref: '#/components/schemas/ApiKey'
+    TooManyRequestsException: {}
+    NotFoundException: {}
+    UnauthorizedException: {}
+    ConflictException: {}
+    Timestamp:
+      type: string
+      format: date-time
     StageKey:
       type: object
       properties:
@@ -572,19 +517,62 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The stage name associated with the stage key.
       description: A reference to a unique stage identified in the format <code>{restApiId}/{stage}</code>.
+    ListOfString:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
+    BadRequestException: {}
+    LimitExceededException: {}
+    String:
+      type: string
+    PatchOperation:
+      type: object
+      properties:
+        op:
+          allOf:
+          - $ref: '#/components/schemas/Op'
+          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
+        path:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
+        from:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
+      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
+    ApiKeys:
+      type: object
+      properties:
+        warnings:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of warning messages logged during the import of API keys when the <code>failOnWarnings</code> option is set to true.
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfApiKey'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of API keys as represented by an ApiKeys resource.
+    Op:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      - move
+      - copy
+      - test
+    Boolean:
+      type: boolean
   parameters:
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-Credential:
       name: X-Amz-Credential
       in: header
@@ -603,14 +591,26 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
       in: header
       schema:
         type: string
       required: false
     X-Amz-Content-Sha256:
       name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
       in: header
       schema:
         type: string

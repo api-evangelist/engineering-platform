@@ -382,6 +382,38 @@ paths:
         pro: false
 components:
   schemas:
+    dns-firewall_dns-firewall-reverse-dns-response:
+      allOf:
+      - $ref: '#/components/schemas/dns-firewall_dns-firewall-reverse-dns'
+      required:
+      - ptr
+      type: object
+    dns-firewall_dns-firewall-cluster-response:
+      allOf:
+      - $ref: '#/components/schemas/dns-firewall_dns-firewall-cluster'
+      - properties:
+          dns_firewall_ips:
+            $ref: '#/components/schemas/dns-firewall_dns_firewall_ips'
+          id:
+            $ref: '#/components/schemas/dns-firewall_identifier'
+          modified_on:
+            $ref: '#/components/schemas/dns-firewall_modified_on'
+        required:
+        - id
+        - dns_firewall_ips
+        - modified_on
+        type: object
+      required:
+      - name
+      - upstream_ips
+      - minimum_cache_ttl
+      - maximum_cache_ttl
+      - negative_cache_ttl
+      - deprecate_any_requests
+      - ecs_fallback
+      - ratelimit
+      - retries
+      type: object
     dns-firewall_result_info:
       properties:
         count:
@@ -401,11 +433,27 @@ components:
           example: 2000
           type: number
       type: object
-    dns-firewall_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
+    dns-firewall_upstream_ips:
+      example:
+      - 192.0.2.1
+      - 198.51.100.1
+      - 2001:DB8:100::CF
+      items:
+        anyOf:
+        - description: Upstream DNS Server IPv4 address
+          example: 192.0.2.1
+          format: ipv4
+          type: string
+        - description: Upstream DNS Server IPv6 address
+          example: 2001:DB8:100::CF
+          format: ipv6
+          type: string
+      minLength: 1
+      type: array
+    dns-firewall_ecs_fallback:
+      description: Whether to forward client IP (resolver) subnet if no EDNS Client Subnet is sent
+      example: false
+      type: boolean
     dns-firewall_maximum_cache_ttl:
       default: 900
       description: Maximum DNS cache TTL This setting sets an upper bound on DNS TTLs for purposes of caching between DNS Firewall and the upstream servers. Higher TTLs will be decreased to the maximum defined here for caching purposes.
@@ -413,67 +461,6 @@ components:
       maximum: 36000
       minimum: 30
       type: number
-    dns-firewall_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    dns-firewall_ecs_fallback:
-      description: Whether to forward client IP (resolver) subnet if no EDNS Client Subnet is sent
-      example: false
-      type: boolean
-    dns-firewall_attack_mitigation:
-      description: Attack mitigation settings
-      properties:
-        enabled:
-          description: When enabled, automatically mitigate random-prefix attacks to protect upstream DNS servers
-          example: true
-          type: boolean
-        only_when_upstream_unhealthy:
-          default: true
-          description: Only mitigate attacks when upstream servers seem unhealthy
-          example: false
-          type: boolean
-      type:
-      - object
-      - 'null'
-    dns-firewall_dns-firewall-cluster-post:
-      allOf:
-      - $ref: '#/components/schemas/dns-firewall_dns-firewall-cluster'
-      required:
-      - name
-      - upstream_ips
-      type: object
-    dns-firewall_name:
-      description: DNS Firewall cluster name
-      example: My Awesome DNS Firewall cluster
-      maxLength: 160
-      minLength: 1
-      type: string
-    dns-firewall_dns_firewall_single_response:
-      allOf:
-      - $ref: '#/components/schemas/dns-firewall_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/dns-firewall_dns-firewall-cluster-response'
-    dns-firewall_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dns-firewall_api-response-common'
-      type: object
-    dns-firewall_deprecate_any_requests:
-      description: Whether to refuse to answer queries for the ANY type
-      example: true
-      type: boolean
     dns-firewall_api-response-common-failure:
       properties:
         errors:
@@ -505,64 +492,40 @@ components:
       - messages
       - result
       type: object
-    dns-firewall_dns-firewall-reverse-dns-patch:
+    dns-firewall_dns_firewall_single_response:
       allOf:
-      - $ref: '#/components/schemas/dns-firewall_dns-firewall-reverse-dns'
-      type: object
-    dns-firewall_upstream_ips:
-      example:
-      - 192.0.2.1
-      - 198.51.100.1
-      - 2001:DB8:100::CF
-      items:
-        anyOf:
-        - description: Upstream DNS Server IPv4 address
-          example: 192.0.2.1
-          format: ipv4
-          type: string
-        - description: Upstream DNS Server IPv6 address
-          example: 2001:DB8:100::CF
-          format: ipv6
-          type: string
-      minLength: 1
-      type: array
-    dns-firewall_dns_firewall_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/dns-firewall_api-response-collection'
+      - $ref: '#/components/schemas/dns-firewall_api-response-single'
       - properties:
           result:
-            items:
-              $ref: '#/components/schemas/dns-firewall_dns-firewall-cluster-response'
-            type: array
+            $ref: '#/components/schemas/dns-firewall_dns-firewall-cluster-response'
+    dns-firewall_modified_on:
+      description: Last modification of DNS Firewall cluster
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    dns-firewall_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dns-firewall_api-response-common'
+      type: object
+    dns-firewall_attack_mitigation:
+      description: Attack mitigation settings
+      properties:
+        enabled:
+          description: When enabled, automatically mitigate random-prefix attacks to protect upstream DNS servers
+          example: true
+          type: boolean
+        only_when_upstream_unhealthy:
+          default: true
+          description: Only mitigate attacks when upstream servers seem unhealthy
+          example: false
+          type: boolean
+      type:
+      - object
+      - 'null'
     dns-firewall_dns-firewall-cluster-patch:
       allOf:
       - $ref: '#/components/schemas/dns-firewall_dns-firewall-cluster'
       type: object
-    dns-firewall_dns_firewall_ips:
-      example:
-      - 203.0.113.1
-      - 203.0.113.254
-      - 2001:DB8:AB::CF
-      - 2001:DB8:CD::CF
-      items:
-        anyOf:
-        - description: Cloudflare-assigned DNS IPv4 address
-          example: 203.0.113.1
-          format: ipv4
-          type: string
-        - description: Cloudflare-assigned DNS IPv6 address
-          example: 2001:DB8:ab::CF
-          format: ipv6
-          type: string
-      type: array
-    dns-firewall_negative_cache_ttl:
-      description: Negative DNS cache TTL This setting controls how long DNS Firewall should cache negative responses (e.g., NXDOMAIN) from the upstream servers.
-      example: 900
-      maximum: 36000
-      minimum: 30
-      type:
-      - number
-      - 'null'
     dns-firewall_dns-firewall-cluster:
       properties:
         attack_mitigation:
@@ -586,40 +549,12 @@ components:
         upstream_ips:
           $ref: '#/components/schemas/dns-firewall_upstream_ips'
       type: object
-    dns-firewall_dns-firewall-cluster-response:
+    dns-firewall_dns-firewall-cluster-post:
       allOf:
       - $ref: '#/components/schemas/dns-firewall_dns-firewall-cluster'
-      - properties:
-          dns_firewall_ips:
-            $ref: '#/components/schemas/dns-firewall_dns_firewall_ips'
-          id:
-            $ref: '#/components/schemas/dns-firewall_identifier'
-          modified_on:
-            $ref: '#/components/schemas/dns-firewall_modified_on'
-        required:
-        - id
-        - dns_firewall_ips
-        - modified_on
-        type: object
       required:
       - name
       - upstream_ips
-      - minimum_cache_ttl
-      - maximum_cache_ttl
-      - negative_cache_ttl
-      - deprecate_any_requests
-      - ecs_fallback
-      - ratelimit
-      - retries
-      type: object
-    dns-firewall_dns-firewall-reverse-dns:
-      properties:
-        ptr:
-          additionalProperties:
-            description: PTR record content
-            type: string
-          description: Map of cluster IP addresses to PTR record contents
-          type: object
       type: object
     dns-firewall_api-response-common:
       properties:
@@ -638,10 +573,33 @@ components:
       - errors
       - messages
       type: object
-    dns-firewall_modified_on:
-      description: Last modification of DNS Firewall cluster
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
+    dns-firewall_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dns-firewall_dns_firewall_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/dns-firewall_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/dns-firewall_dns-firewall-cluster-response'
+            type: array
+    dns-firewall_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
     dns-firewall_ratelimit:
       description: Ratelimit in queries per second per datacenter (applies to DNS queries sent to the upstream nameservers configured on the cluster)
@@ -651,17 +609,64 @@ components:
       type:
       - number
       - 'null'
+    dns-firewall_retries:
+      default: 2
+      description: Number of retries for fetching DNS responses from upstream nameservers (not counting the initial attempt)
+      example: 2
+      maximum: 2
+      minimum: 0
+      type: number
+    dns-firewall_negative_cache_ttl:
+      description: Negative DNS cache TTL This setting controls how long DNS Firewall should cache negative responses (e.g., NXDOMAIN) from the upstream servers.
+      example: 900
+      maximum: 36000
+      minimum: 30
+      type:
+      - number
+      - 'null'
+    dns-firewall_dns-firewall-reverse-dns-patch:
+      allOf:
+      - $ref: '#/components/schemas/dns-firewall_dns-firewall-reverse-dns'
+      type: object
+    dns-firewall_name:
+      description: DNS Firewall cluster name
+      example: My Awesome DNS Firewall cluster
+      maxLength: 160
+      minLength: 1
+      type: string
+    dns-firewall_deprecate_any_requests:
+      description: Whether to refuse to answer queries for the ANY type
+      example: true
+      type: boolean
     dns-firewall_dns_firewall_reverse_dns_response:
       allOf:
       - $ref: '#/components/schemas/dns-firewall_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/dns-firewall_dns-firewall-reverse-dns-response'
-    dns-firewall_dns-firewall-reverse-dns-response:
+    dns-firewall_dns_firewall_ips:
+      example:
+      - 203.0.113.1
+      - 203.0.113.254
+      - 2001:DB8:AB::CF
+      - 2001:DB8:CD::CF
+      items:
+        anyOf:
+        - description: Cloudflare-assigned DNS IPv4 address
+          example: 203.0.113.1
+          format: ipv4
+          type: string
+        - description: Cloudflare-assigned DNS IPv6 address
+          example: 2001:DB8:ab::CF
+          format: ipv6
+          type: string
+      type: array
+    dns-firewall_api-response-collection:
       allOf:
-      - $ref: '#/components/schemas/dns-firewall_dns-firewall-reverse-dns'
-      required:
-      - ptr
+      - $ref: '#/components/schemas/dns-firewall_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/dns-firewall_result_info'
       type: object
     dns-firewall_minimum_cache_ttl:
       default: 60
@@ -670,20 +675,15 @@ components:
       maximum: 36000
       minimum: 30
       type: number
-    dns-firewall_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/dns-firewall_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/dns-firewall_result_info'
+    dns-firewall_dns-firewall-reverse-dns:
+      properties:
+        ptr:
+          additionalProperties:
+            description: PTR record content
+            type: string
+          description: Map of cluster IP addresses to PTR record contents
+          type: object
       type: object
-    dns-firewall_retries:
-      default: 2
-      description: Number of retries for fetching DNS responses from upstream nameservers (not counting the initial attempt)
-      example: 2
-      maximum: 2
-      minimum: 0
-      type: number
   securitySchemes:
     api_email:
       in: header

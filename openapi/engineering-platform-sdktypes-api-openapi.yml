@@ -226,8 +226,44 @@ paths:
       - Sdktypes
 components:
   schemas:
-    TooManyRequestsException: {}
+    SdkTypes:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfSdkType'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: The collection of SdkType instances.
+    NotFoundException: {}
     UnauthorizedException: {}
+    SdkType:
+      type: object
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The identifier of an SdkType instance.
+        friendlyName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The user-friendly name of an SdkType instance.
+        description:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The description of an SdkType.
+        configurationProperties:
+          allOf:
+          - $ref: '#/components/schemas/ListOfSdkConfigurationProperty'
+          - description: A list of configuration properties of an SdkType.
+      description: A type of SDK that API Gateway can generate.
+    ListOfSdkConfigurationProperty:
+      type: array
+      items:
+        $ref: '#/components/schemas/SdkConfigurationProperty'
     SdkConfigurationProperty:
       type: object
       properties:
@@ -252,55 +288,25 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The default value of an SdkType configuration property.
       description: A configuration property of an SDK type.
-    SdkTypes:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfSdkType'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: The collection of SdkType instances.
-    String:
-      type: string
-    ListOfSdkConfigurationProperty:
-      type: array
-      items:
-        $ref: '#/components/schemas/SdkConfigurationProperty'
-    NotFoundException: {}
-    SdkType:
-      type: object
-      properties:
-        id:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The identifier of an SdkType instance.
-        friendlyName:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The user-friendly name of an SdkType instance.
-        description:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The description of an SdkType.
-        configurationProperties:
-          allOf:
-          - $ref: '#/components/schemas/ListOfSdkConfigurationProperty'
-          - description: A list of configuration properties of an SdkType.
-      description: A type of SDK that API Gateway can generate.
-    Boolean:
-      type: boolean
     ListOfSdkType:
       type: array
       items:
         $ref: '#/components/schemas/SdkType'
+    String:
+      type: string
+    TooManyRequestsException: {}
+    Boolean:
+      type: boolean
     BadRequestException: {}
   parameters:
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Credential:
+      name: X-Amz-Credential
       in: header
       schema:
         type: string
@@ -317,26 +323,20 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-Date:
       name: X-Amz-Date
       in: header
       schema:
         type: string
       required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
       in: header
       schema:
         type: string
       required: false
-    X-Amz-Credential:
-      name: X-Amz-Credential
+    X-Amz-Signature:
+      name: X-Amz-Signature
       in: header
       schema:
         type: string

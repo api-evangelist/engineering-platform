@@ -178,6 +178,125 @@ paths:
         pro: false
 components:
   schemas:
+    magic_managed_app_id:
+      description: Managed app ID.
+      example: cloudflare
+      type: string
+    magic_app_subnets:
+      description: CIDRs to associate with traffic decisions.
+      items:
+        allOf:
+        - $ref: '#/components/schemas/magic_cidr'
+        - example: 1.1.1.1/32
+      type: array
+    magic_managed_app:
+      description: Managed app defined by Cloudflare.
+      properties:
+        hostnames:
+          $ref: '#/components/schemas/magic_app_hostnames'
+        ip_subnets:
+          $ref: '#/components/schemas/magic_app_subnets'
+        managed_app_id:
+          $ref: '#/components/schemas/magic_managed_app_id'
+        name:
+          $ref: '#/components/schemas/magic_app_name'
+        type:
+          $ref: '#/components/schemas/magic_app_type'
+      required:
+      - managed_app_id
+      title: Managed App
+      type: object
+    magic_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    magic_cidr:
+      description: A valid CIDR notation representing an IP range.
+      example: 192.0.2.0/24
+      type: string
+    magic_app_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_apps-response-object'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_account_app'
+    magic_app:
+      description: Collection of Hostnames and/or IP Subnets to associate with traffic decisions.
+      oneOf:
+      - $ref: '#/components/schemas/magic_account_app'
+      - $ref: '#/components/schemas/magic_managed_app'
+      type: object
+    magic_app_type:
+      description: Category of the app.
+      example: Development
+      type: string
+    magic_apps-response-array:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic_messages'
+        messages:
+          $ref: '#/components/schemas/magic_messages'
+        result:
+          items: {}
+          type:
+          - array
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic_app_hostnames:
+      description: FQDNs to associate with traffic decisions.
+      items:
+        example: auth.cloudflare.com
+        type: string
+      type: array
+    magic_account_app_id:
+      description: Magic account app ID.
+      example: ac60d3d0435248289d446cedd870bcf4
+      type: string
+    magic_account_app:
+      description: Custom app defined for an account.
+      properties:
+        account_app_id:
+          $ref: '#/components/schemas/magic_account_app_id'
+        hostnames:
+          $ref: '#/components/schemas/magic_app_hostnames'
+        ip_subnets:
+          $ref: '#/components/schemas/magic_app_subnets'
+        name:
+          $ref: '#/components/schemas/magic_app_name'
+        type:
+          $ref: '#/components/schemas/magic_app_type'
+      required:
+      - account_app_id
+      title: Account App
+      type: object
+    magic_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     magic_app_update_request:
       anyOf:
       - required:
@@ -202,12 +321,6 @@ components:
         type:
           $ref: '#/components/schemas/magic_app_type'
       type: object
-    magic_app_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_apps-response-object'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_account_app'
     magic_api-response-common-failure:
       properties:
         errors:
@@ -261,69 +374,6 @@ components:
       - messages
       - result
       type: object
-    magic_account_app:
-      description: Custom app defined for an account.
-      properties:
-        account_app_id:
-          $ref: '#/components/schemas/magic_account_app_id'
-        hostnames:
-          $ref: '#/components/schemas/magic_app_hostnames'
-        ip_subnets:
-          $ref: '#/components/schemas/magic_app_subnets'
-        name:
-          $ref: '#/components/schemas/magic_app_name'
-        type:
-          $ref: '#/components/schemas/magic_app_type'
-      required:
-      - account_app_id
-      title: Account App
-      type: object
-    magic_managed_app:
-      description: Managed app defined by Cloudflare.
-      properties:
-        hostnames:
-          $ref: '#/components/schemas/magic_app_hostnames'
-        ip_subnets:
-          $ref: '#/components/schemas/magic_app_subnets'
-        managed_app_id:
-          $ref: '#/components/schemas/magic_managed_app_id'
-        name:
-          $ref: '#/components/schemas/magic_app_name'
-        type:
-          $ref: '#/components/schemas/magic_app_type'
-      required:
-      - managed_app_id
-      title: Managed App
-      type: object
-    magic_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    magic_app_hostnames:
-      description: FQDNs to associate with traffic decisions.
-      items:
-        example: auth.cloudflare.com
-        type: string
-      type: array
-    magic_account_app_id:
-      description: Magic account app ID.
-      example: ac60d3d0435248289d446cedd870bcf4
-      type: string
-    magic_managed_app_id:
-      description: Managed app ID.
-      example: cloudflare
-      type: string
     magic_app_add_single_request:
       anyOf:
       - required:
@@ -345,54 +395,10 @@ components:
       - name
       - type
       type: object
-    magic_app_type:
-      description: Category of the app.
-      example: Development
-      type: string
     magic_app_name:
       description: Display name for the app.
       example: Cloudflare Dashboard
       type: string
-    magic_app_subnets:
-      description: CIDRs to associate with traffic decisions.
-      items:
-        allOf:
-        - $ref: '#/components/schemas/magic_cidr'
-        - example: 1.1.1.1/32
-      type: array
-    magic_cidr:
-      description: A valid CIDR notation representing an IP range.
-      example: 192.0.2.0/24
-      type: string
-    magic_apps-response-array:
-      properties:
-        errors:
-          $ref: '#/components/schemas/magic_messages'
-        messages:
-          $ref: '#/components/schemas/magic_messages'
-        result:
-          items: {}
-          type:
-          - array
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    magic_app:
-      description: Collection of Hostnames and/or IP Subnets to associate with traffic decisions.
-      oneOf:
-      - $ref: '#/components/schemas/magic_account_app'
-      - $ref: '#/components/schemas/magic_managed_app'
-      type: object
     magic_apps_collection_response:
       allOf:
       - $ref: '#/components/schemas/magic_apps-response-array'
@@ -401,12 +407,6 @@ components:
             items:
               $ref: '#/components/schemas/magic_app'
             type: array
-    magic_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
   securitySchemes:
     api_email:
       in: header

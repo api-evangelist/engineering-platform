@@ -174,60 +174,26 @@ paths:
         - com.cloudflare.edge.worker.deployment.read
 components:
   schemas:
-    workers_version-item-full:
-      allOf:
-      - $ref: '#/components/schemas/workers_version-item-short'
-      - properties:
-          resources:
-            example:
-              bindings:
-              - json: example_binding
-                name: JSON_VAR
-                type: json
-              script:
-                etag: 13a3240e8fb414561b0366813b0b8f42b3e6cfa0d9e70e99835dae83d0d8a794
-                handlers:
-                - fetch
-                last_deployed_from: api
-              script_runtime:
-                usage_model: bundled
-            readOnly: true
-            type: object
-        required:
-        - resources
-        type: object
-    workers_version-item-uploaded:
-      allOf:
-      - $ref: '#/components/schemas/workers_version-item-full'
-      - properties:
-          startup_time_ms:
-            example: 10
-            type: integer
-        required:
-        - resources
-        type: object
-    workers_version_identifier:
-      example: bcf48806-b317-4351-9ee7-36e7d557d4de
-      maxLength: 36
-      readOnly: true
-      type: string
-    workers_versions-single-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/workers_version-item-full'
-    workers_versions-list-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            properties:
-              items:
-                items:
-                  $ref: '#/components/schemas/workers_version-item-short'
-                type: array
-            type: object
+    workers_version-item-short:
+      properties:
+        id:
+          example: 18f97339-c287-4872-9bdd-e2135c07ec12
+          readOnly: true
+          type: string
+        metadata:
+          example:
+            author_email: user@example.com
+            author_id: 408cbcdfd4dda4617efef40b04d168a1
+            created_on: '2022-11-08T17:19:29.176266Z'
+            modified_on: '2022-11-08T17:19:29.176266Z'
+            source: api
+          readOnly: true
+          type: object
+        number:
+          example: 1
+          readOnly: true
+          type: number
+      type: object
     workers_api-response-common:
       properties:
         errors:
@@ -276,36 +242,33 @@ components:
       - messages
       - result
       type: object
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    workers_version-item-full:
+      allOf:
+      - $ref: '#/components/schemas/workers_version-item-short'
+      - properties:
+          resources:
+            example:
+              bindings:
+              - json: example_binding
+                name: JSON_VAR
+                type: json
+              script:
+                etag: 13a3240e8fb414561b0366813b0b8f42b3e6cfa0d9e70e99835dae83d0d8a794
+                handlers:
+                - fetch
+                last_deployed_from: api
+              script_runtime:
+                usage_model: bundled
+            readOnly: true
+            type: object
+        required:
+        - resources
+        type: object
+    workers_version_identifier:
+      example: bcf48806-b317-4351-9ee7-36e7d557d4de
+      maxLength: 36
+      readOnly: true
       type: string
-    workers_schemas-script_name:
-      description: Name of the script.
-      example: this-is_my_script-01
-      pattern: ^[a-z0-9_][a-z0-9-_]*$
-      type: string
-    workers_version-item-short:
-      properties:
-        id:
-          example: 18f97339-c287-4872-9bdd-e2135c07ec12
-          readOnly: true
-          type: string
-        metadata:
-          example:
-            author_email: user@example.com
-            author_id: 408cbcdfd4dda4617efef40b04d168a1
-            created_on: '2022-11-08T17:19:29.176266Z'
-            modified_on: '2022-11-08T17:19:29.176266Z'
-            source: api
-          readOnly: true
-          type: object
-        number:
-          example: 1
-          readOnly: true
-          type: number
-      type: object
     workers_messages:
       example: []
       items:
@@ -321,12 +284,49 @@ components:
         type: object
         uniqueItems: true
       type: array
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    workers_schemas-script_name:
+      description: Name of the script.
+      example: this-is_my_script-01
+      pattern: ^[a-z0-9_][a-z0-9-_]*$
+      type: string
+    workers_versions-list-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            properties:
+              items:
+                items:
+                  $ref: '#/components/schemas/workers_version-item-short'
+                type: array
+            type: object
+    workers_versions-single-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_version-item-full'
     workers_versions-upload-response:
       allOf:
       - $ref: '#/components/schemas/workers_api-response-common'
       - properties:
           result:
             $ref: '#/components/schemas/workers_version-item-uploaded'
+    workers_version-item-uploaded:
+      allOf:
+      - $ref: '#/components/schemas/workers_version-item-full'
+      - properties:
+          startup_time_ms:
+            example: 10
+            type: integer
+        required:
+        - resources
+        type: object
   requestBodies:
     workers_version-post:
       content:

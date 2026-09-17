@@ -258,123 +258,16 @@ components:
     zero-trust-gateway_precedence:
       description: Precedence sets the order of your rules. Lower values indicate higher precedence. At each processing phase, applicable rules are evaluated in ascending order of this value.
       type: integer
-    zero-trust-gateway_rules_components-schemas-response_collection:
+    zero-trust-gateway_api-response-collection:
       allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-collection'
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
       - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/zero-trust-gateway_rules'
-            type: array
-    zero-trust-gateway_rules:
-      properties:
-        action:
-          $ref: '#/components/schemas/zero-trust-gateway_action'
-        created_at:
-          $ref: '#/components/schemas/zero-trust-gateway_timestamp'
-        deleted_at:
-          $ref: '#/components/schemas/zero-trust-gateway_deleted_at'
-        description:
-          $ref: '#/components/schemas/zero-trust-gateway_schemas-description'
-        device_posture:
-          $ref: '#/components/schemas/zero-trust-gateway_device_posture'
-        enabled:
-          $ref: '#/components/schemas/zero-trust-gateway_enabled'
-        filters:
-          $ref: '#/components/schemas/zero-trust-gateway_filters'
-        id:
-          $ref: '#/components/schemas/zero-trust-gateway_rules_components-schemas-uuid'
-        identity:
-          $ref: '#/components/schemas/zero-trust-gateway_identity'
-        name:
-          $ref: '#/components/schemas/zero-trust-gateway_components-schemas-name'
-        precedence:
-          $ref: '#/components/schemas/zero-trust-gateway_precedence'
-        rule_settings:
-          $ref: '#/components/schemas/zero-trust-gateway_rule-settings'
-        schedule:
-          $ref: '#/components/schemas/zero-trust-gateway_schedule'
-        traffic:
-          $ref: '#/components/schemas/zero-trust-gateway_traffic'
-        updated_at:
-          $ref: '#/components/schemas/zero-trust-gateway_timestamp'
+          result_info:
+            $ref: '#/components/schemas/zero-trust-gateway_result_info'
       type: object
-    zero-trust-gateway_traffic:
-      description: The wirefilter expression used for traffic matching.
-      example: http.request.uri matches ".*a/partial/uri.*" and http.request.host in $01302951-49f9-47c9-a400-0297e60b6a10
-      type: string
-    zero-trust-gateway_identity:
-      description: The wirefilter expression used for identity matching.
-      example: any(identity.groups.name[*] in {"finance"})
-      type: string
-    zero-trust-gateway_enabled:
-      description: True if the rule is enabled.
-      example: true
-      type: boolean
-    zero-trust-gateway_deleted_at:
-      description: Date of deletion, if any.
-      format: date-time
-      readOnly: true
-      type:
-      - string
-      - 'null'
-    zero-trust-gateway_rules_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/zero-trust-gateway_rules'
-    zero-trust-gateway_schemas-description:
-      description: The description of the rule.
-      example: Block bad websites based on their host name.
-      type: string
-    zero-trust-gateway_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     zero-trust-gateway_components-schemas-name:
       description: The name of the rule.
       example: block bad websites
-      type: string
-    zero-trust-gateway_empty_response:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
-      - properties:
-          result:
-            type: object
-    zero-trust-gateway_action:
-      description: The action to preform when the associated traffic, identity, and device posture expressions are either absent or evaluate to `true`.
-      enum:
-      - 'on'
-      - 'off'
-      - allow
-      - block
-      - scan
-      - noscan
-      - safesearch
-      - ytrestricted
-      - isolate
-      - noisolate
-      - override
-      - l4_override
-      - egress
-      - audit_ssh
-      - resolve
-      example: allow
-      type: string
-    zero-trust-gateway_identifier:
-      example: 699d98642c564d2e855e9661899b7252
       type: string
     zero-trust-gateway_rule-settings:
       description: Additional settings that modify the rule's action.
@@ -557,92 +450,6 @@ components:
               type: string
           type: object
       type: object
-    zero-trust-gateway_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/zero-trust-gateway_messages'
-        messages:
-          $ref: '#/components/schemas/zero-trust-gateway_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    zero-trust-gateway_device_posture:
-      description: The wirefilter expression used for device posture check matching.
-      example: any(device_posture.checks.passed[*] in {"1308749e-fcfb-4ebc-b051-fe022b632644"})
-      type: string
-    zero-trust-gateway_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    zero-trust-gateway_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
-      type: object
-    zero-trust-gateway_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    zero-trust-gateway_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/zero-trust-gateway_result_info'
-      type: object
-    zero-trust-gateway_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/zero-trust-gateway_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/zero-trust-gateway_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     zero-trust-gateway_filters:
       description: The protocol or layer to evaluate the traffic, identity, and device posture expressions.
       example:
@@ -657,6 +464,10 @@ components:
         example: http
         type: string
       type: array
+    zero-trust-gateway_device_posture:
+      description: The wirefilter expression used for device posture check matching.
+      example: any(device_posture.checks.passed[*] in {"1308749e-fcfb-4ebc-b051-fe022b632644"})
+      type: string
     zero-trust-gateway_dns_resolver_settings_v6:
       properties:
         ip:
@@ -677,6 +488,18 @@ components:
           type: string
       required:
       - ip
+      type: object
+    zero-trust-gateway_rules_components-schemas-uuid:
+      description: The API resource UUID.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    zero-trust-gateway_identifier:
+      example: 699d98642c564d2e855e9661899b7252
+      type: string
+    zero-trust-gateway_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
       type: object
     zero-trust-gateway_dns_resolver_settings_v4:
       properties:
@@ -699,10 +522,62 @@ components:
       required:
       - ip
       type: object
-    zero-trust-gateway_rules_components-schemas-uuid:
-      description: The API resource UUID.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
+    zero-trust-gateway_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/zero-trust-gateway_messages'
+        messages:
+          $ref: '#/components/schemas/zero-trust-gateway_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    zero-trust-gateway_empty_response:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
+      - properties:
+          result:
+            type: object
+    zero-trust-gateway_enabled:
+      description: True if the rule is enabled.
+      example: true
+      type: boolean
+    zero-trust-gateway_action:
+      description: The action to preform when the associated traffic, identity, and device posture expressions are either absent or evaluate to `true`.
+      enum:
+      - 'on'
+      - 'off'
+      - allow
+      - block
+      - scan
+      - noscan
+      - safesearch
+      - ytrestricted
+      - isolate
+      - noisolate
+      - override
+      - l4_override
+      - egress
+      - audit_ssh
+      - resolve
+      example: allow
+      type: string
+    zero-trust-gateway_rules_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/zero-trust-gateway_rules'
+    zero-trust-gateway_identity:
+      description: The wirefilter expression used for identity matching.
+      example: any(identity.groups.name[*] in {"finance"})
       type: string
     zero-trust-gateway_schedule:
       description: The schedule for activating DNS policies. This does not apply to HTTP or network policies.
@@ -740,6 +615,131 @@ components:
           example: 08:00-12:30,13:30-17:00
           type: string
       type: object
+    zero-trust-gateway_schemas-description:
+      description: The description of the rule.
+      example: Block bad websites based on their host name.
+      type: string
+    zero-trust-gateway_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    zero-trust-gateway_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    zero-trust-gateway_deleted_at:
+      description: Date of deletion, if any.
+      format: date-time
+      readOnly: true
+      type:
+      - string
+      - 'null'
+    zero-trust-gateway_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/zero-trust-gateway_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/zero-trust-gateway_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    zero-trust-gateway_rules:
+      properties:
+        action:
+          $ref: '#/components/schemas/zero-trust-gateway_action'
+        created_at:
+          $ref: '#/components/schemas/zero-trust-gateway_timestamp'
+        deleted_at:
+          $ref: '#/components/schemas/zero-trust-gateway_deleted_at'
+        description:
+          $ref: '#/components/schemas/zero-trust-gateway_schemas-description'
+        device_posture:
+          $ref: '#/components/schemas/zero-trust-gateway_device_posture'
+        enabled:
+          $ref: '#/components/schemas/zero-trust-gateway_enabled'
+        filters:
+          $ref: '#/components/schemas/zero-trust-gateway_filters'
+        id:
+          $ref: '#/components/schemas/zero-trust-gateway_rules_components-schemas-uuid'
+        identity:
+          $ref: '#/components/schemas/zero-trust-gateway_identity'
+        name:
+          $ref: '#/components/schemas/zero-trust-gateway_components-schemas-name'
+        precedence:
+          $ref: '#/components/schemas/zero-trust-gateway_precedence'
+        rule_settings:
+          $ref: '#/components/schemas/zero-trust-gateway_rule-settings'
+        schedule:
+          $ref: '#/components/schemas/zero-trust-gateway_schedule'
+        traffic:
+          $ref: '#/components/schemas/zero-trust-gateway_traffic'
+        updated_at:
+          $ref: '#/components/schemas/zero-trust-gateway_timestamp'
+      type: object
+    zero-trust-gateway_rules_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/zero-trust-gateway_rules'
+            type: array
+    zero-trust-gateway_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    zero-trust-gateway_traffic:
+      description: The wirefilter expression used for traffic matching.
+      example: http.request.uri matches ".*a/partial/uri.*" and http.request.host in $01302951-49f9-47c9-a400-0297e60b6a10
+      type: string
   securitySchemes:
     api_email:
       in: header

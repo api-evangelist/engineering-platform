@@ -1033,100 +1033,14 @@ paths:
               headers: {}
 components:
   schemas:
-    MediaObject:
+    VideoDetails:
       properties:
-        contentUrl:
-          type: string
-          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
-          readOnly: true
-        height:
-          type: integer
-          description: The height of the source media object, in pixels.
-          format: int32
-          readOnly: true
-        hostPageUrl:
-          type: string
-          description: URL of the page that hosts the media object.
-          readOnly: true
-        width:
-          type: integer
-          description: The width of the source media object, in pixels.
-          format: int32
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/CreativeWork'
-    Identifiable:
-      properties:
-        id:
-          type: string
-          description: A String identifier.
-          readOnly: true
-      description: Defines the identity of a resource.
-      allOf:
-      - $ref: '#/components/schemas/ResponseBase'
-    Thing:
-      properties:
-        alternateName:
-          type: string
-          readOnly: true
-        bingId:
-          type: string
-          description: An ID that uniquely identifies this item.
-          readOnly: true
-        description:
-          type: string
-          description: A short description of the item.
-          readOnly: true
-        image:
-          $ref: '#/components/schemas/ImageObject'
-        name:
-          type: string
-          description: The name of the thing represented by this object.
-          readOnly: true
-        url:
-          type: string
-          description: The URL to get more information about the thing represented by this object.
-          readOnly: true
+        relatedVideos:
+          $ref: '#/components/schemas/VideosModule'
+        videoResult:
+          $ref: '#/components/schemas/VideoObject'
       allOf:
       - $ref: '#/components/schemas/Response'
-    ErrorResponse:
-      required:
-      - errors
-      properties:
-        errors:
-          type: array
-          description: A list of errors that describe the reasons why the request failed.
-          items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
-    VideosModule:
-      type: object
-      properties:
-        value:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/VideoObject'
-    ResponseBase:
-      required:
-      - _type
-      type: object
-      properties:
-        _type:
-          type: string
-      discriminator:
-        propertyName: _type
     Error:
       required:
       - code
@@ -1182,14 +1096,57 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    VideoDetails:
+    CreativeWork:
       properties:
-        relatedVideos:
-          $ref: '#/components/schemas/VideosModule'
-        videoResult:
-          $ref: '#/components/schemas/VideoObject'
+        provider:
+          type: array
+          description: The source of the creative work.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Thing'
+        text:
+          type: string
+          readOnly: true
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Thing'
+    Thing:
+      properties:
+        alternateName:
+          type: string
+          readOnly: true
+        bingId:
+          type: string
+          description: An ID that uniquely identifies this item.
+          readOnly: true
+        description:
+          type: string
+          description: A short description of the item.
+          readOnly: true
+        image:
+          $ref: '#/components/schemas/ImageObject'
+        name:
+          type: string
+          description: The name of the thing represented by this object.
+          readOnly: true
+        url:
+          type: string
+          description: The URL to get more information about the thing represented by this object.
+          readOnly: true
       allOf:
       - $ref: '#/components/schemas/Response'
+    Identifiable:
+      properties:
+        id:
+          type: string
+          description: A String identifier.
+          readOnly: true
+      description: Defines the identity of a resource.
+      allOf:
+      - $ref: '#/components/schemas/ResponseBase'
     ImageObject:
       properties:
         thumbnail:
@@ -1197,6 +1154,45 @@ components:
       description: Defines an image
       allOf:
       - $ref: '#/components/schemas/MediaObject'
+    Response:
+      properties:
+        webSearchUrl:
+          type: string
+          description: The URL To Bing's search result for this item.
+          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
+    MediaObject:
+      properties:
+        contentUrl:
+          type: string
+          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
+          readOnly: true
+        height:
+          type: integer
+          description: The height of the source media object, in pixels.
+          format: int32
+          readOnly: true
+        hostPageUrl:
+          type: string
+          description: URL of the page that hosts the media object.
+          readOnly: true
+        width:
+          type: integer
+          description: The width of the source media object, in pixels.
+          format: int32
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
+    VideosModule:
+      type: object
+      properties:
+        value:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/VideoObject'
     VideoObject:
       properties:
         allowHttpsEmbed:
@@ -1229,23 +1225,27 @@ components:
       description: Defines a video object that is relevant to the query.
       allOf:
       - $ref: '#/components/schemas/MediaObject'
-    CreativeWork:
+    ErrorResponse:
+      required:
+      - errors
       properties:
-        provider:
+        errors:
           type: array
-          description: The source of the creative work.
-          readOnly: true
+          description: A list of errors that describe the reasons why the request failed.
           items:
-            $ref: '#/components/schemas/Thing'
-        text:
-          type: string
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
-          readOnly: true
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
       allOf:
-      - $ref: '#/components/schemas/Thing'
+      - $ref: '#/components/schemas/Response'
+    ResponseBase:
+      required:
+      - _type
+      type: object
+      properties:
+        _type:
+          type: string
+      discriminator:
+        propertyName: _type
   securitySchemes:
     apiKeyHeader:
       type: apiKey

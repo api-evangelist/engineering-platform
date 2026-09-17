@@ -243,109 +243,6 @@ paths:
       - Zero Trust Certificates
 components:
   schemas:
-    zero-trust-gateway_uuid:
-      description: Certificate UUID tag.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    zero-trust-gateway_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/zero-trust-gateway_messages'
-        messages:
-          $ref: '#/components/schemas/zero-trust-gateway_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    zero-trust-gateway_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    zero-trust-gateway_binding_status:
-      description: The deployment status of the certificate on Cloudflare's edge. Certificates in the 'active' state may be used for Gateway TLS interception.
-      enum:
-      - pending_deployment
-      - active
-      - pending_deletion
-      - inactive
-      type: string
-    zero-trust-gateway_single_response:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/zero-trust-gateway_certificates'
-    zero-trust-gateway_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
-      type: object
-    zero-trust-gateway_generate-cert-request:
-      properties:
-        validity_period_days:
-          description: Number of days the generated certificate will be valid, minimum 1 day and maximum 30 years. Defaults to 5 years.
-          example: 1826
-          type: integer
-      type: object
-    zero-trust-gateway_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    zero-trust-gateway_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    zero-trust-gateway_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/zero-trust-gateway_result_info'
-      type: object
-    zero-trust-gateway_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/zero-trust-gateway_certificates'
-            type: array
-    zero-trust-gateway_identifier:
-      example: 699d98642c564d2e855e9661899b7252
-      type: string
     zero-trust-gateway_api-response-common-failure:
       properties:
         errors:
@@ -377,13 +274,10 @@ components:
       - messages
       - result
       type: object
-    zero-trust-gateway_type:
-      description: The type of certificate, either BYO-PKI (custom) or Gateway-managed.
-      enum:
-      - custom
-      - gateway_managed
-      example: gateway_managed
-      type: string
+    zero-trust-gateway_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
+      type: object
     zero-trust-gateway_certificates:
       properties:
         binding_status:
@@ -420,6 +314,112 @@ components:
         uploaded_on:
           $ref: '#/components/schemas/zero-trust-gateway_timestamp'
       type: object
+    zero-trust-gateway_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/zero-trust-gateway_result_info'
+      type: object
+    zero-trust-gateway_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/zero-trust-gateway_certificates'
+            type: array
+    zero-trust-gateway_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/zero-trust-gateway_messages'
+        messages:
+          $ref: '#/components/schemas/zero-trust-gateway_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    zero-trust-gateway_uuid:
+      description: Certificate UUID tag.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    zero-trust-gateway_type:
+      description: The type of certificate, either BYO-PKI (custom) or Gateway-managed.
+      enum:
+      - custom
+      - gateway_managed
+      example: gateway_managed
+      type: string
+    zero-trust-gateway_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    zero-trust-gateway_single_response:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/zero-trust-gateway_certificates'
+    zero-trust-gateway_binding_status:
+      description: The deployment status of the certificate on Cloudflare's edge. Certificates in the 'active' state may be used for Gateway TLS interception.
+      enum:
+      - pending_deployment
+      - active
+      - pending_deletion
+      - inactive
+      type: string
+    zero-trust-gateway_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    zero-trust-gateway_generate-cert-request:
+      properties:
+        validity_period_days:
+          description: Number of days the generated certificate will be valid, minimum 1 day and maximum 30 years. Defaults to 5 years.
+          example: 1826
+          type: integer
+      type: object
+    zero-trust-gateway_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    zero-trust-gateway_identifier:
+      example: 699d98642c564d2e855e9661899b7252
+      type: string
   securitySchemes:
     api_email:
       in: header

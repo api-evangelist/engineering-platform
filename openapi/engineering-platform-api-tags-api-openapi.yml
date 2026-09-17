@@ -96,73 +96,103 @@ paths:
         '500':
           $ref: '#/components/responses/tag500Error'
 components:
-  examples:
-    tag403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Access Denied
-        detail: The tags feature is only available to enterprise teams
-        status: 403
-    tag400Error:
-      value:
-        title: Bad Request
-        detail: body/tags/0/slug must NOT have more than 64 characters
-        status: 400
-    featureUnavailable403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Forbidden
-        detail: This feature isn't available in your region.
-        status: 403
-    v10HeaderMissing:
-      value:
-        name: instanceNotFoundError
-        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
-  schemas:
-    tag400Error:
-      title: Bad Request
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/badrequest
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Bad Request
-        detail:
-          type: string
-          description: Information about the error.
-          example: body/tags/0/slug must NOT have more than 64 characters
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 400
+  responses:
+    tagGetPut:
+      description: Success Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/tagGetPut'
+          example:
+            tags:
+            - slug: needs-review
+            - slug: test-api
     tag401Error:
-      title: Unauthorized
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag401Error'
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: The request lacks valid credentials.
+            status: 401
+    tag500Error:
+      description: Unexpected Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag500Error'
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Something went wrong
+            detail: Something went wrong while fetching entities having the provided slug.
+            status: 500
+            instance: /tags/needs-review/entities
+    tag404Error:
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tag404Error'
+          example:
+            type: https://api.postman.com/problems/not-found
+            title: Resource Not Found
+            detail: Slug 'needs-review' does not exist.
+            status: 404
+            instance: /tags/needs-review/entities
+    v10HeaderMissing:
+      description: Missing v10 Accept Header
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/v10HeaderMissing'
+          examples:
+            Missing v10 Accept Header:
+              $ref: '#/components/examples/v10HeaderMissing'
+  parameters:
+    v10Accept:
+      name: Accept
+      in: header
+      required: true
+      description: The `application/vnd.api.v10+json` request header required to use the endpoint.
+      schema:
+        type: string
+        enum:
+        - application/vnd.api.v10+json
+        example: application/vnd.api.v10+json
+    apiId:
+      name: apiId
+      in: path
+      required: true
+      description: The API's ID.
+      schema:
+        type: string
+        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
+  schemas:
+    featureUnavailable403Error:
+      title: Feature Unavailable
       type: object
       properties:
         type:
           type: string
           format: uri-reference
           description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/unauthorized
+          example: https://api.postman.com/problems/forbidden
         title:
           type: string
           description: A short summary of the problem.
-          example: Unauthorized
+          example: Forbidden
         detail:
           type: string
           description: Information about the error.
-          example: The request lacks valid credentials.
+          example: This feature isn't available in your region.
         status:
           type: integer
           format: http-status-code
           description: The error's HTTP status code.
-          example: 401
+          example: 403
     tag403Error:
       title: Forbidden
       type: object
@@ -185,32 +215,48 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 403
-    tag500Error:
-      title: Unexpected Error
+    tagGetPut:
+      title: Success Response
+      type: object
+      properties:
+        tags:
+          type: array
+          maxItems: 5
+          minItems: 0
+          description: A list of associated tags.
+          items:
+            type: object
+            description: Information about the tag.
+            properties:
+              slug:
+                type: string
+                pattern: ^[a-z][a-z0-9-]*[a-z0-9]+$
+                minLength: 2
+                maxLength: 64
+                description: The tag's ID within a team or individual (non-team) user scope.
+                example: needs-review
+    tag400Error:
+      title: Bad Request
       type: object
       properties:
         type:
           type: string
           format: uri-reference
           description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/internal-server-error
+          example: https://api.postman.com/problems/badrequest
         title:
           type: string
           description: A short summary of the problem.
-          example: Something went wrong
+          example: Bad Request
         detail:
           type: string
           description: Information about the error.
-          example: Something went wrong while fetching entities having the provided slug.
+          example: body/tags/0/slug must NOT have more than 64 characters
         status:
           type: integer
           format: http-status-code
           description: The error's HTTP status code.
-          example: 500
-        instance:
-          type: string
-          example: /tags/hello-world/entities
-          description: The URI reference that identifies the specific occurrence of the problem.
+          example: 400
     tag404Error:
       title: Not Found
       type: object
@@ -237,48 +283,54 @@ components:
           type: string
           description: The URI reference that identifies the specific occurrence of the problem.
           example: /tags/needs-review/entities
-    featureUnavailable403Error:
-      title: Feature Unavailable
+    tag500Error:
+      title: Unexpected Error
       type: object
       properties:
         type:
           type: string
           format: uri-reference
           description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/forbidden
+          example: https://api.postman.com/problems/internal-server-error
         title:
           type: string
           description: A short summary of the problem.
-          example: Forbidden
+          example: Something went wrong
         detail:
           type: string
           description: Information about the error.
-          example: This feature isn't available in your region.
+          example: Something went wrong while fetching entities having the provided slug.
         status:
           type: integer
           format: http-status-code
           description: The error's HTTP status code.
-          example: 403
-    tagGetPut:
-      title: Success Response
+          example: 500
+        instance:
+          type: string
+          example: /tags/hello-world/entities
+          description: The URI reference that identifies the specific occurrence of the problem.
+    tag401Error:
+      title: Unauthorized
       type: object
       properties:
-        tags:
-          type: array
-          maxItems: 5
-          minItems: 0
-          description: A list of associated tags.
-          items:
-            type: object
-            description: Information about the tag.
-            properties:
-              slug:
-                type: string
-                pattern: ^[a-z][a-z0-9-]*[a-z0-9]+$
-                minLength: 2
-                maxLength: 64
-                description: The tag's ID within a team or individual (non-team) user scope.
-                example: needs-review
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/unauthorized
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Unauthorized
+        detail:
+          type: string
+          description: Information about the error.
+          example: The request lacks valid credentials.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 401
     v10HeaderMissing:
       title: Missing v10 Accept Header
       type: object
@@ -291,80 +343,28 @@ components:
           type: string
           description: The error message.
           example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
-  responses:
+  examples:
     v10HeaderMissing:
-      description: Missing v10 Accept Header
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/v10HeaderMissing'
-          examples:
-            Missing v10 Accept Header:
-              $ref: '#/components/examples/v10HeaderMissing'
-    tag500Error:
-      description: Unexpected Error
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag500Error'
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Something went wrong
-            detail: Something went wrong while fetching entities having the provided slug.
-            status: 500
-            instance: /tags/needs-review/entities
-    tag401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag401Error'
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: The request lacks valid credentials.
-            status: 401
-    tagGetPut:
-      description: Success Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/tagGetPut'
-          example:
-            tags:
-            - slug: needs-review
-            - slug: test-api
-    tag404Error:
-      description: Not Found
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag404Error'
-          example:
-            type: https://api.postman.com/problems/not-found
-            title: Resource Not Found
-            detail: Slug 'needs-review' does not exist.
-            status: 404
-            instance: /tags/needs-review/entities
-  parameters:
-    apiId:
-      name: apiId
-      in: path
-      required: true
-      description: The API's ID.
-      schema:
-        type: string
-        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
-    v10Accept:
-      name: Accept
-      in: header
-      required: true
-      description: The `application/vnd.api.v10+json` request header required to use the endpoint.
-      schema:
-        type: string
-        enum:
-        - application/vnd.api.v10+json
-        example: application/vnd.api.v10+json
+      value:
+        name: instanceNotFoundError
+        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    tag400Error:
+      value:
+        title: Bad Request
+        detail: body/tags/0/slug must NOT have more than 64 characters
+        status: 400
+    tag403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Access Denied
+        detail: The tags feature is only available to enterprise teams
+        status: 403
+    featureUnavailable403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: This feature isn't available in your region.
+        status: 403
   requestBodies:
     tagUpdateTags:
       content:

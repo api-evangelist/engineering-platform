@@ -94,6 +94,95 @@ paths:
       - Workers KV Storage Read
 components:
   schemas:
+    workers-kv_query:
+      description: For specifying result metrics.
+      properties:
+        dimensions:
+          default: '[]'
+          description: Can be used to break down the data by given attributes.
+          items:
+            description: For drilling down on metrics.
+            type: string
+          type: array
+        filters:
+          default: '""'
+          description: 'Used to filter rows by one or more dimensions. Filters can be combined using OR and AND boolean logic. AND takes precedence over OR in all the expressions. The OR operator is defined using a comma (,) or OR keyword surrounded by whitespace. The AND operator is defined using a semicolon (;) or AND keyword surrounded by whitespace. Note that the semicolon is a reserved character in URLs (rfc1738) and needs to be percent-encoded as %3B. Comparison options are:
+
+
+            Operator                  | Name                            | URL Encoded
+
+            --------------------------|---------------------------------|--------------------------
+
+            ==                        | Equals                          | %3D%3D
+
+            !=                        | Does not equals                 | !%3D
+
+            >                        | Greater Than                    | %3E
+
+            <                         | Less Than                       | %3C
+
+            >=                       | Greater than or equal to        | %3E%3D
+
+            <=                        | Less than or equal to           | %3C%3D     .'
+          type: string
+        limit:
+          default: 10000
+          description: Limit number of returned metrics.
+          type: integer
+        metrics:
+          description: One or more metrics to compute.
+          items:
+            description: A quantitative measurement of KV usage.
+            type: string
+          type: array
+        since:
+          default: <6 hours ago>
+          description: Start of time interval to query, defaults to 6 hours before request received.
+          example: '2019-01-02T02:20:00Z'
+          format: date-time
+          type: string
+        sort:
+          default: '[]'
+          description: Array of dimensions or metrics to sort by, each dimension/metric may be prefixed by - (descending) or + (ascending).
+          items:
+            type: string
+          type: array
+        until:
+          default: <now>
+          description: End of time interval to query, defaults to current time.
+          example: '2019-01-02T03:20:00Z'
+          format: date-time
+          type: string
+      type: object
+    workers-kv_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/workers-kv_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/workers-kv_messages'
+          example: []
+        result:
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     workers-kv_components-schemas-result:
       allOf:
       - $ref: '#/components/schemas/workers-kv_result'
@@ -190,110 +279,6 @@ components:
       - totals
       - query
       type: object
-    workers-kv_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    workers-kv_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/workers-kv_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/workers-kv_messages'
-          example: []
-        result:
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    workers-kv_query:
-      description: For specifying result metrics.
-      properties:
-        dimensions:
-          default: '[]'
-          description: Can be used to break down the data by given attributes.
-          items:
-            description: For drilling down on metrics.
-            type: string
-          type: array
-        filters:
-          default: '""'
-          description: 'Used to filter rows by one or more dimensions. Filters can be combined using OR and AND boolean logic. AND takes precedence over OR in all the expressions. The OR operator is defined using a comma (,) or OR keyword surrounded by whitespace. The AND operator is defined using a semicolon (;) or AND keyword surrounded by whitespace. Note that the semicolon is a reserved character in URLs (rfc1738) and needs to be percent-encoded as %3B. Comparison options are:
-
-
-            Operator                  | Name                            | URL Encoded
-
-            --------------------------|---------------------------------|--------------------------
-
-            ==                        | Equals                          | %3D%3D
-
-            !=                        | Does not equals                 | !%3D
-
-            >                        | Greater Than                    | %3E
-
-            <                         | Less Than                       | %3C
-
-            >=                       | Greater than or equal to        | %3E%3D
-
-            <=                        | Less than or equal to           | %3C%3D     .'
-          type: string
-        limit:
-          default: 10000
-          description: Limit number of returned metrics.
-          type: integer
-        metrics:
-          description: One or more metrics to compute.
-          items:
-            description: A quantitative measurement of KV usage.
-            type: string
-          type: array
-        since:
-          default: <6 hours ago>
-          description: Start of time interval to query, defaults to 6 hours before request received.
-          example: '2019-01-02T02:20:00Z'
-          format: date-time
-          type: string
-        sort:
-          default: '[]'
-          description: Array of dimensions or metrics to sort by, each dimension/metric may be prefixed by - (descending) or + (ascending).
-          items:
-            type: string
-          type: array
-        until:
-          default: <now>
-          description: End of time interval to query, defaults to current time.
-          example: '2019-01-02T03:20:00Z'
-          format: date-time
-          type: string
-      type: object
     workers-kv_identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
@@ -317,6 +302,21 @@ components:
       - errors
       - messages
       type: object
+    workers-kv_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
   securitySchemes:
     api_email:
       in: header

@@ -880,74 +880,32 @@ paths:
         - com.cloudflare.edge.worker.queue.update
 components:
   schemas:
-    mq_producer:
+    mq_queue_message:
       properties:
-        environment:
+        attempts:
+          example: 1
+          readOnly: true
+          type: number
+        body:
+          example: hello world
           readOnly: true
           type: string
-        service:
+        id:
+          example: b01b5594f784d0165c2985833f5660dd
           readOnly: true
           type: string
-      type: object
-    mq_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/mq_messages'
-        messages:
-          $ref: '#/components/schemas/mq_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    mq_identifier:
-      description: Identifier.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    mq_max_wait_time_ms:
-      example: 5000
-      type: number
-    mq_consumer_updated:
-      properties:
-        created_on:
+        lease_id:
+          $ref: '#/components/schemas/mq_lease_id'
+        metadata:
+          example:
+            CF-Content-Type: text
+            CF-sourceMessageSource: dash
           readOnly: true
-          type: string
-        dead_letter_queue:
-          example: updated-example-dlq
-        environment:
-          readOnly: true
-          type: string
-        queue_name:
-          readOnly: true
-          type: string
-        script_name:
-          readOnly: true
-          type: string
-        settings:
-          properties:
-            batch_size:
-              example: 100
-              type: number
-            max_retries:
-              $ref: '#/components/schemas/mq_max_retries'
-            max_wait_time_ms:
-              $ref: '#/components/schemas/mq_max_wait_time_ms'
           type: object
+        timestamp_ms:
+          example: 1710950954154.0
+          readOnly: true
+          type: number
       type: object
     mq_queue_updated:
       properties:
@@ -963,48 +921,20 @@ components:
         queue_name:
           $ref: '#/components/schemas/mq_renamed_name'
       type: object
-    mq_max_retries:
-      description: The maximum number of retries
-      example: 3
-      type: number
-    mq_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service.
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results.
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results.
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters.
-          example: 2000
-          type: number
-      type: object
-    mq_batch_size:
-      description: The maximum number of messages to include in a batch.
-      example: 50
-      type: number
-    mq_name:
-      example: example-queue
-      type: string
-    mq_consumer:
+    mq_consumer_created:
       properties:
         created_on:
           readOnly: true
           type: string
+        dead_letter_queue:
+          $ref: '#/components/schemas/mq_dlq_name'
         environment:
           readOnly: true
           type: string
         queue_name:
           readOnly: true
           type: string
-        service:
+        script_name:
           readOnly: true
           type: string
         settings:
@@ -1017,20 +947,10 @@ components:
               $ref: '#/components/schemas/mq_max_wait_time_ms'
           type: object
       type: object
-    mq_queue_created:
-      properties:
-        created_on:
-          readOnly: true
-          type: string
-        modified_on:
-          readOnly: true
-          type: string
-        queue_id:
-          readOnly: true
-          type: string
-        queue_name:
-          $ref: '#/components/schemas/mq_name'
-      type: object
+    mq_visibility_timeout:
+      description: The number of milliseconds that a message is exclusively leased. After the timeout, the message becomes available for another attempt.
+      example: 6000
+      type: number
     mq_queue:
       properties:
         consumers:
@@ -1061,12 +981,8 @@ components:
         queue_name:
           $ref: '#/components/schemas/mq_name'
       type: object
-    mq_renamed_name:
-      example: renamed-example-queue
-      type: string
-    mq_lease_id:
-      example: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..Q8p21d7dceR6vUfwftONdQ.JVqZgAS-Zk7MqmqccYtTHeeMElNHaOMigeWdb8LyMOg.T2_HV99CYzGaQuhTyW8RsgbnpTRZHRM6N7UoSaAKeK0
-      readOnly: true
+    mq_name:
+      example: example-queue
       type: string
     mq_messages:
       example: []
@@ -1083,13 +999,99 @@ components:
         type: object
         uniqueItems: true
       type: array
-    mq_consumer_created:
+    mq_max_retries:
+      description: The maximum number of retries
+      example: 3
+      type: number
+    mq_queue_created:
+      properties:
+        created_on:
+          readOnly: true
+          type: string
+        modified_on:
+          readOnly: true
+          type: string
+        queue_id:
+          readOnly: true
+          type: string
+        queue_name:
+          $ref: '#/components/schemas/mq_name'
+      type: object
+    mq_consumer:
+      properties:
+        created_on:
+          readOnly: true
+          type: string
+        environment:
+          readOnly: true
+          type: string
+        queue_name:
+          readOnly: true
+          type: string
+        service:
+          readOnly: true
+          type: string
+        settings:
+          properties:
+            batch_size:
+              $ref: '#/components/schemas/mq_batch_size'
+            max_retries:
+              $ref: '#/components/schemas/mq_max_retries'
+            max_wait_time_ms:
+              $ref: '#/components/schemas/mq_max_wait_time_ms'
+          type: object
+      type: object
+    mq_batch_size:
+      description: The maximum number of messages to include in a batch.
+      example: 50
+      type: number
+    mq_producer:
+      properties:
+        environment:
+          readOnly: true
+          type: string
+        service:
+          readOnly: true
+          type: string
+      type: object
+    mq_renamed_name:
+      example: renamed-example-queue
+      type: string
+    mq_lease_id:
+      example: eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..Q8p21d7dceR6vUfwftONdQ.JVqZgAS-Zk7MqmqccYtTHeeMElNHaOMigeWdb8LyMOg.T2_HV99CYzGaQuhTyW8RsgbnpTRZHRM6N7UoSaAKeK0
+      readOnly: true
+      type: string
+    mq_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/mq_messages'
+        messages:
+          $ref: '#/components/schemas/mq_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    mq_consumer_updated:
       properties:
         created_on:
           readOnly: true
           type: string
         dead_letter_queue:
-          $ref: '#/components/schemas/mq_dlq_name'
+          example: updated-example-dlq
         environment:
           readOnly: true
           type: string
@@ -1102,12 +1104,57 @@ components:
         settings:
           properties:
             batch_size:
-              $ref: '#/components/schemas/mq_batch_size'
+              example: 100
+              type: number
             max_retries:
               $ref: '#/components/schemas/mq_max_retries'
             max_wait_time_ms:
               $ref: '#/components/schemas/mq_max_wait_time_ms'
           type: object
+      type: object
+    mq_dlq_name:
+      description: The name of the dead letter queue.
+      example: example-dlq
+      type: string
+    mq_identifier:
+      description: Identifier.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    mq_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service.
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results.
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results.
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters.
+          example: 2000
+          type: number
+      type: object
+    mq_max_wait_time_ms:
+      example: 5000
+      type: number
+    mq_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/mq_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/mq_result_info'
       type: object
     mq_api-response-common-failure:
       properties:
@@ -1139,53 +1186,6 @@ components:
       - errors
       - messages
       - result
-      type: object
-    mq_dlq_name:
-      description: The name of the dead letter queue.
-      example: example-dlq
-      type: string
-    mq_visibility_timeout:
-      description: The number of milliseconds that a message is exclusively leased. After the timeout, the message becomes available for another attempt.
-      example: 6000
-      type: number
-    mq_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/mq_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/mq_result_info'
-      type: object
-    mq_queue_message:
-      properties:
-        attempts:
-          example: 1
-          readOnly: true
-          type: number
-        body:
-          example: hello world
-          readOnly: true
-          type: string
-        id:
-          example: b01b5594f784d0165c2985833f5660dd
-          readOnly: true
-          type: string
-        lease_id:
-          $ref: '#/components/schemas/mq_lease_id'
-        metadata:
-          example:
-            CF-Content-Type: text
-            CF-sourceMessageSource: dash
-          readOnly: true
-          type: object
-        timestamp_ms:
-          example: 1710950954154.0
-          readOnly: true
-          type: number
       type: object
   securitySchemes:
     api_email:

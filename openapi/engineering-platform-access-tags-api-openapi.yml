@@ -202,6 +202,37 @@ paths:
       - 'Access: Apps and Policies Write'
 components:
   schemas:
+    access_tags_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/access_tag'
+        type: object
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    access_tags_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_tag'
+            type: array
+        type: object
     access_result_info:
       properties:
         count:
@@ -221,40 +252,6 @@ components:
           example: 2000
           type: number
       type: object
-    access_tags_components-schemas-name:
-      description: The name of the tag
-      example: engineers
-      type: string
-    access_tags_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_tag'
-            type: array
-        type: object
-    access_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/access_messages'
-        messages:
-          $ref: '#/components/schemas/access_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
     access_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/access_api-response-common'
@@ -262,43 +259,6 @@ components:
           result_info:
             $ref: '#/components/schemas/access_result_info'
       type: object
-    access_name_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            properties:
-              name:
-                $ref: '#/components/schemas/access_tags_components-schemas-name'
-            type: object
-        type: object
-    access_tag_without_app_count:
-      description: A tag
-      properties:
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        name:
-          $ref: '#/components/schemas/access_tags_components-schemas-name'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      required:
-      - name
-      type: object
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     access_api-response-common-failure:
       properties:
         errors:
@@ -330,22 +290,6 @@ components:
       - messages
       - result
       type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    access_tags_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/access_tag'
-        type: object
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
     access_tag:
       description: A tag
       properties:
@@ -362,6 +306,62 @@ components:
       required:
       - name
       type: object
+    access_tags_components-schemas-name:
+      description: The name of the tag
+      example: engineers
+      type: string
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    access_tag_without_app_count:
+      description: A tag
+      properties:
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        name:
+          $ref: '#/components/schemas/access_tags_components-schemas-name'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      required:
+      - name
+      type: object
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    access_name_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            properties:
+              name:
+                $ref: '#/components/schemas/access_tags_components-schemas-name'
+            type: object
+        type: object
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
   securitySchemes:
     api_email:
       in: header

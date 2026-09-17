@@ -238,8 +238,295 @@ paths:
       - Teams Write
 components:
   schemas:
+    teams-devices_schemas-type:
+      description: The type of device posture integration.
+      enum:
+      - workspace_one
+      - crowdstrike_s2s
+      - uptycs
+      - intune
+      - kolide
+      - tanium
+      - sentinelone_s2s
+      - custom_s2s
+      example: workspace_one
+      type: string
+    teams-devices_custom_s2s_config_request:
+      properties:
+        access_client_id:
+          description: This id will be passed in the `CF-Access-Client-ID` header when hitting the `api_url`
+          example: 88bf3b6d86161464f6509f7219099e57.access
+          type: string
+        access_client_secret:
+          description: This secret will be passed in the `CF-Access-Client-Secret` header when hitting the `api_url`
+          example: bdd31cbc4dec990953e39163fbbb194c93313ca9f0a6e420346af9d326b1d2a5
+          type: string
+        api_url:
+          description: The Custom Device Posture Integration  API URL.
+          example: https://example.custom-s2s.com
+          type: string
+      required:
+      - api_url
+      - access_client_id
+      - access_client_secret
+      title: Custom Device Posture Integration Config
+      type: object
+    teams-devices_workspace_one_config_response:
+      description: The Workspace One Config Response.
+      properties:
+        api_url:
+          description: The Workspace One API URL provided in the Workspace One Admin Dashboard.
+          example: https://as123.awmdm.com/API
+          type: string
+        auth_url:
+          description: The Workspace One Authorization URL depending on your region.
+          example: https://na.uemauth.vmwservices.com/connect/token
+          type: string
+        client_id:
+          description: The Workspace One client ID provided in the Workspace One Admin Dashboard.
+          example: example client id
+          type: string
+      required:
+      - api_url
+      - auth_url
+      - client_id
+      type: object
+    teams-devices_config_response:
+      description: The configuration object containing third-party integration information.
+      example:
+        api_url: https://as123.awmdm.com/API
+        auth_url: https://na.uemauth.vmwservices.com/connect/token
+        client_id: example client id
+      oneOf:
+      - $ref: '#/components/schemas/teams-devices_workspace_one_config_response'
+      type: object
+    teams-devices_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/teams-devices_messages'
+        messages:
+          $ref: '#/components/schemas/teams-devices_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    teams-devices_device-posture-integrations:
+      properties:
+        config:
+          $ref: '#/components/schemas/teams-devices_config_response'
+        id:
+          $ref: '#/components/schemas/teams-devices_uuid'
+        interval:
+          $ref: '#/components/schemas/teams-devices_interval'
+        name:
+          $ref: '#/components/schemas/teams-devices_components-schemas-name'
+        type:
+          $ref: '#/components/schemas/teams-devices_schemas-type'
+      type: object
+    teams-devices_components-schemas-name:
+      description: The name of the device posture integration.
+      example: My Workspace One Integration
+      type: string
+    teams-devices_tanium_config_request:
+      properties:
+        access_client_id:
+          description: If present, this id will be passed in the `CF-Access-Client-ID` header when hitting the `api_url`
+          example: 88bf3b6d86161464f6509f7219099e57.access
+          type: string
+        access_client_secret:
+          description: If present, this secret will be passed in the `CF-Access-Client-Secret` header when hitting the `api_url`
+          example: bdd31cbc4dec990953e39163fbbb194c93313ca9f0a6e420346af9d326b1d2a5
+          type: string
+        api_url:
+          description: The Tanium API URL.
+          example: https://dummy-tanium-api.cloudflare.com/plugin/products/gateway/graphql
+          type: string
+        client_secret:
+          description: The Tanium client secret.
+          example: example client secret
+          type: string
+      required:
+      - api_url
+      - client_secret
+      title: Tanium Config
+      type: object
+    teams-devices_uuid:
+      description: API UUID.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    teams-devices_kolide_config_request:
+      properties:
+        client_id:
+          description: The Kolide client ID.
+          example: example client id
+          type: string
+        client_secret:
+          description: The Kolide client secret.
+          example: example client secret
+          type: string
+      required:
+      - client_id
+      - client_secret
+      title: Kolide Config
+      type: object
+    teams-devices_interval:
+      description: The interval between each posture check with the third-party API. Use `m` for minutes (e.g. `5m`) and `h` for hours (e.g. `12h`).
+      example: 10m
+      type: string
+    teams-devices_workspace_one_config_request:
+      properties:
+        api_url:
+          description: The Workspace One API URL provided in the Workspace One Admin Dashboard.
+          example: https://as123.awmdm.com/API
+          type: string
+        auth_url:
+          description: The Workspace One Authorization URL depending on your region.
+          example: https://na.uemauth.vmwservices.com/connect/token
+          type: string
+        client_id:
+          description: The Workspace One client ID provided in the Workspace One Admin Dashboard.
+          example: example client id
+          type: string
+        client_secret:
+          description: The Workspace One client secret provided in the Workspace One Admin Dashboard.
+          example: example client secret
+          type: string
+      required:
+      - api_url
+      - auth_url
+      - client_id
+      - client_secret
+      title: Workspace One Config
+      type: object
+    teams-devices_schemas-id_response:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-single'
+      - properties:
+          result:
+            type:
+            - object
+            - 'null'
     teams-devices_identifier:
       example: 699d98642c564d2e855e9661899b7252
+    teams-devices_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type: object
+            - type: string
+            type:
+            - object
+            - 'null'
+      type: object
+    teams-devices_uptycs_config_request:
+      properties:
+        api_url:
+          description: The Uptycs API URL.
+          example: rnd.uptycs.io
+          type: string
+        client_key:
+          description: The Uptycs client secret.
+          example: example client key
+          type: string
+        client_secret:
+          description: The Uptycs client secret.
+          example: example client secret
+          type: string
+        customer_id:
+          description: The Uptycs customer ID.
+          example: example customer id
+          type: string
+      required:
+      - api_url
+      - client_key
+      - customer_id
+      - client_secret
+      title: Uptycs Config
+      type: object
+    teams-devices_config_request:
+      description: The configuration object containing third-party integration information.
+      example:
+        api_url: https://as123.awmdm.com/API
+        auth_url: https://na.uemauth.vmwservices.com/connect/token
+        client_id: example client id
+        client_secret: example client secret
+      oneOf:
+      - $ref: '#/components/schemas/teams-devices_workspace_one_config_request'
+      - $ref: '#/components/schemas/teams-devices_crowdstrike_config_request'
+      - $ref: '#/components/schemas/teams-devices_uptycs_config_request'
+      - $ref: '#/components/schemas/teams-devices_intune_config_request'
+      - $ref: '#/components/schemas/teams-devices_kolide_config_request'
+      - $ref: '#/components/schemas/teams-devices_tanium_config_request'
+      - $ref: '#/components/schemas/teams-devices_sentinelone_s2s_config_request'
+      - $ref: '#/components/schemas/teams-devices_custom_s2s_config_request'
+      type: object
+    teams-devices_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/teams-devices_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/teams-devices_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    teams-devices_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
     teams-devices_intune_config_request:
       properties:
         client_id:
@@ -275,67 +562,14 @@ components:
         type: object
         uniqueItems: true
       type: array
-    teams-devices_config_request:
-      description: The configuration object containing third-party integration information.
-      example:
-        api_url: https://as123.awmdm.com/API
-        auth_url: https://na.uemauth.vmwservices.com/connect/token
-        client_id: example client id
-        client_secret: example client secret
-      oneOf:
-      - $ref: '#/components/schemas/teams-devices_workspace_one_config_request'
-      - $ref: '#/components/schemas/teams-devices_crowdstrike_config_request'
-      - $ref: '#/components/schemas/teams-devices_uptycs_config_request'
-      - $ref: '#/components/schemas/teams-devices_intune_config_request'
-      - $ref: '#/components/schemas/teams-devices_kolide_config_request'
-      - $ref: '#/components/schemas/teams-devices_tanium_config_request'
-      - $ref: '#/components/schemas/teams-devices_sentinelone_s2s_config_request'
-      - $ref: '#/components/schemas/teams-devices_custom_s2s_config_request'
-      type: object
-    teams-devices_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/teams-devices_messages'
-        messages:
-          $ref: '#/components/schemas/teams-devices_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
+    teams-devices_schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/teams-devices_device-posture-integrations'
             type: array
-          - type: string
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    teams-devices_workspace_one_config_response:
-      description: The Workspace One Config Response.
-      properties:
-        api_url:
-          description: The Workspace One API URL provided in the Workspace One Admin Dashboard.
-          example: https://as123.awmdm.com/API
-          type: string
-        auth_url:
-          description: The Workspace One Authorization URL depending on your region.
-          example: https://na.uemauth.vmwservices.com/connect/token
-          type: string
-        client_id:
-          description: The Workspace One client ID provided in the Workspace One Admin Dashboard.
-          example: example client id
-          type: string
-      required:
-      - api_url
-      - auth_url
-      - client_id
-      type: object
     teams-devices_crowdstrike_config_request:
       properties:
         api_url:
@@ -361,199 +595,6 @@ components:
       - client_secret
       title: Crowdstrike Config
       type: object
-    teams-devices_kolide_config_request:
-      properties:
-        client_id:
-          description: The Kolide client ID.
-          example: example client id
-          type: string
-        client_secret:
-          description: The Kolide client secret.
-          example: example client secret
-          type: string
-      required:
-      - client_id
-      - client_secret
-      title: Kolide Config
-      type: object
-    teams-devices_uptycs_config_request:
-      properties:
-        api_url:
-          description: The Uptycs API URL.
-          example: rnd.uptycs.io
-          type: string
-        client_key:
-          description: The Uptycs client secret.
-          example: example client key
-          type: string
-        client_secret:
-          description: The Uptycs client secret.
-          example: example client secret
-          type: string
-        customer_id:
-          description: The Uptycs customer ID.
-          example: example customer id
-          type: string
-      required:
-      - api_url
-      - client_key
-      - customer_id
-      - client_secret
-      title: Uptycs Config
-      type: object
-    teams-devices_schemas-type:
-      description: The type of device posture integration.
-      enum:
-      - workspace_one
-      - crowdstrike_s2s
-      - uptycs
-      - intune
-      - kolide
-      - tanium
-      - sentinelone_s2s
-      - custom_s2s
-      example: workspace_one
-      type: string
-    teams-devices_components-schemas-name:
-      description: The name of the device posture integration.
-      example: My Workspace One Integration
-      type: string
-    teams-devices_workspace_one_config_request:
-      properties:
-        api_url:
-          description: The Workspace One API URL provided in the Workspace One Admin Dashboard.
-          example: https://as123.awmdm.com/API
-          type: string
-        auth_url:
-          description: The Workspace One Authorization URL depending on your region.
-          example: https://na.uemauth.vmwservices.com/connect/token
-          type: string
-        client_id:
-          description: The Workspace One client ID provided in the Workspace One Admin Dashboard.
-          example: example client id
-          type: string
-        client_secret:
-          description: The Workspace One client secret provided in the Workspace One Admin Dashboard.
-          example: example client secret
-          type: string
-      required:
-      - api_url
-      - auth_url
-      - client_id
-      - client_secret
-      title: Workspace One Config
-      type: object
-    teams-devices_tanium_config_request:
-      properties:
-        access_client_id:
-          description: If present, this id will be passed in the `CF-Access-Client-ID` header when hitting the `api_url`
-          example: 88bf3b6d86161464f6509f7219099e57.access
-          type: string
-        access_client_secret:
-          description: If present, this secret will be passed in the `CF-Access-Client-Secret` header when hitting the `api_url`
-          example: bdd31cbc4dec990953e39163fbbb194c93313ca9f0a6e420346af9d326b1d2a5
-          type: string
-        api_url:
-          description: The Tanium API URL.
-          example: https://dummy-tanium-api.cloudflare.com/plugin/products/gateway/graphql
-          type: string
-        client_secret:
-          description: The Tanium client secret.
-          example: example client secret
-          type: string
-      required:
-      - api_url
-      - client_secret
-      title: Tanium Config
-      type: object
-    teams-devices_uuid:
-      description: API UUID.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    teams-devices_interval:
-      description: The interval between each posture check with the third-party API. Use `m` for minutes (e.g. `5m`) and `h` for hours (e.g. `12h`).
-      example: 10m
-      type: string
-    teams-devices_config_response:
-      description: The configuration object containing third-party integration information.
-      example:
-        api_url: https://as123.awmdm.com/API
-        auth_url: https://na.uemauth.vmwservices.com/connect/token
-        client_id: example client id
-      oneOf:
-      - $ref: '#/components/schemas/teams-devices_workspace_one_config_response'
-      type: object
-    teams-devices_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    teams-devices_schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/teams-devices_device-posture-integrations'
-    teams-devices_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type: object
-            - type: string
-            type:
-            - object
-            - 'null'
-      type: object
-    teams-devices_device-posture-integrations:
-      properties:
-        config:
-          $ref: '#/components/schemas/teams-devices_config_response'
-        id:
-          $ref: '#/components/schemas/teams-devices_uuid'
-        interval:
-          $ref: '#/components/schemas/teams-devices_interval'
-        name:
-          $ref: '#/components/schemas/teams-devices_components-schemas-name'
-        type:
-          $ref: '#/components/schemas/teams-devices_schemas-type'
-      type: object
-    teams-devices_schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/teams-devices_device-posture-integrations'
-            type: array
-    teams-devices_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/teams-devices_result_info'
-      type: object
     teams-devices_sentinelone_s2s_config_request:
       properties:
         api_url:
@@ -569,65 +610,24 @@ components:
       - client_secret
       title: SentinelOne S2S Config
       type: object
-    teams-devices_custom_s2s_config_request:
-      properties:
-        access_client_id:
-          description: This id will be passed in the `CF-Access-Client-ID` header when hitting the `api_url`
-          example: 88bf3b6d86161464f6509f7219099e57.access
-          type: string
-        access_client_secret:
-          description: This secret will be passed in the `CF-Access-Client-Secret` header when hitting the `api_url`
-          example: bdd31cbc4dec990953e39163fbbb194c93313ca9f0a6e420346af9d326b1d2a5
-          type: string
-        api_url:
-          description: The Custom Device Posture Integration  API URL.
-          example: https://example.custom-s2s.com
-          type: string
-      required:
-      - api_url
-      - access_client_id
-      - access_client_secret
-      title: Custom Device Posture Integration Config
-      type: object
-    teams-devices_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/teams-devices_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/teams-devices_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    teams-devices_schemas-id_response:
+    teams-devices_schemas-single_response:
       allOf:
       - $ref: '#/components/schemas/teams-devices_api-response-single'
       - properties:
           result:
+            $ref: '#/components/schemas/teams-devices_device-posture-integrations'
+    teams-devices_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-common'
+      - properties:
+          result:
+            items: {}
             type:
-            - object
+            - array
             - 'null'
+          result_info:
+            $ref: '#/components/schemas/teams-devices_result_info'
+      type: object
   securitySchemes:
     api_email:
       in: header

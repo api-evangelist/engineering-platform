@@ -438,23 +438,12 @@ paths:
     - url: https://api.eu.postman.com
 components:
   schemas:
-    aaa_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/aaa_messages'
-        messages:
-          $ref: '#/components/schemas/aaa_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
+    aaa_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     aaa_api-response-common-failure:
       properties:
         errors:
@@ -477,12 +466,6 @@ components:
       - errors
       - messages
       type: object
-    aaa_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
     aaa_audit_logs_response_collection:
       oneOf:
       - properties:
@@ -498,21 +481,23 @@ components:
             example: true
             type: boolean
       - $ref: '#/components/schemas/aaa_api-response-common'
-    aaa_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    aaa_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/aaa_messages'
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     aaa_audit-logs:
       properties:
         action:
@@ -596,21 +581,25 @@ components:
           format: date-time
           type: string
       type: object
+    aaa_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     auditLogsLimitQuery:
       type: integer
       maximum: 300
       example: 50
-    untilDateQuery:
-      type: string
-      format: date
-      example: '2022-09-15'
-    ascDescDefaultDesc:
-      type: string
-      default: desc
-      enum:
-      - asc
-      - desc
-      example: desc
     cursor:
       type: string
       example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
@@ -716,16 +705,71 @@ components:
                     type: object
                     description: Additional information about the performed action.
                     additionalProperties: true
+    ascDescDefaultDesc:
+      type: string
+      default: desc
+      enum:
+      - asc
+      - desc
+      example: desc
+    untilDateQuery:
+      type: string
+      format: date
+      example: '2022-09-15'
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
+    auditLogsOrderBy:
+      name: order_by
+      in: query
+      description: Return the records in ascending (`asc`) or descending (`desc`) order.
+      schema:
+        $ref: '#/components/schemas/ascDescDefaultDesc'
+    auditLogsSinceQuery:
+      name: since
+      in: query
+      description: Return logs created after the given time, in `YYYY-MM-DD` format.
+      schema:
+        $ref: '#/components/schemas/sinceDateQuery'
+    auditLogsUntilQuery:
+      name: until
+      in: query
+      description: Return logs created before the given time, in `YYYY-MM-DD` format.
+      schema:
+        $ref: '#/components/schemas/untilDateQuery'
+    auditLogsLimitQuery:
+      name: limit
+      in: query
+      description: The maximum number of audit events to return at once.
+      schema:
+        $ref: '#/components/schemas/auditLogsLimitQuery'
   responses:
-    getAuditLogs:
-      description: Successful Response
+    common500ErrorServerError:
+      description: Internal Server Error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/getAuditLogs'
-          examples:
-            Successful Response:
-              $ref: '#/components/examples/getAuditLogs'
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
     common401Error:
       description: Unauthorized
       content:
@@ -756,59 +800,15 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
-    common500ErrorServerError:
-      description: Internal Server Error
+    getAuditLogs:
+      description: Successful Response
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-  parameters:
-    auditLogsLimitQuery:
-      name: limit
-      in: query
-      description: The maximum number of audit events to return at once.
-      schema:
-        $ref: '#/components/schemas/auditLogsLimitQuery'
-    auditLogsSinceQuery:
-      name: since
-      in: query
-      description: Return logs created after the given time, in `YYYY-MM-DD` format.
-      schema:
-        $ref: '#/components/schemas/sinceDateQuery'
-    auditLogsOrderBy:
-      name: order_by
-      in: query
-      description: Return the records in ascending (`asc`) or descending (`desc`) order.
-      schema:
-        $ref: '#/components/schemas/ascDescDefaultDesc'
-    cursor:
-      name: cursor
-      in: query
-      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
-      schema:
-        $ref: '#/components/schemas/cursor'
-    auditLogsUntilQuery:
-      name: until
-      in: query
-      description: Return logs created before the given time, in `YYYY-MM-DD` format.
-      schema:
-        $ref: '#/components/schemas/untilDateQuery'
+            $ref: '#/components/schemas/getAuditLogs'
+          examples:
+            Successful Response:
+              $ref: '#/components/examples/getAuditLogs'
   examples:
     getAuditLogs:
       value:

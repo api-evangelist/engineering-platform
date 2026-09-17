@@ -423,21 +423,8 @@ paths:
       - Security Center Insights
 components:
   schemas:
-    security-center_products:
-      example:
-      - access
-      - dns
-      items:
-        type: string
-      type: array
-    security-center_perPage:
-      description: Number of results per page of results
-      example: 25
-      maximum: 1000
-      minimum: 1
-      type: integer
-    security-center_page:
-      description: Current page within paginated list of results
+    security-center_count:
+      description: Total number of results
       example: 1
       type: integer
     security-center_issueTypes:
@@ -447,23 +434,6 @@ components:
       items:
         $ref: '#/components/schemas/security-center_issueType'
       type: array
-    security-center_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/security-center_api-response-common'
-      type: object
-    security-center_issueType:
-      enum:
-      - compliance_violation
-      - email_security
-      - exposed_infrastructure
-      - insecure_configuration
-      - weak_authentication
-      type: string
-    security-center_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
     security-center_messages:
       example: []
       items:
@@ -479,30 +449,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    security-center_dismissed:
-      example: false
-      type: boolean
-    security-center_subjects:
-      items:
-        $ref: '#/components/schemas/security-center_subject'
-      type: array
-    security-center_severityQueryParam:
-      example:
-      - low
-      - moderate
-      items:
-        enum:
-        - low
-        - moderate
-        - critical
-        type: string
-      type: array
-    security-center_subject:
-      example: example.com
-      type: string
-    security-center_issueClass:
-      example: always_use_https_not_enabled
-      type: string
     security-center_valueCountsResponse:
       allOf:
       - $ref: '#/components/schemas/security-center_api-response-common'
@@ -518,6 +464,111 @@ components:
                     type: string
                 type: object
               type: array
+    security-center_products:
+      example:
+      - access
+      - dns
+      items:
+        type: string
+      type: array
+    security-center_subjects:
+      items:
+        $ref: '#/components/schemas/security-center_subject'
+      type: array
+    security-center_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/security-center_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/security-center_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    security-center_dismissed:
+      example: false
+      type: boolean
+    security-center_issueType:
+      enum:
+      - compliance_violation
+      - email_security
+      - exposed_infrastructure
+      - insecure_configuration
+      - weak_authentication
+      type: string
+    security-center_perPage:
+      description: Number of results per page of results
+      example: 25
+      maximum: 1000
+      minimum: 1
+      type: integer
+    security-center_issueClasses:
+      example:
+      - a_record_dangling
+      - always_use_https_not_enabled
+      items:
+        $ref: '#/components/schemas/security-center_issueClass'
+      type: array
+    security-center_issueClass:
+      example: always_use_https_not_enabled
+      type: string
+    security-center_subject:
+      example: example.com
+      type: string
+    security-center_severityQueryParam:
+      example:
+      - low
+      - moderate
+      items:
+        enum:
+        - low
+        - moderate
+        - critical
+        type: string
+      type: array
+    security-center_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    security-center_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/security-center_messages'
+        messages:
+          $ref: '#/components/schemas/security-center_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     security-center_issue:
       properties:
         dismissed:
@@ -550,64 +601,13 @@ components:
           format: date-time
           type: string
       type: object
-    security-center_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/security-center_messages'
-        messages:
-          $ref: '#/components/schemas/security-center_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    security-center_count:
-      description: Total number of results
+    security-center_page:
+      description: Current page within paginated list of results
       example: 1
       type: integer
-    security-center_issueClasses:
-      example:
-      - a_record_dangling
-      - always_use_https_not_enabled
-      items:
-        $ref: '#/components/schemas/security-center_issueClass'
-      type: array
-    security-center_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/security-center_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/security-center_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
+    security-center_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/security-center_api-response-common'
       type: object
   securitySchemes:
     api_email:

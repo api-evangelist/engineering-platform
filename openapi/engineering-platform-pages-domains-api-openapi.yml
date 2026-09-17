@@ -239,6 +239,27 @@ paths:
       - Pages Domains
 components:
   schemas:
+    pages_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    pages_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     pages_domain-object:
       properties:
         certificate_authority:
@@ -311,6 +332,25 @@ components:
           readOnly: true
           type: string
       type: object
+    pages_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/pages_messages'
+        messages:
+          $ref: '#/components/schemas/pages_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     pages_domain-response-collection:
       allOf:
       - $ref: '#/components/schemas/pages_api-response-common'
@@ -320,6 +360,61 @@ components:
             items:
               $ref: '#/components/schemas/pages_domain-object'
             type: array
+    pages_domain-response-single:
+      allOf:
+      - $ref: '#/components/schemas/pages_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/pages_domain-object'
+    pages_project_name:
+      description: Name of the project.
+      example: this-is-my-project-01
+      pattern: ^[a-z0-9][a-z0-9-]*$
+      type: string
+    pages_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/pages_api-response-common'
+      - properties:
+          result:
+            type:
+            - object
+            - 'null'
+      type: object
+    pages_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/pages_messages'
+          example:
+          - code: 7003
+            message: No route for the URI.
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/pages_messages'
+          example: []
+        result:
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    pages_domains-post:
+      properties:
+        name:
+          example: example.com
+          type: string
+      type: object
     pages_api-response-pagination:
       properties:
         result_info:
@@ -351,104 +446,9 @@ components:
           - total_count
           type: object
       type: object
-    pages_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    pages_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    pages_domain-response-single:
-      allOf:
-      - $ref: '#/components/schemas/pages_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/pages_domain-object'
     pages_domain_name:
       description: Name of the domain.
       example: this-is-my-domain-01.com
-      pattern: ^[a-z0-9][a-z0-9-]*$
-      type: string
-    pages_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/pages_api-response-common'
-      - properties:
-          result:
-            type:
-            - object
-            - 'null'
-      type: object
-    pages_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/pages_messages'
-        messages:
-          $ref: '#/components/schemas/pages_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    pages_domains-post:
-      properties:
-        name:
-          example: example.com
-          type: string
-      type: object
-    pages_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/pages_messages'
-          example:
-          - code: 7003
-            message: No route for the URI.
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/pages_messages'
-          example: []
-        result:
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    pages_project_name:
-      description: Name of the project.
-      example: this-is-my-project-01
       pattern: ^[a-z0-9][a-z0-9-]*$
       type: string
   securitySchemes:

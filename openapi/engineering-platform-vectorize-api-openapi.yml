@@ -766,38 +766,24 @@ paths:
         - com.cloudflare.edge.vectorize.index.update
 components:
   schemas:
-    vectorize_index-metric:
-      description: Specifies the type of metric to use calculating distance.
-      enum:
-      - cosine
-      - euclidean
-      - dot-product
+    vectorize_vector-identifier:
+      description: Identifier for a Vector
+      example: some-vector-id-023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 64
+      readOnly: true
       type: string
-    vectorize_index-delete-vectors-by-id-v2-response:
+    vectorize_create-index-request:
       properties:
-        mutationId:
-          $ref: '#/components/schemas/vectorize_mutation-uuid'
-      type: object
-    vectorize_index-description:
-      description: Specifies the description of the index.
-      example: This is my example index.
-      type: string
-    vectorize_index-upsert-v2-response:
-      properties:
-        mutationId:
-          $ref: '#/components/schemas/vectorize_mutation-uuid'
-      type: object
-    vectorize_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/vectorize_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type: object
-            - type: string
-            type:
-            - object
-            - 'null'
+        config:
+          allOf:
+          - $ref: '#/components/schemas/vectorize_index-configuration'
+        description:
+          $ref: '#/components/schemas/vectorize_index-description'
+        name:
+          $ref: '#/components/schemas/vectorize_index-name'
+      required:
+      - name
+      - config
       type: object
     vectorize_index-info-response:
       properties:
@@ -818,60 +804,106 @@ components:
           example: 300000
           type: integer
       type: object
-    vectorize_mutation-uuid:
-      description: The unique identifier for the async mutation operation containing the changeset.
-      example: 0000aaaa-11bb-22cc-33dd-444444eeeeee
-      maxLength: 36
+    vectorize_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/vectorize_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type: object
+            - type: string
+            type:
+            - object
+            - 'null'
+      type: object
+    vectorize_delete-metadata-index-request:
+      properties:
+        propertyName:
+          description: Specifies the metadata property for which the index must be deleted.
+          example: random_metadata_property
+          type: string
+      required:
+      - propertyName
+      type: object
     vectorize_identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       readOnly: true
       type: string
-    vectorize_create-metadata-index-request:
+    vectorize_index-query-v2-response:
       properties:
-        indexType:
-          description: Specifies the type of metadata property to index.
-          enum:
-          - string
-          - number
-          - boolean
-          type: string
-        propertyName:
-          description: Specifies the metadata property to index.
-          example: random_metadata_property
-          type: string
-      required:
-      - propertyName
-      - indexType
-      type: object
-    vectorize_list-metadata-index-response:
-      example:
-        metadataIndexes:
-        - indexType: number
-          propertyName: some-num-prop
-        - indexType: string
-          propertyName: some-str-prop
-        - indexType: boolean
-          propertyName: some-bool-prop
-      properties:
-        metadataIndexes:
-          description: Array of indexed metadata properties.
+        count:
+          description: Specifies the count of vectors returned by the search
+          type: integer
+        matches:
+          description: Array of vectors matched by the search
           items:
             properties:
-              indexType:
-                description: Specifies the type of indexed metadata property.
-                enum:
+              id:
+                $ref: '#/components/schemas/vectorize_vector-identifier'
+              metadata:
+                type:
+                - object
+                - 'null'
+              namespace:
+                type:
                 - string
-                - number
-                - boolean
-                type: string
-              propertyName:
-                description: Specifies the indexed metadata property.
-                example: random_metadata_property
-                type: string
+                - 'null'
+              score:
+                description: The score of the vector according to the index's distance metric
+                type: number
+              values:
+                items:
+                  type: number
+                type:
+                - array
+                - 'null'
             type: object
           type: array
+      type: object
+    vectorize_index-name:
+      example: example-index
+      pattern: ^([a-z]+[a-z0-9_-]*[a-z0-9]+)$
+      type: string
+    vectorize_mutation-uuid:
+      description: The unique identifier for the async mutation operation containing the changeset.
+      example: 0000aaaa-11bb-22cc-33dd-444444eeeeee
+      maxLength: 36
+    vectorize_index-get-vectors-by-id-request:
+      properties:
+        ids:
+          description: A list of vector identifiers to retrieve from the index indicated by the path.
+          example:
+          - 5121db81354a40c6aedc3fe1ace51c59
+          - f90eb49c2107486abdfd78c67e853430
+          items:
+            $ref: '#/components/schemas/vectorize_vector-identifier'
+          type: array
+      type: object
+    vectorize_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/vectorize_messages'
+        messages:
+          $ref: '#/components/schemas/vectorize_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
       type: object
     vectorize_index-preset-configuration:
       properties:
@@ -880,44 +912,7 @@ components:
       required:
       - preset
       type: object
-    vectorize_index-dimensions:
-      description: Specifies the number of dimensions for the index
-      example: 768
-      maximum: 1536
-      minimum: 1
-      type: integer
-    vectorize_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/vectorize_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/vectorize_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    vectorize_delete-metadata-index-response:
+    vectorize_create-metadata-index-response:
       properties:
         mutationId:
           $ref: '#/components/schemas/vectorize_mutation-uuid'
@@ -958,39 +953,79 @@ components:
             type: array
         type: object
       type: array
-    vectorize_create-index-response:
+    vectorize_index-configuration:
+      description: Specifies the type of configuration to use for the index.
+      oneOf:
+      - $ref: '#/components/schemas/vectorize_index-dimension-configuration'
+      - $ref: '#/components/schemas/vectorize_index-preset-configuration'
+    vectorize_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    vectorize_list-metadata-index-response:
+      example:
+        metadataIndexes:
+        - indexType: number
+          propertyName: some-num-prop
+        - indexType: string
+          propertyName: some-str-prop
+        - indexType: boolean
+          propertyName: some-bool-prop
       properties:
-        config:
-          $ref: '#/components/schemas/vectorize_index-dimension-configuration'
-        created_on:
-          description: Specifies the timestamp the resource was created as an ISO8601 string.
-          example: '2022-11-15T18:25:44.442097Z'
-          format: date-time
-          readOnly: true
-          type: string
-        description:
-          $ref: '#/components/schemas/vectorize_index-description'
-        modified_on:
-          description: Specifies the timestamp the resource was modified as an ISO8601 string.
-          example: '2022-11-15T18:25:44.442097Z'
-          format: date-time
-          readOnly: true
-          type: string
-        name:
-          $ref: '#/components/schemas/vectorize_index-name'
+        metadataIndexes:
+          description: Array of indexed metadata properties.
+          items:
+            properties:
+              indexType:
+                description: Specifies the type of indexed metadata property.
+                enum:
+                - string
+                - number
+                - boolean
+                type: string
+              propertyName:
+                description: Specifies the indexed metadata property.
+                example: random_metadata_property
+                type: string
+            type: object
+          type: array
       type: object
-    vectorize_create-index-request:
+    vectorize_index-dimension-configuration:
       properties:
-        config:
-          allOf:
-          - $ref: '#/components/schemas/vectorize_index-configuration'
-        description:
-          $ref: '#/components/schemas/vectorize_index-description'
-        name:
-          $ref: '#/components/schemas/vectorize_index-name'
+        dimensions:
+          $ref: '#/components/schemas/vectorize_index-dimensions'
+        metric:
+          $ref: '#/components/schemas/vectorize_index-metric'
       required:
-      - name
-      - config
+      - dimensions
+      - metric
+      type: object
+    vectorize_delete-metadata-index-response:
+      properties:
+        mutationId:
+          $ref: '#/components/schemas/vectorize_mutation-uuid'
+      type: object
+    vectorize_index-delete-vectors-by-id-request:
+      properties:
+        ids:
+          description: A list of vector identifiers to delete from the index indicated by the path.
+          example:
+          - 5121db81354a40c6aedc3fe1ace51c59
+          - f90eb49c2107486abdfd78c67e853430
+          items:
+            $ref: '#/components/schemas/vectorize_vector-identifier'
+          type: array
       type: object
     vectorize_index-query-v2-request:
       properties:
@@ -1030,137 +1065,10 @@ components:
       required:
       - vector
       type: object
-    vectorize_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    vectorize_index-name:
-      example: example-index
-      pattern: ^([a-z]+[a-z0-9_-]*[a-z0-9]+)$
+    vectorize_index-description:
+      description: Specifies the description of the index.
+      example: This is my example index.
       type: string
-    vectorize_index-query-v2-response:
-      properties:
-        count:
-          description: Specifies the count of vectors returned by the search
-          type: integer
-        matches:
-          description: Array of vectors matched by the search
-          items:
-            properties:
-              id:
-                $ref: '#/components/schemas/vectorize_vector-identifier'
-              metadata:
-                type:
-                - object
-                - 'null'
-              namespace:
-                type:
-                - string
-                - 'null'
-              score:
-                description: The score of the vector according to the index's distance metric
-                type: number
-              values:
-                items:
-                  type: number
-                type:
-                - array
-                - 'null'
-            type: object
-          type: array
-      type: object
-    vectorize_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/vectorize_messages'
-        messages:
-          $ref: '#/components/schemas/vectorize_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    vectorize_index-get-vectors-by-id-request:
-      properties:
-        ids:
-          description: A list of vector identifiers to retrieve from the index indicated by the path.
-          example:
-          - 5121db81354a40c6aedc3fe1ace51c59
-          - f90eb49c2107486abdfd78c67e853430
-          items:
-            $ref: '#/components/schemas/vectorize_vector-identifier'
-          type: array
-      type: object
-    vectorize_index-dimension-configuration:
-      properties:
-        dimensions:
-          $ref: '#/components/schemas/vectorize_index-dimensions'
-        metric:
-          $ref: '#/components/schemas/vectorize_index-metric'
-      required:
-      - dimensions
-      - metric
-      type: object
-    vectorize_index-insert-v2-response:
-      properties:
-        mutationId:
-          $ref: '#/components/schemas/vectorize_mutation-uuid'
-      type: object
-    vectorize_index-delete-vectors-by-id-request:
-      properties:
-        ids:
-          description: A list of vector identifiers to delete from the index indicated by the path.
-          example:
-          - 5121db81354a40c6aedc3fe1ace51c59
-          - f90eb49c2107486abdfd78c67e853430
-          items:
-            $ref: '#/components/schemas/vectorize_vector-identifier'
-          type: array
-      type: object
-    vectorize_create-metadata-index-response:
-      properties:
-        mutationId:
-          $ref: '#/components/schemas/vectorize_mutation-uuid'
-      type: object
-    vectorize_vector-identifier:
-      description: Identifier for a Vector
-      example: some-vector-id-023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 64
-      readOnly: true
-      type: string
-    vectorize_delete-metadata-index-request:
-      properties:
-        propertyName:
-          description: Specifies the metadata property for which the index must be deleted.
-          example: random_metadata_property
-          type: string
-      required:
-      - propertyName
-      type: object
     vectorize_index-preset:
       description: Specifies the preset to use for the index.
       enum:
@@ -1171,11 +1079,103 @@ components:
       - cohere/embed-multilingual-v2.0
       example: '@cf/baai/bge-small-en-v1.5'
       type: string
-    vectorize_index-configuration:
-      description: Specifies the type of configuration to use for the index.
-      oneOf:
-      - $ref: '#/components/schemas/vectorize_index-dimension-configuration'
-      - $ref: '#/components/schemas/vectorize_index-preset-configuration'
+    vectorize_index-delete-vectors-by-id-v2-response:
+      properties:
+        mutationId:
+          $ref: '#/components/schemas/vectorize_mutation-uuid'
+      type: object
+    vectorize_index-insert-v2-response:
+      properties:
+        mutationId:
+          $ref: '#/components/schemas/vectorize_mutation-uuid'
+      type: object
+    vectorize_index-dimensions:
+      description: Specifies the number of dimensions for the index
+      example: 768
+      maximum: 1536
+      minimum: 1
+      type: integer
+    vectorize_index-metric:
+      description: Specifies the type of metric to use calculating distance.
+      enum:
+      - cosine
+      - euclidean
+      - dot-product
+      type: string
+    vectorize_create-metadata-index-request:
+      properties:
+        indexType:
+          description: Specifies the type of metadata property to index.
+          enum:
+          - string
+          - number
+          - boolean
+          type: string
+        propertyName:
+          description: Specifies the metadata property to index.
+          example: random_metadata_property
+          type: string
+      required:
+      - propertyName
+      - indexType
+      type: object
+    vectorize_create-index-response:
+      properties:
+        config:
+          $ref: '#/components/schemas/vectorize_index-dimension-configuration'
+        created_on:
+          description: Specifies the timestamp the resource was created as an ISO8601 string.
+          example: '2022-11-15T18:25:44.442097Z'
+          format: date-time
+          readOnly: true
+          type: string
+        description:
+          $ref: '#/components/schemas/vectorize_index-description'
+        modified_on:
+          description: Specifies the timestamp the resource was modified as an ISO8601 string.
+          example: '2022-11-15T18:25:44.442097Z'
+          format: date-time
+          readOnly: true
+          type: string
+        name:
+          $ref: '#/components/schemas/vectorize_index-name'
+      type: object
+    vectorize_index-upsert-v2-response:
+      properties:
+        mutationId:
+          $ref: '#/components/schemas/vectorize_mutation-uuid'
+      type: object
+    vectorize_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/vectorize_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/vectorize_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
   securitySchemes:
     api_email:
       in: header

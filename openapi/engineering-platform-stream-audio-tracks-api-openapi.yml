@@ -188,6 +188,51 @@ components:
       example: ea95132c15732412d22c1476fa83f27a
       maxLength: 32
       type: string
+    stream_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    stream_listAudioTrackResponse:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/stream_additionalAudio'
+            type: array
+    stream_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    stream_account_identifier:
+      description: The account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     stream_additionalAudio:
       properties:
         default:
@@ -198,14 +243,23 @@ components:
           $ref: '#/components/schemas/stream_audio_state'
         uid:
           $ref: '#/components/schemas/stream_identifier'
-    stream_listAudioTrackResponse:
+    stream_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-single'
+      - properties:
+          result:
+            example: ok
+            type: string
+    stream_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      type: object
+    stream_addAudioTrackResponse:
       allOf:
       - $ref: '#/components/schemas/stream_api-response-common'
       - properties:
           result:
-            items:
-              $ref: '#/components/schemas/stream_additionalAudio'
-            type: array
+            $ref: '#/components/schemas/stream_additionalAudio'
     stream_api-response-common-failure:
       properties:
         errors:
@@ -237,44 +291,33 @@ components:
       - messages
       - result
       type: object
-    stream_addAudioTrackResponse:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/stream_additionalAudio'
+    stream_audio_state:
+      description: Specifies the processing status of the video.
+      enum:
+      - queued
+      - ready
+      - error
+      type: string
+    stream_audio_label:
+      description: A string to uniquely identify the track amongst other audio track labels for the specified video.
+      example: director commentary
+      type: string
     stream_audio_identifier:
       description: The unique identifier for an additional audio track.
       example: ea95132c15732412d22c1476fa83f27a
       maxLength: 32
       type: string
-    stream_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    stream_audio_label:
-      description: A string to uniquely identify the track amongst other audio track labels for the specified video.
-      example: director commentary
-      type: string
-    stream_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      type: object
     stream_audio_default:
       default: false
       description: Denotes whether the audio track will be played by default in a player.
       type: boolean
+    stream_editAudioTrack:
+      properties:
+        default:
+          $ref: '#/components/schemas/stream_audio_default'
+        label:
+          $ref: '#/components/schemas/stream_audio_label'
+      type: object
     stream_copyAudioTrack:
       properties:
         label:
@@ -287,49 +330,6 @@ components:
       required:
       - label
       type: object
-    stream_audio_state:
-      description: Specifies the processing status of the video.
-      enum:
-      - queued
-      - ready
-      - error
-      type: string
-    stream_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    stream_editAudioTrack:
-      properties:
-        default:
-          $ref: '#/components/schemas/stream_audio_default'
-        label:
-          $ref: '#/components/schemas/stream_audio_label'
-      type: object
-    stream_account_identifier:
-      description: The account identifier tag.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    stream_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-single'
-      - properties:
-          result:
-            example: ok
-            type: string
   securitySchemes:
     api_email:
       in: header

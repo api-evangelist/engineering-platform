@@ -175,34 +175,50 @@ paths:
       - Stream Read
 components:
   schemas:
-    stream_downloadedFrom:
-      description: The source URL for a downloaded image. If the watermark profile was created via direct upload, this field is null.
-      example: https://company.com/logo.png
-      type: string
-    stream_padding:
-      default: 0.05
-      description: The whitespace between the adjacent edges (determined by position) of the video and the image. `0.0` indicates no padding, and `1.0` indicates a fully padded video width or length, as determined by the algorithm.
-      example: 0.1
-      maximum: 1
-      minimum: 0
-      type: number
+    stream_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    stream_watermark_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/stream_watermarks'
+            type: array
     stream_watermark_size:
       description: The size of the image in bytes.
       example: 29472
       type: number
-    stream_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
+    stream_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
       type: object
-    stream_watermark_response_single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/stream_watermarks'
-    stream_width:
-      description: The width of the image in pixels.
-      type: integer
     stream_watermarks:
       properties:
         created:
@@ -228,30 +244,23 @@ components:
         width:
           $ref: '#/components/schemas/stream_width'
       type: object
-    stream_watermark_basic_upload:
-      properties:
-        file:
-          description: The image file to upload.
-          example: '@/Users/rchen/Downloads/watermark.png'
-          type: string
-        name:
-          $ref: '#/components/schemas/stream_name'
-        opacity:
-          $ref: '#/components/schemas/stream_opacity'
-        padding:
-          $ref: '#/components/schemas/stream_padding'
-        position:
-          $ref: '#/components/schemas/stream_position'
-        scale:
-          $ref: '#/components/schemas/stream_scale'
-      required:
-      - file
-      type: object
-    stream_position:
-      default: upperRight
-      description: 'The location of the image. Valid positions are: `upperRight`, `upperLeft`, `lowerLeft`, `lowerRight`, and `center`. Note that `center` ignores the `padding` parameter.'
-      example: center
+    stream_name:
+      default: ''
+      description: A short description of the watermark profile.
+      example: Marketing Videos
       type: string
+    stream_account_identifier:
+      description: The account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    stream_opacity:
+      default: 1
+      description: The translucency of the image. A value of `0.0` makes the image completely transparent, and `1.0` makes the image completely opaque. Note that if the image is already semi-transparent, setting this to `1.0` will not make the image completely opaque.
+      example: 0.75
+      maximum: 1
+      minimum: 0
+      type: number
     stream_api-response-common-failure:
       properties:
         errors:
@@ -283,20 +292,51 @@ components:
       - messages
       - result
       type: object
+    stream_watermark_response_single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/stream_watermarks'
+    stream_watermark_basic_upload:
+      properties:
+        file:
+          description: The image file to upload.
+          example: '@/Users/rchen/Downloads/watermark.png'
+          type: string
+        name:
+          $ref: '#/components/schemas/stream_name'
+        opacity:
+          $ref: '#/components/schemas/stream_opacity'
+        padding:
+          $ref: '#/components/schemas/stream_padding'
+        position:
+          $ref: '#/components/schemas/stream_position'
+        scale:
+          $ref: '#/components/schemas/stream_scale'
+      required:
+      - file
+      type: object
+    stream_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      type: object
+    stream_padding:
+      default: 0.05
+      description: The whitespace between the adjacent edges (determined by position) of the video and the image. `0.0` indicates no padding, and `1.0` indicates a fully padded video width or length, as determined by the algorithm.
+      example: 0.1
+      maximum: 1
+      minimum: 0
+      type: number
     stream_watermark_created:
       description: The date and a time a watermark profile was created.
       example: '2014-01-02T02:20:00Z'
       format: date-time
       type: string
-    stream_name:
-      default: ''
-      description: A short description of the watermark profile.
-      example: Marketing Videos
-      type: string
-    stream_account_identifier:
-      description: The account identifier tag.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    stream_position:
+      default: upperRight
+      description: 'The location of the image. Valid positions are: `upperRight`, `upperLeft`, `lowerLeft`, `lowerRight`, and `center`. Note that `center` ignores the `padding` parameter.'
+      example: center
       type: string
     stream_height:
       description: The height of the image in pixels.
@@ -306,13 +346,6 @@ components:
       example: ea95132c15732412d22c1476fa83f27a
       maxLength: 32
       type: string
-    stream_opacity:
-      default: 1
-      description: The translucency of the image. A value of `0.0` makes the image completely transparent, and `1.0` makes the image completely opaque. Note that if the image is already semi-transparent, setting this to `1.0` will not make the image completely opaque.
-      example: 0.75
-      maximum: 1
-      minimum: 0
-      type: number
     stream_scale:
       default: 0.15
       description: The size of the image relative to the overall size of the video. This parameter will adapt to horizontal and vertical videos automatically. `0.0` indicates no scaling (use the size of the image as-is), and `1.0 `fills the entire video.
@@ -320,46 +353,13 @@ components:
       maximum: 1
       minimum: 0
       type: number
-    stream_watermark_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/stream_watermarks'
-            type: array
-    stream_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    stream_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
+    stream_width:
+      description: The width of the image in pixels.
+      type: integer
+    stream_downloadedFrom:
+      description: The source URL for a downloaded image. If the watermark profile was created via direct upload, this field is null.
+      example: https://company.com/logo.png
+      type: string
   securitySchemes:
     api_email:
       in: header

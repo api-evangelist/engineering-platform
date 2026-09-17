@@ -217,26 +217,89 @@ paths:
       - Cloudflare DEX Write
 components:
   schemas:
-    teams-devices_dex_target_policy:
-      properties:
-        default:
-          description: Whether the profile is the account default
-          type: boolean
-        id:
-          description: The id of the device settings profile
-          type: string
-        name:
-          description: The name of the device settings profile
-          type: string
-      type: object
-    teams-devices_dex-response_collection:
+    teams-devices_device-dex-test-schemas-description:
+      description: Additional details about the test.
+      example: Checks the dash endpoint every 30 minutes
+      type: string
+    teams-devices_api-response-collection-common:
       allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-collection-common'
+      - $ref: '#/components/schemas/teams-devices_api-response-common'
       - properties:
           result:
-            items:
-              $ref: '#/components/schemas/teams-devices_device-dex-test-schemas-http'
-            type: array
+            items: {}
+            type:
+            - array
+            - 'null'
+      type: object
+    teams-devices_device-dex-test-schemas-name:
+      description: The name of the DEX test. Must be unique.
+      example: HTTP dash health check
+      type: string
+    teams-devices_device-dex-test-schemas-data:
+      description: The configuration object which contains the details for the WARP client to conduct the test.
+      example:
+        host: https://dash.cloudflare.com
+        kind: http
+        method: GET
+      properties:
+        host:
+          description: The desired endpoint to test.
+          example: https://dash.cloudflare.com
+          type: string
+        kind:
+          description: The type of test.
+          example: http
+          type: string
+        method:
+          description: The HTTP request method type.
+          example: GET
+          type: string
+      type: object
+    teams-devices_identifier:
+      example: 699d98642c564d2e855e9661899b7252
+    teams-devices_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    teams-devices_device-dex-test-target-policies:
+      description: Device settings profiles targeted by this test
+      items:
+        $ref: '#/components/schemas/teams-devices_dex_target_policy'
+      type: array
+    teams-devices_dex-single_response:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/teams-devices_device-dex-test-schemas-http'
+    teams-devices_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type: object
+            - type: string
+            type:
+            - object
+            - 'null'
+      type: object
+    teams-devices_uuid:
+      description: API UUID.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
     teams-devices_device-dex-test-schemas-http:
       properties:
         data:
@@ -259,47 +322,21 @@ components:
       - enabled
       - data
       type: object
-    teams-devices_api-response-collection-common:
+    teams-devices_dex-response_collection:
       allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-common'
+      - $ref: '#/components/schemas/teams-devices_api-response-collection-common'
       - properties:
           result:
-            items: {}
-            type:
-            - array
-            - 'null'
-      type: object
-    teams-devices_identifier:
-      example: 699d98642c564d2e855e9661899b7252
-    teams-devices_dex-single_response:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/teams-devices_device-dex-test-schemas-http'
-    teams-devices_uuid:
-      description: API UUID.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    teams-devices_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    teams-devices_device-dex-test-schemas-description:
-      description: Additional details about the test.
-      example: Checks the dash endpoint every 30 minutes
+            items:
+              $ref: '#/components/schemas/teams-devices_device-dex-test-schemas-http'
+            type: array
+    teams-devices_device-dex-test-schemas-enabled:
+      description: Determines whether or not the test is active.
+      example: true
+      type: boolean
+    teams-devices_device-dex-test-schemas-interval:
+      description: How often the test will run.
+      example: 30m
       type: string
     teams-devices_api-response-common-failure:
       properties:
@@ -332,31 +369,18 @@ components:
       - messages
       - result
       type: object
-    teams-devices_device-dex-test-schemas-data:
-      description: The configuration object which contains the details for the WARP client to conduct the test.
-      example:
-        host: https://dash.cloudflare.com
-        kind: http
-        method: GET
+    teams-devices_dex_target_policy:
       properties:
-        host:
-          description: The desired endpoint to test.
-          example: https://dash.cloudflare.com
+        default:
+          description: Whether the profile is the account default
+          type: boolean
+        id:
+          description: The id of the device settings profile
           type: string
-        kind:
-          description: The type of test.
-          example: http
-          type: string
-        method:
-          description: The HTTP request method type.
-          example: GET
+        name:
+          description: The name of the device settings profile
           type: string
       type: object
-    teams-devices_device-dex-test-target-policies:
-      description: Device settings profiles targeted by this test
-      items:
-        $ref: '#/components/schemas/teams-devices_dex_target_policy'
-      type: array
     teams-devices_api-response-common:
       properties:
         errors:
@@ -381,30 +405,6 @@ components:
       - messages
       - result
       type: object
-    teams-devices_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type: object
-            - type: string
-            type:
-            - object
-            - 'null'
-      type: object
-    teams-devices_device-dex-test-schemas-name:
-      description: The name of the DEX test. Must be unique.
-      example: HTTP dash health check
-      type: string
-    teams-devices_device-dex-test-schemas-enabled:
-      description: Determines whether or not the test is active.
-      example: true
-      type: boolean
-    teams-devices_device-dex-test-schemas-interval:
-      description: How often the test will run.
-      example: 30m
-      type: string
   securitySchemes:
     api_email:
       in: header

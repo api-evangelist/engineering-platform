@@ -53,6 +53,43 @@ paths:
       - IP List
 components:
   schemas:
+    intel_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/intel_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/intel_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    intel_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     intel_api-response-common:
       properties:
         errors:
@@ -89,21 +126,6 @@ components:
           result_info:
             $ref: '#/components/schemas/intel_result_info'
       type: object
-    intel_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     intel_ip-list:
       properties:
         description:
@@ -113,20 +135,6 @@ components:
         name:
           example: Malware
           type: string
-    intel_components-schemas-response:
-      allOf:
-      - $ref: '#/components/schemas/intel_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/intel_ip-list'
-            type: array
-    intel_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
     intel_result_info:
       properties:
         count:
@@ -146,37 +154,29 @@ components:
           example: 2000
           type: number
       type: object
-    intel_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/intel_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/intel_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
+    intel_components-schemas-response:
+      allOf:
+      - $ref: '#/components/schemas/intel_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/intel_ip-list'
+            type: array
+    intel_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
   securitySchemes:
     api_email:
       in: header

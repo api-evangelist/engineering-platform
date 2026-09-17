@@ -280,87 +280,14 @@ paths:
         pro: false
 components:
   schemas:
-    magic_connector-id:
-      description: Magic Connector identifier tag.
-      example: ac60d3d0435248289d446cedd870bcf4
-      type: string
-    magic_sites_add_single_request:
-      properties:
-        connector_id:
-          $ref: '#/components/schemas/magic_connector-id'
-        description:
-          type: string
-        ha_mode:
-          description: Site high availability mode. If set to true, the site can have two connectors and runs in high availability mode.
-          example: true
-          type: boolean
-        location:
-          $ref: '#/components/schemas/magic_site-location'
-        name:
-          $ref: '#/components/schemas/magic_site-name'
-        secondary_connector_id:
-          $ref: '#/components/schemas/magic_secondary-connector-id'
-      required:
-      - name
-      type: object
-    magic_site_single_response:
+    magic_sites_collection_response:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-single'
       - properties:
           result:
-            $ref: '#/components/schemas/magic_site'
-    magic_site_update_request:
-      properties:
-        connector_id:
-          $ref: '#/components/schemas/magic_connector-id'
-        description:
-          type: string
-        location:
-          $ref: '#/components/schemas/magic_site-location'
-        name:
-          $ref: '#/components/schemas/magic_site-name'
-        secondary_connector_id:
-          $ref: '#/components/schemas/magic_secondary-connector-id'
-      type: object
-    magic_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
-      type: object
-    magic_site-name:
-      description: The name of the site.
-      example: site_1
-      type: string
-    magic_site-location:
-      description: Location of site in latitude and longitude.
-      properties:
-        lat:
-          description: Latitude
-          example: 37.6192
-          type: string
-        lon:
-          description: Longitude
-          example: 122.3816
-          type: string
-      type: object
-    magic_secondary-connector-id:
-      description: Magic Connector identifier tag. Used when high availability mode is on.
-      example: 8d67040d3835dbcf46ce29da440dc482
-      type: string
-    magic_site_modified_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_site'
+            items:
+              $ref: '#/components/schemas/magic_site'
+            type: array
     magic_messages:
       example: []
       items:
@@ -376,63 +303,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    magic_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/magic_messages'
-        messages:
-          $ref: '#/components/schemas/magic_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    magic_site_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_site'
-    magic_site:
-      properties:
-        connector_id:
-          $ref: '#/components/schemas/magic_connector-id'
-        description:
-          type: string
-        ha_mode:
-          description: Site high availability mode. If set to true, the site can have two connectors and runs in high availability mode.
-          example: true
-          type: boolean
-        id:
-          $ref: '#/components/schemas/magic_identifier'
-        location:
-          $ref: '#/components/schemas/magic_site-location'
-        name:
-          $ref: '#/components/schemas/magic_site-name'
-        secondary_connector_id:
-          $ref: '#/components/schemas/magic_secondary-connector-id'
-      type: object
-    magic_sites_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/magic_site'
-            type: array
     magic_api-response-common-failure:
       properties:
         errors:
@@ -464,12 +334,142 @@ components:
       - messages
       - result
       type: object
+    magic_site:
+      properties:
+        connector_id:
+          $ref: '#/components/schemas/magic_connector-id'
+        description:
+          type: string
+        ha_mode:
+          description: Site high availability mode. If set to true, the site can have two connectors and runs in high availability mode.
+          example: true
+          type: boolean
+        id:
+          $ref: '#/components/schemas/magic_identifier'
+        location:
+          $ref: '#/components/schemas/magic_site-location'
+        name:
+          $ref: '#/components/schemas/magic_site-name'
+        secondary_connector_id:
+          $ref: '#/components/schemas/magic_secondary-connector-id'
+      type: object
+    magic_site_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_site'
+    magic_connector-id:
+      description: Magic Connector identifier tag.
+      example: ac60d3d0435248289d446cedd870bcf4
+      type: string
+    magic_secondary-connector-id:
+      description: Magic Connector identifier tag. Used when high availability mode is on.
+      example: 8d67040d3835dbcf46ce29da440dc482
+      type: string
+    magic_site-location:
+      description: Location of site in latitude and longitude.
+      properties:
+        lat:
+          description: Latitude
+          example: 37.6192
+          type: string
+        lon:
+          description: Longitude
+          example: 122.3816
+          type: string
+      type: object
+    magic_site-name:
+      description: The name of the site.
+      example: site_1
+      type: string
+    magic_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
+    magic_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic_messages'
+        messages:
+          $ref: '#/components/schemas/magic_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic_site_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_site'
+    magic_site_update_request:
+      properties:
+        connector_id:
+          $ref: '#/components/schemas/magic_connector-id'
+        description:
+          type: string
+        location:
+          $ref: '#/components/schemas/magic_site-location'
+        name:
+          $ref: '#/components/schemas/magic_site-name'
+        secondary_connector_id:
+          $ref: '#/components/schemas/magic_secondary-connector-id'
+      type: object
+    magic_sites_add_single_request:
+      properties:
+        connector_id:
+          $ref: '#/components/schemas/magic_connector-id'
+        description:
+          type: string
+        ha_mode:
+          description: Site high availability mode. If set to true, the site can have two connectors and runs in high availability mode.
+          example: true
+          type: boolean
+        location:
+          $ref: '#/components/schemas/magic_site-location'
+        name:
+          $ref: '#/components/schemas/magic_site-name'
+        secondary_connector_id:
+          $ref: '#/components/schemas/magic_secondary-connector-id'
+      required:
+      - name
+      type: object
     magic_identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       readOnly: true
       type: string
+    magic_site_modified_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_site'
   securitySchemes:
     api_email:
       in: header

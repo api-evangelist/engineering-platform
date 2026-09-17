@@ -1035,59 +1035,32 @@ paths:
               headers: {}
 components:
   schemas:
-    Identifiable:
-      properties:
-        id:
-          type: string
-          description: A String identifier.
-          readOnly: true
-      description: Defines the identity of a resource.
-      allOf:
-      - $ref: '#/components/schemas/ResponseBase'
-    TimeZoneTimeZoneInformation:
-      required:
-      - location
-      - time
-      - utcOffset
+    RankingRankingResponse:
       type: object
       properties:
-        location:
-          type: string
-          description: The name of the geographical location.For example, County; City; City, State; City, State, Country; or Time Zone.
-        time:
-          type: string
-          description: The data and time specified in the form, YYYY-MM-DDThh;mm:ss.ssssssZ.
-        utcOffset:
-          type: string
-          description: The offset from UTC. For example, UTC-7.
-      description: Defines a date and time for a geographical location.
-      x-ms-discriminator-value: TimeZone/TimeZoneInformation
-    WebWebAnswer:
+        mainline:
+          $ref: '#/components/schemas/RankingRankingGroup'
+        pole:
+          $ref: '#/components/schemas/RankingRankingGroup'
+        sidebar:
+          $ref: '#/components/schemas/RankingRankingGroup'
+      description: Defines where on the search results page content should be placed and in what order.
+      x-ms-discriminator-value: Ranking/RankingResponse
+    News:
       required:
       - value
       properties:
-        someResultsRemoved:
-          type: boolean
-          description: A Boolean value that indicates whether the response excluded some results from the answer. If Bing excluded some results, the value is true.
+        location:
+          type: string
           readOnly: true
         value:
           type: array
-          description: A list of webpages that are relevant to the query.
+          description: An array of NewsArticle objects that contain information about news articles that are relevant to the query. If there are no results to return for the request, the array is empty.
           items:
-            $ref: '#/components/schemas/WebPage'
-      description: Defines a list of relevant webpage links.
+            $ref: '#/components/schemas/NewsArticle'
+      description: Defines a news answer.
       allOf:
       - $ref: '#/components/schemas/SearchResultsAnswer'
-      x-ms-discriminator-value: Web/WebAnswer
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
     WebMetaTag:
       type: object
       properties:
@@ -1101,6 +1074,44 @@ components:
           readOnly: true
       description: Defines a webpage's metadata.
       x-ms-discriminator-value: Web/MetaTag
+    Query:
+      required:
+      - text
+      type: object
+      properties:
+        displayText:
+          type: string
+          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
+          readOnly: true
+        searchLink:
+          type: string
+          readOnly: true
+        text:
+          type: string
+          description: The query string. Use this string as the query term in a new search request.
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+        webSearchUrl:
+          type: string
+          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
+          readOnly: true
+      description: Defines a search query.
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
+    Response:
+      properties:
+        webSearchUrl:
+          type: string
+          description: The URL To Bing's search result for this item.
+          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
     QueryContext:
       required:
       - originalQuery
@@ -1129,167 +1140,49 @@ components:
           type: string
           description: The query string as specified in the request.
       description: Defines the query context that Bing used for the request.
-    TimeZone:
+    ErrorResponse:
       required:
-      - primaryCityTime
+      - errors
       properties:
-        otherCityTimes:
+        errors:
           type: array
-          description: A list of dates and times of nearby time zones.
+          description: A list of errors that describe the reasons why the request failed.
+          items:
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    WebPage:
+      properties:
+        dateLastCrawled:
+          type: string
+          description: The last time that Bing crawled the webpage. The date is in the form, YYYY-MM-DDTHH:MM:SS. For example, 2015-04-13T05:23:39.
+          readOnly: true
+        deepLinks:
+          type: array
+          description: A list of links to related content that Bing found in the website that contains this webpage. The Webpage object in this context includes only the name, url, urlPingSuffix, and snippet fields.
           readOnly: true
           items:
-            $ref: '#/components/schemas/TimeZoneTimeZoneInformation'
-        primaryCityTime:
-          $ref: '#/components/schemas/TimeZoneTimeZoneInformation'
-      description: Defines the data and time of one or more geographic locations.
-      allOf:
-      - $ref: '#/components/schemas/SearchResultsAnswer'
-    RankingRankingGroup:
-      required:
-      - items
-      type: object
-      properties:
-        items:
-          type: array
-          description: A list of search result items to display in the group.
-          items:
-            $ref: '#/components/schemas/RankingRankingItem'
-      description: Defines a search results group, such as mainline.
-      x-ms-discriminator-value: Ranking/RankingGroup
-    RelatedSearchesRelatedSearchAnswer:
-      required:
-      - value
-      properties:
-        value:
-          type: array
-          description: A list of related queries that were made by others.
-          items:
-            $ref: '#/components/schemas/Query'
-      description: Defines a list of related queries made by others.
-      allOf:
-      - $ref: '#/components/schemas/SearchResultsAnswer'
-      x-ms-discriminator-value: RelatedSearches/RelatedSearchAnswer
-    ImageObject:
-      properties:
-        thumbnail:
+            $ref: '#/components/schemas/WebPage'
+        displayUrl:
+          type: string
+          description: The display URL of the webpage. The URL is meant for display purposes only and is not well formed.
+          readOnly: true
+        primaryImageOfPage:
           $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
-    SpellSuggestions:
-      required:
-      - value
-      properties:
-        value:
+        searchTags:
           type: array
-          description: A list of suggested query strings that may represent the user's intention. The list contains only one Query object.
-          items:
-            $ref: '#/components/schemas/Query'
-      description: Defines a suggested query string that likely represents the user's intent. The search results include this response if Bing determines that the user may have intended to search for something different. For example, if the user searches for alon brown, Bing may determine that the user likely intended to search for Alton Brown instead (based on past searches by others of Alon Brown).
-      allOf:
-      - $ref: '#/components/schemas/SearchResultsAnswer'
-    Article:
-      properties:
-        wordCount:
-          type: integer
-          description: The number of words in the text of the Article.
-          format: int32
+          description: A list of search tags that the webpage owner specified on the webpage. The API returns only indexed search tags. The name field of the MetaTag object contains the indexed search tag. Search tags begin with search.* (for example, search.assetId). The content field contains the tag's value.
           readOnly: true
+          items:
+            $ref: '#/components/schemas/WebMetaTag'
+        snippet:
+          type: string
+          description: A snippet of text from the webpage that describes its contents.
+          readOnly: true
+      description: Defines a webpage that is relevant to the query.
       allOf:
       - $ref: '#/components/schemas/CreativeWork'
-    MediaObject:
-      properties:
-        contentUrl:
-          type: string
-          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
-          readOnly: true
-        height:
-          type: integer
-          description: The height of the source media object, in pixels.
-          format: int32
-          readOnly: true
-        hostPageUrl:
-          type: string
-          description: URL of the page that hosts the media object.
-          readOnly: true
-        width:
-          type: integer
-          description: The width of the source media object, in pixels.
-          format: int32
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/CreativeWork'
-    Images:
-      required:
-      - value
-      properties:
-        nextOffset:
-          type: integer
-          format: int32
-          readOnly: true
-        queryExpansions:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-        relatedSearches:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-        similarTerms:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-        value:
-          type: array
-          description: A list of image objects that are relevant to the query. If there are no results, the List is empty.
-          items:
-            $ref: '#/components/schemas/ImageObject'
-      description: Defines an image answer
-      allOf:
-      - $ref: '#/components/schemas/SearchResultsAnswer'
-    Videos:
-      required:
-      - value
-      properties:
-        nextOffset:
-          type: integer
-          format: int32
-          readOnly: true
-        queryExpansions:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-        relatedSearches:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-        value:
-          type: array
-          description: A list of video objects that are relevant to the query.
-          items:
-            $ref: '#/components/schemas/VideoObject'
-      description: Defines a video answer.
-      allOf:
-      - $ref: '#/components/schemas/SearchResultsAnswer'
-    SearchResultsAnswer:
-      properties:
-        isFamilyFriendly:
-          type: boolean
-          readOnly: true
-        queryContext:
-          $ref: '#/components/schemas/QueryContext'
-        totalEstimatedMatches:
-          type: integer
-          description: The estimated number of webpages that are relevant to the query. Use this number along with the count and offset query parameters to page the results.
-          format: int64
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Answer'
     RankingRankingItem:
       required:
       - answerType
@@ -1332,102 +1225,6 @@ components:
           $ref: '#/components/schemas/Identifiable'
       description: Defines a search result item to display
       x-ms-discriminator-value: Ranking/RankingItem
-    CreativeWork:
-      properties:
-        provider:
-          type: array
-          description: The source of the creative work.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Thing'
-        text:
-          type: string
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Thing'
-    Computation:
-      required:
-      - expression
-      - value
-      properties:
-        expression:
-          type: string
-          description: The math or conversion expression. If the query contains a request to convert units of measure (for example, meters to feet), this field contains the from units and value contains the to units. If the query contains a mathematical expression such as 2+2, this field contains the expression and value contains the answer. Note that mathematical expressions may be normalized. For example, if the query was sqrt(4^2+8^2), the normalized expression may be sqrt((4^2)+(8^2)). If the user's query is a math question and the textDecorations query parameter is set to true, the expression string may include formatting markers. For example, if the user's query is log(2), the normalized expression includes the subscript markers. For more information, see Hit Highlighting.
-        value:
-          type: string
-          description: The expression's answer.
-      description: Defines an expression and its answer
-      allOf:
-      - $ref: '#/components/schemas/Answer'
-    SearchResponse:
-      properties:
-        computation:
-          $ref: '#/components/schemas/Computation'
-        images:
-          $ref: '#/components/schemas/Images'
-        news:
-          $ref: '#/components/schemas/News'
-        queryContext:
-          $ref: '#/components/schemas/QueryContext'
-        rankingResponse:
-          $ref: '#/components/schemas/RankingRankingResponse'
-        relatedSearches:
-          $ref: '#/components/schemas/RelatedSearchesRelatedSearchAnswer'
-        spellSuggestions:
-          $ref: '#/components/schemas/SpellSuggestions'
-        timeZone:
-          $ref: '#/components/schemas/TimeZone'
-        videos:
-          $ref: '#/components/schemas/Videos'
-        webPages:
-          $ref: '#/components/schemas/WebWebAnswer'
-      description: Defines the top-level object that the response includes when the request succeeds.
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    WebPage:
-      properties:
-        dateLastCrawled:
-          type: string
-          description: The last time that Bing crawled the webpage. The date is in the form, YYYY-MM-DDTHH:MM:SS. For example, 2015-04-13T05:23:39.
-          readOnly: true
-        deepLinks:
-          type: array
-          description: A list of links to related content that Bing found in the website that contains this webpage. The Webpage object in this context includes only the name, url, urlPingSuffix, and snippet fields.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/WebPage'
-        displayUrl:
-          type: string
-          description: The display URL of the webpage. The URL is meant for display purposes only and is not well formed.
-          readOnly: true
-        primaryImageOfPage:
-          $ref: '#/components/schemas/ImageObject'
-        searchTags:
-          type: array
-          description: A list of search tags that the webpage owner specified on the webpage. The API returns only indexed search tags. The name field of the MetaTag object contains the indexed search tag. Search tags begin with search.* (for example, search.assetId). The content field contains the tag's value.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/WebMetaTag'
-        snippet:
-          type: string
-          description: A snippet of text from the webpage that describes its contents.
-          readOnly: true
-      description: Defines a webpage that is relevant to the query.
-      allOf:
-      - $ref: '#/components/schemas/CreativeWork'
-    ResponseBase:
-      required:
-      - _type
-      type: object
-      properties:
-        _type:
-          type: string
-      discriminator:
-        propertyName: _type
     Error:
       required:
       - code
@@ -1483,43 +1280,82 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    News:
+    TimeZone:
+      required:
+      - primaryCityTime
+      properties:
+        otherCityTimes:
+          type: array
+          description: A list of dates and times of nearby time zones.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/TimeZoneTimeZoneInformation'
+        primaryCityTime:
+          $ref: '#/components/schemas/TimeZoneTimeZoneInformation'
+      description: Defines the data and time of one or more geographic locations.
+      allOf:
+      - $ref: '#/components/schemas/SearchResultsAnswer'
+    Answer:
+      properties:
+        followUpQueries:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Query'
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    RankingRankingGroup:
+      required:
+      - items
+      type: object
+      properties:
+        items:
+          type: array
+          description: A list of search result items to display in the group.
+          items:
+            $ref: '#/components/schemas/RankingRankingItem'
+      description: Defines a search results group, such as mainline.
+      x-ms-discriminator-value: Ranking/RankingGroup
+    RelatedSearchesRelatedSearchAnswer:
       required:
       - value
       properties:
-        location:
-          type: string
-          readOnly: true
         value:
           type: array
-          description: An array of NewsArticle objects that contain information about news articles that are relevant to the query. If there are no results to return for the request, the array is empty.
+          description: A list of related queries that were made by others.
           items:
-            $ref: '#/components/schemas/NewsArticle'
-      description: Defines a news answer.
+            $ref: '#/components/schemas/Query'
+      description: Defines a list of related queries made by others.
       allOf:
       - $ref: '#/components/schemas/SearchResultsAnswer'
-    Query:
+      x-ms-discriminator-value: RelatedSearches/RelatedSearchAnswer
+    ResponseBase:
       required:
-      - text
+      - _type
       type: object
       properties:
-        displayText:
+        _type:
           type: string
-          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
-          readOnly: true
-        searchLink:
+      discriminator:
+        propertyName: _type
+    Computation:
+      required:
+      - expression
+      - value
+      properties:
+        expression:
           type: string
-          readOnly: true
-        text:
+          description: The math or conversion expression. If the query contains a request to convert units of measure (for example, meters to feet), this field contains the from units and value contains the to units. If the query contains a mathematical expression such as 2+2, this field contains the expression and value contains the answer. Note that mathematical expressions may be normalized. For example, if the query was sqrt(4^2+8^2), the normalized expression may be sqrt((4^2)+(8^2)). If the user's query is a math question and the textDecorations query parameter is set to true, the expression string may include formatting markers. For example, if the user's query is log(2), the normalized expression includes the subscript markers. For more information, see Hit Highlighting.
+        value:
           type: string
-          description: The query string. Use this string as the query term in a new search request.
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-        webSearchUrl:
-          type: string
-          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
-          readOnly: true
-      description: Defines a search query.
+          description: The expression's answer.
+      description: Defines an expression and its answer
+      allOf:
+      - $ref: '#/components/schemas/Answer'
+    NewsArticle:
+      description: Defines a news article.
+      allOf:
+      - $ref: '#/components/schemas/Article'
     Thing:
       properties:
         bingId:
@@ -1542,42 +1378,161 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/Response'
-    ErrorResponse:
+    TimeZoneTimeZoneInformation:
       required:
-      - errors
+      - location
+      - time
+      - utcOffset
+      type: object
       properties:
-        errors:
+        location:
+          type: string
+          description: The name of the geographical location.For example, County; City; City, State; City, State, Country; or Time Zone.
+        time:
+          type: string
+          description: The data and time specified in the form, YYYY-MM-DDThh;mm:ss.ssssssZ.
+        utcOffset:
+          type: string
+          description: The offset from UTC. For example, UTC-7.
+      description: Defines a date and time for a geographical location.
+      x-ms-discriminator-value: TimeZone/TimeZoneInformation
+    Article:
+      properties:
+        wordCount:
+          type: integer
+          description: The number of words in the text of the Article.
+          format: int32
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
+    SpellSuggestions:
+      required:
+      - value
+      properties:
+        value:
           type: array
-          description: A list of errors that describe the reasons why the request failed.
+          description: A list of suggested query strings that may represent the user's intention. The list contains only one Query object.
           items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
+            $ref: '#/components/schemas/Query'
+      description: Defines a suggested query string that likely represents the user's intent. The search results include this response if Bing determines that the user may have intended to search for something different. For example, if the user searches for alon brown, Bing may determine that the user likely intended to search for Alton Brown instead (based on past searches by others of Alon Brown).
+      allOf:
+      - $ref: '#/components/schemas/SearchResultsAnswer'
+    SearchResponse:
+      properties:
+        computation:
+          $ref: '#/components/schemas/Computation'
+        images:
+          $ref: '#/components/schemas/Images'
+        news:
+          $ref: '#/components/schemas/News'
+        queryContext:
+          $ref: '#/components/schemas/QueryContext'
+        rankingResponse:
+          $ref: '#/components/schemas/RankingRankingResponse'
+        relatedSearches:
+          $ref: '#/components/schemas/RelatedSearchesRelatedSearchAnswer'
+        spellSuggestions:
+          $ref: '#/components/schemas/SpellSuggestions'
+        timeZone:
+          $ref: '#/components/schemas/TimeZone'
+        videos:
+          $ref: '#/components/schemas/Videos'
+        webPages:
+          $ref: '#/components/schemas/WebWebAnswer'
+      description: Defines the top-level object that the response includes when the request succeeds.
       allOf:
       - $ref: '#/components/schemas/Response'
-    Answer:
+    CreativeWork:
       properties:
-        followUpQueries:
+        provider:
+          type: array
+          description: The source of the creative work.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Thing'
+        text:
+          type: string
+          readOnly: true
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Thing'
+    WebWebAnswer:
+      required:
+      - value
+      properties:
+        someResultsRemoved:
+          type: boolean
+          description: A Boolean value that indicates whether the response excluded some results from the answer. If Bing excluded some results, the value is true.
+          readOnly: true
+        value:
+          type: array
+          description: A list of webpages that are relevant to the query.
+          items:
+            $ref: '#/components/schemas/WebPage'
+      description: Defines a list of relevant webpage links.
+      allOf:
+      - $ref: '#/components/schemas/SearchResultsAnswer'
+      x-ms-discriminator-value: Web/WebAnswer
+    Identifiable:
+      properties:
+        id:
+          type: string
+          description: A String identifier.
+          readOnly: true
+      description: Defines the identity of a resource.
+      allOf:
+      - $ref: '#/components/schemas/ResponseBase'
+    MediaObject:
+      properties:
+        contentUrl:
+          type: string
+          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
+          readOnly: true
+        height:
+          type: integer
+          description: The height of the source media object, in pixels.
+          format: int32
+          readOnly: true
+        hostPageUrl:
+          type: string
+          description: URL of the page that hosts the media object.
+          readOnly: true
+        width:
+          type: integer
+          description: The width of the source media object, in pixels.
+          format: int32
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
+    Videos:
+      required:
+      - value
+      properties:
+        nextOffset:
+          type: integer
+          format: int32
+          readOnly: true
+        queryExpansions:
           type: array
           readOnly: true
           items:
             $ref: '#/components/schemas/Query'
+        relatedSearches:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Query'
+        value:
+          type: array
+          description: A list of video objects that are relevant to the query.
+          items:
+            $ref: '#/components/schemas/VideoObject'
+      description: Defines a video answer.
       allOf:
-      - $ref: '#/components/schemas/Response'
-    NewsArticle:
-      description: Defines a news article.
-      allOf:
-      - $ref: '#/components/schemas/Article'
-    RankingRankingResponse:
-      type: object
-      properties:
-        mainline:
-          $ref: '#/components/schemas/RankingRankingGroup'
-        pole:
-          $ref: '#/components/schemas/RankingRankingGroup'
-        sidebar:
-          $ref: '#/components/schemas/RankingRankingGroup'
-      description: Defines where on the search results page content should be placed and in what order.
-      x-ms-discriminator-value: Ranking/RankingResponse
+      - $ref: '#/components/schemas/SearchResultsAnswer'
     VideoObject:
       properties:
         allowHttpsEmbed:
@@ -1610,6 +1565,51 @@ components:
       description: Defines a video object that is relevant to the query.
       allOf:
       - $ref: '#/components/schemas/MediaObject'
+    SearchResultsAnswer:
+      properties:
+        isFamilyFriendly:
+          type: boolean
+          readOnly: true
+        queryContext:
+          $ref: '#/components/schemas/QueryContext'
+        totalEstimatedMatches:
+          type: integer
+          description: The estimated number of webpages that are relevant to the query. Use this number along with the count and offset query parameters to page the results.
+          format: int64
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Answer'
+    Images:
+      required:
+      - value
+      properties:
+        nextOffset:
+          type: integer
+          format: int32
+          readOnly: true
+        queryExpansions:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Query'
+        relatedSearches:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Query'
+        similarTerms:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Query'
+        value:
+          type: array
+          description: A list of image objects that are relevant to the query. If there are no results, the List is empty.
+          items:
+            $ref: '#/components/schemas/ImageObject'
+      description: Defines an image answer
+      allOf:
+      - $ref: '#/components/schemas/SearchResultsAnswer'
   securitySchemes:
     apiKeyHeader:
       type: apiKey

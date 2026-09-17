@@ -118,41 +118,8 @@ paths:
         - com.cloudflare.edge.worker.deployment.edit
 components:
   schemas:
-    workers_deployments-base:
-      properties:
-        annotations:
-          properties:
-            workers/message:
-              description: Human-readable message about the deployment.
-              example: Deploy bug fix.
-              maxLength: 50
-              type: string
-          type: object
-        author_email:
-          example: user@example.com
-          readOnly: true
-          type: string
-        created_on:
-          example: '2022-11-08T17:19:29.176266Z'
-          readOnly: true
-          type: string
-        id:
-          allOf:
-          - $ref: '#/components/schemas/workers_schemas-deployment_identifier'
-          readOnly: true
-        source:
-          example: api
-          readOnly: true
-          type: string
-        strategy:
-          type: string
-      type: object
     workers_schemas-deployment_identifier:
       example: dc78f0bc-05c5-46b7-bb4e-137f55930378
-      maxLength: 36
-      type: string
-    workers_schemas-version_identifier:
-      example: bcf48806-b317-4351-9ee7-36e7d557d4de
       maxLength: 36
       type: string
     workers_api-response-common:
@@ -203,21 +170,6 @@ components:
       - messages
       - result
       type: object
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    workers_deployments-create-body:
-      allOf:
-      - $ref: '#/components/schemas/workers_deployments-base'
-      - oneOf:
-        - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
-    workers_schemas-script_name:
-      description: Name of the script.
-      example: this-is_my_script-01
-      pattern: ^[a-z0-9_][a-z0-9-_]*$
-      type: string
     workers_schemas-deployments-single-response:
       allOf:
       - $ref: '#/components/schemas/workers_api-response-common'
@@ -228,36 +180,6 @@ components:
             - oneOf:
               - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
         type: object
-    workers_schemas-deployments-list-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            properties:
-              deployments:
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/workers_deployments-base'
-                  - oneOf:
-                    - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
-                type: array
-            type: object
-        type: object
-    workers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     workers_deployments-strategy-percentage:
       properties:
         strategy:
@@ -282,6 +204,84 @@ components:
       required:
       - strategy
       - versions
+      type: object
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    workers_deployments-create-body:
+      allOf:
+      - $ref: '#/components/schemas/workers_deployments-base'
+      - oneOf:
+        - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
+    workers_schemas-script_name:
+      description: Name of the script.
+      example: this-is_my_script-01
+      pattern: ^[a-z0-9_][a-z0-9-_]*$
+      type: string
+    workers_schemas-version_identifier:
+      example: bcf48806-b317-4351-9ee7-36e7d557d4de
+      maxLength: 36
+      type: string
+    workers_schemas-deployments-list-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            properties:
+              deployments:
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/workers_deployments-base'
+                  - oneOf:
+                    - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
+                type: array
+            type: object
+        type: object
+    workers_deployments-base:
+      properties:
+        annotations:
+          properties:
+            workers/message:
+              description: Human-readable message about the deployment.
+              example: Deploy bug fix.
+              maxLength: 50
+              type: string
+          type: object
+        author_email:
+          example: user@example.com
+          readOnly: true
+          type: string
+        created_on:
+          example: '2022-11-08T17:19:29.176266Z'
+          readOnly: true
+          type: string
+        id:
+          allOf:
+          - $ref: '#/components/schemas/workers_schemas-deployment_identifier'
+          readOnly: true
+        source:
+          example: api
+          readOnly: true
+          type: string
+        strategy:
+          type: string
       type: object
   securitySchemes:
     api_email:
