@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
-  title: APIs.io Engineering Platform Client Video Search API
-  description: The Video Search API lets you search on Bing for video that are relevant to the user's search query, for insights about a video or for videos that are trending based on search requests made by others. This section provides technical details about the query parameters and headers that you use to request videos and the JSON response objects that contain them. For examples that show how to make requests, see [Searching the Web for Videos](https://docs.microsoft.com/azure/cognitive-services/bing-video-search/search-the-web).
+  title: Client Video Search API
+  description: The Video Search API lets you search on Bing for video that are relevant to the user's search query, for insights about a video or for videos that are trending based on search requests made by others. This section provides technical details about the query parameters and headers that you use to request videos and the JSON response objects that contain them. For examples that show how to make requests, see Searching the Web for Videos.
   contact: {}
   version: '1.0'
   x-apisguru-categories:
@@ -22,13 +22,13 @@ servers:
 security:
 - apiKeyHeader: []
 tags:
-- name: VideoSearch
+- name: Video Search
 paths:
   /videos/search:
     get:
       tags:
-      - VideoSearch
-      summary: APIs.io Engineering Platform The Video Search API lets you send a search query to Bing and get back a list of videos that are relevant to the search query. This section provides technical details about the query parameters and headers that you use to request videos and the JSON response objects that contain them. For examples that show how to make requests, see [Searching the Web for Videos](https://docs.microsoft.com/azure/cognitive-services/bing-video-search/search-the-web).
+      - Video Search
+      summary: APIs.io Engineering Platform The Video Search API lets you send a search query…
       operationId: Videos_Search
       parameters:
       - name: X-BingApis-SDK
@@ -1665,23 +1665,27 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    CreativeWork:
+    ResponseBase:
+      required:
+      - _type
+      type: object
       properties:
-        provider:
+        _type:
+          type: string
+      discriminator:
+        propertyName: _type
+    PivotSuggestions:
+      required:
+      - pivot
+      - suggestions
+      type: object
+      properties:
+        pivot:
+          type: string
+        suggestions:
           type: array
-          description: The source of the creative work.
-          readOnly: true
           items:
-            $ref: '#/components/schemas/Thing'
-        text:
-          type: string
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Thing'
+            $ref: '#/components/schemas/Query'
     Query:
       required:
       - text
@@ -1704,41 +1708,25 @@ components:
           description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
           readOnly: true
       description: Defines a search query.
-    PivotSuggestions:
+    ErrorResponse:
       required:
-      - pivot
-      - suggestions
-      type: object
+      - errors
       properties:
-        pivot:
-          type: string
-        suggestions:
+        errors:
           type: array
+          description: A list of errors that describe the reasons why the request failed.
+          items:
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    Answer:
+      properties:
+        followUpQueries:
+          type: array
+          readOnly: true
           items:
             $ref: '#/components/schemas/Query'
-    Thing:
-      properties:
-        alternateName:
-          type: string
-          readOnly: true
-        bingId:
-          type: string
-          description: An ID that uniquely identifies this item.
-          readOnly: true
-        description:
-          type: string
-          description: A short description of the item.
-          readOnly: true
-        image:
-          $ref: '#/components/schemas/ImageObject'
-        name:
-          type: string
-          description: The name of the thing represented by this object.
-          readOnly: true
-        url:
-          type: string
-          description: The URL to get more information about the thing represented by this object.
-          readOnly: true
       allOf:
       - $ref: '#/components/schemas/Response'
     Identifiable:
@@ -1750,31 +1738,6 @@ components:
       description: Defines the identity of a resource.
       allOf:
       - $ref: '#/components/schemas/ResponseBase'
-    ImageObject:
-      properties:
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
-    Answer:
-      properties:
-        followUpQueries:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
     Videos:
       required:
       - value
@@ -1810,28 +1773,43 @@ components:
       description: Defines a video answer.
       allOf:
       - $ref: '#/components/schemas/SearchResultsAnswer'
-    MediaObject:
+    Thing:
       properties:
-        contentUrl:
+        alternateName:
           type: string
-          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
           readOnly: true
-        height:
-          type: integer
-          description: The height of the source media object, in pixels.
-          format: int32
-          readOnly: true
-        hostPageUrl:
+        bingId:
           type: string
-          description: URL of the page that hosts the media object.
+          description: An ID that uniquely identifies this item.
           readOnly: true
-        width:
-          type: integer
-          description: The width of the source media object, in pixels.
-          format: int32
+        description:
+          type: string
+          description: A short description of the item.
+          readOnly: true
+        image:
+          $ref: '#/components/schemas/ImageObject'
+        name:
+          type: string
+          description: The name of the thing represented by this object.
+          readOnly: true
+        url:
+          type: string
+          description: The URL to get more information about the thing represented by this object.
           readOnly: true
       allOf:
-      - $ref: '#/components/schemas/CreativeWork'
+      - $ref: '#/components/schemas/Response'
+    SearchResultsAnswer:
+      properties:
+        isFamilyFriendly:
+          type: boolean
+          readOnly: true
+        totalEstimatedMatches:
+          type: integer
+          description: The estimated number of webpages that are relevant to the query. Use this number along with the count and offset query parameters to page the results.
+          format: int64
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Answer'
     VideoObject:
       properties:
         allowHttpsEmbed:
@@ -1864,39 +1842,61 @@ components:
       description: Defines a video object that is relevant to the query.
       allOf:
       - $ref: '#/components/schemas/MediaObject'
-    ErrorResponse:
-      required:
-      - errors
+    Response:
       properties:
-        errors:
-          type: array
-          description: A list of errors that describe the reasons why the request failed.
-          items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    SearchResultsAnswer:
-      properties:
-        isFamilyFriendly:
-          type: boolean
-          readOnly: true
-        totalEstimatedMatches:
-          type: integer
-          description: The estimated number of webpages that are relevant to the query. Use this number along with the count and offset query parameters to page the results.
-          format: int64
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Answer'
-    ResponseBase:
-      required:
-      - _type
-      type: object
-      properties:
-        _type:
+        webSearchUrl:
           type: string
-      discriminator:
-        propertyName: _type
+          description: The URL To Bing's search result for this item.
+          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
+    MediaObject:
+      properties:
+        contentUrl:
+          type: string
+          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
+          readOnly: true
+        height:
+          type: integer
+          description: The height of the source media object, in pixels.
+          format: int32
+          readOnly: true
+        hostPageUrl:
+          type: string
+          description: URL of the page that hosts the media object.
+          readOnly: true
+        width:
+          type: integer
+          description: The width of the source media object, in pixels.
+          format: int32
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
+    CreativeWork:
+      properties:
+        provider:
+          type: array
+          description: The source of the creative work.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Thing'
+        text:
+          type: string
+          readOnly: true
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Thing'
   securitySchemes:
     apiKeyHeader:
       type: apiKey

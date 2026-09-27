@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare mTLS Certificate Management API
+  title: Cloudflare mTLS Certificate Management API
   version: 4.0.0
 tags:
 - name: mTLS Certificate Management
@@ -265,14 +254,31 @@ paths:
         pro: true
 components:
   schemas:
-    tls-certificates-and-hostnames_schemas-name:
-      description: Optional unique name for the certificate. Only used for human readability.
-      example: example_ca_cert
-      type: string
-    tls-certificates-and-hostnames_components-schemas-updated_at:
-      description: This is the time the certificate was updated.
-      example: '2022-11-22T17:32:30.467938Z'
+    tls-certificates-and-hostnames_mtls-management_components-schemas-expires_on:
+      description: When the certificate expires.
+      example: '2122-10-29T16:59:47Z'
       format: date-time
+      readOnly: true
+      type: string
+    tls-certificates-and-hostnames_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    tls-certificates-and-hostnames_signature:
+      description: The type of hash used for the certificate.
+      example: SHA256WithRSA
+      readOnly: true
       type: string
     tls-certificates-and-hostnames_api-response-common-failure:
       properties:
@@ -305,31 +311,6 @@ components:
       - messages
       - result
       type: object
-    tls-certificates-and-hostnames_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/tls-certificates-and-hostnames_result_info'
-      type: object
-    tls-certificates-and-hostnames_mtls-management_components-schemas-uploaded_on:
-      description: This is the time the certificate was uploaded.
-      example: '2022-11-22T17:32:30.467938Z'
-      format: date-time
-      type: string
-    tls-certificates-and-hostnames_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    tls-certificates-and-hostnames_mtls-management_components-schemas-certificate_response_single:
-      allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-single'
-      - properties:
-          result:
-            allOf:
-            - $ref: '#/components/schemas/tls-certificates-and-hostnames_components-schemas-certificateObject'
-            type: object
     tls-certificates-and-hostnames_schemas-certificates:
       description: The uploaded root CA certificate.
       example: '-----BEGIN CERTIFICATE-----
@@ -338,6 +319,13 @@ components:
 
         -----END CERTIFICATE-----'
       type: string
+    tls-certificates-and-hostnames_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/tls-certificates-and-hostnames_result_info'
+      type: object
     tls-certificates-and-hostnames_mtls-management_components-schemas-certificate_response_collection:
       allOf:
       - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-collection'
@@ -362,44 +350,107 @@ components:
                 example: 1
                 type: number
             type: object
-    tls-certificates-and-hostnames_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-common'
-      type: object
-    tls-certificates-and-hostnames_signature:
-      description: The type of hash used for the certificate.
-      example: SHA256WithRSA
-      readOnly: true
+    tls-certificates-and-hostnames_mtls-management_components-schemas-status:
+      description: Certificate deployment status for the given service.
+      example: pending_deployment
       type: string
+    tls-certificates-and-hostnames_ca:
+      description: Indicates whether the certificate is a CA or leaf certificate.
+      example: true
+      type: boolean
     tls-certificates-and-hostnames_schemas-issuer:
       description: The certificate authority that issued the certificate.
       example: O=Example Inc.,L=California,ST=San Francisco,C=US
       readOnly: true
       type: string
-    tls-certificates-and-hostnames_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    tls-certificates-and-hostnames_components-schemas-private_key:
+      description: The private key for the certificate
+      example: REDACTED_PRIVATE_KEY_EXAMPLE
+      type: string
+    tls-certificates-and-hostnames_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-common'
+      type: object
+    tls-certificates-and-hostnames_components-schemas-updated_at:
+      description: This is the time the certificate was updated.
+      example: '2022-11-22T17:32:30.467938Z'
+      format: date-time
+      type: string
     tls-certificates-and-hostnames_service:
       description: The service using the certificate.
       example: gateway
       type: string
-    tls-certificates-and-hostnames_mtls-management_components-schemas-expires_on:
-      description: When the certificate expires.
-      example: '2122-10-29T16:59:47Z'
-      format: date-time
+    tls-certificates-and-hostnames_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    tls-certificates-and-hostnames_schemas-serial_number:
+      description: The certificate serial number.
+      example: '235217144297995885180570755458463043449861756659'
       readOnly: true
+      type: string
+    tls-certificates-and-hostnames_certificate_response_single_post:
+      allOf:
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-single'
+      - properties:
+          result:
+            allOf:
+            - $ref: '#/components/schemas/tls-certificates-and-hostnames_certificateObjectPost'
+            type: object
+    tls-certificates-and-hostnames_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
+        messages:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    tls-certificates-and-hostnames_association_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/tls-certificates-and-hostnames_associationObject'
+            type: array
+    tls-certificates-and-hostnames_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    tls-certificates-and-hostnames_associationObject:
+      properties:
+        service:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_service'
+        status:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_mtls-management_components-schemas-status'
+    tls-certificates-and-hostnames_schemas-name:
+      description: Optional unique name for the certificate. Only used for human readability.
+      example: example_ca_cert
       type: string
     tls-certificates-and-hostnames_certificateObjectPost:
       properties:
@@ -423,75 +474,6 @@ components:
           $ref: '#/components/schemas/tls-certificates-and-hostnames_components-schemas-updated_at'
         uploaded_on:
           $ref: '#/components/schemas/tls-certificates-and-hostnames_mtls-management_components-schemas-uploaded_on'
-    tls-certificates-and-hostnames_components-schemas-private_key:
-      description: The private key for the certificate
-      example: 'REDACTED_PRIVATE_KEY_EXAMPLE'
-      type: string
-    tls-certificates-and-hostnames_ca:
-      description: Indicates whether the certificate is a CA or leaf certificate.
-      example: true
-      type: boolean
-    tls-certificates-and-hostnames_certificate_response_single_post:
-      allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-single'
-      - properties:
-          result:
-            allOf:
-            - $ref: '#/components/schemas/tls-certificates-and-hostnames_certificateObjectPost'
-            type: object
-    tls-certificates-and-hostnames_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    tls-certificates-and-hostnames_schemas-serial_number:
-      description: The certificate serial number.
-      example: '235217144297995885180570755458463043449861756659'
-      readOnly: true
-      type: string
-    tls-certificates-and-hostnames_association_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/tls-certificates-and-hostnames_associationObject'
-            type: array
-    tls-certificates-and-hostnames_mtls-management_components-schemas-status:
-      description: Certificate deployment status for the given service.
-      example: pending_deployment
-      type: string
-    tls-certificates-and-hostnames_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
-        messages:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
     tls-certificates-and-hostnames_components-schemas-certificateObject:
       properties:
         ca:
@@ -512,12 +494,19 @@ components:
           $ref: '#/components/schemas/tls-certificates-and-hostnames_signature'
         uploaded_on:
           $ref: '#/components/schemas/tls-certificates-and-hostnames_mtls-management_components-schemas-uploaded_on'
-    tls-certificates-and-hostnames_associationObject:
-      properties:
-        service:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_service'
-        status:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_mtls-management_components-schemas-status'
+    tls-certificates-and-hostnames_mtls-management_components-schemas-certificate_response_single:
+      allOf:
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-single'
+      - properties:
+          result:
+            allOf:
+            - $ref: '#/components/schemas/tls-certificates-and-hostnames_components-schemas-certificateObject'
+            type: object
+    tls-certificates-and-hostnames_mtls-management_components-schemas-uploaded_on:
+      description: This is the time the certificate was uploaded.
+      example: '2022-11-22T17:32:30.467938Z'
+      format: date-time
+      type: string
   securitySchemes:
     api_email:
       in: header

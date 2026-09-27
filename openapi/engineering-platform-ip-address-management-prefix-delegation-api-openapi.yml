@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare IP Address Management Prefix Delegation API
+  title: Cloudflare IP Address Management Prefix Delegation API
   version: 4.0.0
 tags:
 - name: IP Address Management Prefix Delegation
@@ -155,17 +144,50 @@ paths:
       - 'IP Prefixes: Write'
 components:
   schemas:
-    addressing_schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/addressing_ipam-delegations'
-            type: array
-    addressing_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
+    addressing_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    addressing_delegation_identifier:
+      description: Delegation identifier tag.
+      example: d933b1530bc56c9953cf8ce166da8004
+      maxLength: 32
+      readOnly: true
+      type: string
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
     addressing_api-response-common-failure:
       properties:
@@ -198,32 +220,6 @@ components:
       - messages
       - result
       type: object
-    addressing_schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/addressing_ipam-delegations'
-    addressing_delegated_account_identifier:
-      description: Account identifier for the account to which prefix is being delegated.
-      example: b1946ac92492d2347c6235b4d2611184
-      maxLength: 32
-      type: string
-    addressing_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    addressing_delegation_identifier:
-      description: Delegation identifier tag.
-      example: d933b1530bc56c9953cf8ce166da8004
-      maxLength: 32
-      readOnly: true
-      type: string
-    addressing_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-common'
-      type: object
     addressing_id_response:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-single'
@@ -233,10 +229,12 @@ components:
               id:
                 $ref: '#/components/schemas/addressing_delegation_identifier'
             type: object
-    addressing_cidr:
-      description: IP Prefix in Classless Inter-Domain Routing format.
-      example: 192.0.2.0/24
-      type: string
+    addressing_schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/addressing_ipam-delegations'
     addressing_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-common'
@@ -244,55 +242,18 @@ components:
           result_info:
             $ref: '#/components/schemas/addressing_result_info'
       type: object
-    addressing_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
+    addressing_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-common'
       type: object
-    addressing_ipam-delegations:
-      properties:
-        cidr:
-          $ref: '#/components/schemas/addressing_cidr'
-        created_at:
-          $ref: '#/components/schemas/addressing_timestamp'
-        delegated_account_id:
-          $ref: '#/components/schemas/addressing_delegated_account_identifier'
-        id:
-          $ref: '#/components/schemas/addressing_delegation_identifier'
-        modified_at:
-          $ref: '#/components/schemas/addressing_timestamp'
-        parent_prefix_id:
-          $ref: '#/components/schemas/addressing_identifier'
-      type: object
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    addressing_schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/addressing_ipam-delegations'
+            type: array
     addressing_api-response-common:
       properties:
         errors:
@@ -310,6 +271,34 @@ components:
       - errors
       - messages
       type: object
+    addressing_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    addressing_delegated_account_identifier:
+      description: Account identifier for the account to which prefix is being delegated.
+      example: b1946ac92492d2347c6235b4d2611184
+      maxLength: 32
+      type: string
+    addressing_ipam-delegations:
+      properties:
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        created_at:
+          $ref: '#/components/schemas/addressing_timestamp'
+        delegated_account_id:
+          $ref: '#/components/schemas/addressing_delegated_account_identifier'
+        id:
+          $ref: '#/components/schemas/addressing_delegation_identifier'
+        modified_at:
+          $ref: '#/components/schemas/addressing_timestamp'
+        parent_prefix_id:
+          $ref: '#/components/schemas/addressing_identifier'
+      type: object
+    addressing_cidr:
+      description: IP Prefix in Classless Inter-Domain Routing format.
+      example: 192.0.2.0/24
+      type: string
   securitySchemes:
     api_email:
       in: header

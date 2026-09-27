@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Zero Trust Risk Scoring Integrations API
+  title: Cloudflare Zero Trust Risk Scoring Integrations API
   version: 4.0.0
 tags:
 - name: Zero Trust Risk Scoring Integrations
@@ -51,7 +40,7 @@ paths:
       - api_email: []
         api_key: []
         api_token: []
-      summary: APIs.io Engineering Platform List all risk score integrations for the account.
+      summary: APIs.io Engineering Platform List all risk score integrations for the account
       tags:
       - Zero Trust Risk Scoring Integrations
       x-api-token-group:
@@ -93,7 +82,7 @@ paths:
       - api_email: []
         api_key: []
         api_token: []
-      summary: APIs.io Engineering Platform Create new risk score integration.
+      summary: APIs.io Engineering Platform Create new risk score integration
       tags:
       - Zero Trust Risk Scoring Integrations
       x-api-token-group:
@@ -135,7 +124,7 @@ paths:
       - api_email: []
         api_key: []
         api_token: []
-      summary: APIs.io Engineering Platform Delete a risk score integration.
+      summary: APIs.io Engineering Platform Delete a risk score integration
       tags:
       - Zero Trust Risk Scoring Integrations
     get:
@@ -174,7 +163,7 @@ paths:
       - api_email: []
         api_key: []
         api_token: []
-      summary: APIs.io Engineering Platform Get risk score integration by id.
+      summary: APIs.io Engineering Platform Get risk score integration by id
       tags:
       - Zero Trust Risk Scoring Integrations
     put:
@@ -220,7 +209,7 @@ paths:
       - api_email: []
         api_key: []
         api_token: []
-      summary: APIs.io Engineering Platform Update a risk score integration.
+      summary: APIs.io Engineering Platform Update a risk score integration
       tags:
       - Zero Trust Risk Scoring Integrations
   /accounts/{account_id}/zt_risk_scoring/integrations/reference_id/{reference_id}:
@@ -259,11 +248,74 @@ paths:
       - api_email: []
         api_key: []
         api_token: []
-      summary: APIs.io Engineering Platform Get risk score integration by reference id.
+      summary: APIs.io Engineering Platform Get risk score integration by reference id
       tags:
       - Zero Trust Risk Scoring Integrations
 components:
   schemas:
+    dlp_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dlp_api-response-common'
+      type: object
+    dlp_RiskScoreIntegrationArray:
+      items:
+        $ref: '#/components/schemas/dlp_RiskScoreIntegration'
+      type: array
+    dlp_UpdateIntegrationBody:
+      properties:
+        active:
+          description: Whether this integration is enabled. If disabled, no risk changes will be exported to the third-party.
+          type: boolean
+        reference_id:
+          description: 'A reference id that can be supplied by the client. Currently this should be set to the Access-Okta IDP ID (a UUIDv4).
+
+            https://developers.cloudflare.com/api/operations/access-identity-providers-get-an-access-identity-provider'
+          type:
+          - string
+          - 'null'
+        tenant_url:
+          description: The base url of the tenant, e.g. "https://tenant.okta.com"
+          format: uri
+          type: string
+      required:
+      - tenant_url
+      - active
+      type: object
+    dlp_RiskScoreIntegrationType:
+      enum:
+      - Okta
+      type: string
+    dlp_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     dlp_Empty:
       type:
       - object
@@ -309,57 +361,6 @@ components:
       - active
       - created_at
       type: object
-    dlp_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/dlp_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/dlp_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    dlp_UpdateIntegrationBody:
-      properties:
-        active:
-          description: Whether this integration is enabled. If disabled, no risk changes will be exported to the third-party.
-          type: boolean
-        reference_id:
-          description: 'A reference id that can be supplied by the client. Currently this should be set to the Access-Okta IDP ID (a UUIDv4).
-
-            https://developers.cloudflare.com/api/operations/access-identity-providers-get-an-access-identity-provider'
-          type:
-          - string
-          - 'null'
-        tenant_url:
-          description: The base url of the tenant, e.g. "https://tenant.okta.com"
-          format: uri
-          type: string
-      required:
-      - tenant_url
-      - active
-      type: object
     dlp_CreateIntegrationBody:
       properties:
         integration_type:
@@ -379,10 +380,6 @@ components:
       - integration_type
       - tenant_url
       type: object
-    dlp_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dlp_api-response-common'
-      type: object
     dlp_messages:
       example: []
       items:
@@ -398,10 +395,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    dlp_RiskScoreIntegrationType:
-      enum:
-      - Okta
-      type: string
     dlp_api-response-common:
       properties:
         errors:
@@ -419,10 +412,6 @@ components:
       - errors
       - messages
       type: object
-    dlp_RiskScoreIntegrationArray:
-      items:
-        $ref: '#/components/schemas/dlp_RiskScoreIntegration'
-      type: array
   securitySchemes:
     api_email:
       in: header

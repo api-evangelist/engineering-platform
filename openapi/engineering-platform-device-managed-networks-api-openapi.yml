@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Device Managed Networks API
+  title: Cloudflare Device Managed Networks API
   version: 4.0.0
 tags:
 - name: Device Managed Networks
@@ -233,6 +222,14 @@ paths:
       - Teams Write
 components:
   schemas:
+    teams-devices_schemas-config_request:
+      description: The configuration object containing information for the WARP client to detect the managed network.
+      example:
+        sha256: b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c
+        tls_sockaddr: foo.bar:1234
+      oneOf:
+      - $ref: '#/components/schemas/teams-devices_tls_config_request'
+      type: object
     teams-devices_tls_config_request:
       properties:
         sha256:
@@ -246,8 +243,31 @@ components:
       required:
       - tls_sockaddr
       type: object
-    teams-devices_identifier:
-      example: 699d98642c564d2e855e9661899b7252
+    teams-devices_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/teams-devices_device-managed-networks'
+            type: array
+    teams-devices_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/teams-devices_device-managed-networks'
+    teams-devices_uuid:
+      description: API UUID.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    teams-devices_components-schemas-type:
+      description: The type of device managed network.
+      enum:
+      - tls
+      example: tls
+      type: string
     teams-devices_messages:
       example: []
       items:
@@ -263,23 +283,14 @@ components:
         type: object
         uniqueItems: true
       type: array
-    teams-devices_components-schemas-type:
-      description: The type of device managed network.
-      enum:
-      - tls
-      example: tls
-      type: string
-    teams-devices_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/teams-devices_device-managed-networks'
-    teams-devices_uuid:
-      description: API UUID.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
+    teams-devices_schemas-config_response:
+      description: The configuration object containing information for the WARP client to detect the managed network.
+      example:
+        sha256: b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c
+        tls_sockaddr: foo.bar:1234
+      oneOf:
+      - $ref: '#/components/schemas/teams-devices_tls_config_response'
+      type: object
     teams-devices_api-response-single:
       allOf:
       - $ref: '#/components/schemas/teams-devices_api-response-common'
@@ -292,17 +303,17 @@ components:
             - object
             - 'null'
       type: object
-    teams-devices_device-managed-networks_components-schemas-name:
-      description: The name of the device managed network. This name must be unique.
-      example: managed-network-1
-      type: string
-    teams-devices_schemas-config_response:
-      description: The configuration object containing information for the WARP client to detect the managed network.
-      example:
-        sha256: b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c
-        tls_sockaddr: foo.bar:1234
-      oneOf:
-      - $ref: '#/components/schemas/teams-devices_tls_config_response'
+    teams-devices_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/teams-devices_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/teams-devices_result_info'
       type: object
     teams-devices_device-managed-networks:
       properties:
@@ -315,14 +326,6 @@ components:
         type:
           $ref: '#/components/schemas/teams-devices_components-schemas-type'
       type: object
-    teams-devices_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/teams-devices_device-managed-networks'
-            type: array
     teams-devices_tls_config_response:
       description: The Managed Network TLS Config Response.
       properties:
@@ -411,26 +414,12 @@ components:
           example: 2000
           type: number
       type: object
-    teams-devices_schemas-config_request:
-      description: The configuration object containing information for the WARP client to detect the managed network.
-      example:
-        sha256: b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c
-        tls_sockaddr: foo.bar:1234
-      oneOf:
-      - $ref: '#/components/schemas/teams-devices_tls_config_request'
-      type: object
-    teams-devices_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/teams-devices_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/teams-devices_result_info'
-      type: object
+    teams-devices_identifier:
+      example: 699d98642c564d2e855e9661899b7252
+    teams-devices_device-managed-networks_components-schemas-name:
+      description: The name of the device managed network. This name must be unique.
+      example: managed-network-1
+      type: string
   securitySchemes:
     api_email:
       in: header

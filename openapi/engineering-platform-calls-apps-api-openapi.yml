@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Calls Apps API
+  title: Cloudflare Calls Apps API
   version: 4.0.0
 tags:
 - name: Calls Apps
@@ -190,39 +179,45 @@ paths:
       - Calls Write
 components:
   schemas:
+    calls_account_identifier:
+      description: The account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    calls_app_with_secret:
+      properties:
+        created:
+          $ref: '#/components/schemas/calls_created'
+        modified:
+          $ref: '#/components/schemas/calls_modified'
+        name:
+          $ref: '#/components/schemas/calls_name'
+        secret:
+          $ref: '#/components/schemas/calls_secret'
+        uid:
+          $ref: '#/components/schemas/calls_identifier'
+      type: object
+    calls_identifier:
+      description: A Cloudflare-generated unique identifier for a item.
+      example: 2a95132c15732412d22c1476fa83f27a
+      maxLength: 32
+      minLength: 32
+      type: string
     calls_api-response-single:
       allOf:
       - $ref: '#/components/schemas/calls_api-response-common'
       type: object
-    calls_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    calls_turn_key:
-      description: Bearer token
-      example: 66bcf64aa8907b9f9d90ac17746a77ce394c393b92b3916633dc02846e608ad4
-      maxLength: 64
-      minLength: 64
-      type: string
-    calls_app_response_collection:
+    calls_app_response_single_with_secret:
       allOf:
-      - $ref: '#/components/schemas/calls_api-response-common'
+      - $ref: '#/components/schemas/calls_api-response-single'
       - properties:
           result:
-            items:
-              $ref: '#/components/schemas/calls_turn_key'
-            type: array
+            $ref: '#/components/schemas/calls_app_with_secret'
+    calls_modified:
+      description: The date and time the item was last modified.
+      example: '2014-01-02T02:20:00Z'
+      format: date-time
+      type: string
     calls_api-response-common:
       properties:
         errors:
@@ -240,6 +235,12 @@ components:
       - errors
       - messages
       type: object
+    calls_app_response_single:
+      allOf:
+      - $ref: '#/components/schemas/calls_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/calls_app'
     calls_api-response-common-failure:
       properties:
         errors:
@@ -276,30 +277,7 @@ components:
       description: A short description of Calls app, not shown to end users.
       example: production-realtime-app
       type: string
-    calls_identifier:
-      description: A Cloudflare-generated unique identifier for a item.
-      example: 2a95132c15732412d22c1476fa83f27a
-      maxLength: 32
-      minLength: 32
-      type: string
-    calls_app_editable_fields:
-      properties:
-        name:
-          $ref: '#/components/schemas/calls_name'
-      type: object
-    calls_app_response_single:
-      allOf:
-      - $ref: '#/components/schemas/calls_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/calls_app'
-    calls_app_response_single_with_secret:
-      allOf:
-      - $ref: '#/components/schemas/calls_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/calls_app_with_secret'
-    calls_secret:
+    calls_turn_key:
       description: Bearer token
       example: 66bcf64aa8907b9f9d90ac17746a77ce394c393b92b3916633dc02846e608ad4
       maxLength: 64
@@ -316,34 +294,45 @@ components:
         uid:
           $ref: '#/components/schemas/calls_identifier'
       type: object
-    calls_modified:
-      description: The date and time the item was last modified.
-      example: '2014-01-02T02:20:00Z'
-      format: date-time
+    calls_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    calls_secret:
+      description: Bearer token
+      example: 66bcf64aa8907b9f9d90ac17746a77ce394c393b92b3916633dc02846e608ad4
+      maxLength: 64
+      minLength: 64
       type: string
-    calls_app_with_secret:
+    calls_app_editable_fields:
       properties:
-        created:
-          $ref: '#/components/schemas/calls_created'
-        modified:
-          $ref: '#/components/schemas/calls_modified'
         name:
           $ref: '#/components/schemas/calls_name'
-        secret:
-          $ref: '#/components/schemas/calls_secret'
-        uid:
-          $ref: '#/components/schemas/calls_identifier'
       type: object
     calls_created:
       description: The date and time the item was created.
       example: '2014-01-02T02:20:00Z'
       format: date-time
       type: string
-    calls_account_identifier:
-      description: The account identifier tag.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
+    calls_app_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/calls_api-response-common'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/calls_turn_key'
+            type: array
   securitySchemes:
     api_email:
       in: header

@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Worker Environment API
+  title: Cloudflare Worker Environment API
   version: 4.0.0
 tags:
 - name: Worker Environment
@@ -248,6 +237,162 @@ paths:
         - com.cloudflare.edge.worker.script.create
 components:
   schemas:
+    workers_script-settings-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_script-settings-item'
+    workers_tail_consumers_script:
+      description: A reference to a script that will consume logs from the attached Worker.
+      properties:
+        environment:
+          description: Optional environment if the Worker utilizes one.
+          example: production
+          type: string
+        namespace:
+          description: Optional dispatch namespace the script belongs to.
+          example: my-namespace
+          type: string
+        service:
+          description: Name of Worker that is to be the consumer.
+          example: my-log-consumer
+          type: string
+      required:
+      - service
+      type: object
+    workers_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      type: object
+    workers_service:
+      description: Name of Worker to bind to
+      example: my-worker
+      type: string
+    workers_usage_model:
+      description: Specifies the usage model for the Worker (e.g. 'bundled' or 'unbound').
+      example: unbound
+      pattern: ^(bundled|unbound)$
+      type: string
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    workers_script-response-single:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_script-response'
+        x-cfLinkErrors:
+          '10001': Unsupported or unexpected Content Type
+          '10002': Unexpected internal server error
+          '10003': Missing required URL parameter
+          '10004': Malformed URL parameter
+          '10006': Unparseable script body
+          '10007': Resource not found (similar to HTTP 404)
+          '10014': Internal error while attempting authorization checks
+          '10015': The current account is not authorized to use workers
+          '10018': Attempted to update a script where the e-tag does not match
+          '10021': Script content failed validation checks, but was otherwise parseable
+          '10023': Unauthorized access attempt
+          '10027': Script body was too large
+          '10075': Requires a Workers Paid plan
+    workers_tail_consumers:
+      description: List of Workers that will consume logs from the attached Worker.
+      items:
+        $ref: '#/components/schemas/workers_tail_consumers_script'
+      type: array
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    workers_modified_on:
+      description: When the script was last modified.
+      example: '2017-01-01T00:00:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    workers_placement_mode:
+      description: Specifies the placement mode for the Worker (e.g. 'smart').
+      example: smart
+      type: string
+    workers_created_on:
+      description: When the script was created.
+      example: '2017-01-01T00:00:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    workers_environment:
+      description: Optional environment if the Worker utilizes one.
+      example: production
+      type: string
+    workers_script-response:
+      properties:
+        created_on:
+          $ref: '#/components/schemas/workers_created_on'
+        etag:
+          $ref: '#/components/schemas/workers_etag'
+        id:
+          description: The id of the script in the Workers system. Usually the script name.
+          example: my-workers-script
+          readOnly: true
+          type: string
+        logpush:
+          $ref: '#/components/schemas/workers_logpush'
+        modified_on:
+          $ref: '#/components/schemas/workers_modified_on'
+        placement_mode:
+          $ref: '#/components/schemas/workers_placement_mode'
+        tail_consumers:
+          $ref: '#/components/schemas/workers_tail_consumers'
+        usage_model:
+          $ref: '#/components/schemas/workers_usage_model'
+    workers_script-settings-item:
+      properties:
+        logpush:
+          $ref: '#/components/schemas/workers_logpush'
+        tail_consumers:
+          $ref: '#/components/schemas/workers_tail_consumers'
+      type: object
+    workers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers_messages'
+        messages:
+          $ref: '#/components/schemas/workers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers_etag:
+      description: Hashed script content, can be used in a If-None-Match header when updating.
+      example: ea95132c15732412d22c1476fa83f27a
+      readOnly: true
+      type: string
+    workers_logpush:
+      description: Whether Logpush is turned on for the Worker.
+      example: false
+      type: boolean
     workers_api-response-common-failure:
       properties:
         errors:
@@ -279,162 +424,6 @@ components:
       - messages
       - result
       type: object
-    workers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    workers_script-settings-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/workers_script-settings-item'
-    workers_tail_consumers:
-      description: List of Workers that will consume logs from the attached Worker.
-      items:
-        $ref: '#/components/schemas/workers_tail_consumers_script'
-      type: array
-    workers_usage_model:
-      description: Specifies the usage model for the Worker (e.g. 'bundled' or 'unbound').
-      example: unbound
-      pattern: ^(bundled|unbound)$
-      type: string
-    workers_service:
-      description: Name of Worker to bind to
-      example: my-worker
-      type: string
-    workers_etag:
-      description: Hashed script content, can be used in a If-None-Match header when updating.
-      example: ea95132c15732412d22c1476fa83f27a
-      readOnly: true
-      type: string
-    workers_placement_mode:
-      description: Specifies the placement mode for the Worker (e.g. 'smart').
-      example: smart
-      type: string
-    workers_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      type: object
-    workers_script-response:
-      properties:
-        created_on:
-          $ref: '#/components/schemas/workers_created_on'
-        etag:
-          $ref: '#/components/schemas/workers_etag'
-        id:
-          description: The id of the script in the Workers system. Usually the script name.
-          example: my-workers-script
-          readOnly: true
-          type: string
-        logpush:
-          $ref: '#/components/schemas/workers_logpush'
-        modified_on:
-          $ref: '#/components/schemas/workers_modified_on'
-        placement_mode:
-          $ref: '#/components/schemas/workers_placement_mode'
-        tail_consumers:
-          $ref: '#/components/schemas/workers_tail_consumers'
-        usage_model:
-          $ref: '#/components/schemas/workers_usage_model'
-    workers_script-response-single:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/workers_script-response'
-        x-cfLinkErrors:
-          '10001': Unsupported or unexpected Content Type
-          '10002': Unexpected internal server error
-          '10003': Missing required URL parameter
-          '10004': Malformed URL parameter
-          '10006': Unparseable script body
-          '10007': Resource not found (similar to HTTP 404)
-          '10014': Internal error while attempting authorization checks
-          '10015': The current account is not authorized to use workers
-          '10018': Attempted to update a script where the e-tag does not match
-          '10021': Script content failed validation checks, but was otherwise parseable
-          '10023': Unauthorized access attempt
-          '10027': Script body was too large
-          '10075': Requires a Workers Paid plan
-    workers_logpush:
-      description: Whether Logpush is turned on for the Worker.
-      example: false
-      type: boolean
-    workers_created_on:
-      description: When the script was created.
-      example: '2017-01-01T00:00:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    workers_tail_consumers_script:
-      description: A reference to a script that will consume logs from the attached Worker.
-      properties:
-        environment:
-          description: Optional environment if the Worker utilizes one.
-          example: production
-          type: string
-        namespace:
-          description: Optional dispatch namespace the script belongs to.
-          example: my-namespace
-          type: string
-        service:
-          description: Name of Worker that is to be the consumer.
-          example: my-log-consumer
-          type: string
-      required:
-      - service
-      type: object
-    workers_modified_on:
-      description: When the script was last modified.
-      example: '2017-01-01T00:00:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    workers_script-settings-item:
-      properties:
-        logpush:
-          $ref: '#/components/schemas/workers_logpush'
-        tail_consumers:
-          $ref: '#/components/schemas/workers_tail_consumers'
-      type: object
-    workers_environment:
-      description: Optional environment if the Worker utilizes one.
-      example: production
-      type: string
-    workers_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/workers_messages'
-        messages:
-          $ref: '#/components/schemas/workers_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
   securitySchemes:
     api_email:
       in: header

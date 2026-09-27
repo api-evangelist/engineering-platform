@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Access Custom Pages API
+  title: Cloudflare Access Custom Pages API
   version: 4.0.0
 tags:
 - name: Access Custom Pages
@@ -201,74 +190,15 @@ paths:
       - 'Access: Custom Page Write'
 components:
   schemas:
-    access_custom_page_without_html:
-      properties:
-        app_count:
-          $ref: '#/components/schemas/access_schemas-app_count'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        name:
-          $ref: '#/components/schemas/access_custom-pages_components-schemas-name'
-        type:
-          $ref: '#/components/schemas/access_schemas-type'
-        uid:
-          $ref: '#/components/schemas/access_uuid'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      required:
-      - name
-      - type
-      type: object
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    access_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    access_custom-pages_components-schemas-name:
-      description: Custom page name.
-      type: string
-    access_api-response-collection:
+    access_components-schemas-id_response:
       allOf:
       - $ref: '#/components/schemas/access_api-response-common'
       - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
-      type: object
-    access_custom-pages_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
           result:
-            $ref: '#/components/schemas/access_custom_page'
+            properties:
+              id:
+                $ref: '#/components/schemas/access_uuid'
+            type: object
     access_api-response-common-failure:
       properties:
         errors:
@@ -300,23 +230,100 @@ components:
       - messages
       - result
       type: object
-    access_components-schemas-id_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/access_uuid'
-            type: object
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
     access_schemas-app_count:
       description: Number of apps the custom page is assigned to.
       type: integer
+    access_custom-pages_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_custom_page_without_html'
+            type: array
+    access_schemas-type:
+      description: Custom page type.
+      enum:
+      - identity_denied
+      - forbidden
+      type: string
+    access_custom-pages_components-schemas-name:
+      description: Custom page name.
+      type: string
+    access_custom_page_without_html:
+      properties:
+        app_count:
+          $ref: '#/components/schemas/access_schemas-app_count'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        name:
+          $ref: '#/components/schemas/access_custom-pages_components-schemas-name'
+        type:
+          $ref: '#/components/schemas/access_schemas-type'
+        uid:
+          $ref: '#/components/schemas/access_uuid'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      required:
+      - name
+      - type
+      type: object
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
+    access_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     access_custom_page:
       properties:
         app_count:
@@ -340,43 +347,31 @@ components:
       - custom_html
       - type
       type: object
-    access_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/access_messages'
-        messages:
-          $ref: '#/components/schemas/access_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    access_api-response-single:
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    access_custom-pages_components-schemas-single_response:
       allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
-    access_custom-pages_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
+      - $ref: '#/components/schemas/access_api-response-single'
       - properties:
           result:
-            items:
-              $ref: '#/components/schemas/access_custom_page_without_html'
-            type: array
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+            $ref: '#/components/schemas/access_custom_page'
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
       type: string
     access_single_response_without_html:
       allOf:
@@ -384,12 +379,6 @@ components:
       - properties:
           result:
             $ref: '#/components/schemas/access_custom_page_without_html'
-    access_schemas-type:
-      description: Custom page type.
-      enum:
-      - identity_denied
-      - forbidden
-      type: string
   securitySchemes:
     api_email:
       in: header

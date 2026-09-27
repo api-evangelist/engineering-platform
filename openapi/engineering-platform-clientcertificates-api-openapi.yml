@@ -2,8 +2,10 @@ openapi: 3.2.0
 info:
   version: 2015-07-09
   x-release: v4
-  title: APIs.io Engineering Platform Amazon API Gateway Clientcertificates API
-  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  title: Amazon API Gateway Clientcertificates API
+  description: 'Amazon API Gateway
+
+    Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.'
   x-logo:
     url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
     backgroundColor: '#FFFFFF'
@@ -168,6 +170,8 @@ paths:
           type: string
       tags:
       - Clientcertificates
+      summary: Delete client certificate
+      x-summary-source: derived
     get:
       operationId: GetClientCertificate
       description: Gets information about the current ClientCertificate resource.
@@ -211,6 +215,8 @@ paths:
           type: string
       tags:
       - Clientcertificates
+      summary: Get client certificate
+      x-summary-source: derived
     patch:
       operationId: UpdateClientCertificate
       description: Changes information about an ClientCertificate resource.
@@ -278,6 +284,8 @@ paths:
                     $ref: '#/components/schemas/PatchOperation'
       tags:
       - Clientcertificates
+      summary: Update client certificate
+      x-summary-source: derived
   /clientcertificates:
     parameters:
     - $ref: '#/components/parameters/X-Amz-Content-Sha256'
@@ -345,6 +353,8 @@ paths:
                     $ref: '#/components/schemas/String'
       tags:
       - Clientcertificates
+      summary: Generate client certificate
+      x-summary-source: derived
     get:
       operationId: GetClientCertificates
       description: Gets a collection of ClientCertificate resources.
@@ -394,23 +404,103 @@ paths:
           type: integer
       tags:
       - Clientcertificates
+      summary: Get client certificates
+      x-summary-source: derived
 components:
+  parameters:
+    X-Amz-Credential:
+      name: X-Amz-Credential
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
+      in: header
+      schema:
+        type: string
+      required: false
   schemas:
     MapOfStringToString:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
-    TooManyRequestsException: {}
+    BadRequestException: {}
+    ClientCertificates:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfClientCertificate'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of ClientCertificate resources.
     NotFoundException: {}
     UnauthorizedException: {}
     ConflictException: {}
     Timestamp:
       type: string
       format: date-time
+    LimitExceededException: {}
+    PatchOperation:
+      type: object
+      properties:
+        op:
+          allOf:
+          - $ref: '#/components/schemas/Op'
+          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
+        path:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
+        from:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
+      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
     ListOfClientCertificate:
       type: array
       items:
         $ref: '#/components/schemas/ClientCertificate'
+    String:
+      type: string
     ClientCertificate:
       type: object
       properties:
@@ -439,42 +529,7 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: Represents a client certificate used to configure client-side SSL authentication while sending requests to the integration endpoint.
-    BadRequestException: {}
-    LimitExceededException: {}
-    ClientCertificates:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfClientCertificate'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of ClientCertificate resources.
-    String:
-      type: string
-    PatchOperation:
-      type: object
-      properties:
-        op:
-          allOf:
-          - $ref: '#/components/schemas/Op'
-          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
-        path:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
-        value:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
-        from:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
-      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
+    TooManyRequestsException: {}
     Op:
       type: string
       enum:
@@ -484,49 +539,6 @@ components:
       - move
       - copy
       - test
-  parameters:
-    X-Amz-Credential:
-      name: X-Amz-Credential
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Date:
-      name: X-Amz-Date
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
   securitySchemes:
     hmac:
       type: apiKey

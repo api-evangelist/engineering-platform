@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare DNS Firewall Analytics API
+  title: Cloudflare DNS Firewall Analytics API
   version: 4.0.0
 tags:
 - name: DNS Firewall Analytics
@@ -25,7 +14,7 @@ paths:
       description: 'Retrieves a list of summarised aggregate metrics over a given time period.
 
 
-        See [Analytics API properties](https://developers.cloudflare.com/dns/reference/analytics-api-properties/) for detailed information about the available query parameters.'
+        See Analytics API properties for detailed information about the available query parameters.'
       operationId: dns-firewall-analytics-table
       parameters:
       - in: path
@@ -105,7 +94,7 @@ paths:
       description: 'Retrieves a list of aggregate metrics grouped by time interval.
 
 
-        See [Analytics API properties](https://developers.cloudflare.com/dns/reference/analytics-api-properties/) for detailed information about the available query parameters.'
+        See Analytics API properties for detailed information about the available query parameters.'
       operationId: dns-firewall-analytics-by-time
       parameters:
       - in: path
@@ -191,6 +180,72 @@ components:
       example: '2023-11-11T13:00:00Z'
       format: date-time
       type: string
+    dns-analytics_report_bytime:
+      allOf:
+      - $ref: '#/components/schemas/dns-analytics_result'
+      - properties:
+          data:
+            items:
+              properties:
+                metrics:
+                  description: Array with one item per requested metric. Each item is an array of values, broken down by time interval.
+                  items:
+                    description: Nominal metric values, broken down by time interval.
+                    items: {}
+                    properties:
+                      items:
+                        description: Nominal metric value.
+                        type: number
+                    type: array
+                  type: array
+              required:
+              - metrics
+          query:
+            properties:
+              time_delta:
+                $ref: '#/components/schemas/dns-analytics_time_delta'
+            required:
+            - time_delta
+            type: object
+          time_intervals:
+            description: 'Array of time intervals in the response data. Each interval is represented as an array containing two values: the start time, and the end time.
+
+              '
+            items:
+              description: Array with exactly two items, representing the start and end time (respectively) of this time interval.
+              items:
+                description: Time value.
+                example: '2023-11-11T12:00:00Z'
+                format: date-time
+                type: string
+              type: array
+            type: array
+        required:
+        - time_intervals
+        - query
+        - data
+    dns-analytics_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/dns-analytics_messages'
+        messages:
+          $ref: '#/components/schemas/dns-analytics_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    dns-analytics_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     dns-analytics_data:
       description: Array with one row per combination of dimension values.
       items:
@@ -206,135 +261,13 @@ components:
         - dimensions
         type: object
       type: array
-    dns-analytics_limit:
-      default: 100000
-      description: Limit number of returned metrics.
-      example: 100
-      type: integer
+    dns-analytics_filters:
+      description: Segmentation filter in 'attribute operator value' format.
+      example: responseCode==NOERROR,queryType==A
+      type: string
     dns-analytics_metrics:
       description: A comma-separated list of metrics to query.
       example: queryCount,uncachedCount
-      type: string
-    dns-analytics_result:
-      properties:
-        data:
-          $ref: '#/components/schemas/dns-analytics_data'
-        data_lag:
-          description: Number of seconds between current time and last processed event, in another words how many seconds of data could be missing.
-          example: 60
-          minimum: 0
-          type: number
-        max:
-          description: Maximum results for each metric (object mapping metric names to values). Currently always an empty object.
-          type: object
-        min:
-          description: Minimum results for each metric (object mapping metric names to values). Currently always an empty object.
-          type: object
-        query:
-          $ref: '#/components/schemas/dns-analytics_query'
-        rows:
-          description: Total number of rows in the result.
-          example: 100
-          minimum: 0
-          type: number
-        totals:
-          description: Total results for metrics across all data (object mapping metric names to values).
-          type: object
-      required:
-      - rows
-      - totals
-      - min
-      - max
-      - data_lag
-      - query
-      - data
-      type: object
-    dns-analytics_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/dns-analytics_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/dns-analytics_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    dns-analytics_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    dns-analytics_since:
-      description: Start date and time of requesting data period in ISO 8601 format.
-      example: '2023-11-11T12:00:00Z'
-      format: date-time
-      type: string
-    dns-analytics_sort:
-      description: A comma-separated list of dimensions to sort by, where each dimension may be prefixed by - (descending) or + (ascending).
-      example: +responseCode,-queryName
-      type: string
-    dns-analytics_report:
-      allOf:
-      - $ref: '#/components/schemas/dns-analytics_result'
-      - properties:
-          data:
-            items:
-              properties:
-                metrics:
-                  description: Array with one item per requested metric. Each item is a single value.
-                  items:
-                    description: Nominal metric value.
-                    type: number
-                  type: array
-              required:
-              - metrics
-        required:
-        - data
-    dns-analytics_time_delta:
-      description: Unit of time to group data by.
-      enum:
-      - all
-      - auto
-      - year
-      - quarter
-      - month
-      - week
-      - day
-      - hour
-      - dekaminute
-      - minute
-      example: hour
       type: string
     dns-analytics_query:
       properties:
@@ -383,7 +316,26 @@ components:
       - until
       - limit
       type: object
-    dns-analytics_report_bytime:
+    dns-analytics_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dns-analytics_api-response-common'
+      type: object
+    dns-analytics_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dns-analytics_report:
       allOf:
       - $ref: '#/components/schemas/dns-analytics_result'
       - properties:
@@ -391,76 +343,113 @@ components:
             items:
               properties:
                 metrics:
-                  description: Array with one item per requested metric. Each item is an array of values, broken down by time interval.
+                  description: Array with one item per requested metric. Each item is a single value.
                   items:
-                    description: Nominal metric values, broken down by time interval.
-                    items: {}
-                    properties:
-                      items:
-                        description: Nominal metric value.
-                        type: number
-                    type: array
+                    description: Nominal metric value.
+                    type: number
                   type: array
               required:
               - metrics
-          query:
-            properties:
-              time_delta:
-                $ref: '#/components/schemas/dns-analytics_time_delta'
-            required:
-            - time_delta
-            type: object
-          time_intervals:
-            description: 'Array of time intervals in the response data. Each interval is represented as an array containing two values: the start time, and the end time.
-
-              '
-            items:
-              description: Array with exactly two items, representing the start and end time (respectively) of this time interval.
-              items:
-                description: Time value.
-                example: '2023-11-11T12:00:00Z'
-                format: date-time
-                type: string
-              type: array
-            type: array
         required:
-        - time_intervals
-        - query
         - data
-    dns-analytics_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    dns-analytics_limit:
+      default: 100000
+      description: Limit number of returned metrics.
+      example: 100
+      type: integer
+    dns-analytics_time_delta:
+      description: Unit of time to group data by.
+      enum:
+      - all
+      - auto
+      - year
+      - quarter
+      - month
+      - week
+      - day
+      - hour
+      - dekaminute
+      - minute
+      example: hour
       type: string
-    dns-analytics_dimensions:
-      description: A comma-separated list of dimensions to group results by.
-      example: queryType
-      type: string
-    dns-analytics_filters:
-      description: Segmentation filter in 'attribute operator value' format.
-      example: responseCode==NOERROR,queryType==A
-      type: string
-    dns-analytics_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dns-analytics_api-response-common'
-      type: object
-    dns-analytics_api-response-common:
+    dns-analytics_api-response-common-failure:
       properties:
         errors:
-          $ref: '#/components/schemas/dns-analytics_messages'
+          allOf:
+          - $ref: '#/components/schemas/dns-analytics_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
         messages:
-          $ref: '#/components/schemas/dns-analytics_messages'
+          allOf:
+          - $ref: '#/components/schemas/dns-analytics_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
         success:
           description: Whether the API call was successful
           enum:
-          - true
-          example: true
+          - false
+          example: false
           type: boolean
       required:
       - success
       - errors
       - messages
+      - result
       type: object
+    dns-analytics_result:
+      properties:
+        data:
+          $ref: '#/components/schemas/dns-analytics_data'
+        data_lag:
+          description: Number of seconds between current time and last processed event, in another words how many seconds of data could be missing.
+          example: 60
+          minimum: 0
+          type: number
+        max:
+          description: Maximum results for each metric (object mapping metric names to values). Currently always an empty object.
+          type: object
+        min:
+          description: Minimum results for each metric (object mapping metric names to values). Currently always an empty object.
+          type: object
+        query:
+          $ref: '#/components/schemas/dns-analytics_query'
+        rows:
+          description: Total number of rows in the result.
+          example: 100
+          minimum: 0
+          type: number
+        totals:
+          description: Total results for metrics across all data (object mapping metric names to values).
+          type: object
+      required:
+      - rows
+      - totals
+      - min
+      - max
+      - data_lag
+      - query
+      - data
+      type: object
+    dns-analytics_sort:
+      description: A comma-separated list of dimensions to sort by, where each dimension may be prefixed by - (descending) or + (ascending).
+      example: +responseCode,-queryName
+      type: string
+    dns-analytics_dimensions:
+      description: A comma-separated list of dimensions to group results by.
+      example: queryType
+      type: string
+    dns-analytics_since:
+      description: Start date and time of requesting data period in ISO 8601 format.
+      example: '2023-11-11T12:00:00Z'
+      format: date-time
+      type: string
   securitySchemes:
     api_email:
       in: header

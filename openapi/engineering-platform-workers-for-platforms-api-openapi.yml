@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Workers for Platforms API
+  title: Cloudflare Workers for Platforms API
   version: 4.0.0
 tags:
 - name: Workers for Platforms
@@ -985,233 +974,53 @@ paths:
         - com.cloudflare.edge.worker.script.read
 components:
   schemas:
-    workers_script-response-upload-single:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/workers_script-response-upload'
-        x-cfLinkErrors:
-          '10001': Unsupported or unexpected Content Type
-          '10002': Unexpected internal server error
-          '10003': Missing required URL parameter
-          '10004': Malformed URL parameter
-          '10006': Unparseable script body
-          '10007': Resource not found (similar to HTTP 404)
-          '10014': Internal error while attempting authorization checks
-          '10015': The current account is not authorized to use workers
-          '10018': Attempted to update a script where the e-tag does not match
-          '10021': Script content failed validation checks, but was otherwise parseable
-          '10023': Unauthorized access attempt
-          '10027': Script body was too large
-          '10075': Requires a Workers Paid plan
-    workers_api-response-common-failure:
+    workers_tail_consumers_script:
+      description: A reference to a script that will consume logs from the attached Worker.
       properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/workers_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/workers_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    workers_stepped_migrations:
-      allOf:
-      - $ref: '#/components/schemas/workers_migration_tag_conditions'
-      - properties:
-          steps:
-            description: Migrations to apply in order.
-            items:
-              $ref: '#/components/schemas/workers_migration_step'
-            type: array
-        type: object
-    workers_queue_binding:
-      properties:
-        name:
-          $ref: '#/components/schemas/workers_binding_name'
-        queue_name:
-          description: Name of the Queue to bind to
-          example: my-queue
-          type: string
-        type:
-          description: The class of resource that the binding provides.
-          enum:
-          - queue
-          example: queue
-          type: string
-      required:
-      - name
-      - type
-      - queue_name
-      type: object
-    workers_secret_name:
-      description: A JavaScript variable name for the secret binding.
-      example: mySecret
-      readOnly: true
-      type: string
-    workers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    workers_tail_consumers:
-      description: List of Workers that will consume logs from the attached Worker.
-      items:
-        $ref: '#/components/schemas/workers_tail_consumers_script'
-      type: array
-    workers_do_binding:
-      properties:
-        class_name:
-          description: The exported class name of the Durable Object
-          example: MyDurableObject
-          type: string
         environment:
-          description: The environment of the script_name to bind to
+          description: Optional environment if the Worker utilizes one.
+          example: production
+          type: string
+        namespace:
+          description: Optional dispatch namespace the script belongs to.
+          example: my-namespace
+          type: string
+        service:
+          description: Name of Worker that is to be the consumer.
+          example: my-log-consumer
+          type: string
+      required:
+      - service
+      type: object
+    workers_service_binding:
+      properties:
+        environment:
+          description: Optional environment if the Worker utilizes one.
           example: production
           type: string
         name:
           $ref: '#/components/schemas/workers_binding_name'
-        namespace_id:
-          $ref: '#/components/schemas/workers_namespace_identifier'
-        script_name:
-          description: The script where the Durable Object is defined, if it is external to this Worker
-          example: my-other-worker
+        service:
+          description: Name of Worker to bind to
+          example: my-worker
           type: string
         type:
           description: The class of resource that the binding provides.
           enum:
-          - durable_object_namespace
-          example: durable_object_namespace
+          - service
+          example: service
           type: string
       required:
       - name
       - type
-      - class_name
+      - service
+      - environment
       type: object
-    workers_binding:
-      description: A binding to allow the Worker to communicate with resources
-      oneOf:
-      - $ref: '#/components/schemas/workers_kv_namespace_binding'
-      - $ref: '#/components/schemas/workers_service_binding'
-      - $ref: '#/components/schemas/workers_do_binding'
-      - $ref: '#/components/schemas/workers_r2_binding'
-      - $ref: '#/components/schemas/workers_queue_binding'
-      - $ref: '#/components/schemas/workers_d1_binding'
-      - $ref: '#/components/schemas/workers_dispatch_namespace_binding'
-      - $ref: '#/components/schemas/workers_mtls_cert_binding'
-      type: object
-    workers_single_step_migrations:
-      allOf:
-      - $ref: '#/components/schemas/workers_migration_tag_conditions'
-      - $ref: '#/components/schemas/workers_migration_step'
-      description: A single set of migrations to apply.
-    workers_script-and-version-settings-item:
-      properties:
-        bindings:
-          $ref: '#/components/schemas/workers_bindings'
-        compatibility_date:
-          $ref: '#/components/schemas/workers_compatibility_date'
-        compatibility_flags:
-          $ref: '#/components/schemas/workers_compatibility_flags'
-        limits:
-          $ref: '#/components/schemas/workers_limits'
-        logpush:
-          $ref: '#/components/schemas/workers_logpush'
-        migrations:
-          description: 'Migrations to apply for Durable Objects associated with this Worker.
-
-            '
-          oneOf:
-          - $ref: '#/components/schemas/workers_single_step_migrations'
-          - $ref: '#/components/schemas/workers_stepped_migrations'
-        placement:
-          $ref: '#/components/schemas/workers_placement_config'
-        tags:
-          $ref: '#/components/schemas/workers_tags'
-        tail_consumers:
-          $ref: '#/components/schemas/workers_tail_consumers'
-        usage_model:
-          $ref: '#/components/schemas/workers_usage_model'
-      type: object
-    workers_namespace-list-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/workers_namespace-response'
-            type: array
-    workers_tag:
-      description: Tag to help you manage your Worker
-      example: my-tag
-      type: string
-    workers_script_count:
-      description: The current number of scripts in this Dispatch Namespace
-      example: 800
-      type: integer
-    workers_uuid:
-      description: API Resource UUID tag.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    workers_compatibility_flags:
-      description: Opt your Worker into specific changes
+    workers_tags:
+      description: Tags to help you manage your Workers
       items:
-        $ref: '#/components/schemas/workers_compatibility_flag'
+        $ref: '#/components/schemas/workers_tag'
       type: array
-    workers_kv_namespace_binding:
-      properties:
-        name:
-          $ref: '#/components/schemas/workers_binding_name'
-        namespace_id:
-          $ref: '#/components/schemas/workers_namespace_identifier'
-        type:
-          description: The class of resource that the binding provides.
-          enum:
-          - kv_namespace
-          example: kv_namespace
-          type: string
-      required:
-      - name
-      - type
-      - namespace_id
-      type: object
-    workers_dispatch_namespace_name:
-      description: Name of the Workers for Platforms dispatch namespace.
-      example: my-dispatch-namespace
-      pattern: ^.+$
-      type: string
     workers_d1_binding:
       properties:
         binding:
@@ -1236,11 +1045,216 @@ components:
       - type
       - binding
       type: object
+    workers_placement_config:
+      properties:
+        mode:
+          description: Enables [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement). Only `"smart"` is currently supported
+          enum:
+          - smart
+          type: string
+      type: object
+    workers_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      type: object
+    workers_script-response-upload:
+      allOf:
+      - $ref: '#/components/schemas/workers_script-response'
+      - properties:
+          startup_time_ms:
+            example: 10
+            type: integer
+    workers_namespace_identifier:
+      description: Namespace identifier tag.
+      example: 0f2ac74b498b48028cb68387c421e279
+      maxLength: 32
+      readOnly: true
+      type: string
     workers_usage_model:
       description: Specifies the usage model for the Worker (e.g. 'bundled' or 'unbound').
       example: unbound
       pattern: ^(bundled|unbound)$
       type: string
+    workers_stepped_migrations:
+      allOf:
+      - $ref: '#/components/schemas/workers_migration_tag_conditions'
+      - properties:
+          steps:
+            description: Migrations to apply in order.
+            items:
+              $ref: '#/components/schemas/workers_migration_step'
+            type: array
+        type: object
+    workers_compatibility_date:
+      description: Opt your Worker into changes after this date
+      example: '2022-04-05'
+      type: string
+    workers_script_count:
+      description: The current number of scripts in this Dispatch Namespace
+      example: 800
+      type: integer
+    workers_compatibility_flag:
+      description: A flag to opt into a specific change
+      example: formdata_parser_supports_files
+      type: string
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    workers_script_name:
+      description: Name of the script, used in URLs and route configuration.
+      example: this-is_my_script-01
+      pattern: ^[a-z0-9_][a-z0-9-_]*$
+      type: string
+    workers_namespace-single-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_namespace-response'
+    workers_binding_name:
+      description: A JavaScript variable name for the binding.
+      example: myBinding
+      readOnly: true
+      type: string
+    workers_dispatch_namespace_name:
+      description: Name of the Workers for Platforms dispatch namespace.
+      example: my-dispatch-namespace
+      pattern: ^.+$
+      type: string
+    workers_tail_consumers:
+      description: List of Workers that will consume logs from the attached Worker.
+      items:
+        $ref: '#/components/schemas/workers_tail_consumers_script'
+      type: array
+    workers_script-response-single:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_script-response'
+        x-cfLinkErrors:
+          '10001': Unsupported or unexpected Content Type
+          '10002': Unexpected internal server error
+          '10003': Missing required URL parameter
+          '10004': Malformed URL parameter
+          '10006': Unparseable script body
+          '10007': Resource not found (similar to HTTP 404)
+          '10014': Internal error while attempting authorization checks
+          '10015': The current account is not authorized to use workers
+          '10018': Attempted to update a script where the e-tag does not match
+          '10021': Script content failed validation checks, but was otherwise parseable
+          '10023': Unauthorized access attempt
+          '10027': Script body was too large
+          '10075': Requires a Workers Paid plan
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    workers_binding:
+      description: A binding to allow the Worker to communicate with resources
+      oneOf:
+      - $ref: '#/components/schemas/workers_kv_namespace_binding'
+      - $ref: '#/components/schemas/workers_service_binding'
+      - $ref: '#/components/schemas/workers_do_binding'
+      - $ref: '#/components/schemas/workers_r2_binding'
+      - $ref: '#/components/schemas/workers_queue_binding'
+      - $ref: '#/components/schemas/workers_d1_binding'
+      - $ref: '#/components/schemas/workers_dispatch_namespace_binding'
+      - $ref: '#/components/schemas/workers_mtls_cert_binding'
+      type: object
+    workers_migration_tag_conditions:
+      properties:
+        new_tag:
+          description: Tag to set as the latest migration tag.
+          example: v2
+          type: string
+        old_tag:
+          description: Tag used to verify against the latest migration tag for this Worker. If they don't match, the upload is rejected.
+          example: v1
+          type: string
+      type: object
+    workers_queue_binding:
+      properties:
+        name:
+          $ref: '#/components/schemas/workers_binding_name'
+        queue_name:
+          description: Name of the Queue to bind to
+          example: my-queue
+          type: string
+        type:
+          description: The class of resource that the binding provides.
+          enum:
+          - queue
+          example: queue
+          type: string
+      required:
+      - name
+      - type
+      - queue_name
+      type: object
+    workers_modified_on:
+      description: When the script was last modified.
+      example: '2017-01-01T00:00:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    workers_uuid:
+      description: API Resource UUID tag.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    workers_tag:
+      description: Tag to help you manage your Worker
+      example: my-tag
+      type: string
+    workers_kv_namespace_binding:
+      properties:
+        name:
+          $ref: '#/components/schemas/workers_binding_name'
+        namespace_id:
+          $ref: '#/components/schemas/workers_namespace_identifier'
+        type:
+          description: The class of resource that the binding provides.
+          enum:
+          - kv_namespace
+          example: kv_namespace
+          type: string
+      required:
+      - name
+      - type
+      - namespace_id
+      type: object
+    workers_limits:
+      description: Limits to apply for this Worker.
+      properties:
+        cpu_ms:
+          description: The amount of CPU time this Worker can use in milliseconds.
+          example: 50
+          type: integer
+      type: object
+    workers_bindings:
+      description: List of bindings attached to this Worker
+      items:
+        $ref: '#/components/schemas/workers_binding'
+      type: array
+    workers_single_step_migrations:
+      allOf:
+      - $ref: '#/components/schemas/workers_migration_tag_conditions'
+      - $ref: '#/components/schemas/workers_migration_step'
+      description: A single set of migrations to apply.
     workers_etag:
       description: Hashed script content, can be used in a If-None-Match header when updating.
       example: ea95132c15732412d22c1476fa83f27a
@@ -1250,70 +1264,34 @@ components:
       description: Specifies the placement mode for the Worker (e.g. 'smart').
       example: smart
       type: string
-    workers_placement_config:
+    workers_created_on:
+      description: When the script was created.
+      example: '2017-01-01T00:00:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    workers_secret:
       properties:
-        mode:
-          description: Enables [Smart Placement](https://developers.cloudflare.com/workers/configuration/smart-placement). Only `"smart"` is currently supported
-          enum:
-          - smart
-          type: string
-      type: object
-    workers_r2_binding:
-      properties:
-        bucket_name:
-          description: R2 bucket to bind to
-          example: my-r2-bucket
-          type: string
         name:
-          $ref: '#/components/schemas/workers_binding_name'
+          description: The name of this secret, this is what will be used to access it inside the Worker.
+          example: MY_SECRET
+          type: string
+        text:
+          description: The value of the secret.
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+          type: string
         type:
-          description: The class of resource that the binding provides.
+          description: The type of secret to put.
           enum:
-          - r2_bucket
-          example: r2_bucket
+          - secret_text
+          example: secret_text
           type: string
-      required:
-      - name
-      - type
-      - bucket_name
       type: object
-    workers_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      type: object
-    workers_script-response:
-      properties:
-        created_on:
-          $ref: '#/components/schemas/workers_created_on'
-        etag:
-          $ref: '#/components/schemas/workers_etag'
-        id:
-          description: The id of the script in the Workers system. Usually the script name.
-          example: my-workers-script
-          readOnly: true
-          type: string
-        logpush:
-          $ref: '#/components/schemas/workers_logpush'
-        modified_on:
-          $ref: '#/components/schemas/workers_modified_on'
-        placement_mode:
-          $ref: '#/components/schemas/workers_placement_mode'
-        tail_consumers:
-          $ref: '#/components/schemas/workers_tail_consumers'
-        usage_model:
-          $ref: '#/components/schemas/workers_usage_model'
-    workers_namespace-script-response:
-      description: Details about a worker uploaded to a Workers for Platforms namespace.
-      properties:
-        created_on:
-          $ref: '#/components/schemas/workers_created_on'
-        dispatch_namespace:
-          $ref: '#/components/schemas/workers_dispatch_namespace_name'
-        modified_on:
-          $ref: '#/components/schemas/workers_modified_on'
-        script:
-          $ref: '#/components/schemas/workers_script-response'
-      type: object
+    workers_compatibility_flags:
+      description: Opt your Worker into specific changes
+      items:
+        $ref: '#/components/schemas/workers_compatibility_flag'
+      type: array
     workers_secret-response:
       properties:
         name:
@@ -1367,11 +1345,168 @@ components:
             type: object
           type: array
       type: object
-    workers_binding_name:
-      description: A JavaScript variable name for the binding.
-      example: myBinding
+    workers_namespace-script-response:
+      description: Details about a worker uploaded to a Workers for Platforms namespace.
+      properties:
+        created_on:
+          $ref: '#/components/schemas/workers_created_on'
+        dispatch_namespace:
+          $ref: '#/components/schemas/workers_dispatch_namespace_name'
+        modified_on:
+          $ref: '#/components/schemas/workers_modified_on'
+        script:
+          $ref: '#/components/schemas/workers_script-response'
+      type: object
+    workers_namespace-delete-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            enum:
+            - null
+            type:
+            - object
+            - 'null'
+    workers_script-response:
+      properties:
+        created_on:
+          $ref: '#/components/schemas/workers_created_on'
+        etag:
+          $ref: '#/components/schemas/workers_etag'
+        id:
+          description: The id of the script in the Workers system. Usually the script name.
+          example: my-workers-script
+          readOnly: true
+          type: string
+        logpush:
+          $ref: '#/components/schemas/workers_logpush'
+        modified_on:
+          $ref: '#/components/schemas/workers_modified_on'
+        placement_mode:
+          $ref: '#/components/schemas/workers_placement_mode'
+        tail_consumers:
+          $ref: '#/components/schemas/workers_tail_consumers'
+        usage_model:
+          $ref: '#/components/schemas/workers_usage_model'
+    workers_namespace-script-response-single:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_namespace-script-response'
+    workers_mtls_cert_binding:
+      properties:
+        certificate_id:
+          description: ID of the certificate to bind to
+          example: efwu2n6s-q69d-2kr9-184j-4913e8h391k6
+          type: string
+        name:
+          $ref: '#/components/schemas/workers_binding_name'
+        type:
+          description: The class of resource that the binding provides.
+          enum:
+          - mtls_certificate
+          example: mtls_certificate
+          type: string
+      required:
+      - name
+      - type
+      - certificate
+      type: object
+    workers_do_binding:
+      properties:
+        class_name:
+          description: The exported class name of the Durable Object
+          example: MyDurableObject
+          type: string
+        environment:
+          description: The environment of the script_name to bind to
+          example: production
+          type: string
+        name:
+          $ref: '#/components/schemas/workers_binding_name'
+        namespace_id:
+          $ref: '#/components/schemas/workers_namespace_identifier'
+        script_name:
+          description: The script where the Durable Object is defined, if it is external to this Worker
+          example: my-other-worker
+          type: string
+        type:
+          description: The class of resource that the binding provides.
+          enum:
+          - durable_object_namespace
+          example: durable_object_namespace
+          type: string
+      required:
+      - name
+      - type
+      - class_name
+      type: object
+    workers_namespace-list-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/workers_namespace-response'
+            type: array
+    workers_r2_binding:
+      properties:
+        bucket_name:
+          description: R2 bucket to bind to
+          example: my-r2-bucket
+          type: string
+        name:
+          $ref: '#/components/schemas/workers_binding_name'
+        type:
+          description: The class of resource that the binding provides.
+          enum:
+          - r2_bucket
+          example: r2_bucket
+          type: string
+      required:
+      - name
+      - type
+      - bucket_name
+      type: object
+    workers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers_messages'
+        messages:
+          $ref: '#/components/schemas/workers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers_secret_name:
+      description: A JavaScript variable name for the secret binding.
+      example: mySecret
       readOnly: true
       type: string
+    workers_namespace-response:
+      properties:
+        created_by:
+          $ref: '#/components/schemas/workers_identifier'
+        created_on:
+          $ref: '#/components/schemas/workers_created_on'
+        modified_by:
+          $ref: '#/components/schemas/workers_identifier'
+        modified_on:
+          $ref: '#/components/schemas/workers_modified_on'
+        namespace_id:
+          $ref: '#/components/schemas/workers_uuid'
+        namespace_name:
+          $ref: '#/components/schemas/workers_dispatch_namespace_name'
+        script_count:
+          $ref: '#/components/schemas/workers_script_count'
     workers_dispatch_namespace_binding:
       properties:
         name:
@@ -1411,45 +1546,75 @@ components:
       - type
       - namespace
       type: object
-    workers_compatibility_flag:
-      description: A flag to opt into a specific change
-      example: formdata_parser_supports_files
-      type: string
-    workers_script_name:
-      description: Name of the script, used in URLs and route configuration.
-      example: this-is_my_script-01
-      pattern: ^[a-z0-9_][a-z0-9-_]*$
-      type: string
-    workers_namespace_identifier:
-      description: Namespace identifier tag.
-      example: 0f2ac74b498b48028cb68387c421e279
-      maxLength: 32
-      readOnly: true
-      type: string
-    workers_limits:
-      description: Limits to apply for this Worker.
+    workers_logpush:
+      description: Whether Logpush is turned on for the Worker.
+      example: false
+      type: boolean
+    workers_api-response-common-failure:
       properties:
-        cpu_ms:
-          description: The amount of CPU time this Worker can use in milliseconds.
-          example: 50
-          type: integer
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/workers_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/workers_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
       type: object
-    workers_namespace-single-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/workers_namespace-response'
-    workers_compatibility_date:
-      description: Opt your Worker into changes after this date
-      example: '2022-04-05'
-      type: string
-    workers_script-response-single:
+    workers_script-and-version-settings-item:
+      properties:
+        bindings:
+          $ref: '#/components/schemas/workers_bindings'
+        compatibility_date:
+          $ref: '#/components/schemas/workers_compatibility_date'
+        compatibility_flags:
+          $ref: '#/components/schemas/workers_compatibility_flags'
+        limits:
+          $ref: '#/components/schemas/workers_limits'
+        logpush:
+          $ref: '#/components/schemas/workers_logpush'
+        migrations:
+          description: 'Migrations to apply for Durable Objects associated with this Worker.
+
+            '
+          oneOf:
+          - $ref: '#/components/schemas/workers_single_step_migrations'
+          - $ref: '#/components/schemas/workers_stepped_migrations'
+        placement:
+          $ref: '#/components/schemas/workers_placement_config'
+        tags:
+          $ref: '#/components/schemas/workers_tags'
+        tail_consumers:
+          $ref: '#/components/schemas/workers_tail_consumers'
+        usage_model:
+          $ref: '#/components/schemas/workers_usage_model'
+      type: object
+    workers_script-response-upload-single:
       allOf:
       - $ref: '#/components/schemas/workers_api-response-single'
       - properties:
           result:
-            $ref: '#/components/schemas/workers_script-response'
+            $ref: '#/components/schemas/workers_script-response-upload'
         x-cfLinkErrors:
           '10001': Unsupported or unexpected Content Type
           '10002': Unexpected internal server error
@@ -1464,182 +1629,6 @@ components:
           '10023': Unauthorized access attempt
           '10027': Script body was too large
           '10075': Requires a Workers Paid plan
-    workers_logpush:
-      description: Whether Logpush is turned on for the Worker.
-      example: false
-      type: boolean
-    workers_tags:
-      description: Tags to help you manage your Workers
-      items:
-        $ref: '#/components/schemas/workers_tag'
-      type: array
-    workers_namespace-script-response-single:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/workers_namespace-script-response'
-    workers_modified_on:
-      description: When the script was last modified.
-      example: '2017-01-01T00:00:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    workers_created_on:
-      description: When the script was created.
-      example: '2017-01-01T00:00:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    workers_tail_consumers_script:
-      description: A reference to a script that will consume logs from the attached Worker.
-      properties:
-        environment:
-          description: Optional environment if the Worker utilizes one.
-          example: production
-          type: string
-        namespace:
-          description: Optional dispatch namespace the script belongs to.
-          example: my-namespace
-          type: string
-        service:
-          description: Name of Worker that is to be the consumer.
-          example: my-log-consumer
-          type: string
-      required:
-      - service
-      type: object
-    workers_namespace-delete-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            enum:
-            - null
-            type:
-            - object
-            - 'null'
-    workers_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/workers_messages'
-        messages:
-          $ref: '#/components/schemas/workers_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    workers_bindings:
-      description: List of bindings attached to this Worker
-      items:
-        $ref: '#/components/schemas/workers_binding'
-      type: array
-    workers_script-response-upload:
-      allOf:
-      - $ref: '#/components/schemas/workers_script-response'
-      - properties:
-          startup_time_ms:
-            example: 10
-            type: integer
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    workers_service_binding:
-      properties:
-        environment:
-          description: Optional environment if the Worker utilizes one.
-          example: production
-          type: string
-        name:
-          $ref: '#/components/schemas/workers_binding_name'
-        service:
-          description: Name of Worker to bind to
-          example: my-worker
-          type: string
-        type:
-          description: The class of resource that the binding provides.
-          enum:
-          - service
-          example: service
-          type: string
-      required:
-      - name
-      - type
-      - service
-      - environment
-      type: object
-    workers_namespace-response:
-      properties:
-        created_by:
-          $ref: '#/components/schemas/workers_identifier'
-        created_on:
-          $ref: '#/components/schemas/workers_created_on'
-        modified_by:
-          $ref: '#/components/schemas/workers_identifier'
-        modified_on:
-          $ref: '#/components/schemas/workers_modified_on'
-        namespace_id:
-          $ref: '#/components/schemas/workers_uuid'
-        namespace_name:
-          $ref: '#/components/schemas/workers_dispatch_namespace_name'
-        script_count:
-          $ref: '#/components/schemas/workers_script_count'
-    workers_migration_tag_conditions:
-      properties:
-        new_tag:
-          description: Tag to set as the latest migration tag.
-          example: v2
-          type: string
-        old_tag:
-          description: Tag used to verify against the latest migration tag for this Worker. If they don't match, the upload is rejected.
-          example: v1
-          type: string
-      type: object
-    workers_mtls_cert_binding:
-      properties:
-        certificate_id:
-          description: ID of the certificate to bind to
-          example: efwu2n6s-q69d-2kr9-184j-4913e8h391k6
-          type: string
-        name:
-          $ref: '#/components/schemas/workers_binding_name'
-        type:
-          description: The class of resource that the binding provides.
-          enum:
-          - mtls_certificate
-          example: mtls_certificate
-          type: string
-      required:
-      - name
-      - type
-      - certificate
-      type: object
-    workers_secret:
-      properties:
-        name:
-          description: The name of this secret, this is what will be used to access it inside the Worker.
-          example: MY_SECRET
-          type: string
-        text:
-          description: The value of the secret.
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-          type: string
-        type:
-          description: The type of secret to put.
-          enum:
-          - secret_text
-          example: secret_text
-          type: string
-      type: object
   responses:
     workers_200:
       content:

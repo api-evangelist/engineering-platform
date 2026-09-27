@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Pages Deployment API
+  title: Cloudflare Pages Deployment API
   version: 4.0.0
 tags:
 - name: Pages Deployment
@@ -340,15 +329,104 @@ paths:
       - Pages Deployment
 components:
   schemas:
-    pages_deployment-list-response:
+    pages_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    pages_project_name:
+      description: Name of the project.
+      example: this-is-my-project-01
+      pattern: ^[a-z0-9][a-z0-9-]*$
+      type: string
+    pages_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/pages_messages'
+          example:
+          - code: 7003
+            message: No route for the URI.
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/pages_messages'
+          example: []
+        result:
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    pages_deployment-response-details:
       allOf:
       - $ref: '#/components/schemas/pages_api-response-common'
-      - $ref: '#/components/schemas/pages_api-response-pagination'
       - properties:
           result:
-            items:
-              $ref: '#/components/schemas/pages_deployments'
-            type: array
+            $ref: '#/components/schemas/pages_deployments'
+    pages_source:
+      properties:
+        config:
+          properties:
+            deployments_enabled:
+              type: boolean
+            owner:
+              type: string
+            path_excludes:
+              items:
+                type: string
+              type: array
+            path_includes:
+              items:
+                type: string
+              type: array
+            pr_comments_enabled:
+              type: boolean
+            preview_branch_excludes:
+              items:
+                type: string
+              type: array
+            preview_branch_includes:
+              items:
+                type: string
+              type: array
+            preview_deployment_setting:
+              enum:
+              - all
+              - none
+              - custom
+              type: string
+            production_branch:
+              type: string
+            production_deployments_enabled:
+              type: boolean
+            repo_name:
+              type: string
+          type: object
+        type:
+          type: string
+      readOnly: true
+      type: object
     pages_stage:
       description: The status of the deployment.
       properties:
@@ -381,27 +459,6 @@ components:
           type: string
       readOnly: true
       type: object
-    pages_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    pages_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     pages_deployment-response-logs:
       allOf:
       - $ref: '#/components/schemas/pages_api-response-common'
@@ -491,25 +548,6 @@ components:
                 type: integer
             type: object
         type: object
-    pages_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/pages_messages'
-        messages:
-          $ref: '#/components/schemas/pages_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     pages_build_config:
       description: Configs for the project build process.
       properties:
@@ -550,17 +588,52 @@ components:
           - string
           - 'null'
       type: object
-    pages_deployment-response-details:
+    pages_api-response-pagination:
+      properties:
+        result_info:
+          properties:
+            count:
+              description: The number of items on the current page.
+              example: 1
+              type: integer
+            page:
+              description: The page currently being requested.
+              example: 1
+              type: integer
+            per_page:
+              description: The number of items per page being returned.
+              example: 100
+              type: integer
+            total_count:
+              description: The total count of items.
+              example: 1
+              type: integer
+            total_pages:
+              description: The total count of pages.
+              example: 1
+              type: integer
+          required:
+          - page
+          - per_page
+          - count
+          - total_count
+          type: object
+      type: object
+    pages_deployment-new-deployment:
       allOf:
       - $ref: '#/components/schemas/pages_api-response-common'
       - properties:
           result:
             $ref: '#/components/schemas/pages_deployments'
-    pages_project_name:
-      description: Name of the project.
-      example: this-is-my-project-01
-      pattern: ^[a-z0-9][a-z0-9-]*$
-      type: string
+    pages_deployment-list-response:
+      allOf:
+      - $ref: '#/components/schemas/pages_api-response-common'
+      - $ref: '#/components/schemas/pages_api-response-pagination'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/pages_deployments'
+            type: array
     pages_deployments:
       properties:
         aliases:
@@ -708,28 +781,24 @@ components:
           readOnly: true
           type: string
       type: object
-    pages_api-response-common-failure:
+    pages_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    pages_api-response-common:
       properties:
         errors:
-          allOf:
-          - $ref: '#/components/schemas/pages_messages'
-          example:
-          - code: 7003
-            message: No route for the URI.
-          minLength: 1
+          $ref: '#/components/schemas/pages_messages'
         messages:
-          allOf:
-          - $ref: '#/components/schemas/pages_messages'
-          example: []
-        result:
-          type:
-          - object
-          - 'null'
+          $ref: '#/components/schemas/pages_messages'
         success:
-          description: Whether the API call was successful.
+          description: Whether the API call was successful
           enum:
           - false
-          example: false
+          - true
+          example: true
           type: boolean
       required:
       - success
@@ -737,86 +806,6 @@ components:
       - messages
       - result
       type: object
-    pages_api-response-pagination:
-      properties:
-        result_info:
-          properties:
-            count:
-              description: The number of items on the current page.
-              example: 1
-              type: integer
-            page:
-              description: The page currently being requested.
-              example: 1
-              type: integer
-            per_page:
-              description: The number of items per page being returned.
-              example: 100
-              type: integer
-            total_count:
-              description: The total count of items.
-              example: 1
-              type: integer
-            total_pages:
-              description: The total count of pages.
-              example: 1
-              type: integer
-          required:
-          - page
-          - per_page
-          - count
-          - total_count
-          type: object
-      type: object
-    pages_source:
-      properties:
-        config:
-          properties:
-            deployments_enabled:
-              type: boolean
-            owner:
-              type: string
-            path_excludes:
-              items:
-                type: string
-              type: array
-            path_includes:
-              items:
-                type: string
-              type: array
-            pr_comments_enabled:
-              type: boolean
-            preview_branch_excludes:
-              items:
-                type: string
-              type: array
-            preview_branch_includes:
-              items:
-                type: string
-              type: array
-            preview_deployment_setting:
-              enum:
-              - all
-              - none
-              - custom
-              type: string
-            production_branch:
-              type: string
-            production_deployments_enabled:
-              type: boolean
-            repo_name:
-              type: string
-          type: object
-        type:
-          type: string
-      readOnly: true
-      type: object
-    pages_deployment-new-deployment:
-      allOf:
-      - $ref: '#/components/schemas/pages_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/pages_deployments'
   securitySchemes:
     api_email:
       in: header

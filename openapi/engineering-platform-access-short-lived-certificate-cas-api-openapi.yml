@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Access Short-Lived Certificate CAs API
+  title: Cloudflare Access Short-Lived Certificate CAs API
   version: 4.0.0
 tags:
 - name: Access Short-Lived Certificate CAs
@@ -161,66 +150,6 @@ paths:
       - 'Access: Apps and Policies Read'
 components:
   schemas:
-    access_ca_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_ca'
-            type: array
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    access_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    access_public_key:
-      description: The public key to add to your SSH server configuration.
-      example: ecdsa-sha2-nistp256 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx= open-ssh-ca@cloudflareaccess.org
-      readOnly: true
-      type: string
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
-      type: object
-    access_id:
-      description: The ID of the CA.
-      example: 7eddae4619b50ab1361ba8ae9bd72269a432fea041529ed9
-      maxLength: 48
-      readOnly: true
-      type: string
     access_api-response-common-failure:
       properties:
         errors:
@@ -252,16 +181,84 @@ components:
       - messages
       - result
       type: object
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
+    access_schemas-id_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/access_id'
+            type: object
+    access_public_key:
+      description: The public key to add to your SSH server configuration.
+      example: ecdsa-sha2-nistp256 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx= open-ssh-ca@cloudflareaccess.org
+      readOnly: true
       type: string
+    access_ca:
+      properties:
+        aud:
+          $ref: '#/components/schemas/access_aud'
+        id:
+          $ref: '#/components/schemas/access_id'
+        public_key:
+          $ref: '#/components/schemas/access_public_key'
+      type: object
     access_identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       type: string
+    access_id:
+      description: The ID of the CA.
+      example: 7eddae4619b50ab1361ba8ae9bd72269a432fea041529ed9
+      maxLength: 48
+      readOnly: true
+      type: string
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_ca_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_ca'
+            type: array
+    access_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
+    access_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    access_ca_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            type: object
     access_api-response-common:
       properties:
         errors:
@@ -279,40 +276,32 @@ components:
       - errors
       - messages
       type: object
-    access_ca_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            type: object
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
     access_aud:
       description: The Application Audience (AUD) tag. Identifies the application associated with the CA.
       example: 737646a56ab1df6ec9bddc7e5ca84eaf3b0768850f3ffb5d74f1534911fe3893
       maxLength: 64
       readOnly: true
       type: string
-    access_schemas-id_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/access_id'
-            type: object
-    access_ca:
-      properties:
-        aud:
-          $ref: '#/components/schemas/access_aud'
-        id:
-          $ref: '#/components/schemas/access_id'
-        public_key:
-          $ref: '#/components/schemas/access_public_key'
-      type: object
   securitySchemes:
     api_email:
       in: header

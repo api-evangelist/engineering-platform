@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   version: 1.1.4
-  title: APIs.io Engineering Platform GitHub v3 REST Dependency Graph API
+  title: GitHub v3 REST Dependency Graph API
   description: GitHub's v3 REST API.
   license:
     name: MIT
@@ -68,7 +68,7 @@ paths:
         subcategory: dependency-review
   /repos/{owner}/{repo}/dependency-graph/sbom:
     get:
-      summary: APIs.io Engineering Platform Export a software bill of materials (SBOM) for a repository.
+      summary: APIs.io Engineering Platform Export a software bill of materials (SBOM) for a…
       description: Exports the software bill of materials (SBOM) for a repository in SPDX JSON format.
       tags:
       - Dependency-Graph
@@ -163,6 +163,12 @@ paths:
         subcategory: dependency-submission
 components:
   examples:
+    dependency-graph-create-snapshot-success:
+      value:
+        id: 12345
+        created_at: '2018-05-04T01:14:52Z'
+        message: Dependency results for the repo have been successfully updated.
+        result: SUCCESS
     dependency-graph-create-snapshot-request:
       value:
         version: 0
@@ -192,6 +198,28 @@ components:
                 - tunnel
               tunnel:
                 package_url: pkg:/npm/tunnel@0.0.6
+    dependency-graph-export-sbom-response:
+      value:
+        sbom:
+          SPDXID: SPDXRef-DOCUMENT
+          spdxVersion: SPDX-2.3
+          creationInfo:
+            created: '2021-09-01T00:00:00Z'
+            creators:
+            - 'Tool: GitHub.com-Dependency-Graph'
+          name: github/example
+          dataLicense: CC0-1.0
+          documentDescribes:
+          - github/example
+          documentNamespace: https://github.com/github/example/dependency_graph/sbom-abcdef123456
+          packages:
+          - SPDXID: SPDXRef-Package
+            name: rubygems:rails
+            versionInfo: 1.0.0
+            downloadLocation: NOASSERTION
+            filesAnalyzed: false
+            licenseConcluded: NOASSERTION
+            licenseDeclared: NOASSERTION
     diff-range-response:
       value:
       - change_type: removed
@@ -225,82 +253,7 @@ components:
           advisory_ghsa_id: GHSA-fqfj-cmh6-hj49
           advisory_summary: Ruby OpenID
           advisory_url: https://github.com/advisories/GHSA-fqfj-cmh6-hj49
-    dependency-graph-export-sbom-response:
-      value:
-        sbom:
-          SPDXID: SPDXRef-DOCUMENT
-          spdxVersion: SPDX-2.3
-          creationInfo:
-            created: '2021-09-01T00:00:00Z'
-            creators:
-            - 'Tool: GitHub.com-Dependency-Graph'
-          name: github/example
-          dataLicense: CC0-1.0
-          documentDescribes:
-          - github/example
-          documentNamespace: https://github.com/github/example/dependency_graph/sbom-abcdef123456
-          packages:
-          - SPDXID: SPDXRef-Package
-            name: rubygems:rails
-            versionInfo: 1.0.0
-            downloadLocation: NOASSERTION
-            filesAnalyzed: false
-            licenseConcluded: NOASSERTION
-            licenseDeclared: NOASSERTION
-    dependency-graph-create-snapshot-success:
-      value:
-        id: 12345
-        created_at: '2018-05-04T01:14:52Z'
-        message: Dependency results for the repo have been successfully updated.
-        result: SUCCESS
-  parameters:
-    repo:
-      name: repo
-      description: The name of the repository without the `.git` extension. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
-    manifest-path:
-      name: name
-      description: The full path, relative to the repository root, of the dependency manifest file.
-      in: query
-      required: false
-      schema:
-        type: string
-    owner:
-      name: owner
-      description: The account owner of the repository. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
   schemas:
-    manifest:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The name of the manifest.
-          example: package-lock.json
-        file:
-          type: object
-          properties:
-            source_location:
-              type: string
-              description: The path of the manifest file relative to the root of the Git repository.
-              example: /src/build/package-lock.json
-          additionalProperties: false
-        metadata:
-          $ref: '#/components/schemas/metadata'
-        resolved:
-          type: object
-          description: A collection of resolved package dependencies.
-          additionalProperties:
-            $ref: '#/components/schemas/dependency'
-      required:
-      - name
-      additionalProperties: false
     dependency-graph-spdx-sbom:
       title: Dependency Graph SPDX SBOM
       description: A schema for the SPDX JSON format returned by the Dependency Graph.
@@ -441,6 +394,31 @@ components:
           - packages
       required:
       - sbom
+    manifest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the manifest.
+          example: package-lock.json
+        file:
+          type: object
+          properties:
+            source_location:
+              type: string
+              description: The path of the manifest file relative to the root of the Git repository.
+              example: /src/build/package-lock.json
+          additionalProperties: false
+        metadata:
+          $ref: '#/components/schemas/metadata'
+        resolved:
+          type: object
+          description: A collection of resolved package dependencies.
+          additionalProperties:
+            $ref: '#/components/schemas/dependency'
+      required:
+      - name
+      additionalProperties: false
     metadata:
       title: metadata
       description: User-defined metadata to store domain-specific information limited to 8 keys with scalar values.
@@ -451,129 +429,6 @@ components:
         - type: string
         - type: number
         - type: boolean
-    basic-error:
-      title: Basic Error
-      description: Basic Error
-      type: object
-      properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        url:
-          type: string
-        status:
-          type: string
-    dependency-graph-diff:
-      title: Dependency Graph Diff
-      description: A diff of the dependencies between two commits.
-      type: array
-      items:
-        type: object
-        properties:
-          change_type:
-            type: string
-            enum:
-            - added
-            - removed
-          manifest:
-            type: string
-            example: path/to/package-lock.json
-          ecosystem:
-            type: string
-            example: npm
-          name:
-            type: string
-            example: '@actions/core'
-          version:
-            type: string
-            example: 1.0.0
-          package_url:
-            type:
-            - string
-            - 'null'
-            example: pkg:/npm/%40actions/core@1.1.0
-          license:
-            type:
-            - string
-            - 'null'
-            example: MIT
-          source_repository_url:
-            type:
-            - string
-            - 'null'
-            example: https://github.com/github/actions
-          vulnerabilities:
-            type: array
-            items:
-              type: object
-              properties:
-                severity:
-                  type: string
-                  example: critical
-                advisory_ghsa_id:
-                  type: string
-                  example: GHSA-rf4j-j272-fj86
-                advisory_summary:
-                  type: string
-                  example: A summary of the advisory.
-                advisory_url:
-                  type: string
-                  example: https://github.com/advisories/GHSA-rf4j-j272-fj86
-              required:
-              - severity
-              - advisory_ghsa_id
-              - advisory_summary
-              - advisory_url
-          scope:
-            description: Where the dependency is utilized. `development` means that the dependency is only utilized in the development environment. `runtime` means that the dependency is utilized at runtime and in the development environment.
-            type: string
-            enum:
-            - unknown
-            - runtime
-            - development
-        required:
-        - change_type
-        - manifest
-        - ecosystem
-        - name
-        - version
-        - package_url
-        - license
-        - source_repository_url
-        - vulnerabilities
-        - scope
-    dependency:
-      type: object
-      properties:
-        package_url:
-          type: string
-          description: Package-url (PURL) of dependency. See https://github.com/package-url/purl-spec for more details.
-          example: pkg:/npm/%40actions/http-client@1.0.11
-          pattern: ^pkg
-        metadata:
-          $ref: '#/components/schemas/metadata'
-        relationship:
-          type: string
-          description: A notation of whether a dependency is requested directly by this manifest or is a dependency of another dependency.
-          example: direct
-          enum:
-          - direct
-          - indirect
-        scope:
-          type: string
-          description: A notation of whether the dependency is required for the primary build artifact (runtime) or is only used for development. Future versions of this specification may allow for more granular scopes.
-          example: runtime
-          enum:
-          - runtime
-          - development
-        dependencies:
-          type: array
-          description: Array of package-url (PURLs) of direct child dependencies.
-          example: '@actions/http-client'
-          items:
-            type: string
-      additionalProperties: false
     snapshot:
       title: snapshot
       description: Create a new snapshot of a repository's dependencies.
@@ -653,12 +508,136 @@ components:
       - job
       - scanned
       additionalProperties: false
-  headers:
-    link:
-      example: <https://api.github.com/resource?page=2>; rel="next", <https://api.github.com/resource?page=5>; rel="last"
-      schema:
-        type: string
+    basic-error:
+      title: Basic Error
+      description: Basic Error
+      type: object
+      properties:
+        message:
+          type: string
+        documentation_url:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+    dependency:
+      type: object
+      properties:
+        package_url:
+          type: string
+          description: Package-url (PURL) of dependency. See https://github.com/package-url/purl-spec for more details.
+          example: pkg:/npm/%40actions/http-client@1.0.11
+          pattern: ^pkg
+        metadata:
+          $ref: '#/components/schemas/metadata'
+        relationship:
+          type: string
+          description: A notation of whether a dependency is requested directly by this manifest or is a dependency of another dependency.
+          example: direct
+          enum:
+          - direct
+          - indirect
+        scope:
+          type: string
+          description: A notation of whether the dependency is required for the primary build artifact (runtime) or is only used for development. Future versions of this specification may allow for more granular scopes.
+          example: runtime
+          enum:
+          - runtime
+          - development
+        dependencies:
+          type: array
+          description: Array of package-url (PURLs) of direct child dependencies.
+          example: '@actions/http-client'
+          items:
+            type: string
+      additionalProperties: false
+    dependency-graph-diff:
+      title: Dependency Graph Diff
+      description: A diff of the dependencies between two commits.
+      type: array
+      items:
+        type: object
+        properties:
+          change_type:
+            type: string
+            enum:
+            - added
+            - removed
+          manifest:
+            type: string
+            example: path/to/package-lock.json
+          ecosystem:
+            type: string
+            example: npm
+          name:
+            type: string
+            example: '@actions/core'
+          version:
+            type: string
+            example: 1.0.0
+          package_url:
+            type:
+            - string
+            - 'null'
+            example: pkg:/npm/%40actions/core@1.1.0
+          license:
+            type:
+            - string
+            - 'null'
+            example: MIT
+          source_repository_url:
+            type:
+            - string
+            - 'null'
+            example: https://github.com/github/actions
+          vulnerabilities:
+            type: array
+            items:
+              type: object
+              properties:
+                severity:
+                  type: string
+                  example: critical
+                advisory_ghsa_id:
+                  type: string
+                  example: GHSA-rf4j-j272-fj86
+                advisory_summary:
+                  type: string
+                  example: A summary of the advisory.
+                advisory_url:
+                  type: string
+                  example: https://github.com/advisories/GHSA-rf4j-j272-fj86
+              required:
+              - severity
+              - advisory_ghsa_id
+              - advisory_summary
+              - advisory_url
+          scope:
+            description: Where the dependency is utilized. `development` means that the dependency is only utilized in the development environment. `runtime` means that the dependency is utilized at runtime and in the development environment.
+            type: string
+            enum:
+            - unknown
+            - runtime
+            - development
+        required:
+        - change_type
+        - manifest
+        - ecosystem
+        - name
+        - version
+        - package_url
+        - license
+        - source_repository_url
+        - vulnerabilities
+        - scope
   responses:
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
     dependency_review_forbidden:
       description: Response if GitHub Advanced Security is not enabled for this repository
       content:
@@ -671,12 +650,33 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
-    forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/basic-error'
+  parameters:
+    owner:
+      name: owner
+      description: The account owner of the repository. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    repo:
+      name: repo
+      description: The name of the repository without the `.git` extension. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    manifest-path:
+      name: name
+      description: The full path, relative to the repository root, of the dependency manifest file.
+      in: query
+      required: false
+      schema:
+        type: string
+  headers:
+    link:
+      example: <https://api.github.com/resource?page=2>; rel="next", <https://api.github.com/resource?page=5>; rel="last"
+      schema:
+        type: string
 externalDocs:
   description: GitHub Enterprise Developer Docs
   url: https://docs.github.com/enterprise-server@3.9/rest/

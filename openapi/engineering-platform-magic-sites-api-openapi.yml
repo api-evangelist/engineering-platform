@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Magic Sites API
+  title: Cloudflare Magic Sites API
   version: 4.0.0
 tags:
 - name: Magic Sites
@@ -280,29 +269,31 @@ paths:
         pro: false
 components:
   schemas:
-    magic_sites_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/magic_site'
-            type: array
-    magic_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    magic_site_update_request:
+      properties:
+        connector_id:
+          $ref: '#/components/schemas/magic_connector-id'
+        description:
+          type: string
+        location:
+          $ref: '#/components/schemas/magic_site-location'
+        name:
+          $ref: '#/components/schemas/magic_site-name'
+        secondary_connector_id:
+          $ref: '#/components/schemas/magic_secondary-connector-id'
+      type: object
+    magic_site-location:
+      description: Location of site in latitude and longitude.
+      properties:
+        lat:
+          description: Latitude
+          example: 37.6192
+          type: string
+        lon:
+          description: Longitude
+          example: 122.3816
+          type: string
+      type: object
     magic_api-response-common-failure:
       properties:
         errors:
@@ -334,26 +325,11 @@ components:
       - messages
       - result
       type: object
-    magic_site:
-      properties:
-        connector_id:
-          $ref: '#/components/schemas/magic_connector-id'
-        description:
-          type: string
-        ha_mode:
-          description: Site high availability mode. If set to true, the site can have two connectors and runs in high availability mode.
-          example: true
-          type: boolean
-        id:
-          $ref: '#/components/schemas/magic_identifier'
-        location:
-          $ref: '#/components/schemas/magic_site-location'
-        name:
-          $ref: '#/components/schemas/magic_site-name'
-        secondary_connector_id:
-          $ref: '#/components/schemas/magic_secondary-connector-id'
-      type: object
-    magic_site_single_response:
+    magic_secondary-connector-id:
+      description: Magic Connector identifier tag. Used when high availability mode is on.
+      example: 8d67040d3835dbcf46ce29da440dc482
+      type: string
+    magic_site_deleted_response:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-single'
       - properties:
@@ -363,82 +339,6 @@ components:
       description: Magic Connector identifier tag.
       example: ac60d3d0435248289d446cedd870bcf4
       type: string
-    magic_secondary-connector-id:
-      description: Magic Connector identifier tag. Used when high availability mode is on.
-      example: 8d67040d3835dbcf46ce29da440dc482
-      type: string
-    magic_site-location:
-      description: Location of site in latitude and longitude.
-      properties:
-        lat:
-          description: Latitude
-          example: 37.6192
-          type: string
-        lon:
-          description: Longitude
-          example: 122.3816
-          type: string
-      type: object
-    magic_site-name:
-      description: The name of the site.
-      example: site_1
-      type: string
-    magic_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
-      type: object
-    magic_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/magic_messages'
-        messages:
-          $ref: '#/components/schemas/magic_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    magic_site_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_site'
-    magic_site_update_request:
-      properties:
-        connector_id:
-          $ref: '#/components/schemas/magic_connector-id'
-        description:
-          type: string
-        location:
-          $ref: '#/components/schemas/magic_site-location'
-        name:
-          $ref: '#/components/schemas/magic_site-name'
-        secondary_connector_id:
-          $ref: '#/components/schemas/magic_secondary-connector-id'
-      type: object
     magic_sites_add_single_request:
       properties:
         connector_id:
@@ -464,6 +364,95 @@ components:
       maxLength: 32
       readOnly: true
       type: string
+    magic_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic_messages'
+        messages:
+          $ref: '#/components/schemas/magic_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic_site-name:
+      description: The name of the site.
+      example: site_1
+      type: string
+    magic_sites_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/magic_site'
+            type: array
+    magic_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    magic_site_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_site'
+    magic_site:
+      properties:
+        connector_id:
+          $ref: '#/components/schemas/magic_connector-id'
+        description:
+          type: string
+        ha_mode:
+          description: Site high availability mode. If set to true, the site can have two connectors and runs in high availability mode.
+          example: true
+          type: boolean
+        id:
+          $ref: '#/components/schemas/magic_identifier'
+        location:
+          $ref: '#/components/schemas/magic_site-location'
+        name:
+          $ref: '#/components/schemas/magic_site-name'
+        secondary_connector_id:
+          $ref: '#/components/schemas/magic_secondary-connector-id'
+      type: object
+    magic_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
     magic_site_modified_response:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-single'

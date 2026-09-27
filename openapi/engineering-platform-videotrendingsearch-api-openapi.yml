@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
-  title: APIs.io Engineering Platform Video Search Client Video Trending Search API
-  description: The Video Search API lets you search on Bing for video that are relevant to the user's search query, for insights about a video or for videos that are trending based on search requests made by others. This section provides technical details about the query parameters and headers that you use to request videos and the JSON response objects that contain them. For examples that show how to make requests, see [Searching the Web for Videos](https://docs.microsoft.com/azure/cognitive-services/bing-video-search/search-the-web).
+  title: Video Search Client Video Trending Search API
+  description: The Video Search API lets you search on Bing for video that are relevant to the user's search query, for insights about a video or for videos that are trending based on search requests made by others. This section provides technical details about the query parameters and headers that you use to request videos and the JSON response objects that contain them. For examples that show how to make requests, see Searching the Web for Videos.
   contact: {}
   version: '1.0'
   x-apisguru-categories:
@@ -28,7 +28,7 @@ paths:
     get:
       tags:
       - VideoTrendingSearch
-      summary: APIs.io Engineering Platform The Video Trending Search API lets you search on Bing and get back a list of videos that are trending based on search requests made by others. The videos are broken out into different categories. For example, Top Music Videos. For a list of markets that support trending videos, see [Trending Videos](https://docs.microsoft.com/azure/cognitive-services/bing-video-search/trending-videos).
+      summary: APIs.io Engineering Platform The Video Trending Search API lets you search on…
       operationId: Videos_Trending
       parameters:
       - name: X-BingApis-SDK
@@ -1022,19 +1022,6 @@ paths:
               headers: {}
 components:
   schemas:
-    TrendingVideosSubcategory:
-      required:
-      - tiles
-      - title
-      type: object
-      properties:
-        tiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/TrendingVideosTile'
-        title:
-          type: string
-      x-ms-discriminator-value: TrendingVideos/Subcategory
     Error:
       required:
       - code
@@ -1090,34 +1077,41 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    CreativeWork:
-      properties:
-        provider:
-          type: array
-          description: The source of the creative work.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Thing'
-        text:
-          type: string
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Thing'
-    TrendingVideosTile:
+    TrendingVideosSubcategory:
       required:
-      - image
-      - query
+      - tiles
+      - title
       type: object
       properties:
-        image:
-          $ref: '#/components/schemas/ImageObject'
-        query:
-          $ref: '#/components/schemas/Query'
-      x-ms-discriminator-value: TrendingVideos/Tile
+        tiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendingVideosTile'
+        title:
+          type: string
+      x-ms-discriminator-value: TrendingVideos/Subcategory
+    TrendingVideosCategory:
+      required:
+      - subcategories
+      - title
+      type: object
+      properties:
+        subcategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendingVideosSubcategory'
+        title:
+          type: string
+      x-ms-discriminator-value: TrendingVideos/Category
+    ResponseBase:
+      required:
+      - _type
+      type: object
+      properties:
+        _type:
+          type: string
+      discriminator:
+        propertyName: _type
     Query:
       required:
       - text
@@ -1140,29 +1134,16 @@ components:
           description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
           readOnly: true
       description: Defines a search query.
-    Thing:
+    ErrorResponse:
+      required:
+      - errors
       properties:
-        alternateName:
-          type: string
-          readOnly: true
-        bingId:
-          type: string
-          description: An ID that uniquely identifies this item.
-          readOnly: true
-        description:
-          type: string
-          description: A short description of the item.
-          readOnly: true
-        image:
-          $ref: '#/components/schemas/ImageObject'
-        name:
-          type: string
-          description: The name of the thing represented by this object.
-          readOnly: true
-        url:
-          type: string
-          description: The URL to get more information about the thing represented by this object.
-          readOnly: true
+        errors:
+          type: array
+          description: A list of errors that describe the reasons why the request failed.
+          items:
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
       allOf:
       - $ref: '#/components/schemas/Response'
     TrendingVideos:
@@ -1189,13 +1170,31 @@ components:
       description: Defines the identity of a resource.
       allOf:
       - $ref: '#/components/schemas/ResponseBase'
-    ImageObject:
+    Thing:
       properties:
-        thumbnail:
+        alternateName:
+          type: string
+          readOnly: true
+        bingId:
+          type: string
+          description: An ID that uniquely identifies this item.
+          readOnly: true
+        description:
+          type: string
+          description: A short description of the item.
+          readOnly: true
+        image:
           $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
+        name:
+          type: string
+          description: The name of the thing represented by this object.
+          readOnly: true
+        url:
+          type: string
+          description: The URL to get more information about the thing represented by this object.
+          readOnly: true
       allOf:
-      - $ref: '#/components/schemas/MediaObject'
+      - $ref: '#/components/schemas/Response'
     Response:
       properties:
         webSearchUrl:
@@ -1205,6 +1204,24 @@ components:
       description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
       allOf:
       - $ref: '#/components/schemas/Identifiable'
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
+    TrendingVideosTile:
+      required:
+      - image
+      - query
+      type: object
+      properties:
+        image:
+          $ref: '#/components/schemas/ImageObject'
+        query:
+          $ref: '#/components/schemas/Query'
+      x-ms-discriminator-value: TrendingVideos/Tile
     MediaObject:
       properties:
         contentUrl:
@@ -1227,40 +1244,23 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/CreativeWork'
-    TrendingVideosCategory:
-      required:
-      - subcategories
-      - title
-      type: object
+    CreativeWork:
       properties:
-        subcategories:
+        provider:
           type: array
+          description: The source of the creative work.
+          readOnly: true
           items:
-            $ref: '#/components/schemas/TrendingVideosSubcategory'
-        title:
+            $ref: '#/components/schemas/Thing'
+        text:
           type: string
-      x-ms-discriminator-value: TrendingVideos/Category
-    ErrorResponse:
-      required:
-      - errors
-      properties:
-        errors:
-          type: array
-          description: A list of errors that describe the reasons why the request failed.
-          items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
+          readOnly: true
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
       allOf:
-      - $ref: '#/components/schemas/Response'
-    ResponseBase:
-      required:
-      - _type
-      type: object
-      properties:
-        _type:
-          type: string
-      discriminator:
-        propertyName: _type
+      - $ref: '#/components/schemas/Thing'
   securitySchemes:
     apiKeyHeader:
       type: apiKey

@@ -95,11 +95,9 @@ paths:
         **Note:**
 
 
-        - This API returns a different response for users with the [Guest and Partner roles](https://learning.postman.com/docs/collaborating-in-postman/roles-and-permissions/#team-roles).
+        - This API returns a different response for users with the Guest and Partner roles.
 
-        - The `flow_count` response only returns for users on [Free plans](https://www.postman.com/pricing/).
-
-        '
+        - The `flow_count` response only returns for users on Free plans.'
       operationId: getAuthenticatedUser
       tags:
       - User
@@ -135,39 +133,17 @@ components:
       - errors
       - messages
       type: object
-    iam_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    iam_last_name:
-      description: User's last name
-      example: Appleseed
-      maxLength: 60
-      type:
-      - string
-      - 'null'
-    iam_first_name:
-      description: User's first name
-      example: John
-      maxLength: 60
-      type:
-      - string
-      - 'null'
     iam_api-response-single:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-common'
       type: object
+    iam_country:
+      description: The country in which the user lives.
+      example: US
+      maxLength: 30
+      type:
+      - string
+      - 'null'
     iam_api-response-common-failure:
       properties:
         errors:
@@ -199,13 +175,6 @@ components:
       - messages
       - result
       type: object
-    iam_zipcode:
-      description: The zipcode or postal code where the user lives.
-      example: '12345'
-      maxLength: 20
-      type:
-      - string
-      - 'null'
     iam_single_user_response:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-single'
@@ -213,10 +182,10 @@ components:
           result:
             type: object
         type: object
-    iam_country:
-      description: The country in which the user lives.
-      example: US
-      maxLength: 30
+    iam_zipcode:
+      description: The zipcode or postal code where the user lives.
+      example: '12345'
+      maxLength: 20
       type:
       - string
       - 'null'
@@ -227,6 +196,35 @@ components:
       type:
       - string
       - 'null'
+    iam_last_name:
+      description: User's last name
+      example: Appleseed
+      maxLength: 60
+      type:
+      - string
+      - 'null'
+    iam_first_name:
+      description: User's first name
+      example: John
+      maxLength: 60
+      type:
+      - string
+      - 'null'
+    iam_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     getAuthenticatedUser:
       title: Successful Response
       type: object
@@ -305,6 +303,28 @@ components:
                 description: The operation's current usage value.
                 example: 110276
   responses:
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
     getAuthenticatedUser:
       description: Successful Response
       content:
@@ -405,28 +425,6 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
   securitySchemes:
     api_email:
       in: header

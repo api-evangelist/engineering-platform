@@ -412,7 +412,7 @@ paths:
   /audit/logs:
     get:
       summary: APIs.io Engineering Platform Get team audit logs
-      description: Gets a list of your team's generated audit events. For a complete list of all audit events, see [Audit logs](https://learning.postman.com/docs/administration/audit-logs/).
+      description: Gets a list of your team's generated audit events. For a complete list of all audit events, see Audit logs.
       operationId: getAuditLogs
       x-postman-plan: Enterprise
       tags:
@@ -438,12 +438,36 @@ paths:
     - url: https://api.eu.postman.com
 components:
   schemas:
-    aaa_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
+    aaa_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    aaa_audit_logs_response_collection:
+      oneOf:
+      - properties:
+          errors:
+            $ref: '#/components/schemas/aaa_messages'
+          messages:
+            $ref: '#/components/schemas/aaa_messages'
+          result:
+            items:
+              $ref: '#/components/schemas/aaa_audit-logs'
+            type: array
+          success:
+            example: true
+            type: boolean
+      - $ref: '#/components/schemas/aaa_api-response-common'
     aaa_api-response-common-failure:
       properties:
         errors:
@@ -466,38 +490,12 @@ components:
       - errors
       - messages
       type: object
-    aaa_audit_logs_response_collection:
-      oneOf:
-      - properties:
-          errors:
-            $ref: '#/components/schemas/aaa_messages'
-          messages:
-            $ref: '#/components/schemas/aaa_messages'
-          result:
-            items:
-              $ref: '#/components/schemas/aaa_audit-logs'
-            type: array
-          success:
-            example: true
-            type: boolean
-      - $ref: '#/components/schemas/aaa_api-response-common'
-    aaa_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/aaa_messages'
-        messages:
-          $ref: '#/components/schemas/aaa_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
+    aaa_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     aaa_audit-logs:
       properties:
         action:
@@ -581,32 +579,23 @@ components:
           format: date-time
           type: string
       type: object
-    aaa_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    auditLogsLimitQuery:
-      type: integer
-      maximum: 300
-      example: 50
-    cursor:
-      type: string
-      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
-    sinceDateQuery:
-      type: string
-      format: date
-      example: '2022-08-30'
+    aaa_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/aaa_messages'
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     getAuditLogs:
       title: Successful Response
       type: object
@@ -705,6 +694,13 @@ components:
                     type: object
                     description: Additional information about the performed action.
                     additionalProperties: true
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
+    sinceDateQuery:
+      type: string
+      format: date
+      example: '2022-08-30'
     ascDescDefaultDesc:
       type: string
       default: desc
@@ -716,99 +712,10 @@ components:
       type: string
       format: date
       example: '2022-09-15'
-  parameters:
-    cursor:
-      name: cursor
-      in: query
-      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
-      schema:
-        $ref: '#/components/schemas/cursor'
-    auditLogsOrderBy:
-      name: order_by
-      in: query
-      description: Return the records in ascending (`asc`) or descending (`desc`) order.
-      schema:
-        $ref: '#/components/schemas/ascDescDefaultDesc'
-    auditLogsSinceQuery:
-      name: since
-      in: query
-      description: Return logs created after the given time, in `YYYY-MM-DD` format.
-      schema:
-        $ref: '#/components/schemas/sinceDateQuery'
-    auditLogsUntilQuery:
-      name: until
-      in: query
-      description: Return logs created before the given time, in `YYYY-MM-DD` format.
-      schema:
-        $ref: '#/components/schemas/untilDateQuery'
     auditLogsLimitQuery:
-      name: limit
-      in: query
-      description: The maximum number of audit events to return at once.
-      schema:
-        $ref: '#/components/schemas/auditLogsLimitQuery'
-  responses:
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    common401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
-    getAuditLogs:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/getAuditLogs'
-          examples:
-            Successful Response:
-              $ref: '#/components/examples/getAuditLogs'
+      type: integer
+      maximum: 300
+      example: 50
   examples:
     getAuditLogs:
       value:
@@ -855,6 +762,99 @@ components:
             team:
               name: Test-Team
               id: 1234
+  parameters:
+    auditLogsOrderBy:
+      name: order_by
+      in: query
+      description: Return the records in ascending (`asc`) or descending (`desc`) order.
+      schema:
+        $ref: '#/components/schemas/ascDescDefaultDesc'
+    auditLogsLimitQuery:
+      name: limit
+      in: query
+      description: The maximum number of audit events to return at once.
+      schema:
+        $ref: '#/components/schemas/auditLogsLimitQuery'
+    cursor:
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
+    auditLogsSinceQuery:
+      name: since
+      in: query
+      description: Return logs created after the given time, in `YYYY-MM-DD` format.
+      schema:
+        $ref: '#/components/schemas/sinceDateQuery'
+    auditLogsUntilQuery:
+      name: until
+      in: query
+      description: Return logs created before the given time, in `YYYY-MM-DD` format.
+      schema:
+        $ref: '#/components/schemas/untilDateQuery'
+  responses:
+    common401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
+    getAuditLogs:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getAuditLogs'
+          examples:
+            Successful Response:
+              $ref: '#/components/examples/getAuditLogs'
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
   securitySchemes:
     api_email:
       in: header

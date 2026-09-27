@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Cloudflare Tunnel Configuration API
+  title: Cloudflare Tunnel Configuration API
   version: 4.0.0
 tags:
 - name: Cloudflare Tunnel Configuration
@@ -102,14 +91,6 @@ paths:
       - Cloudflare Tunnel Configuration
 components:
   schemas:
-    tunnel_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    tunnel_schemas-api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/tunnel_schemas-api-response-common'
-      type: object
     tunnel_messages:
       example: []
       items:
@@ -125,73 +106,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    tunnel_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/tunnel_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/tunnel_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    tunnel_tunnel_id:
-      description: UUID of the tunnel.
-      example: f70ff985-a4ef-4643-bbbc-4a0ed4fc8415
-      format: uuid
-      maxLength: 36
-      readOnly: true
-      type: string
-    tunnel_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    tunnel_ingressRule:
-      description: Public hostname
-      properties:
-        hostname:
-          description: Public hostname for this service.
-          example: tunnel.example.com
-          type: string
-        originRequest:
-          $ref: '#/components/schemas/tunnel_originRequest'
-        path:
-          default: ''
-          description: Requests with this path route to this public hostname.
-          example: subpath
-          type: string
-        service:
-          description: 'Protocol and address of destination server. Supported protocols: http://, https://, unix://, tcp://, ssh://, rdp://, unix+tls://, smb://. Alternatively can return a HTTP status code http_status:[code] e.g. ''http_status:404''.
-
-            '
-          example: https://localhost:8001
-          type: string
-      required:
-      - hostname
-      - service
-      type: object
     tunnel_originRequest:
       description: Configuration parameters for the public hostname specific connection settings between cloudflared and origin server.
       properties:
@@ -266,22 +180,16 @@ components:
           description: Timeout for completing a TLS handshake to your origin server, if you have chosen to connect Tunnel to an HTTPS server.
           type: integer
       type: object
-    tunnel_configuration:
-      description: Cloudflare Tunnel configuration
-      properties:
-        account_id:
-          $ref: '#/components/schemas/tunnel_identifier'
-        config:
-          $ref: '#/components/schemas/tunnel_config'
-        created_at:
-          $ref: '#/components/schemas/tunnel_timestamp'
-        source:
-          $ref: '#/components/schemas/tunnel_schemas-config_src'
-        tunnel_id:
-          $ref: '#/components/schemas/tunnel_tunnel_id'
-        version:
-          $ref: '#/components/schemas/tunnel_schemas-config_version'
-      type: object
+    tunnel_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    tunnel_configuration_response:
+      allOf:
+      - $ref: '#/components/schemas/tunnel_schemas-api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/tunnel_configuration'
     tunnel_schemas-config_version:
       description: The version of the Tunnel Configuration.
       type: integer
@@ -302,12 +210,58 @@ components:
       - errors
       - messages
       type: object
-    tunnel_configuration_response:
-      allOf:
-      - $ref: '#/components/schemas/tunnel_schemas-api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/tunnel_configuration'
+    tunnel_configuration:
+      description: Cloudflare Tunnel configuration
+      properties:
+        account_id:
+          $ref: '#/components/schemas/tunnel_identifier'
+        config:
+          $ref: '#/components/schemas/tunnel_config'
+        created_at:
+          $ref: '#/components/schemas/tunnel_timestamp'
+        source:
+          $ref: '#/components/schemas/tunnel_schemas-config_src'
+        tunnel_id:
+          $ref: '#/components/schemas/tunnel_tunnel_id'
+        version:
+          $ref: '#/components/schemas/tunnel_schemas-config_version'
+      type: object
+    tunnel_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    tunnel_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/tunnel_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/tunnel_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     tunnel_config:
       description: The tunnel configuration and ingress rules.
       properties:
@@ -328,6 +282,13 @@ components:
           readOnly: true
           type: object
       type: object
+    tunnel_tunnel_id:
+      description: UUID of the tunnel.
+      example: f70ff985-a4ef-4643-bbbc-4a0ed4fc8415
+      format: uuid
+      maxLength: 36
+      readOnly: true
+      type: string
     tunnel_schemas-config_src:
       default: local
       description: Indicates if this is a locally or remotely configured tunnel. If `local`, manage the tunnel using a YAML file on the origin machine. If `cloudflare`, manage the tunnel's configuration on the Zero Trust dashboard.
@@ -336,6 +297,34 @@ components:
       - cloudflare
       example: cloudflare
       type: string
+    tunnel_schemas-api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/tunnel_schemas-api-response-common'
+      type: object
+    tunnel_ingressRule:
+      description: Public hostname
+      properties:
+        hostname:
+          description: Public hostname for this service.
+          example: tunnel.example.com
+          type: string
+        originRequest:
+          $ref: '#/components/schemas/tunnel_originRequest'
+        path:
+          default: ''
+          description: Requests with this path route to this public hostname.
+          example: subpath
+          type: string
+        service:
+          description: 'Protocol and address of destination server. Supported protocols: http://, https://, unix://, tcp://, ssh://, rdp://, unix+tls://, smb://. Alternatively can return a HTTP status code http_status:[code] e.g. ''http_status:404''.
+
+            '
+          example: https://localhost:8001
+          type: string
+      required:
+      - hostname
+      - service
+      type: object
   securitySchemes:
     api_email:
       in: header

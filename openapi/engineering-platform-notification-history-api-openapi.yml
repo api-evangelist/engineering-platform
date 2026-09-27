@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Notification History API
+  title: Cloudflare Notification History API
   version: 4.0.0
 tags:
 - name: Notification History
@@ -82,6 +71,12 @@ paths:
       - Account Settings Read
 components:
   schemas:
+    aaa_account-id:
+      description: The account id
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     aaa_mechanism_type:
       description: The type of mechanism to which the notification has been dispatched. This can be email/pagerduty/webhook based on the mechanism configured.
       enum:
@@ -90,20 +85,55 @@ components:
       - webhook
       example: email
       type: string
-    aaa_sent:
-      description: Timestamp of when the notification was dispatched in ISO 8601 format.
-      example: '2021-10-08T17:52:17.571336Z'
-      format: date-time
-      type: string
-    aaa_mechanism:
-      description: The mechanism to which the notification has been dispatched.
-      example: test@example.com
-      type: string
-    aaa_before:
-      description: Limit the returned results to history records older than the specified date. This must be a timestamp that conforms to RFC3339.
-      example: '2022-05-20T20:29:58.679897Z'
-      format: date-time
-      type: string
+    aaa_schemas-api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example: []
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    aaa_per_page:
+      default: 25
+      description: Number of items per page.
+      maximum: 1000
+      minimum: 5
+      type: number
     aaa_components-schemas-description:
       description: Description of the notification policy (if present).
       example: Universal Certificate validation status, issuance, renewal, and expiration notices
@@ -123,29 +153,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    aaa_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      readOnly: true
-      type: string
-      x-auditable: true
-    aaa_policy-id:
-      description: The unique identifier of a notification policy
-      example: 0da2b59e-f118-439d-8097-bdfb215203c9
-      maxLength: 36
-      readOnly: true
-      type: string
-    aaa_per_page:
-      default: 25
-      description: Number of items per page.
-      maximum: 1000
-      minimum: 5
-      type: number
-    aaa_schemas-alert_type:
-      description: Type of notification that has been dispatched.
-      example: universal_ssl_event_type
-      type: string
     aaa_history:
       properties:
         alert_body:
@@ -167,6 +174,61 @@ components:
         sent:
           $ref: '#/components/schemas/aaa_sent'
       type: object
+    aaa_before:
+      description: Limit the returned results to history records older than the specified date. This must be a timestamp that conforms to RFC3339.
+      example: '2022-05-20T20:29:58.679897Z'
+      format: date-time
+      type: string
+    aaa_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/aaa_messages'
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/aaa_result_info'
+      type: object
+    aaa_sent:
+      description: Timestamp of when the notification was dispatched in ISO 8601 format.
+      example: '2021-10-08T17:52:17.571336Z'
+      format: date-time
+      type: string
+    aaa_schemas-alert_type:
+      description: Type of notification that has been dispatched.
+      example: universal_ssl_event_type
+      type: string
+    aaa_policy-id:
+      description: The unique identifier of a notification policy
+      example: 0da2b59e-f118-439d-8097-bdfb215203c9
+      maxLength: 36
+      readOnly: true
+      type: string
+    aaa_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      readOnly: true
+      type: string
+      x-auditable: true
+    aaa_alert_body:
+      description: Message body included in the notification sent.
+      example: SSL certificate has expired
+      type: string
     aaa_history_components-schemas-response_collection:
       allOf:
       - $ref: '#/components/schemas/aaa_api-response-collection'
@@ -221,87 +283,14 @@ components:
               page: 1
               per_page: 20
             type: object
+    aaa_mechanism:
+      description: The mechanism to which the notification has been dispatched.
+      example: test@example.com
+      type: string
     aaa_schemas-name:
       description: Name of the policy.
       example: SSL Notification Event Policy
       type: string
-    aaa_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/aaa_messages'
-        messages:
-          $ref: '#/components/schemas/aaa_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    aaa_alert_body:
-      description: Message body included in the notification sent.
-      example: SSL certificate has expired
-      type: string
-    aaa_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    aaa_account-id:
-      description: The account id
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    aaa_schemas-api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/aaa_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/aaa_messages'
-          example: []
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    aaa_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/aaa_result_info'
-      type: object
   securitySchemes:
     api_email:
       in: header

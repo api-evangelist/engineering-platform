@@ -1,28 +1,17 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Origin CA API
+  title: Cloudflare Origin CA API
   version: 4.0.0
 tags:
 - name: Origin CA
 paths:
   /certificates:
     get:
-      description: List all existing Origin CA certificates for a given zone. Use your Origin CA Key as your User Service Key when calling this endpoint ([see above](#requests)).
+      description: List all existing Origin CA certificates for a given zone. Use your Origin CA Key as your User Service Key when calling this endpoint (see above).
       operationId: origin-ca-list-certificates
       parameters:
       - in: query
@@ -55,7 +44,7 @@ paths:
         free: true
         pro: true
     post:
-      description: Create an Origin CA certificate. Use your Origin CA Key as your User Service Key when calling this endpoint ([see above](#requests)).
+      description: Create an Origin CA certificate. Use your Origin CA Key as your User Service Key when calling this endpoint (see above).
       operationId: origin-ca-create-certificate
       requestBody:
         content:
@@ -99,7 +88,7 @@ paths:
         pro: true
   /certificates/{certificate_id}:
     delete:
-      description: Revoke an existing Origin CA certificate by its serial number. Use your Origin CA Key as your User Service Key when calling this endpoint ([see above](#requests)).
+      description: Revoke an existing Origin CA certificate by its serial number. Use your Origin CA Key as your User Service Key when calling this endpoint (see above).
       operationId: origin-ca-revoke-certificate
       parameters:
       - in: path
@@ -137,7 +126,7 @@ paths:
         free: true
         pro: true
     get:
-      description: Get an existing Origin CA certificate by its serial number. Use your Origin CA Key as your User Service Key when calling this endpoint ([see above](#requests)).
+      description: Get an existing Origin CA certificate by its serial number. Use your Origin CA Key as your User Service Key when calling this endpoint (see above).
       operationId: origin-ca-get-certificate
       parameters:
       - in: path
@@ -172,67 +161,59 @@ paths:
         pro: true
 components:
   schemas:
-    tls-certificates-and-hostnames_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    tls-certificates-and-hostnames_api-response-collection:
+    tls-certificates-and-hostnames_requested_validity:
+      default: 5475
+      description: The number of days for which the certificate should be valid.
+      enum:
+      - 7
+      - 30
+      - 90
+      - 365
+      - 730
+      - 1095
+      - 5475
+      example: 5475
+      type: number
+    tls-certificates-and-hostnames_schemas-certificate_response_single:
       allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-common'
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-single'
       - properties:
-          result_info:
-            $ref: '#/components/schemas/tls-certificates-and-hostnames_result_info'
-      type: object
-    tls-certificates-and-hostnames_hostnames:
-      description: Array of hostnames or wildcard names (e.g., *.example.com) bound to the certificate.
-      example:
-      - example.com
-      - '*.example.com'
-      items:
-        type: string
-      type: array
-    tls-certificates-and-hostnames_api-response-common-failure:
+          result:
+            $ref: '#/components/schemas/tls-certificates-and-hostnames_certificates'
+        type: object
+    tls-certificates-and-hostnames_api-response-common:
       properties:
         errors:
-          allOf:
-          - $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
         messages:
-          allOf:
-          - $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
         success:
           description: Whether the API call was successful
           enum:
-          - false
-          example: false
+          - true
+          example: true
           type: boolean
       required:
       - success
       - errors
       - messages
-      - result
       type: object
+    tls-certificates-and-hostnames_certificate_revoke_response:
+      allOf:
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/tls-certificates-and-hostnames_identifier'
+              revoked_at:
+                $ref: '#/components/schemas/tls-certificates-and-hostnames_revoked_at'
+        type: object
+    tls-certificates-and-hostnames_revoked_at:
+      description: When the certificate was revoked.
+      example: '2024-09-06T18:43:47.928893Z'
+      format: date-time
+      readOnly: true
+      type: string
     tls-certificates-and-hostnames_csr:
       description: The Certificate Signing Request (CSR). Must be newline-encoded.
       example: '-----BEGIN CERTIFICATE REQUEST-----
@@ -269,23 +250,113 @@ components:
 
         -----END CERTIFICATE REQUEST-----'
       type: string
-    tls-certificates-and-hostnames_api-response-common:
+    tls-certificates-and-hostnames_schemas-certificate_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/tls-certificates-and-hostnames_certificates'
+            type: array
+        type: object
+    tls-certificates-and-hostnames_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-common'
+      type: object
+    tls-certificates-and-hostnames_request_type:
+      description: Signature type desired on certificate ("origin-rsa" (rsa), "origin-ecc" (ecdsa), or "keyless-certificate" (for Keyless SSL servers).
+      enum:
+      - origin-rsa
+      - origin-ecc
+      - keyless-certificate
+      example: origin-rsa
+      type: string
+    tls-certificates-and-hostnames_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    tls-certificates-and-hostnames_hostnames:
+      description: Array of hostnames or wildcard names (e.g., *.example.com) bound to the certificate.
+      example:
+      - example.com
+      - '*.example.com'
+      items:
+        type: string
+      type: array
+    tls-certificates-and-hostnames_certificates:
+      properties:
+        certificate:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_components-schemas-certificate'
+        csr:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_csr'
+        expires_on:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_schemas-expires_on'
+        hostnames:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_hostnames'
+        id:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_identifier'
+        request_type:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_request_type'
+        requested_validity:
+          $ref: '#/components/schemas/tls-certificates-and-hostnames_requested_validity'
+      required:
+      - hostnames
+      - csr
+      - requested_validity
+      - request_type
+      type: object
+    tls-certificates-and-hostnames_schemas-expires_on:
+      description: When the certificate will expire.
+      example: 2014-01-01 05:20:00 +0000 UTC
+      readOnly: true
+      type: string
+    tls-certificates-and-hostnames_api-response-common-failure:
       properties:
         errors:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
+          allOf:
+          - $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
         messages:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
+          allOf:
+          - $ref: '#/components/schemas/tls-certificates-and-hostnames_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
         success:
           description: Whether the API call was successful
           enum:
-          - true
-          example: true
+          - false
+          example: false
           type: boolean
       required:
       - success
       - errors
       - messages
+      - result
       type: object
+    tls-certificates-and-hostnames_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     tls-certificates-and-hostnames_result_info:
       properties:
         count:
@@ -305,24 +376,13 @@ components:
           example: 2000
           type: number
       type: object
-    tls-certificates-and-hostnames_certificate_revoke_response:
+    tls-certificates-and-hostnames_api-response-collection:
       allOf:
+      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-common'
       - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/tls-certificates-and-hostnames_identifier'
-              revoked_at:
-                $ref: '#/components/schemas/tls-certificates-and-hostnames_revoked_at'
-        type: object
-    tls-certificates-and-hostnames_request_type:
-      description: Signature type desired on certificate ("origin-rsa" (rsa), "origin-ecc" (ecdsa), or "keyless-certificate" (for Keyless SSL servers).
-      enum:
-      - origin-rsa
-      - origin-ecc
-      - keyless-certificate
-      example: origin-rsa
-      type: string
+          result_info:
+            $ref: '#/components/schemas/tls-certificates-and-hostnames_result_info'
+      type: object
     tls-certificates-and-hostnames_components-schemas-certificate:
       description: The Origin CA certificate. Will be newline-encoded.
       example: '-----BEGIN CERTIFICATE-----
@@ -359,77 +419,6 @@ components:
 
         -----END CERTIFICATE-----'
       readOnly: true
-      type: string
-    tls-certificates-and-hostnames_schemas-certificate_response_single:
-      allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/tls-certificates-and-hostnames_certificates'
-        type: object
-    tls-certificates-and-hostnames_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-common'
-      type: object
-    tls-certificates-and-hostnames_certificates:
-      properties:
-        certificate:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_components-schemas-certificate'
-        csr:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_csr'
-        expires_on:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_schemas-expires_on'
-        hostnames:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_hostnames'
-        id:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_identifier'
-        request_type:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_request_type'
-        requested_validity:
-          $ref: '#/components/schemas/tls-certificates-and-hostnames_requested_validity'
-      required:
-      - hostnames
-      - csr
-      - requested_validity
-      - request_type
-      type: object
-    tls-certificates-and-hostnames_schemas-expires_on:
-      description: When the certificate will expire.
-      example: 2014-01-01 05:20:00 +0000 UTC
-      readOnly: true
-      type: string
-    tls-certificates-and-hostnames_requested_validity:
-      default: 5475
-      description: The number of days for which the certificate should be valid.
-      enum:
-      - 7
-      - 30
-      - 90
-      - 365
-      - 730
-      - 1095
-      - 5475
-      example: 5475
-      type: number
-    tls-certificates-and-hostnames_revoked_at:
-      description: When the certificate was revoked.
-      example: '2024-09-06T18:43:47.928893Z'
-      format: date-time
-      readOnly: true
-      type: string
-    tls-certificates-and-hostnames_schemas-certificate_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/tls-certificates-and-hostnames_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/tls-certificates-and-hostnames_certificates'
-            type: array
-        type: object
-    tls-certificates-and-hostnames_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
       type: string
   securitySchemes:
     api_email:

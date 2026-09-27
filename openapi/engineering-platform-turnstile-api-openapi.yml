@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Turnstile API
+  title: Cloudflare Turnstile API
   version: 4.0.0
 tags:
 - name: Turnstile
@@ -286,9 +275,7 @@ paths:
         is set to `false`, the previous secret remains valid for 2 hours.
 
 
-        Note that secrets cannot be rotated again during the grace period.
-
-        '
+        Note that secrets cannot be rotated again during the grace period.'
       operationId: accounts-turnstile-widget-rotate-secret
       requestBody:
         content:
@@ -324,6 +311,75 @@ paths:
       - Turnstile
 components:
   schemas:
+    turnstile_secret:
+      description: Secret key for this widget.
+      example: 0x4AAF00AAAABn0R22HWm098HVBjhdsYUc
+      type: string
+    turnstile_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      required:
+      - page
+      - per_page
+      - count
+      - total_count
+      type: object
+    turnstile_modified_on:
+      description: When the widget was modified.
+      example: '2014-01-01T05:20:00.123123Z'
+      format: date-time
+      readOnly: true
+      type: string
+    turnstile_widget_list:
+      description: A Turnstile Widgets configuration as it appears in listings
+      properties:
+        bot_fight_mode:
+          $ref: '#/components/schemas/turnstile_bot_fight_mode'
+        clearance_level:
+          $ref: '#/components/schemas/turnstile_clearance_level'
+        created_on:
+          $ref: '#/components/schemas/turnstile_created_on'
+        domains:
+          $ref: '#/components/schemas/turnstile_domains'
+        mode:
+          $ref: '#/components/schemas/turnstile_mode'
+        modified_on:
+          $ref: '#/components/schemas/turnstile_modified_on'
+        name:
+          $ref: '#/components/schemas/turnstile_name'
+        offlabel:
+          $ref: '#/components/schemas/turnstile_offlabel'
+        region:
+          $ref: '#/components/schemas/turnstile_region'
+        sitekey:
+          $ref: '#/components/schemas/turnstile_sitekey'
+      required:
+      - sitekey
+      - created_on
+      - modified_on
+      - name
+      - domains
+      - mode
+      - region
+      - bot_fight_mode
+      - offlabel
+      - clearance_level
+      type: object
     turnstile_widget_detail:
       description: A Turnstile widget's detailed configuration
       properties:
@@ -362,31 +418,60 @@ components:
       - offlabel
       - clearance_level
       type: object
-    turnstile_secret:
-      description: Secret key for this widget.
-      example: 0x4AAF00AAAABn0R22HWm098HVBjhdsYUc
-      type: string
-    turnstile_offlabel:
-      description: 'Do not show any Cloudflare branding on the widget (ENT only).
+    turnstile_bot_fight_mode:
+      description: 'If bot_fight_mode is set to `true`, Cloudflare issues computationally
+
+        expensive challenges in response to malicious bots (ENT only).
 
         '
       example: false
       type: boolean
-    turnstile_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/turnstile_messages'
-        messages:
-          $ref: '#/components/schemas/turnstile_messages'
-        success:
-          description: Whether the API call was successful
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
+    turnstile_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    turnstile_clearance_level:
+      description: 'If Turnstile is embedded on a Cloudflare site and the widget should grant challenge clearance,
+
+        this setting can determine the clearance level to be set
+
+        '
+      enum:
+      - no_clearance
+      - jschallenge
+      - managed
+      - interactive
+      example: interactive
+      type: string
+    turnstile_region:
+      default: world
+      description: Region where this widget can be used.
+      enum:
+      - world
+      type: string
+    turnstile_name:
+      description: 'Human readable widget name. Not unique. Cloudflare suggests that you
+
+        set this to a meaningful string to make it easier to identify your
+
+        widget, and where it is used.
+
+        '
+      example: blog.cloudflare.com login form
+      maxLength: 254
+      minLength: 1
+      type: string
     turnstile_api-response-common-failure:
       properties:
         errors:
@@ -414,105 +499,42 @@ components:
       - messages
       - result
       type: object
-    turnstile_widget_list:
-      description: A Turnstile Widgets configuration as it appears in listings
-      properties:
-        bot_fight_mode:
-          $ref: '#/components/schemas/turnstile_bot_fight_mode'
-        clearance_level:
-          $ref: '#/components/schemas/turnstile_clearance_level'
-        created_on:
-          $ref: '#/components/schemas/turnstile_created_on'
-        domains:
-          $ref: '#/components/schemas/turnstile_domains'
-        mode:
-          $ref: '#/components/schemas/turnstile_mode'
-        modified_on:
-          $ref: '#/components/schemas/turnstile_modified_on'
-        name:
-          $ref: '#/components/schemas/turnstile_name'
-        offlabel:
-          $ref: '#/components/schemas/turnstile_offlabel'
-        region:
-          $ref: '#/components/schemas/turnstile_region'
-        sitekey:
-          $ref: '#/components/schemas/turnstile_sitekey'
-      required:
-      - sitekey
-      - created_on
-      - modified_on
-      - name
-      - domains
-      - mode
-      - region
-      - bot_fight_mode
-      - offlabel
-      - clearance_level
-      type: object
-    turnstile_clearance_level:
-      description: 'If Turnstile is embedded on a Cloudflare site and the widget should grant challenge clearance,
+    turnstile_mode:
+      description: Widget Mode
+      enum:
+      - non-interactive
+      - invisible
+      - managed
+      example: invisible
+      type: string
+    turnstile_invalidate_immediately:
+      default: false
+      description: 'If `invalidate_immediately` is set to `false`, the previous secret will
 
-        this setting can determine the clearance level to be set
+        remain valid for two hours. Otherwise, the secret is immediately
+
+        invalidated, and requests using it will be rejected.
 
         '
-      enum:
-      - no_clearance
-      - jschallenge
-      - managed
-      - interactive
-      example: interactive
+      type: boolean
+    turnstile_offlabel:
+      description: 'Do not show any Cloudflare branding on the widget (ENT only).
+
+        '
+      example: false
+      type: boolean
+    turnstile_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
       type: string
-    turnstile_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      required:
-      - page
-      - per_page
-      - count
-      - total_count
-      type: object
     turnstile_created_on:
       description: When the widget was created.
       example: '2014-01-01T05:20:00.123123Z'
       format: date-time
       readOnly: true
       type: string
-    turnstile_region:
-      default: world
-      description: Region where this widget can be used.
-      enum:
-      - world
-      type: string
-    turnstile_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     turnstile_domains:
       example:
       - 203.0.113.1
@@ -528,60 +550,25 @@ components:
         type: string
       maxLength: 10
       type: array
-    turnstile_invalidate_immediately:
-      default: false
-      description: 'If `invalidate_immediately` is set to `false`, the previous secret will
-
-        remain valid for two hours. Otherwise, the secret is immediately
-
-        invalidated, and requests using it will be rejected.
-
-        '
-      type: boolean
-    turnstile_mode:
-      description: Widget Mode
-      enum:
-      - non-interactive
-      - invisible
-      - managed
-      example: invisible
-      type: string
-    turnstile_bot_fight_mode:
-      description: 'If bot_fight_mode is set to `true`, Cloudflare issues computationally
-
-        expensive challenges in response to malicious bots (ENT only).
-
-        '
-      example: false
-      type: boolean
+    turnstile_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/turnstile_messages'
+        messages:
+          $ref: '#/components/schemas/turnstile_messages'
+        success:
+          description: Whether the API call was successful
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     turnstile_sitekey:
       description: Widget item identifier tag.
       example: 0x4AAF00AAAABn0R22HWm-YUc
       maxLength: 32
-      type: string
-    turnstile_modified_on:
-      description: When the widget was modified.
-      example: '2014-01-01T05:20:00.123123Z'
-      format: date-time
-      readOnly: true
-      type: string
-    turnstile_name:
-      description: 'Human readable widget name. Not unique. Cloudflare suggests that you
-
-        set this to a meaningful string to make it easier to identify your
-
-        widget, and where it is used.
-
-        '
-      example: blog.cloudflare.com login form
-      maxLength: 254
-      minLength: 1
-      type: string
-    turnstile_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
       type: string
   securitySchemes:
     api_email:

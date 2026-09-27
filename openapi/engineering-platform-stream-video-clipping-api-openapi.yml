@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Stream Video Clipping API
+  title: Cloudflare Stream Video Clipping API
   version: 4.0.0
 tags:
 - name: Stream Video Clipping
@@ -58,43 +47,56 @@ paths:
       - Stream Video Clipping
 components:
   schemas:
-    stream_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    stream_api-response-common:
+    stream_maxDurationSeconds:
+      description: The maximum duration in seconds for a video upload. Can be set for a video that is not yet uploaded to limit its duration. Uploads that exceed the specified duration will fail during processing. A value of `-1` means the value is unknown.
+      maximum: 21600
+      minimum: 1
+      type: integer
+    stream_account_identifier:
+      description: The account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    stream_watermarkAtUpload:
       properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
+        uid:
+          description: The unique identifier for the watermark profile.
+          example: ea95132c15732412d22c1476fa83f27a
+          maxLength: 32
+          type: string
       type: object
-    stream_media_metadata:
-      description: A user modifiable key-value store used to reference other systems of record for managing videos.
+    stream_clipping_created:
+      description: The date and time the clip was created.
+      example: '2014-01-02T02:20:00Z'
+      format: date-time
+      type: string
+    stream_creator:
+      description: A user-defined identifier for the media creator.
+      example: creator-id_abcde12345
+      maxLength: 64
+      type: string
+    stream_thumbnailTimestampPct:
+      default: 0
+      description: The timestamp for a thumbnail image calculated as a percentage value of the video's duration. To convert from a second-wise timestamp to a percentage, divide the desired timestamp by the total duration of the video.  If this value is not set, the default thumbnail image is taken from 0s of the video.
+      example: 0.529241
+      maximum: 1
+      minimum: 0
+      type: number
+    stream_allowedOrigins:
+      description: Lists the origins allowed to display the video. Enter allowed origin domains in an array and use `*` for wildcard subdomains. Empty arrays allow the video to be viewed on any origin.
       example:
-        name: video12345.mp4
-      type: object
+      - example.com
+      items:
+        type: string
+      type: array
+    stream_end_time_seconds:
+      description: Specifies the end time for the video clip in seconds.
+      type: integer
+    stream_clipped_from_video_uid:
+      description: The unique video identifier (UID).
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     stream_playback:
       properties:
         dash:
@@ -106,46 +108,32 @@ components:
           example: https://customer-m033z5x00ks6nunl.cloudflarestream.com/ea95132c15732412d22c1476fa83f27a/manifest/video.m3u8
           type: string
       type: object
-    stream_preview:
-      description: The video's preview page URI. This field is omitted until encoding is complete.
-      example: https://customer-m033z5x00ks6nunl.cloudflarestream.com/ea95132c15732412d22c1476fa83f27a/watch
-      format: uri
-      type: string
-    stream_account_identifier:
-      description: The account identifier tag.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    stream_videoClipStandard:
-      properties:
-        allowedOrigins:
-          $ref: '#/components/schemas/stream_allowedOrigins'
-        clippedFromVideoUID:
-          $ref: '#/components/schemas/stream_clipped_from_video_uid'
-        creator:
-          $ref: '#/components/schemas/stream_creator'
-        endTimeSeconds:
-          $ref: '#/components/schemas/stream_end_time_seconds'
-        maxDurationSeconds:
-          $ref: '#/components/schemas/stream_maxDurationSeconds'
-        requireSignedURLs:
-          $ref: '#/components/schemas/stream_requireSignedURLs'
-        startTimeSeconds:
-          $ref: '#/components/schemas/stream_start_time_seconds'
-        thumbnailTimestampPct:
-          $ref: '#/components/schemas/stream_thumbnailTimestampPct'
-        watermark:
-          $ref: '#/components/schemas/stream_watermarkAtUpload'
-      required:
-      - clippedFromVideoUID
-      - startTimeSeconds
-      - endTimeSeconds
-      type: object
     stream_live_input_modified:
       description: The date and time the live input was last modified.
       example: '2014-01-02T02:20:00Z'
       format: date-time
       type: string
+    stream_requireSignedURLs:
+      default: false
+      description: Indicates whether the video can be a accessed using the UID. When set to `true`, a signed token must be generated with a signing key to view the video.
+      example: true
+      type: boolean
+    stream_media_state:
+      description: Specifies the processing status for all quality levels for a video.
+      enum:
+      - pendingupload
+      - downloading
+      - queued
+      - inprogress
+      - ready
+      - error
+      example: inprogress
+      type: string
+    stream_media_metadata:
+      description: A user modifiable key-value store used to reference other systems of record for managing videos.
+      example:
+        name: video12345.mp4
+      type: object
     stream_api-response-common-failure:
       properties:
         errors:
@@ -177,40 +165,51 @@ components:
       - messages
       - result
       type: object
-    stream_start_time_seconds:
-      description: Specifies the start time for the video clip in seconds.
-      type: integer
-    stream_clipResponseSingle:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/stream_clipping'
-    stream_clipping_created:
-      description: The date and time the clip was created.
-      example: '2014-01-02T02:20:00Z'
-      format: date-time
+    stream_preview:
+      description: The video's preview page URI. This field is omitted until encoding is complete.
+      example: https://customer-m033z5x00ks6nunl.cloudflarestream.com/ea95132c15732412d22c1476fa83f27a/watch
+      format: uri
       type: string
-    stream_end_time_seconds:
-      description: Specifies the end time for the video clip in seconds.
-      type: integer
-    stream_creator:
-      description: A user-defined identifier for the media creator.
-      example: creator-id_abcde12345
-      maxLength: 64
-      type: string
-    stream_allowedOrigins:
-      description: Lists the origins allowed to display the video. Enter allowed origin domains in an array and use `*` for wildcard subdomains. Empty arrays allow the video to be viewed on any origin.
-      example:
-      - example.com
+    stream_messages:
+      example: []
       items:
-        type: string
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
       type: array
-    stream_clipped_from_video_uid:
-      description: The unique video identifier (UID).
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
+    stream_videoClipStandard:
+      properties:
+        allowedOrigins:
+          $ref: '#/components/schemas/stream_allowedOrigins'
+        clippedFromVideoUID:
+          $ref: '#/components/schemas/stream_clipped_from_video_uid'
+        creator:
+          $ref: '#/components/schemas/stream_creator'
+        endTimeSeconds:
+          $ref: '#/components/schemas/stream_end_time_seconds'
+        maxDurationSeconds:
+          $ref: '#/components/schemas/stream_maxDurationSeconds'
+        requireSignedURLs:
+          $ref: '#/components/schemas/stream_requireSignedURLs'
+        startTimeSeconds:
+          $ref: '#/components/schemas/stream_start_time_seconds'
+        thumbnailTimestampPct:
+          $ref: '#/components/schemas/stream_thumbnailTimestampPct'
+        watermark:
+          $ref: '#/components/schemas/stream_watermarkAtUpload'
+      required:
+      - clippedFromVideoUID
+      - startTimeSeconds
+      - endTimeSeconds
+      type: object
     stream_clipping:
       properties:
         allowedOrigins:
@@ -243,42 +242,32 @@ components:
           $ref: '#/components/schemas/stream_thumbnailTimestampPct'
         watermark:
           $ref: '#/components/schemas/stream_watermarkAtUpload'
-    stream_requireSignedURLs:
-      default: false
-      description: Indicates whether the video can be a accessed using the UID. When set to `true`, a signed token must be generated with a signing key to view the video.
-      example: true
-      type: boolean
-    stream_maxDurationSeconds:
-      description: The maximum duration in seconds for a video upload. Can be set for a video that is not yet uploaded to limit its duration. Uploads that exceed the specified duration will fail during processing. A value of `-1` means the value is unknown.
-      maximum: 21600
-      minimum: 1
-      type: integer
-    stream_thumbnailTimestampPct:
-      default: 0
-      description: The timestamp for a thumbnail image calculated as a percentage value of the video's duration. To convert from a second-wise timestamp to a percentage, divide the desired timestamp by the total duration of the video.  If this value is not set, the default thumbnail image is taken from 0s of the video.
-      example: 0.529241
-      maximum: 1
-      minimum: 0
-      type: number
-    stream_media_state:
-      description: Specifies the processing status for all quality levels for a video.
-      enum:
-      - pendingupload
-      - downloading
-      - queued
-      - inprogress
-      - ready
-      - error
-      example: inprogress
-      type: string
-    stream_watermarkAtUpload:
+    stream_clipResponseSingle:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/stream_clipping'
+    stream_api-response-common:
       properties:
-        uid:
-          description: The unique identifier for the watermark profile.
-          example: ea95132c15732412d22c1476fa83f27a
-          maxLength: 32
-          type: string
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
       type: object
+    stream_start_time_seconds:
+      description: Specifies the start time for the video clip in seconds.
+      type: integer
   securitySchemes:
     api_email:
       in: header

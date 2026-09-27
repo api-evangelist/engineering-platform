@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   version: 1.1.4
-  title: APIs.io Engineering Platform GitHub v3 REST Oidc API
+  title: GitHub v3 REST Oidc API
   description: GitHub's v3 REST API.
   license:
     name: MIT
@@ -22,18 +22,18 @@ servers:
       description: Self-hosted Enterprise Server protocol
       default: http
 tags:
-- name: Oidc
+- name: OIDC
   description: Endpoints to manage GitHub OIDC configuration using the REST API.
 paths:
   /orgs/{org}/actions/oidc/customization/sub:
     get:
-      summary: APIs.io Engineering Platform Get the customization template for an OIDC subject claim for an organization
+      summary: APIs.io Engineering Platform Get the customization template for an OIDC subject…
       description: 'Gets the customization template for an OpenID Connect (OIDC) subject claim.
 
 
         OAuth app tokens and personal access tokens (classic) need the `read:org` scope to use this endpoint.'
       tags:
-      - Oidc
+      - OIDC
       operationId: oidc/get-oidc-custom-sub-template-for-org
       externalDocs:
         description: API method documentation
@@ -55,13 +55,13 @@ paths:
         category: actions
         subcategory: oidc
     put:
-      summary: APIs.io Engineering Platform Set the customization template for an OIDC subject claim for an organization
+      summary: APIs.io Engineering Platform Set the customization template for an OIDC subject…
       description: 'Creates or updates the customization template for an OpenID Connect (OIDC) subject claim.
 
 
         OAuth app tokens and personal access tokens (classic) need the `write:org` scope to use this endpoint.'
       tags:
-      - Oidc
+      - OIDC
       operationId: oidc/update-oidc-custom-sub-template-for-org
       externalDocs:
         description: API method documentation
@@ -97,19 +97,27 @@ paths:
         category: actions
         subcategory: oidc
 components:
-  examples:
-    oidc-custom-sub:
-      value:
-        include_claim_keys:
-        - repo
-        - context
+  parameters:
+    org:
+      name: org
+      description: The organization name. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
   schemas:
-    empty-object:
-      title: Empty Object
-      description: An object without any properties.
+    oidc-custom-sub:
+      title: Actions OIDC Subject customization
+      description: Actions OIDC Subject customization
       type: object
-      properties: {}
-      additionalProperties: false
+      properties:
+        include_claim_keys:
+          description: Array of unique strings. Each claim key can only contain alphanumeric characters and underscores.
+          type: array
+          items:
+            type: string
+      required:
+      - include_claim_keys
     basic-error:
       title: Basic Error
       description: Basic Error
@@ -123,39 +131,31 @@ components:
           type: string
         status:
           type: string
-    oidc-custom-sub:
-      title: Actions OIDC Subject customization
-      description: Actions OIDC Subject customization
+    empty-object:
+      title: Empty Object
+      description: An object without any properties.
       type: object
-      properties:
-        include_claim_keys:
-          description: Array of unique strings. Each claim key can only contain alphanumeric characters and underscores.
-          type: array
-          items:
-            type: string
-      required:
-      - include_claim_keys
+      properties: {}
+      additionalProperties: false
   responses:
-    not_found:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/basic-error'
     forbidden:
       description: Forbidden
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
-  parameters:
-    org:
-      name: org
-      description: The organization name. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
+    not_found:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
+  examples:
+    oidc-custom-sub:
+      value:
+        include_claim_keys:
+        - repo
+        - context
 externalDocs:
   description: GitHub Enterprise Developer Docs
   url: https://docs.github.com/enterprise-server@3.9/rest/

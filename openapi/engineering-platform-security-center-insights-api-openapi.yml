@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Security Center Insights API
+  title: Cloudflare Security Center Insights API
   version: 4.0.0
 tags:
 - name: Security Center Insights
@@ -423,17 +412,6 @@ paths:
       - Security Center Insights
 components:
   schemas:
-    security-center_count:
-      description: Total number of results
-      example: 1
-      type: integer
-    security-center_issueTypes:
-      example:
-      - compliance_violation
-      - email_security
-      items:
-        $ref: '#/components/schemas/security-center_issueType'
-      type: array
     security-center_messages:
       example: []
       items:
@@ -449,32 +427,9 @@ components:
         type: object
         uniqueItems: true
       type: array
-    security-center_valueCountsResponse:
-      allOf:
-      - $ref: '#/components/schemas/security-center_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - items:
-                properties:
-                  count:
-                    example: 1
-                    type: integer
-                  value:
-                    type: string
-                type: object
-              type: array
-    security-center_products:
-      example:
-      - access
-      - dns
-      items:
-        type: string
-      type: array
-    security-center_subjects:
-      items:
-        $ref: '#/components/schemas/security-center_subject'
-      type: array
+    security-center_issueClass:
+      example: always_use_https_not_enabled
+      type: string
     security-center_api-response-common-failure:
       properties:
         errors:
@@ -506,23 +461,38 @@ components:
       - messages
       - result
       type: object
-    security-center_dismissed:
-      example: false
-      type: boolean
-    security-center_issueType:
-      enum:
-      - compliance_violation
-      - email_security
-      - exposed_infrastructure
-      - insecure_configuration
-      - weak_authentication
-      type: string
     security-center_perPage:
       description: Number of results per page of results
       example: 25
       maximum: 1000
       minimum: 1
       type: integer
+    security-center_valueCountsResponse:
+      allOf:
+      - $ref: '#/components/schemas/security-center_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - items:
+                properties:
+                  count:
+                    example: 1
+                    type: integer
+                  value:
+                    type: string
+                type: object
+              type: array
+    security-center_subjects:
+      items:
+        $ref: '#/components/schemas/security-center_subject'
+      type: array
+    security-center_page:
+      description: Current page within paginated list of results
+      example: 1
+      type: integer
+    security-center_dismissed:
+      example: false
+      type: boolean
     security-center_issueClasses:
       example:
       - a_record_dangling
@@ -530,44 +500,9 @@ components:
       items:
         $ref: '#/components/schemas/security-center_issueClass'
       type: array
-    security-center_issueClass:
-      example: always_use_https_not_enabled
-      type: string
-    security-center_subject:
-      example: example.com
-      type: string
-    security-center_severityQueryParam:
-      example:
-      - low
-      - moderate
-      items:
-        enum:
-        - low
-        - moderate
-        - critical
-        type: string
-      type: array
-    security-center_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    security-center_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/security-center_messages'
-        messages:
-          $ref: '#/components/schemas/security-center_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
+    security-center_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/security-center_api-response-common'
       type: object
     security-center_issue:
       properties:
@@ -601,14 +536,68 @@ components:
           format: date-time
           type: string
       type: object
-    security-center_page:
-      description: Current page within paginated list of results
+    security-center_count:
+      description: Total number of results
       example: 1
       type: integer
-    security-center_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/security-center_api-response-common'
+    security-center_products:
+      example:
+      - access
+      - dns
+      items:
+        type: string
+      type: array
+    security-center_issueType:
+      enum:
+      - compliance_violation
+      - email_security
+      - exposed_infrastructure
+      - insecure_configuration
+      - weak_authentication
+      type: string
+    security-center_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/security-center_messages'
+        messages:
+          $ref: '#/components/schemas/security-center_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
       type: object
+    security-center_severityQueryParam:
+      example:
+      - low
+      - moderate
+      items:
+        enum:
+        - low
+        - moderate
+        - critical
+        type: string
+      type: array
+    security-center_issueTypes:
+      example:
+      - compliance_violation
+      - email_security
+      items:
+        $ref: '#/components/schemas/security-center_issueType'
+      type: array
+    security-center_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    security-center_subject:
+      example: example.com
+      type: string
   securitySchemes:
     api_email:
       in: header

@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare ASN Intelligence API
+  title: Cloudflare ASN Intelligence API
   version: 4.0.0
 tags:
 - name: ASN Intelligence
@@ -130,6 +119,37 @@ paths:
       - ASN Intelligence
 components:
   schemas:
+    intel_asn:
+      type: integer
+    intel_per_page:
+      description: Number of results per page of results.
+      example: 20
+      type: number
+    intel_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    intel_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/intel_schemas-api-response-common'
+      type: object
+    intel_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     intel_schemas-api-response-common:
       properties:
         errors:
@@ -147,8 +167,6 @@ components:
       - errors
       - messages
       type: object
-    intel_asn:
-      type: integer
     intel_api-response-common-failure:
       properties:
         errors:
@@ -180,49 +198,20 @@ components:
       - messages
       - result
       type: object
-    intel_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    intel_count:
-      description: Total results returned based on your search parameters.
-      example: 1
-      type: number
     intel_asn_components-schemas-response:
       allOf:
       - $ref: '#/components/schemas/intel_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/intel_asn'
-    intel_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    intel_per_page:
-      description: Number of results per page of results.
-      example: 20
-      type: number
     intel_page:
       description: Current page within paginated list of results.
       example: 1
       type: number
-    intel_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/intel_schemas-api-response-common'
-      type: object
+    intel_count:
+      description: Total results returned based on your search parameters.
+      example: 1
+      type: number
   securitySchemes:
     api_email:
       in: header

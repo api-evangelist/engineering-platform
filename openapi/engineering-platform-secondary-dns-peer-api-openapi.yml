@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Secondary DNS (Peer) API
+  title: Cloudflare Secondary DNS (Peer) API
   version: 4.0.0
 tags:
 - name: Secondary DNS (Peer)
@@ -254,28 +243,19 @@ paths:
         pro: false
 components:
   schemas:
-    secondary-dns_peer:
-      properties:
-        id:
-          $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
-        ip:
-          $ref: '#/components/schemas/secondary-dns_ip'
-        ixfr_enable:
-          $ref: '#/components/schemas/secondary-dns_ixfr_enable'
-        name:
-          $ref: '#/components/schemas/secondary-dns_components-schemas-name'
-        port:
-          $ref: '#/components/schemas/secondary-dns_port'
-        tsig_id:
-          $ref: '#/components/schemas/secondary-dns_tsig_id'
-      required:
-      - id
-      - name
-      type: object
-    secondary-dns_api-response-single:
+    secondary-dns_ip:
+      description: IPv4/IPv6 address of primary or secondary nameserver, depending on what zone this peer is linked to. For primary zones this IP defines the IP of the secondary nameserver Cloudflare will NOTIFY upon zone changes. For secondary zones this IP defines the IP of the primary nameserver Cloudflare will send AXFR/IXFR requests to.
+      example: 192.0.2.53
+      type: string
+    secondary-dns_components-schemas-id_response:
       allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-common'
-      type: object
+      - $ref: '#/components/schemas/secondary-dns_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
+            type: object
     secondary-dns_messages:
       example: []
       items:
@@ -291,66 +271,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    secondary-dns_account_identifier:
-      example: 01a7362d577a6c3019a474fd6f485823
-      readOnly: true
-      type: string
-    secondary-dns_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/secondary-dns_messages'
-        messages:
-          $ref: '#/components/schemas/secondary-dns_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    secondary-dns_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    secondary-dns_ixfr_enable:
-      description: Enable IXFR transfer protocol, default is AXFR. Only applicable to secondary zones.
-      example: false
-      type: boolean
-    secondary-dns_components-schemas-name:
-      description: The name of the peer.
-      example: my-peer-1
-      type: string
-    secondary-dns_port:
-      description: DNS port of primary or secondary nameserver, depending on what zone this peer is linked to.
-      example: 53
-      type: number
-    secondary-dns_ip:
-      description: IPv4/IPv6 address of primary or secondary nameserver, depending on what zone this peer is linked to. For primary zones this IP defines the IP of the secondary nameserver Cloudflare will NOTIFY upon zone changes. For secondary zones this IP defines the IP of the primary nameserver Cloudflare will send AXFR/IXFR requests to.
-      example: 192.0.2.53
-      type: string
-    secondary-dns_tsig_id:
-      description: TSIG authentication will be used for zone transfer if configured.
-      example: 69cd1e104af3e6ed3cb344f263fd0d5a
-      type: string
     secondary-dns_schemas-response_collection:
       allOf:
       - $ref: '#/components/schemas/secondary-dns_api-response-collection'
@@ -359,26 +279,10 @@ components:
             items:
               $ref: '#/components/schemas/secondary-dns_peer'
             type: array
-    secondary-dns_components-schemas-id_response:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
-            type: object
-    secondary-dns_components-schemas-identifier:
-      example: 23ff594956f20c2a721606e94745a8aa
-      readOnly: true
-      type: string
-    secondary-dns_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/secondary-dns_result_info'
-      type: object
+    secondary-dns_port:
+      description: DNS port of primary or secondary nameserver, depending on what zone this peer is linked to.
+      example: 53
+      type: number
     secondary-dns_api-response-common-failure:
       properties:
         errors:
@@ -410,12 +314,97 @@ components:
       - messages
       - result
       type: object
+    secondary-dns_ixfr_enable:
+      description: Enable IXFR transfer protocol, default is AXFR. Only applicable to secondary zones.
+      example: false
+      type: boolean
+    secondary-dns_components-schemas-identifier:
+      example: 23ff594956f20c2a721606e94745a8aa
+      readOnly: true
+      type: string
     secondary-dns_schemas-single_response:
       allOf:
       - $ref: '#/components/schemas/secondary-dns_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/secondary-dns_peer'
+    secondary-dns_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-common'
+      type: object
+    secondary-dns_account_identifier:
+      example: 01a7362d577a6c3019a474fd6f485823
+      readOnly: true
+      type: string
+    secondary-dns_tsig_id:
+      description: TSIG authentication will be used for zone transfer if configured.
+      example: 69cd1e104af3e6ed3cb344f263fd0d5a
+      type: string
+    secondary-dns_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/secondary-dns_result_info'
+      type: object
+    secondary-dns_peer:
+      properties:
+        id:
+          $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
+        ip:
+          $ref: '#/components/schemas/secondary-dns_ip'
+        ixfr_enable:
+          $ref: '#/components/schemas/secondary-dns_ixfr_enable'
+        name:
+          $ref: '#/components/schemas/secondary-dns_components-schemas-name'
+        port:
+          $ref: '#/components/schemas/secondary-dns_port'
+        tsig_id:
+          $ref: '#/components/schemas/secondary-dns_tsig_id'
+      required:
+      - id
+      - name
+      type: object
+    secondary-dns_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    secondary-dns_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/secondary-dns_messages'
+        messages:
+          $ref: '#/components/schemas/secondary-dns_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    secondary-dns_components-schemas-name:
+      description: The name of the peer.
+      example: my-peer-1
+      type: string
   securitySchemes:
     api_email:
       in: header

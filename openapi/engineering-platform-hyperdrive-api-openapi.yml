@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Hyperdrive API
+  title: Cloudflare Hyperdrive API
   version: 4.0.0
 tags:
 - name: Hyperdrive
@@ -350,13 +339,8 @@ paths:
         - com.cloudflare.edge.hyperdrive.database.update
 components:
   schemas:
-    hyperdrive_hyperdrive-scheme:
-      default: postgres
-      description: Specifies the URL scheme used to connect to your origin database.
-      enum:
-      - postgres
-      - postgresql
-      - mysql
+    hyperdrive_hyperdrive-name:
+      example: example-hyperdrive
       type: string
     hyperdrive_identifier:
       description: Identifier
@@ -364,75 +348,15 @@ components:
       maxLength: 32
       readOnly: true
       type: string
-    hyperdrive_api-response-common-failure:
+    hyperdrive_create-update-hyperdrive-config:
+      allOf:
+      - $ref: '#/components/schemas/hyperdrive_hyperdrive'
       properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/hyperdrive_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/hyperdrive_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
+        origin:
+          $ref: '#/components/schemas/hyperdrive_hyperdrive-origin-with-secrets'
       required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    hyperdrive_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/hyperdrive_messages'
-        messages:
-          $ref: '#/components/schemas/hyperdrive_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    hyperdrive_hyperdrive-caching:
-      properties:
-        disabled:
-          description: 'When set to true, disables the caching of SQL responses. (Default: false)'
-          example: false
-          type: boolean
-        max_age:
-          description: 'When present, specifies max duration for which items should persist in the cache. (Default: 60)'
-          example: 60
-          type: integer
-        stale_while_revalidate:
-          description: 'When present, indicates the number of seconds cache may serve the response after it becomes stale. (Default: 15)'
-          example: 15
-          type: integer
+      - name
+      - origin
       type: object
     hyperdrive_api-response-single:
       allOf:
@@ -476,20 +400,59 @@ components:
       - database
       - user
       type: object
-    hyperdrive_hyperdrive-origin-with-secrets:
-      allOf:
-      - $ref: '#/components/schemas/hyperdrive_hyperdrive-origin'
+    hyperdrive_api-response-common:
       properties:
-        access_client_secret:
-          description: The Client Secret of the Access token to use when connecting to the origin database
-          example: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-          type: string
-        password:
-          description: The password required to access your origin database. This value is write-only and never returned by the API.
-          example: password1234!
-          type: string
+        errors:
+          $ref: '#/components/schemas/hyperdrive_messages'
+        messages:
+          $ref: '#/components/schemas/hyperdrive_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
       required:
-      - password
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    hyperdrive_hyperdrive-caching:
+      properties:
+        disabled:
+          description: 'When set to true, disables the caching of SQL responses. (Default: false)'
+          example: false
+          type: boolean
+        max_age:
+          description: 'When present, specifies max duration for which items should persist in the cache. (Default: 60)'
+          example: 60
+          type: integer
+        stale_while_revalidate:
+          description: 'When present, indicates the number of seconds cache may serve the response after it becomes stale. (Default: 15)'
+          example: 15
+          type: integer
+      type: object
+    hyperdrive_hyperdrive-scheme:
+      default: postgres
+      description: Specifies the URL scheme used to connect to your origin database.
+      enum:
+      - postgres
+      - postgresql
+      - mysql
+      type: string
+    hyperdrive_patch-hyperdrive-config:
+      allOf:
+      - $ref: '#/components/schemas/hyperdrive_hyperdrive'
+      properties:
+        origin:
+          $ref: '#/components/schemas/hyperdrive_hyperdrive-origin-with-secrets'
       type: object
     hyperdrive_messages:
       example: []
@@ -506,15 +469,43 @@ components:
         type: object
         uniqueItems: true
       type: array
-    hyperdrive_hyperdrive-name:
-      example: example-hyperdrive
-      type: string
-    hyperdrive_patch-hyperdrive-config:
+    hyperdrive_hyperdrive-with-identifier:
       allOf:
       - $ref: '#/components/schemas/hyperdrive_hyperdrive'
       properties:
-        origin:
-          $ref: '#/components/schemas/hyperdrive_hyperdrive-origin-with-secrets'
+        id:
+          $ref: '#/components/schemas/hyperdrive_identifier'
+      type: object
+    hyperdrive_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/hyperdrive_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/hyperdrive_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
       type: object
     hyperdrive_hyperdrive:
       properties:
@@ -525,22 +516,20 @@ components:
         origin:
           $ref: '#/components/schemas/hyperdrive_hyperdrive-origin'
       type: object
-    hyperdrive_hyperdrive-with-identifier:
+    hyperdrive_hyperdrive-origin-with-secrets:
       allOf:
-      - $ref: '#/components/schemas/hyperdrive_hyperdrive'
+      - $ref: '#/components/schemas/hyperdrive_hyperdrive-origin'
       properties:
-        id:
-          $ref: '#/components/schemas/hyperdrive_identifier'
-      type: object
-    hyperdrive_create-update-hyperdrive-config:
-      allOf:
-      - $ref: '#/components/schemas/hyperdrive_hyperdrive'
-      properties:
-        origin:
-          $ref: '#/components/schemas/hyperdrive_hyperdrive-origin-with-secrets'
+        access_client_secret:
+          description: The Client Secret of the Access token to use when connecting to the origin database
+          example: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          type: string
+        password:
+          description: The password required to access your origin database. This value is write-only and never returned by the API.
+          example: password1234!
+          type: string
       required:
-      - name
-      - origin
+      - password
       type: object
   securitySchemes:
     api_email:

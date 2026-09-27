@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Account Rulesets API
+  title: Cloudflare Account Rulesets API
   version: 4.0.0
 tags:
 - name: Account Rulesets
@@ -678,22 +667,1023 @@ paths:
         free: true
         pro: true
 components:
+  responses:
+    rulesets_Rulesets:
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/rulesets_Response'
+            - properties:
+                errors:
+                  enum:
+                  - []
+                result:
+                  description: A list of rulesets. The returned information will not include the rules in each ruleset.
+                  items:
+                    allOf:
+                    - $ref: '#/components/schemas/rulesets_Ruleset'
+                    - properties:
+                        kind:
+                          $ref: '#/components/schemas/rulesets_RulesetKind'
+                        phase:
+                          $ref: '#/components/schemas/rulesets_RulesetPhase'
+                      required:
+                      - name
+                      - kind
+                      - phase
+                  title: Rulesets
+                  type: array
+                success:
+                  enum:
+                  - true
+      description: A rulesets response.
+    rulesets_Empty:
+      description: An empty response.
+    rulesets_Ruleset:
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/rulesets_Response'
+            - properties:
+                errors:
+                  enum:
+                  - []
+                result:
+                  allOf:
+                  - $ref: '#/components/schemas/rulesets_Ruleset'
+                  - properties:
+                      kind:
+                        $ref: '#/components/schemas/rulesets_RulesetKind'
+                      phase:
+                        $ref: '#/components/schemas/rulesets_RulesetPhase'
+                      rules:
+                        $ref: '#/components/schemas/rulesets_ResponseRules'
+                    required:
+                    - name
+                    - kind
+                    - phase
+                    - rules
+                success:
+                  enum:
+                  - true
+      description: A ruleset response.
+    rulesets_Failure:
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/rulesets_Response'
+            - properties:
+                result:
+                  enum:
+                  - null
+                success:
+                  enum:
+                  - false
+      description: A failure response.
   schemas:
-    rulesets_RuleAction:
-      description: The action to perform when the rule matches.
-      pattern: ^[a-z]+$
-      title: Action
-      type: string
-    rulesets_JsChallengeRule:
+    rulesets_ExecuteRule:
       allOf:
       - $ref: '#/components/schemas/rulesets_Rule'
       - properties:
           action:
             enum:
-            - js_challenge
+            - execute
+          action_parameters:
+            properties:
+              id:
+                allOf:
+                - $ref: '#/components/schemas/rulesets_RulesetId'
+                - description: The ID of the ruleset to execute.
+                  example: 4814384a9e5d4991b9815dcfc25d2f1f
+              matched_data:
+                description: The configuration to use for matched data logging.
+                properties:
+                  public_key:
+                    description: The public key to encrypt matched data logs with.
+                    example: iGqBmyIUxuWt1rvxoAharN9FUXneUBxA/Y19PyyrEG0=
+                    minLength: 1
+                    title: Public key
+                    type: string
+                required:
+                - public_key
+                title: Matched data
+                type: object
+              overrides:
+                description: A set of overrides to apply to the target ruleset.
+                minProperties: 1
+                properties:
+                  action:
+                    allOf:
+                    - $ref: '#/components/schemas/rulesets_RuleAction'
+                    - description: An action to override all rules with. This option has lower precedence than rule and category overrides.
+                      example: log
+                  categories:
+                    description: A list of category-level overrides. This option has the second-highest precedence after rule-level overrides.
+                    items:
+                      description: A category-level override
+                      minProperties: 2
+                      properties:
+                        action:
+                          allOf:
+                          - $ref: '#/components/schemas/rulesets_RuleAction'
+                          - description: The action to override rules in the category with.
+                            example: log
+                        category:
+                          allOf:
+                          - $ref: '#/components/schemas/rulesets_RuleCategory'
+                          - description: The name of the category to override.
+                        enabled:
+                          allOf:
+                          - $ref: '#/components/schemas/rulesets_RuleEnabled'
+                          - description: Whether to enable execution of rules in the category.
+                        sensitivity_level:
+                          allOf:
+                          - $ref: '#/components/schemas/rulesets_ExecuteSensitivityLevel'
+                          - description: The sensitivity level to use for rules in the category.
+                      required:
+                      - category
+                      title: Category override
+                      type: object
+                    minItems: 1
+                    title: Category overrides
+                    type: array
+                    uniqueItems: true
+                  enabled:
+                    allOf:
+                    - $ref: '#/components/schemas/rulesets_RuleEnabled'
+                    - description: Whether to enable execution of all rules. This option has lower precedence than rule and category overrides.
+                  rules:
+                    description: A list of rule-level overrides. This option has the highest precedence.
+                    items:
+                      description: A rule-level override
+                      minProperties: 2
+                      properties:
+                        action:
+                          allOf:
+                          - $ref: '#/components/schemas/rulesets_RuleAction'
+                          - description: The action to override the rule with.
+                            example: log
+                        enabled:
+                          allOf:
+                          - $ref: '#/components/schemas/rulesets_RuleEnabled'
+                          - description: Whether to enable execution of the rule.
+                        id:
+                          allOf:
+                          - $ref: '#/components/schemas/rulesets_RuleId'
+                          - description: The ID of the rule to override.
+                            example: 8ac8bc2a661e475d940980f9317f28e1
+                        score_threshold:
+                          description: The score threshold to use for the rule.
+                          title: Score threshold
+                          type: integer
+                        sensitivity_level:
+                          allOf:
+                          - $ref: '#/components/schemas/rulesets_ExecuteSensitivityLevel'
+                          - description: The sensitivity level to use for the rule.
+                      required:
+                      - id
+                      title: Rule override
+                      type: object
+                    minItems: 1
+                    title: Rule overrides
+                    type: array
+                    uniqueItems: true
+                  sensitivity_level:
+                    allOf:
+                    - $ref: '#/components/schemas/rulesets_ExecuteSensitivityLevel'
+                    - description: A sensitivity level to set for all rules. This option has lower precedence than rule and category overrides and is only applicable for DDoS phases.
+                title: Overrides
+                type: object
+            required:
+            - id
           description:
-            example: Issue a non-interactive Javascript Challenge if the visitor had not solved a Interactive Challenge, Managed Challenge, or Javascript Challenge prior to the request when the address is not 1.1.1.1
-        title: Javascript Challenge rule
+            example: Execute the OWASP ruleset when the IP address is not 1.1.1.1
+        title: Execute rule
+    rulesets_RewriteUriPart:
+      oneOf:
+      - properties:
+          value:
+            description: Predefined replacement value.
+            example: /images
+            minLength: 1
+            type: string
+        required:
+        - value
+        title: Static value
+        type: object
+      - properties:
+          expression:
+            description: Expression to evaluate for the replacement value.
+            example: regex_replace(http.request.uri.path, "/bar$", "/baz")
+            minLength: 1
+            type: string
+        required:
+        - expression
+        title: Dynamic value
+        type: object
+    rulesets_RewriteRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - rewrite
+          action_parameters:
+            properties:
+              headers:
+                additionalProperties:
+                  oneOf:
+                  - description: Remove the header from the request.
+                    properties:
+                      operation:
+                        enum:
+                        - remove
+                        title: Operation
+                        type: string
+                    required:
+                    - operation
+                    title: Remove header
+                    type: object
+                  - description: Set a request header with a static value.
+                    properties:
+                      operation:
+                        enum:
+                        - set
+                        title: Operation
+                        type: string
+                      value:
+                        description: Static value for the header.
+                        example: static-header-value
+                        minLength: 1
+                        title: Value
+                        type: string
+                    required:
+                    - operation
+                    - value
+                    title: Static header
+                    type: object
+                  - description: Set a request header with a dynamic value.
+                    properties:
+                      expression:
+                        description: Expression for the header value.
+                        example: ip.src
+                        minLength: 1
+                        title: Expression
+                        type: string
+                      operation:
+                        enum:
+                        - set
+                        title: Operation
+                        type: string
+                    required:
+                    - operation
+                    - expression
+                    title: Dynamic header
+                    type: object
+                description: Map of request headers to modify.
+                example:
+                  client-http-version:
+                    expression: http.request.version
+                    operation: set
+                title: Headers
+                type: object
+              uri:
+                description: URI to rewrite the request to.
+                properties:
+                  path:
+                    allOf:
+                    - description: Path portion rewrite.
+                      example:
+                        expression: regex_replace(http.request.uri.path, "/bar$", "/baz")
+                      title: Path
+                    - $ref: '#/components/schemas/rulesets_RewriteUriPart'
+                  query:
+                    allOf:
+                    - description: Query portion rewrite.
+                      example:
+                        expression: regex_replace(http.request.uri.query, "foo=bar", "")
+                      title: Query
+                    - $ref: '#/components/schemas/rulesets_RewriteUriPart'
+                title: URI
+                type: object
+          description:
+            example: Add a header when the IP address is not 1.1.1.1
+        title: Rewrite rule
+    rulesets_CompressResponseRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - compress_response
+          action_parameters:
+            properties:
+              algorithms:
+                description: Custom order for compression algorithms.
+                example:
+                - name: none
+                items:
+                  description: Compression algorithm to enable.
+                  properties:
+                    name:
+                      description: Name of compression algorithm to enable.
+                      enum:
+                      - none
+                      - auto
+                      - default
+                      - gzip
+                      - brotli
+                      title: Name
+                      type: string
+                  title: Compression Algorithm
+                  type: object
+                title: Algorithm
+                type: array
+          description:
+            example: Disable compression when address is not 1.1.1.1
+        title: Compression rule
+    rulesets_ExecuteSensitivityLevel:
+      enum:
+      - default
+      - medium
+      - low
+      - eoff
+      title: Sensitivity level
+      type: string
+    rulesets_ScoreRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - score
+          action_parameters:
+            example:
+              increment: 3
+            minProperties: 1
+            properties:
+              increment:
+                description: Increment contains the delta to change the score and can be either positive or negative.
+                example: 3
+                title: Increment
+                type: integer
+          description:
+            example: Increment score when the IP address is not 1.1.1.1
+        title: Score rule
+    rulesets_RulesetKind:
+      description: The kind of the ruleset.
+      enum:
+      - managed
+      - custom
+      - root
+      - zone
+      example: root
+      title: Kind
+      type: string
+    rulesets_RuleCategory:
+      description: A category of the rule.
+      example: directory-traversal
+      minLength: 1
+      title: Category
+      type: string
+    rulesets_Response:
+      description: A response object.
+      properties:
+        errors:
+          $ref: '#/components/schemas/rulesets_Errors'
+        messages:
+          $ref: '#/components/schemas/rulesets_Messages'
+        result:
+          description: A result.
+          title: Result
+        success:
+          description: Whether the API call was successful.
+          title: Success
+          type: boolean
+      required:
+      - result
+      - success
+      - errors
+      - messages
+      title: Response
+      type: object
+    rulesets_ForceConnectionCloseRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - force_connection_close
+          description:
+            example: Closes ongoing HTTP connections. This action does not block a request, but it forces the client to reconnect. For HTTP/2 and HTTP/3 connections, the connection will be closed even if it breaks other requests running on the same connection.
+        title: Force Connection Close rule
+    rulesets_Message:
+      description: A message.
+      properties:
+        code:
+          description: A unique code for this message.
+          example: 10000
+          title: Code
+          type: integer
+        message:
+          description: A text description of this message.
+          example: something bad happened
+          minLength: 1
+          title: Description
+          type: string
+        source:
+          description: The source of this message.
+          properties:
+            pointer:
+              description: A JSON pointer to the field that is the source of the message.
+              example: /rules/0/action
+              minLength: 1
+              title: Pointer
+              type: string
+          required:
+          - pointer
+          title: Source
+          type: object
+      required:
+      - message
+      title: Message
+      type: object
+    rulesets_RulesetPhase:
+      description: The phase of the ruleset.
+      enum:
+      - ddos_l4
+      - ddos_l7
+      - http_config_settings
+      - http_custom_errors
+      - http_log_custom_fields
+      - http_ratelimit
+      - http_request_cache_settings
+      - http_request_dynamic_redirect
+      - http_request_firewall_custom
+      - http_request_firewall_managed
+      - http_request_late_transform
+      - http_request_origin
+      - http_request_redirect
+      - http_request_sanitize
+      - http_request_sbfm
+      - http_request_select_configuration
+      - http_request_transform
+      - http_response_compression
+      - http_response_firewall_managed
+      - http_response_headers_transform
+      - magic_transit
+      - magic_transit_ids_managed
+      - magic_transit_managed
+      - magic_transit_ratelimit
+      example: http_request_firewall_custom
+      title: Phase
+      type: string
+    rulesets_Rule:
+      properties:
+        action:
+          $ref: '#/components/schemas/rulesets_RuleAction'
+        action_parameters:
+          description: The parameters configuring the rule's action.
+          title: Action parameters
+          type: object
+        categories:
+          description: The categories of the rule.
+          example:
+          - directory-traversal
+          - header
+          items:
+            $ref: '#/components/schemas/rulesets_RuleCategory'
+          minItems: 1
+          readOnly: true
+          title: Categories
+          type: array
+          uniqueItems: true
+        description:
+          default: ''
+          description: An informative description of the rule.
+          title: Description
+          type: string
+        enabled:
+          allOf:
+          - $ref: '#/components/schemas/rulesets_RuleEnabled'
+          - default: true
+        expression:
+          description: The expression defining which traffic will match the rule.
+          example: ip.src ne 1.1.1.1
+          minLength: 1
+          title: Expression
+          type: string
+        id:
+          $ref: '#/components/schemas/rulesets_RuleId'
+        last_updated:
+          description: The timestamp of when the rule was last modified.
+          example: '2000-01-01T00:00:00.000000Z'
+          format: date-time
+          readOnly: true
+          title: Last updated
+          type: string
+        logging:
+          description: An object configuring the rule's logging behavior.
+          properties:
+            enabled:
+              description: Whether to generate a log when the rule matches.
+              example: true
+              title: Enabled
+              type: boolean
+          required:
+          - enabled
+          title: Logging
+          type: object
+        ref:
+          description: The reference of the rule (the rule ID by default).
+          example: my_ref
+          minLength: 1
+          title: Ref
+          type: string
+        version:
+          description: The version of the rule.
+          example: '1'
+          pattern: ^[0-9]+$
+          readOnly: true
+          title: Version
+          type: string
+      required:
+      - version
+      - last_updated
+      title: Rule
+      type: object
+    rulesets_RulePosition:
+      description: An object configuring where the rule will be placed.
+      title: Position
+      type: object
+    rulesets_ServeErrorRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - serve_error
+          action_parameters:
+            properties:
+              content:
+                description: Error response content.
+                example: '{"error": "1xxx error occurred"}
+
+                  '
+                maxLength: 10240
+                minLength: 1
+                title: Content
+                type: string
+              content_type:
+                description: Content-type header to set with the response.
+                enum:
+                - application/json
+                - text/xml
+                - text/plain
+                - text/html
+                example: application/json
+                title: Content Type
+                type: string
+              status_code:
+                description: The status code to use for the error.
+                example: 500
+                maximum: 999
+                minimum: 400
+                title: Status Code
+                type: number
+          description:
+            example: Serve a JSON response to api users on error
+        title: Serve Error rule
+    rulesets_SetConfigRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - set_config
+          action_parameters:
+            properties:
+              automatic_https_rewrites:
+                description: Turn on or off Automatic HTTPS Rewrites.
+                title: Automatic HTTPS rewrites
+                type: boolean
+              autominify:
+                description: Select which file extensions to minify automatically.
+                properties:
+                  css:
+                    description: Minify CSS files.
+                    title: CSS
+                    type: boolean
+                  html:
+                    description: Minify HTML files.
+                    title: HTML
+                    type: boolean
+                  js:
+                    description: Minify JS files.
+                    title: JS
+                    type: boolean
+                title: Auto Minify
+                type: object
+              bic:
+                description: Turn on or off Browser Integrity Check.
+                title: Browser Integrity Check
+                type: boolean
+              disable_apps:
+                description: Turn off all active Cloudflare Apps.
+                enum:
+                - true
+                title: Disable Apps
+                type: boolean
+              disable_rum:
+                description: Turn off Real User Monitoring (RUM).
+                enum:
+                - true
+                title: Disable RUM
+                type: boolean
+              disable_zaraz:
+                description: Turn off Zaraz.
+                enum:
+                - true
+                title: Disable Zaraz
+                type: boolean
+              email_obfuscation:
+                description: Turn on or off Email Obfuscation.
+                title: Email Obfuscation
+                type: boolean
+              fonts:
+                description: Turn on or off Cloudflare Fonts.
+                title: Cloudflare Fonts
+                type: boolean
+              hotlink_protection:
+                description: Turn on or off the Hotlink Protection.
+                title: Hotlink Protection
+                type: boolean
+              mirage:
+                description: Turn on or off Mirage.
+                title: Mirage
+                type: boolean
+              opportunistic_encryption:
+                description: Turn on or off Opportunistic Encryption.
+                title: Opportunistic Encryption
+                type: boolean
+              polish:
+                description: Configure the Polish level.
+                enum:
+                - 'off'
+                - lossless
+                - lossy
+                title: Polish
+                type: string
+              rocket_loader:
+                description: Turn on or off Rocket Loader
+                title: Rocket Loader
+                type: boolean
+              security_level:
+                description: Configure the Security Level.
+                enum:
+                - 'off'
+                - essentially_off
+                - low
+                - medium
+                - high
+                - under_attack
+                title: Security Level
+                type: string
+              server_side_excludes:
+                description: Turn on or off Server Side Excludes.
+                title: Server Side Excludes
+                type: boolean
+              ssl:
+                description: Configure the SSL level.
+                enum:
+                - 'off'
+                - flexible
+                - full
+                - strict
+                - origin_pull
+                title: SSL
+                type: string
+              sxg:
+                description: Turn on or off Signed Exchanges (SXG).
+                title: Signed Exchanges (SXG)
+                type: boolean
+          description:
+            example: Disable Zaraz when IP address is not 1.1.1.1
+        title: Set Config Rule
+    rulesets_LogRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - log
+          description:
+            example: Log when the IP address is not 1.1.1.1
+        title: Log rule
+    rulesets_ManagedChallengeRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - managed_challenge
+          description:
+            example: Issue a Managed Challenge if the visitor had not solved a Managed Challenge or Interactive Challenge prior to the request when the address is not 1.1.1.1
+        title: Managed Challenge rule
+    rulesets_RequestRule:
+      discriminator:
+        mapping:
+          block: '#/components/schemas/rulesets_BlockRule'
+          challenge: '#/components/schemas/rulesets_ChallengeRule'
+          compress_response: '#/components/schemas/rulesets_CompressResponseRule'
+          ddos_dynamic: '#/components/schemas/rulesets_DDoSDynamicRule'
+          execute: '#/components/schemas/rulesets_ExecuteRule'
+          force_connection_close: '#/components/schemas/rulesets_ForceConnectionCloseRule'
+          js_challenge: '#/components/schemas/rulesets_JsChallengeRule'
+          log: '#/components/schemas/rulesets_LogRule'
+          log_custom_field: '#/components/schemas/rulesets_LogCustomFieldRule'
+          managed_challenge: '#/components/schemas/rulesets_ManagedChallengeRule'
+          redirect: '#/components/schemas/rulesets_RedirectRule'
+          rewrite: '#/components/schemas/rulesets_RewriteRule'
+          route: '#/components/schemas/rulesets_RouteRule'
+          score: '#/components/schemas/rulesets_ScoreRule'
+          serve_error: '#/components/schemas/rulesets_ServeErrorRule'
+          set_cache_settings: '#/components/schemas/rulesets_SetCacheSettingsRule'
+          set_config: '#/components/schemas/rulesets_SetConfigRule'
+          skip: '#/components/schemas/rulesets_SkipRule'
+        propertyName: action
+      oneOf:
+      - $ref: '#/components/schemas/rulesets_BlockRule'
+      - $ref: '#/components/schemas/rulesets_ChallengeRule'
+      - $ref: '#/components/schemas/rulesets_CompressResponseRule'
+      - $ref: '#/components/schemas/rulesets_ExecuteRule'
+      - $ref: '#/components/schemas/rulesets_JsChallengeRule'
+      - $ref: '#/components/schemas/rulesets_LogRule'
+      - $ref: '#/components/schemas/rulesets_ManagedChallengeRule'
+      - $ref: '#/components/schemas/rulesets_RedirectRule'
+      - $ref: '#/components/schemas/rulesets_RewriteRule'
+      - $ref: '#/components/schemas/rulesets_RouteRule'
+      - $ref: '#/components/schemas/rulesets_ScoreRule'
+      - $ref: '#/components/schemas/rulesets_ServeErrorRule'
+      - $ref: '#/components/schemas/rulesets_SetConfigRule'
+      - $ref: '#/components/schemas/rulesets_SkipRule'
+      - $ref: '#/components/schemas/rulesets_SetCacheSettingsRule'
+      - $ref: '#/components/schemas/rulesets_LogCustomFieldRule'
+      - $ref: '#/components/schemas/rulesets_DDoSDynamicRule'
+      - $ref: '#/components/schemas/rulesets_ForceConnectionCloseRule'
+    rulesets_DDoSDynamicRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - ddos_dynamic
+          description:
+            example: Performs a specific action according to a set of internal guidelines defined by Cloudflare.
+        title: DDoS Dynamic rule
+    rulesets_Errors:
+      description: A list of error messages.
+      items:
+        $ref: '#/components/schemas/rulesets_Message'
+      title: Errors
+      type: array
+    rulesets_BlockRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - block
+          action_parameters:
+            properties:
+              response:
+                description: The response to show when the block is applied.
+                properties:
+                  content:
+                    description: The content to return.
+                    example: "{\n  \"success\": false,\n  \"error\": \"you have been blocked\"\n}"
+                    minLength: 1
+                    title: Content
+                    type: string
+                  content_type:
+                    description: The type of the content to return.
+                    example: application/json
+                    minLength: 1
+                    title: Content type
+                    type: string
+                  status_code:
+                    description: The status code to return.
+                    maximum: 499
+                    minimum: 400
+                    title: Status code
+                    type: integer
+                required:
+                - status_code
+                - content
+                - content_type
+                title: Response
+                type: object
+          description:
+            example: Block when the IP address is not 1.1.1.1
+        title: Block rule
+    rulesets_Ruleset:
+      description: A ruleset object.
+      properties:
+        description:
+          default: ''
+          description: An informative description of the ruleset.
+          example: My ruleset to execute managed rulesets
+          title: Description
+          type: string
+        id:
+          allOf:
+          - $ref: '#/components/schemas/rulesets_RulesetId'
+          - readOnly: true
+        last_updated:
+          description: The timestamp of when the ruleset was last modified.
+          example: '2000-01-01T00:00:00.000000Z'
+          format: date-time
+          readOnly: true
+          title: Last updated
+          type: string
+        name:
+          description: The human-readable name of the ruleset.
+          example: My ruleset
+          minLength: 1
+          title: Name
+          type: string
+        version:
+          $ref: '#/components/schemas/rulesets_RulesetVersion'
+      required:
+      - id
+      - version
+      - last_updated
+      title: Ruleset
+      type: object
+    rulesets_RuleId:
+      description: The unique ID of the rule.
+      example: 3a03d665bac047339bb530ecb439a90d
+      pattern: ^[0-9a-f]{32}$
+      title: ID
+      type: string
+    rulesets_SkipRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - skip
+          action_parameters:
+            example:
+              ruleset: current
+            minProperties: 1
+            properties:
+              phases:
+                description: A list of phases to skip the execution of. This option is incompatible with the ruleset and rulesets options.
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/rulesets_RulesetPhase'
+                  - description: A phase to skip the execution of.
+                minItems: 1
+                title: Phases
+                type: array
+                uniqueItems: true
+              products:
+                description: A list of legacy security products to skip the execution of.
+                items:
+                  description: The name of a legacy security product to skip the execution of.
+                  enum:
+                  - bic
+                  - hot
+                  - rateLimit
+                  - securityLevel
+                  - uaBlock
+                  - waf
+                  - zoneLockdown
+                  title: Product
+                  type: string
+                minItems: 1
+                title: Products
+                type: array
+                uniqueItems: true
+              rules:
+                additionalProperties:
+                  description: A list of rule IDs in the ruleset to skip the execution of.
+                  items:
+                    allOf:
+                    - $ref: '#/components/schemas/rulesets_RuleId'
+                    - description: The ID of a rule in the ruleset to skip the execution of.
+                      example: 8ac8bc2a661e475d940980f9317f28e1
+                      title: Rule
+                  minItems: 1
+                  title: Rules
+                  type: array
+                  uniqueItems: true
+                description: A mapping of ruleset IDs to a list of rule IDs in that ruleset to skip the execution of. This option is incompatible with the ruleset option.
+                example:
+                  4814384a9e5d4991b9815dcfc25d2f1f:
+                  - 8ac8bc2a661e475d940980f9317f28e1
+                minProperties: 1
+                title: Rules
+                type: object
+              ruleset:
+                description: A ruleset to skip the execution of. This option is incompatible with the rulesets, rules and phases options.
+                enum:
+                - current
+                title: Ruleset
+                type: string
+              rulesets:
+                description: A list of ruleset IDs to skip the execution of. This option is incompatible with the ruleset and phases options.
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/rulesets_RulesetId'
+                  - description: The ID of a ruleset to skip the execution of.
+                    example: 4814384a9e5d4991b9815dcfc25d2f1f
+                    title: Ruleset
+                minItems: 1
+                title: Rulesets
+                type: array
+                uniqueItems: true
+          description:
+            example: Skip the current ruleset when the IP address is not 1.1.1.1
+        title: Skip rule
+    rulesets_ResponseRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_RequestRule'
+      - required:
+        - id
+        - expression
+        - action
+        - ref
+        - enabled
+    rulesets_RouteRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - route
+          action_parameters:
+            properties:
+              host_header:
+                description: Rewrite the HTTP Host header.
+                example: static.example.com
+                minLength: 1
+                title: Host Header
+                type: string
+              origin:
+                description: Override the IP/TCP destination.
+                properties:
+                  host:
+                    description: Override the resolved hostname.
+                    example: static.example.com
+                    minLength: 1
+                    title: DNS Record
+                    type: string
+                  port:
+                    description: Override the destination port.
+                    maximum: 65535
+                    minimum: 1
+                    title: Port
+                    type: number
+                title: Origin
+                type: object
+              sni:
+                description: Override the Server Name Indication (SNI).
+                properties:
+                  value:
+                    description: The SNI override.
+                    example: static.example.com
+                    minLength: 1
+                    title: Value
+                    type: string
+                required:
+                - value
+                title: SNI
+                type: object
+          description:
+            example: Select origin server when IP address is not 1.1.1.1
+        title: Origin rule
+    rulesets_AccountId:
+      description: The unique ID of the account.
+      example: abf9b32d38c5f572afde3336ec0ce302
+      pattern: ^[0-9a-f]{32}$
+      title: ID
+      type: string
+    rulesets_RuleEnabled:
+      description: Whether the rule should be executed.
+      example: true
+      title: Enabled
+      type: boolean
+    rulesets_Messages:
+      description: A list of warning messages.
+      items:
+        $ref: '#/components/schemas/rulesets_Message'
+      title: Messages
+      type: array
     rulesets_SetCacheSettingsRule:
       allOf:
       - $ref: '#/components/schemas/rulesets_Rule'
@@ -986,728 +1976,27 @@ components:
           description:
             example: Set cache settings when the hostname  address is not example.com
         title: Set Cache Settings rule
-    rulesets_RequestRules:
-      description: The list of rules in the ruleset.
-      items:
-        $ref: '#/components/schemas/rulesets_RequestRule'
-      title: Rules
-      type: array
-    rulesets_RulePosition:
-      description: An object configuring where the rule will be placed.
-      title: Position
-      type: object
-    rulesets_ExecuteSensitivityLevel:
-      enum:
-      - default
-      - medium
-      - low
-      - eoff
-      title: Sensitivity level
-      type: string
-    rulesets_Ruleset:
-      description: A ruleset object.
-      properties:
-        description:
-          default: ''
-          description: An informative description of the ruleset.
-          example: My ruleset to execute managed rulesets
-          title: Description
-          type: string
-        id:
-          allOf:
-          - $ref: '#/components/schemas/rulesets_RulesetId'
-          - readOnly: true
-        last_updated:
-          description: The timestamp of when the ruleset was last modified.
-          example: '2000-01-01T00:00:00.000000Z'
-          format: date-time
-          readOnly: true
-          title: Last updated
-          type: string
-        name:
-          description: The human-readable name of the ruleset.
-          example: My ruleset
-          minLength: 1
-          title: Name
-          type: string
-        version:
-          $ref: '#/components/schemas/rulesets_RulesetVersion'
-      required:
-      - id
-      - version
-      - last_updated
-      title: Ruleset
-      type: object
-    rulesets_RequestRule:
-      discriminator:
-        mapping:
-          block: '#/components/schemas/rulesets_BlockRule'
-          challenge: '#/components/schemas/rulesets_ChallengeRule'
-          compress_response: '#/components/schemas/rulesets_CompressResponseRule'
-          ddos_dynamic: '#/components/schemas/rulesets_DDoSDynamicRule'
-          execute: '#/components/schemas/rulesets_ExecuteRule'
-          force_connection_close: '#/components/schemas/rulesets_ForceConnectionCloseRule'
-          js_challenge: '#/components/schemas/rulesets_JsChallengeRule'
-          log: '#/components/schemas/rulesets_LogRule'
-          log_custom_field: '#/components/schemas/rulesets_LogCustomFieldRule'
-          managed_challenge: '#/components/schemas/rulesets_ManagedChallengeRule'
-          redirect: '#/components/schemas/rulesets_RedirectRule'
-          rewrite: '#/components/schemas/rulesets_RewriteRule'
-          route: '#/components/schemas/rulesets_RouteRule'
-          score: '#/components/schemas/rulesets_ScoreRule'
-          serve_error: '#/components/schemas/rulesets_ServeErrorRule'
-          set_cache_settings: '#/components/schemas/rulesets_SetCacheSettingsRule'
-          set_config: '#/components/schemas/rulesets_SetConfigRule'
-          skip: '#/components/schemas/rulesets_SkipRule'
-        propertyName: action
-      oneOf:
-      - $ref: '#/components/schemas/rulesets_BlockRule'
-      - $ref: '#/components/schemas/rulesets_ChallengeRule'
-      - $ref: '#/components/schemas/rulesets_CompressResponseRule'
-      - $ref: '#/components/schemas/rulesets_ExecuteRule'
-      - $ref: '#/components/schemas/rulesets_JsChallengeRule'
-      - $ref: '#/components/schemas/rulesets_LogRule'
-      - $ref: '#/components/schemas/rulesets_ManagedChallengeRule'
-      - $ref: '#/components/schemas/rulesets_RedirectRule'
-      - $ref: '#/components/schemas/rulesets_RewriteRule'
-      - $ref: '#/components/schemas/rulesets_RouteRule'
-      - $ref: '#/components/schemas/rulesets_ScoreRule'
-      - $ref: '#/components/schemas/rulesets_ServeErrorRule'
-      - $ref: '#/components/schemas/rulesets_SetConfigRule'
-      - $ref: '#/components/schemas/rulesets_SkipRule'
-      - $ref: '#/components/schemas/rulesets_SetCacheSettingsRule'
-      - $ref: '#/components/schemas/rulesets_LogCustomFieldRule'
-      - $ref: '#/components/schemas/rulesets_DDoSDynamicRule'
-      - $ref: '#/components/schemas/rulesets_ForceConnectionCloseRule'
-    rulesets_ServeErrorRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - serve_error
-          action_parameters:
-            properties:
-              content:
-                description: Error response content.
-                example: '{"error": "1xxx error occurred"}
-
-                  '
-                maxLength: 10240
-                minLength: 1
-                title: Content
-                type: string
-              content_type:
-                description: Content-type header to set with the response.
-                enum:
-                - application/json
-                - text/xml
-                - text/plain
-                - text/html
-                example: application/json
-                title: Content Type
-                type: string
-              status_code:
-                description: The status code to use for the error.
-                example: 500
-                maximum: 999
-                minimum: 400
-                title: Status Code
-                type: number
-          description:
-            example: Serve a JSON response to api users on error
-        title: Serve Error rule
-    rulesets_Messages:
-      description: A list of warning messages.
-      items:
-        $ref: '#/components/schemas/rulesets_Message'
-      title: Messages
-      type: array
-    rulesets_ResponseRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_RequestRule'
-      - required:
-        - id
-        - expression
-        - action
-        - ref
-        - enabled
-    rulesets_ForceConnectionCloseRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - force_connection_close
-          description:
-            example: Closes ongoing HTTP connections. This action does not block a request, but it forces the client to reconnect. For HTTP/2 and HTTP/3 connections, the connection will be closed even if it breaks other requests running on the same connection.
-        title: Force Connection Close rule
-    rulesets_RuleId:
-      description: The unique ID of the rule.
-      example: 3a03d665bac047339bb530ecb439a90d
-      pattern: ^[0-9a-f]{32}$
-      title: ID
-      type: string
-    rulesets_DDoSDynamicRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - ddos_dynamic
-          description:
-            example: Performs a specific action according to a set of internal guidelines defined by Cloudflare.
-        title: DDoS Dynamic rule
-    rulesets_RulesetPhase:
-      description: The phase of the ruleset.
-      enum:
-      - ddos_l4
-      - ddos_l7
-      - http_config_settings
-      - http_custom_errors
-      - http_log_custom_fields
-      - http_ratelimit
-      - http_request_cache_settings
-      - http_request_dynamic_redirect
-      - http_request_firewall_custom
-      - http_request_firewall_managed
-      - http_request_late_transform
-      - http_request_origin
-      - http_request_redirect
-      - http_request_sanitize
-      - http_request_sbfm
-      - http_request_select_configuration
-      - http_request_transform
-      - http_response_compression
-      - http_response_firewall_managed
-      - http_response_headers_transform
-      - magic_transit
-      - magic_transit_ids_managed
-      - magic_transit_managed
-      - magic_transit_ratelimit
-      example: http_request_firewall_custom
-      title: Phase
-      type: string
-    rulesets_BlockRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - block
-          action_parameters:
-            properties:
-              response:
-                description: The response to show when the block is applied.
-                properties:
-                  content:
-                    description: The content to return.
-                    example: "{\n  \"success\": false,\n  \"error\": \"you have been blocked\"\n}"
-                    minLength: 1
-                    title: Content
-                    type: string
-                  content_type:
-                    description: The type of the content to return.
-                    example: application/json
-                    minLength: 1
-                    title: Content type
-                    type: string
-                  status_code:
-                    description: The status code to return.
-                    maximum: 499
-                    minimum: 400
-                    title: Status code
-                    type: integer
-                required:
-                - status_code
-                - content
-                - content_type
-                title: Response
-                type: object
-          description:
-            example: Block when the IP address is not 1.1.1.1
-        title: Block rule
-    rulesets_RulesetKind:
-      description: The kind of the ruleset.
-      enum:
-      - managed
-      - custom
-      - root
-      - zone
-      example: root
-      title: Kind
-      type: string
-    rulesets_ChallengeRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - challenge
-          description:
-            example: Issue an Interactive Challenge if the visitor had not solved an Interactive Challenge prior to the request when the address is not 1.1.1.1
-        title: Challenge rule
-    rulesets_RouteRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - route
-          action_parameters:
-            properties:
-              host_header:
-                description: Rewrite the HTTP Host header.
-                example: static.example.com
-                minLength: 1
-                title: Host Header
-                type: string
-              origin:
-                description: Override the IP/TCP destination.
-                properties:
-                  host:
-                    description: Override the resolved hostname.
-                    example: static.example.com
-                    minLength: 1
-                    title: DNS Record
-                    type: string
-                  port:
-                    description: Override the destination port.
-                    maximum: 65535
-                    minimum: 1
-                    title: Port
-                    type: number
-                title: Origin
-                type: object
-              sni:
-                description: Override the Server Name Indication (SNI).
-                properties:
-                  value:
-                    description: The SNI override.
-                    example: static.example.com
-                    minLength: 1
-                    title: Value
-                    type: string
-                required:
-                - value
-                title: SNI
-                type: object
-          description:
-            example: Select origin server when IP address is not 1.1.1.1
-        title: Origin rule
-    rulesets_RewriteRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - rewrite
-          action_parameters:
-            properties:
-              headers:
-                additionalProperties:
-                  oneOf:
-                  - description: Remove the header from the request.
-                    properties:
-                      operation:
-                        enum:
-                        - remove
-                        title: Operation
-                        type: string
-                    required:
-                    - operation
-                    title: Remove header
-                    type: object
-                  - description: Set a request header with a static value.
-                    properties:
-                      operation:
-                        enum:
-                        - set
-                        title: Operation
-                        type: string
-                      value:
-                        description: Static value for the header.
-                        example: static-header-value
-                        minLength: 1
-                        title: Value
-                        type: string
-                    required:
-                    - operation
-                    - value
-                    title: Static header
-                    type: object
-                  - description: Set a request header with a dynamic value.
-                    properties:
-                      expression:
-                        description: Expression for the header value.
-                        example: ip.src
-                        minLength: 1
-                        title: Expression
-                        type: string
-                      operation:
-                        enum:
-                        - set
-                        title: Operation
-                        type: string
-                    required:
-                    - operation
-                    - expression
-                    title: Dynamic header
-                    type: object
-                description: Map of request headers to modify.
-                example:
-                  client-http-version:
-                    expression: http.request.version
-                    operation: set
-                title: Headers
-                type: object
-              uri:
-                description: URI to rewrite the request to.
-                properties:
-                  path:
-                    allOf:
-                    - description: Path portion rewrite.
-                      example:
-                        expression: regex_replace(http.request.uri.path, "/bar$", "/baz")
-                      title: Path
-                    - $ref: '#/components/schemas/rulesets_RewriteUriPart'
-                  query:
-                    allOf:
-                    - description: Query portion rewrite.
-                      example:
-                        expression: regex_replace(http.request.uri.query, "foo=bar", "")
-                      title: Query
-                    - $ref: '#/components/schemas/rulesets_RewriteUriPart'
-                title: URI
-                type: object
-          description:
-            example: Add a header when the IP address is not 1.1.1.1
-        title: Rewrite rule
     rulesets_ResponseRules:
       description: The list of rules in the ruleset.
       items:
         $ref: '#/components/schemas/rulesets_ResponseRule'
       title: Rules
       type: array
-    rulesets_ExecuteRule:
+    rulesets_JsChallengeRule:
       allOf:
       - $ref: '#/components/schemas/rulesets_Rule'
       - properties:
           action:
             enum:
-            - execute
-          action_parameters:
-            properties:
-              id:
-                allOf:
-                - $ref: '#/components/schemas/rulesets_RulesetId'
-                - description: The ID of the ruleset to execute.
-                  example: 4814384a9e5d4991b9815dcfc25d2f1f
-              matched_data:
-                description: The configuration to use for matched data logging.
-                properties:
-                  public_key:
-                    description: The public key to encrypt matched data logs with.
-                    example: iGqBmyIUxuWt1rvxoAharN9FUXneUBxA/Y19PyyrEG0=
-                    minLength: 1
-                    title: Public key
-                    type: string
-                required:
-                - public_key
-                title: Matched data
-                type: object
-              overrides:
-                description: A set of overrides to apply to the target ruleset.
-                minProperties: 1
-                properties:
-                  action:
-                    allOf:
-                    - $ref: '#/components/schemas/rulesets_RuleAction'
-                    - description: An action to override all rules with. This option has lower precedence than rule and category overrides.
-                      example: log
-                  categories:
-                    description: A list of category-level overrides. This option has the second-highest precedence after rule-level overrides.
-                    items:
-                      description: A category-level override
-                      minProperties: 2
-                      properties:
-                        action:
-                          allOf:
-                          - $ref: '#/components/schemas/rulesets_RuleAction'
-                          - description: The action to override rules in the category with.
-                            example: log
-                        category:
-                          allOf:
-                          - $ref: '#/components/schemas/rulesets_RuleCategory'
-                          - description: The name of the category to override.
-                        enabled:
-                          allOf:
-                          - $ref: '#/components/schemas/rulesets_RuleEnabled'
-                          - description: Whether to enable execution of rules in the category.
-                        sensitivity_level:
-                          allOf:
-                          - $ref: '#/components/schemas/rulesets_ExecuteSensitivityLevel'
-                          - description: The sensitivity level to use for rules in the category.
-                      required:
-                      - category
-                      title: Category override
-                      type: object
-                    minItems: 1
-                    title: Category overrides
-                    type: array
-                    uniqueItems: true
-                  enabled:
-                    allOf:
-                    - $ref: '#/components/schemas/rulesets_RuleEnabled'
-                    - description: Whether to enable execution of all rules. This option has lower precedence than rule and category overrides.
-                  rules:
-                    description: A list of rule-level overrides. This option has the highest precedence.
-                    items:
-                      description: A rule-level override
-                      minProperties: 2
-                      properties:
-                        action:
-                          allOf:
-                          - $ref: '#/components/schemas/rulesets_RuleAction'
-                          - description: The action to override the rule with.
-                            example: log
-                        enabled:
-                          allOf:
-                          - $ref: '#/components/schemas/rulesets_RuleEnabled'
-                          - description: Whether to enable execution of the rule.
-                        id:
-                          allOf:
-                          - $ref: '#/components/schemas/rulesets_RuleId'
-                          - description: The ID of the rule to override.
-                            example: 8ac8bc2a661e475d940980f9317f28e1
-                        score_threshold:
-                          description: The score threshold to use for the rule.
-                          title: Score threshold
-                          type: integer
-                        sensitivity_level:
-                          allOf:
-                          - $ref: '#/components/schemas/rulesets_ExecuteSensitivityLevel'
-                          - description: The sensitivity level to use for the rule.
-                      required:
-                      - id
-                      title: Rule override
-                      type: object
-                    minItems: 1
-                    title: Rule overrides
-                    type: array
-                    uniqueItems: true
-                  sensitivity_level:
-                    allOf:
-                    - $ref: '#/components/schemas/rulesets_ExecuteSensitivityLevel'
-                    - description: A sensitivity level to set for all rules. This option has lower precedence than rule and category overrides and is only applicable for DDoS phases.
-                title: Overrides
-                type: object
-            required:
-            - id
+            - js_challenge
           description:
-            example: Execute the OWASP ruleset when the IP address is not 1.1.1.1
-        title: Execute rule
-    rulesets_Message:
-      description: A message.
-      properties:
-        code:
-          description: A unique code for this message.
-          example: 10000
-          title: Code
-          type: integer
-        message:
-          description: A text description of this message.
-          example: something bad happened
-          minLength: 1
-          title: Description
-          type: string
-        source:
-          description: The source of this message.
-          properties:
-            pointer:
-              description: A JSON pointer to the field that is the source of the message.
-              example: /rules/0/action
-              minLength: 1
-              title: Pointer
-              type: string
-          required:
-          - pointer
-          title: Source
-          type: object
-      required:
-      - message
-      title: Message
-      type: object
-    rulesets_SkipRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - skip
-          action_parameters:
-            example:
-              ruleset: current
-            minProperties: 1
-            properties:
-              phases:
-                description: A list of phases to skip the execution of. This option is incompatible with the ruleset and rulesets options.
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/rulesets_RulesetPhase'
-                  - description: A phase to skip the execution of.
-                minItems: 1
-                title: Phases
-                type: array
-                uniqueItems: true
-              products:
-                description: A list of legacy security products to skip the execution of.
-                items:
-                  description: The name of a legacy security product to skip the execution of.
-                  enum:
-                  - bic
-                  - hot
-                  - rateLimit
-                  - securityLevel
-                  - uaBlock
-                  - waf
-                  - zoneLockdown
-                  title: Product
-                  type: string
-                minItems: 1
-                title: Products
-                type: array
-                uniqueItems: true
-              rules:
-                additionalProperties:
-                  description: A list of rule IDs in the ruleset to skip the execution of.
-                  items:
-                    allOf:
-                    - $ref: '#/components/schemas/rulesets_RuleId'
-                    - description: The ID of a rule in the ruleset to skip the execution of.
-                      example: 8ac8bc2a661e475d940980f9317f28e1
-                      title: Rule
-                  minItems: 1
-                  title: Rules
-                  type: array
-                  uniqueItems: true
-                description: A mapping of ruleset IDs to a list of rule IDs in that ruleset to skip the execution of. This option is incompatible with the ruleset option.
-                example:
-                  4814384a9e5d4991b9815dcfc25d2f1f:
-                  - 8ac8bc2a661e475d940980f9317f28e1
-                minProperties: 1
-                title: Rules
-                type: object
-              ruleset:
-                description: A ruleset to skip the execution of. This option is incompatible with the rulesets, rules and phases options.
-                enum:
-                - current
-                title: Ruleset
-                type: string
-              rulesets:
-                description: A list of ruleset IDs to skip the execution of. This option is incompatible with the ruleset and phases options.
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/rulesets_RulesetId'
-                  - description: The ID of a ruleset to skip the execution of.
-                    example: 4814384a9e5d4991b9815dcfc25d2f1f
-                    title: Ruleset
-                minItems: 1
-                title: Rulesets
-                type: array
-                uniqueItems: true
-          description:
-            example: Skip the current ruleset when the IP address is not 1.1.1.1
-        title: Skip rule
-    rulesets_Rule:
-      properties:
-        action:
-          $ref: '#/components/schemas/rulesets_RuleAction'
-        action_parameters:
-          description: The parameters configuring the rule's action.
-          title: Action parameters
-          type: object
-        categories:
-          description: The categories of the rule.
-          example:
-          - directory-traversal
-          - header
-          items:
-            $ref: '#/components/schemas/rulesets_RuleCategory'
-          minItems: 1
-          readOnly: true
-          title: Categories
-          type: array
-          uniqueItems: true
-        description:
-          default: ''
-          description: An informative description of the rule.
-          title: Description
-          type: string
-        enabled:
-          allOf:
-          - $ref: '#/components/schemas/rulesets_RuleEnabled'
-          - default: true
-        expression:
-          description: The expression defining which traffic will match the rule.
-          example: ip.src ne 1.1.1.1
-          minLength: 1
-          title: Expression
-          type: string
-        id:
-          $ref: '#/components/schemas/rulesets_RuleId'
-        last_updated:
-          description: The timestamp of when the rule was last modified.
-          example: '2000-01-01T00:00:00.000000Z'
-          format: date-time
-          readOnly: true
-          title: Last updated
-          type: string
-        logging:
-          description: An object configuring the rule's logging behavior.
-          properties:
-            enabled:
-              description: Whether to generate a log when the rule matches.
-              example: true
-              title: Enabled
-              type: boolean
-          required:
-          - enabled
-          title: Logging
-          type: object
-        ref:
-          description: The reference of the rule (the rule ID by default).
-          example: my_ref
-          minLength: 1
-          title: Ref
-          type: string
-        version:
-          description: The version of the rule.
-          example: '1'
-          pattern: ^[0-9]+$
-          readOnly: true
-          title: Version
-          type: string
-      required:
-      - version
-      - last_updated
-      title: Rule
-      type: object
-    rulesets_RuleEnabled:
-      description: Whether the rule should be executed.
-      example: true
-      title: Enabled
-      type: boolean
-    rulesets_ManagedChallengeRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - managed_challenge
-          description:
-            example: Issue a Managed Challenge if the visitor had not solved a Managed Challenge or Interactive Challenge prior to the request when the address is not 1.1.1.1
-        title: Managed Challenge rule
+            example: Issue a non-interactive Javascript Challenge if the visitor had not solved a Interactive Challenge, Managed Challenge, or Javascript Challenge prior to the request when the address is not 1.1.1.1
+        title: Javascript Challenge rule
+    rulesets_RuleAction:
+      description: The action to perform when the rule matches.
+      pattern: ^[a-z]+$
+      title: Action
+      type: string
     rulesets_RulesetVersion:
       description: The version of the ruleset.
       example: '1'
@@ -1715,160 +2004,12 @@ components:
       readOnly: true
       title: Version
       type: string
-    rulesets_AccountId:
-      description: The unique ID of the account.
-      example: abf9b32d38c5f572afde3336ec0ce302
-      pattern: ^[0-9a-f]{32}$
-      title: ID
-      type: string
-    rulesets_RuleCategory:
-      description: A category of the rule.
-      example: directory-traversal
-      minLength: 1
-      title: Category
-      type: string
-    rulesets_SetConfigRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - set_config
-          action_parameters:
-            properties:
-              automatic_https_rewrites:
-                description: Turn on or off Automatic HTTPS Rewrites.
-                title: Automatic HTTPS rewrites
-                type: boolean
-              autominify:
-                description: Select which file extensions to minify automatically.
-                properties:
-                  css:
-                    description: Minify CSS files.
-                    title: CSS
-                    type: boolean
-                  html:
-                    description: Minify HTML files.
-                    title: HTML
-                    type: boolean
-                  js:
-                    description: Minify JS files.
-                    title: JS
-                    type: boolean
-                title: Auto Minify
-                type: object
-              bic:
-                description: Turn on or off Browser Integrity Check.
-                title: Browser Integrity Check
-                type: boolean
-              disable_apps:
-                description: Turn off all active Cloudflare Apps.
-                enum:
-                - true
-                title: Disable Apps
-                type: boolean
-              disable_rum:
-                description: Turn off Real User Monitoring (RUM).
-                enum:
-                - true
-                title: Disable RUM
-                type: boolean
-              disable_zaraz:
-                description: Turn off Zaraz.
-                enum:
-                - true
-                title: Disable Zaraz
-                type: boolean
-              email_obfuscation:
-                description: Turn on or off Email Obfuscation.
-                title: Email Obfuscation
-                type: boolean
-              fonts:
-                description: Turn on or off Cloudflare Fonts.
-                title: Cloudflare Fonts
-                type: boolean
-              hotlink_protection:
-                description: Turn on or off the Hotlink Protection.
-                title: Hotlink Protection
-                type: boolean
-              mirage:
-                description: Turn on or off Mirage.
-                title: Mirage
-                type: boolean
-              opportunistic_encryption:
-                description: Turn on or off Opportunistic Encryption.
-                title: Opportunistic Encryption
-                type: boolean
-              polish:
-                description: Configure the Polish level.
-                enum:
-                - 'off'
-                - lossless
-                - lossy
-                title: Polish
-                type: string
-              rocket_loader:
-                description: Turn on or off Rocket Loader
-                title: Rocket Loader
-                type: boolean
-              security_level:
-                description: Configure the Security Level.
-                enum:
-                - 'off'
-                - essentially_off
-                - low
-                - medium
-                - high
-                - under_attack
-                title: Security Level
-                type: string
-              server_side_excludes:
-                description: Turn on or off Server Side Excludes.
-                title: Server Side Excludes
-                type: boolean
-              ssl:
-                description: Configure the SSL level.
-                enum:
-                - 'off'
-                - flexible
-                - full
-                - strict
-                - origin_pull
-                title: SSL
-                type: string
-              sxg:
-                description: Turn on or off Signed Exchanges (SXG).
-                title: Signed Exchanges (SXG)
-                type: boolean
-          description:
-            example: Disable Zaraz when IP address is not 1.1.1.1
-        title: Set Config Rule
-    rulesets_Errors:
-      description: A list of error messages.
+    rulesets_RequestRules:
+      description: The list of rules in the ruleset.
       items:
-        $ref: '#/components/schemas/rulesets_Message'
-      title: Errors
+        $ref: '#/components/schemas/rulesets_RequestRule'
+      title: Rules
       type: array
-    rulesets_ScoreRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - score
-          action_parameters:
-            example:
-              increment: 3
-            minProperties: 1
-            properties:
-              increment:
-                description: Increment contains the delta to change the score and can be either positive or negative.
-                example: 3
-                title: Increment
-                type: integer
-          description:
-            example: Increment score when the IP address is not 1.1.1.1
-        title: Score rule
     rulesets_LogCustomFieldRule:
       allOf:
       - $ref: '#/components/schemas/rulesets_Rule'
@@ -1942,98 +2083,6 @@ components:
           description:
             example: Log custom field when the IP address is not 1.1.1.1
         title: Log Custom Field rule
-    rulesets_RewriteUriPart:
-      oneOf:
-      - properties:
-          value:
-            description: Predefined replacement value.
-            example: /images
-            minLength: 1
-            type: string
-        required:
-        - value
-        title: Static value
-        type: object
-      - properties:
-          expression:
-            description: Expression to evaluate for the replacement value.
-            example: regex_replace(http.request.uri.path, "/bar$", "/baz")
-            minLength: 1
-            type: string
-        required:
-        - expression
-        title: Dynamic value
-        type: object
-    rulesets_LogRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - log
-          description:
-            example: Log when the IP address is not 1.1.1.1
-        title: Log rule
-    rulesets_Response:
-      description: A response object.
-      properties:
-        errors:
-          $ref: '#/components/schemas/rulesets_Errors'
-        messages:
-          $ref: '#/components/schemas/rulesets_Messages'
-        result:
-          description: A result.
-          title: Result
-        success:
-          description: Whether the API call was successful.
-          title: Success
-          type: boolean
-      required:
-      - result
-      - success
-      - errors
-      - messages
-      title: Response
-      type: object
-    rulesets_CompressResponseRule:
-      allOf:
-      - $ref: '#/components/schemas/rulesets_Rule'
-      - properties:
-          action:
-            enum:
-            - compress_response
-          action_parameters:
-            properties:
-              algorithms:
-                description: Custom order for compression algorithms.
-                example:
-                - name: none
-                items:
-                  description: Compression algorithm to enable.
-                  properties:
-                    name:
-                      description: Name of compression algorithm to enable.
-                      enum:
-                      - none
-                      - auto
-                      - default
-                      - gzip
-                      - brotli
-                      title: Name
-                      type: string
-                  title: Compression Algorithm
-                  type: object
-                title: Algorithm
-                type: array
-          description:
-            example: Disable compression when address is not 1.1.1.1
-        title: Compression rule
-    rulesets_RulesetId:
-      description: The unique ID of the ruleset.
-      example: 2f2feab2026849078ba485f918791bdc
-      pattern: ^[0-9a-f]{32}$
-      title: ID
-      type: string
     rulesets_RedirectRule:
       allOf:
       - $ref: '#/components/schemas/rulesets_Rule'
@@ -2102,84 +2151,24 @@ components:
           description:
             example: Redirect when IP address is not 1.1.1.1
         title: Redirect rule
-  responses:
-    rulesets_Ruleset:
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/rulesets_Response'
-            - properties:
-                errors:
-                  enum:
-                  - []
-                result:
-                  allOf:
-                  - $ref: '#/components/schemas/rulesets_Ruleset'
-                  - properties:
-                      kind:
-                        $ref: '#/components/schemas/rulesets_RulesetKind'
-                      phase:
-                        $ref: '#/components/schemas/rulesets_RulesetPhase'
-                      rules:
-                        $ref: '#/components/schemas/rulesets_ResponseRules'
-                    required:
-                    - name
-                    - kind
-                    - phase
-                    - rules
-                success:
-                  enum:
-                  - true
-      description: A ruleset response.
-    rulesets_Failure:
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/rulesets_Response'
-            - properties:
-                result:
-                  enum:
-                  - null
-                success:
-                  enum:
-                  - false
-      description: A failure response.
-    rulesets_Rulesets:
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/rulesets_Response'
-            - properties:
-                errors:
-                  enum:
-                  - []
-                result:
-                  description: A list of rulesets. The returned information will not include the rules in each ruleset.
-                  items:
-                    allOf:
-                    - $ref: '#/components/schemas/rulesets_Ruleset'
-                    - properties:
-                        kind:
-                          $ref: '#/components/schemas/rulesets_RulesetKind'
-                        phase:
-                          $ref: '#/components/schemas/rulesets_RulesetPhase'
-                      required:
-                      - name
-                      - kind
-                      - phase
-                  title: Rulesets
-                  type: array
-                success:
-                  enum:
-                  - true
-      description: A rulesets response.
-    rulesets_Empty:
-      description: An empty response.
+    rulesets_ChallengeRule:
+      allOf:
+      - $ref: '#/components/schemas/rulesets_Rule'
+      - properties:
+          action:
+            enum:
+            - challenge
+          description:
+            example: Issue an Interactive Challenge if the visitor had not solved an Interactive Challenge prior to the request when the address is not 1.1.1.1
+        title: Challenge rule
+    rulesets_RulesetId:
+      description: The unique ID of the ruleset.
+      example: 2f2feab2026849078ba485f918791bdc
+      pattern: ^[0-9a-f]{32}$
+      title: ID
+      type: string
   requestBodies:
-    rulesets_CreateRuleset:
+    rulesets_UpdateRuleset:
       content:
         application/json:
           schema:
@@ -2193,22 +2182,15 @@ components:
                 rules:
                   $ref: '#/components/schemas/rulesets_RequestRules'
               required:
-              - name
-              - kind
-              - phase
               - rules
       required: true
-    rulesets_UpdateRuleset:
+    rulesets_UpdateEntrypointRuleset:
       content:
         application/json:
           schema:
             allOf:
             - $ref: '#/components/schemas/rulesets_Ruleset'
             - properties:
-                kind:
-                  $ref: '#/components/schemas/rulesets_RulesetKind'
-                phase:
-                  $ref: '#/components/schemas/rulesets_RulesetPhase'
                 rules:
                   $ref: '#/components/schemas/rulesets_RequestRules'
               required:
@@ -2254,16 +2236,23 @@ components:
                           type: number
                       title: Index position
       required: true
-    rulesets_UpdateEntrypointRuleset:
+    rulesets_CreateRuleset:
       content:
         application/json:
           schema:
             allOf:
             - $ref: '#/components/schemas/rulesets_Ruleset'
             - properties:
+                kind:
+                  $ref: '#/components/schemas/rulesets_RulesetKind'
+                phase:
+                  $ref: '#/components/schemas/rulesets_RulesetPhase'
                 rules:
                   $ref: '#/components/schemas/rulesets_RequestRules'
               required:
+              - name
+              - kind
+              - phase
               - rules
       required: true
   securitySchemes:

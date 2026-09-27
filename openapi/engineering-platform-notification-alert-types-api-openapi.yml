@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Notification Alert Types API
+  title: Cloudflare Notification Alert Types API
   version: 4.0.0
 tags:
 - name: Notification Alert Types
@@ -64,10 +53,27 @@ components:
       description: Use this value when creating and updating a notification policy.
       example: http_alert_origin_error
       type: string
-    aaa_display_name:
-      description: Alert type name.
-      example: Origin Error Rate Alert
+    aaa_account-id:
+      description: The account id
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
       type: string
+    aaa_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     aaa_filter_options:
       description: 'Format of additional configuration options (filters) for the alert type. Data type of filters during policy creation: Array of strings.'
       example:
@@ -85,31 +91,6 @@ components:
         Range: 0-1
       items: {}
       type: array
-    aaa_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    aaa_account-id:
-      description: The account id
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
     aaa_schemas-api-response-common-failure:
       properties:
         errors:
@@ -133,45 +114,6 @@ components:
       - success
       - errors
       - messages
-      type: object
-    aaa_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/aaa_result_info'
-      type: object
-    aaa_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/aaa_messages'
-        messages:
-          $ref: '#/components/schemas/aaa_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    aaa_description:
-      description: Describes the alert type.
-      example: High levels of 5xx HTTP errors at your origin
-      type: string
-    aaa_alert-types:
-      properties:
-        description:
-          $ref: '#/components/schemas/aaa_description'
-        display_name:
-          $ref: '#/components/schemas/aaa_display_name'
-        filter_options:
-          $ref: '#/components/schemas/aaa_filter_options'
-        type:
-          $ref: '#/components/schemas/aaa_type'
       type: object
     aaa_response_collection:
       allOf:
@@ -201,21 +143,68 @@ components:
                   Range: 0-1
                 type: http_alert_origin_error
             type: object
-    aaa_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    aaa_description:
+      description: Describes the alert type.
+      example: High levels of 5xx HTTP errors at your origin
+      type: string
+    aaa_alert-types:
+      properties:
+        description:
+          $ref: '#/components/schemas/aaa_description'
+        display_name:
+          $ref: '#/components/schemas/aaa_display_name'
+        filter_options:
+          $ref: '#/components/schemas/aaa_filter_options'
+        type:
+          $ref: '#/components/schemas/aaa_type'
+      type: object
+    aaa_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    aaa_display_name:
+      description: Alert type name.
+      example: Origin Error Rate Alert
+      type: string
+    aaa_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/aaa_messages'
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/aaa_result_info'
+      type: object
   securitySchemes:
     api_email:
       in: header

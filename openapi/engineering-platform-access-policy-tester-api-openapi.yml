@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Access Policy Tester API
+  title: Cloudflare Access Policy Tester API
   version: 4.0.0
 tags:
 - name: Access Policy Tester
@@ -86,7 +75,7 @@ paths:
       security:
       - api_email: []
         api_key: []
-      summary: APIs.io Engineering Platform Get the current status of a given Access policy test
+      summary: APIs.io Engineering Platform Get the current status of a given Access policy…
       tags:
       - Access Policy Tester
   /accounts/{account_id}/access/policy-tests/{policy_test_id}/users:
@@ -125,42 +114,11 @@ paths:
       - Access Policy Tester
 components:
   schemas:
-    access_policy_test_id:
-      description: The UUID of the policy test.
-      example: f1a8b3c9d4e5f6789a0b1c2d3e4f5678a9b0c1d2e3f4a5b67890c1d2e3f4b5a6
-      maxLength: 64
+    access_email:
+      description: The email of the user.
+      example: jdoe@example.com
+      format: email
       type: string
-    access_policy_resp:
-      properties:
-        approval_groups:
-          $ref: '#/components/schemas/access_approval_groups'
-        approval_required:
-          $ref: '#/components/schemas/access_approval_required'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        decision:
-          $ref: '#/components/schemas/access_decision'
-        exclude:
-          $ref: '#/components/schemas/access_schemas-exclude'
-        id:
-          $ref: '#/components/schemas/access_schemas-uuid'
-        include:
-          $ref: '#/components/schemas/access_include'
-        isolation_required:
-          $ref: '#/components/schemas/access_isolation_required'
-        name:
-          $ref: '#/components/schemas/access_policy_components-schemas-name'
-        purpose_justification_prompt:
-          $ref: '#/components/schemas/access_purpose_justification_prompt'
-        purpose_justification_required:
-          $ref: '#/components/schemas/access_purpose_justification_required'
-        require:
-          $ref: '#/components/schemas/access_schemas-require'
-        session_duration:
-          $ref: '#/components/schemas/access_components-schemas-session_duration'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      type: object
     access_everyone_rule:
       description: Matches everyone.
       properties:
@@ -172,21 +130,10 @@ components:
       - everyone
       title: Everyone
       type: object
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    access_purpose_justification_prompt:
+      description: A custom message that will appear on the purpose justification screen.
+      example: Please enter a justification for entering this protected domain.
+      type: string
     access_decision:
       description: The action Access will take if a user matches this policy.
       enum:
@@ -195,6 +142,49 @@ components:
       - non_identity
       - bypass
       example: allow
+      type: string
+    access_okta_group_rule:
+      description: 'Matches an Okta group.
+
+        Requires an Okta identity provider.'
+      properties:
+        okta:
+          properties:
+            identity_provider_id:
+              description: The ID of your Okta identity provider.
+              example: ea85612a-29c8-46c2-bacb-669d65136971
+              type: string
+            name:
+              description: The name of the Okta group.
+              example: devs
+              type: string
+          required:
+          - name
+          - identity_provider_id
+          type: object
+      required:
+      - okta
+      title: Okta group
+      type: object
+    access_email_list_rule:
+      description: Matches an email address from a list.
+      properties:
+        email_list:
+          properties:
+            id:
+              description: The ID of a previously created email list.
+              example: aa0a4aab-672b-4bdb-bc33-a59f1130a11f
+              type: string
+          required:
+          - id
+          type: object
+      required:
+      - email_list
+      title: Email list
+      type: object
+    access_policy_components-schemas-name:
+      description: The name of the Access policy.
+      example: Allow devs
       type: string
     access_email_rule:
       description: Matches a specific email.
@@ -213,10 +203,32 @@ components:
       - email
       title: Email
       type: object
-    access_users_components-schemas-name:
-      description: The name of the user.
-      example: Jane Doe
-      type: string
+    access_isolation_required:
+      default: false
+      description: Require this application to be served in an isolated browser for users matching this policy. 'Client Web Isolation' must be on for the account in order to use this feature.
+      example: false
+      type: boolean
+    access_schemas-require:
+      description: Rules evaluated with an AND logical operator. To match the policy, a user must meet all of the Require rules.
+      items:
+        $ref: '#/components/schemas/access_rule'
+      type: array
+    access_authentication_method_rule:
+      description: Enforce different MFA options
+      properties:
+        auth_method:
+          properties:
+            auth_method:
+              description: The type of authentication method https://datatracker.ietf.org/doc/html/rfc8176#section-2.
+              example: mfa
+              type: string
+          required:
+          - auth_method
+          type: object
+      required:
+      - auth_method
+      title: Authentication method
+      type: object
     access_policy_update_resp:
       properties:
         id:
@@ -238,122 +250,22 @@ components:
         users_blocked:
           $ref: '#/components/schemas/access_users_blocked'
       type: object
-    access_api-response-common-failure:
+    access_certificate_rule:
+      description: Matches any valid client certificate.
+      example:
+        certificate: {}
       properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/access_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/access_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    access_approval_required:
-      default: false
-      description: Requires the user to request access from an administrator at the start of each session.
-      example: true
-      type: boolean
-    access_authentication_method_rule:
-      description: Enforce different MFA options
-      properties:
-        auth_method:
-          properties:
-            auth_method:
-              description: The type of authentication method https://datatracker.ietf.org/doc/html/rfc8176#section-2.
-              example: mfa
-              type: string
-          required:
-          - auth_method
+        certificate:
+          example: {}
           type: object
       required:
-      - auth_method
-      title: Authentication method
+      - certificate
+      title: Valid certificate
       type: object
-    access_schemas-exclude:
-      description: Rules evaluated with a NOT logical operator. To match the policy, a user cannot meet any of the Exclude rules.
-      items:
-        $ref: '#/components/schemas/access_rule'
-      type: array
-    access_pages_processed:
-      description: The number of pages of (processed) users.
-      example: 2
+    access_total_users:
+      description: The total number of users in the user base.
+      example: 20
       type: integer
-    access_azure_group_rule:
-      description: 'Matches an Azure group.
-
-        Requires an Azure identity provider.'
-      properties:
-        azureAD:
-          properties:
-            id:
-              description: The ID of an Azure group.
-              example: aa0a4aab-672b-4bdb-bc33-a59f1130a11f
-              type: string
-            identity_provider_id:
-              description: The ID of your Azure identity provider.
-              example: ea85612a-29c8-46c2-bacb-669d65136971
-              type: string
-          required:
-          - id
-          - identity_provider_id
-          type: object
-      required:
-      - azureAD
-      title: Azure group
-      type: object
-    access_access_group_rule:
-      description: Matches an Access group.
-      properties:
-        group:
-          properties:
-            id:
-              description: The ID of a previously created Access group.
-              example: aa0a4aab-672b-4bdb-bc33-a59f1130a11f
-              type: string
-          required:
-          - id
-          type: object
-      required:
-      - group
-      title: Access groups
-      type: object
-    access_service_token_rule:
-      description: Matches a specific Access Service Token
-      properties:
-        service_token:
-          properties:
-            token_id:
-              description: The ID of a Service Token.
-              example: aa0a4aab-672b-4bdb-bc33-a59f1130a11f
-              type: string
-          required:
-          - token_id
-          type: object
-      required:
-      - service_token
-      title: Service Token
-      type: object
     access_gsuite_group_rule:
       description: 'Matches a group in Google Workspace.
 
@@ -377,11 +289,6 @@ components:
       - gsuite
       title: Google Workspace group
       type: object
-    access_components-schemas-session_duration:
-      default: 24h
-      description: 'The amount of time that tokens issued for the application will be valid. Must be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms, s, m, h.'
-      example: 24h
-      type: string
     access_ip_rule:
       description: Matches an IP address block.
       properties:
@@ -398,33 +305,24 @@ components:
       - ip
       title: IP ranges
       type: object
-    access_policy_components-schemas-name:
-      description: The name of the Access policy.
-      example: Allow devs
+    access_policy_test_id:
+      description: The UUID of the policy test.
+      example: f1a8b3c9d4e5f6789a0b1c2d3e4f5678a9b0c1d2e3f4a5b67890c1d2e3f4b5a6
+      maxLength: 64
       type: string
-    access_percent_approved:
-      description: The percentage of (processed) users approved based on policy evaluation results.
-      example: 25
+    access_users_blocked:
+      description: The number of (processed) users blocked based on policy evaluation results.
+      example: 5
       type: integer
-    access_policy_users:
-      properties:
-        email:
-          $ref: '#/components/schemas/access_email'
-        id:
-          $ref: '#/components/schemas/access_uuid'
-        name:
-          $ref: '#/components/schemas/access_users_components-schemas-name'
-        status:
-          $ref: '#/components/schemas/access_user_result'
-      type: object
-    access_update_status:
-      description: The status of the policy test.
-      enum:
-      - blocked
-      - processing
-      - complete
-      example: complete
+    access_users_components-schemas-name:
+      description: The name of the user.
+      example: Jane Doe
       type: string
+    access_policy_users_resp:
+      description: Page of processed users.
+      items:
+        $ref: '#/components/schemas/access_policy_users'
+      type: array
     access_any_valid_service_token_rule:
       description: Matches any valid Access Service Token
       properties:
@@ -436,6 +334,32 @@ components:
       - any_valid_service_token
       title: Any Valid Service Token
       type: object
+    access_access_group_rule:
+      description: Matches an Access group.
+      properties:
+        group:
+          properties:
+            id:
+              description: The ID of a previously created Access group.
+              example: aa0a4aab-672b-4bdb-bc33-a59f1130a11f
+              type: string
+          required:
+          - id
+          type: object
+      required:
+      - group
+      title: Access groups
+      type: object
+    access_schemas-exclude:
+      description: Rules evaluated with a NOT logical operator. To match the policy, a user cannot meet any of the Exclude rules.
+      items:
+        $ref: '#/components/schemas/access_rule'
+      type: array
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     access_policy_init_resp:
       properties:
         id:
@@ -443,57 +367,100 @@ components:
         status:
           $ref: '#/components/schemas/access_status'
       type: object
-    access_saml_group_rule:
-      description: 'Matches a SAML group.
-
-        Requires a SAML identity provider.'
+    access_status:
+      description: The status of the policy test request.
+      enum:
+      - success
+      example: success
+      type: string
+    access_rule:
+      oneOf:
+      - $ref: '#/components/schemas/access_email_rule'
+      - $ref: '#/components/schemas/access_email_list_rule'
+      - $ref: '#/components/schemas/access_domain_rule'
+      - $ref: '#/components/schemas/access_everyone_rule'
+      - $ref: '#/components/schemas/access_ip_rule'
+      - $ref: '#/components/schemas/access_ip_list_rule'
+      - $ref: '#/components/schemas/access_certificate_rule'
+      - $ref: '#/components/schemas/access_access_group_rule'
+      - $ref: '#/components/schemas/access_azure_group_rule'
+      - $ref: '#/components/schemas/access_github_organization_rule'
+      - $ref: '#/components/schemas/access_gsuite_group_rule'
+      - $ref: '#/components/schemas/access_okta_group_rule'
+      - $ref: '#/components/schemas/access_saml_group_rule'
+      - $ref: '#/components/schemas/access_service_token_rule'
+      - $ref: '#/components/schemas/access_any_valid_service_token_rule'
+      - $ref: '#/components/schemas/access_external_evaluation_rule'
+      - $ref: '#/components/schemas/access_country_rule'
+      - $ref: '#/components/schemas/access_authentication_method_rule'
+      - $ref: '#/components/schemas/access_device_posture_rule'
+      type: object
+    access_external_evaluation_rule:
+      description: Create Allow or Block policies which evaluate the user based on custom criteria.
       properties:
-        saml:
+        external_evaluation:
           properties:
-            attribute_name:
-              description: The name of the SAML attribute.
-              example: group
+            evaluate_url:
+              description: The API endpoint containing your business logic.
+              example: https://eval.example.com
               type: string
-            attribute_value:
-              description: The SAML attribute value to look for.
-              example: devs@cloudflare.com
-              type: string
-            identity_provider_id:
-              description: The ID of your SAML identity provider.
-              example: ea85612a-29c8-46c2-bacb-669d65136971
+            keys_url:
+              description: The API endpoint containing the key that Access uses to verify that the response came from your API.
+              example: https://eval.example.com/keys
               type: string
           required:
-          - attribute_name
-          - attribute_value
-          - identity_provider_id
+          - evaluate_url
+          - keys_url
           type: object
       required:
-      - saml
-      title: SAML group
+      - external_evaluation
+      title: External Evaluation
       type: object
-    access_github_organization_rule:
-      description: 'Matches a Github organization.
-
-        Requires a Github identity provider.'
+    access_schemas-uuid:
+      description: The UUID of the policy
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    access_update_status:
+      description: The status of the policy test.
+      enum:
+      - blocked
+      - processing
+      - complete
+      example: complete
+      type: string
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    access_policy_users:
       properties:
-        github-organization:
-          properties:
-            identity_provider_id:
-              description: The ID of your Github identity provider.
-              example: ea85612a-29c8-46c2-bacb-669d65136971
-              type: string
-            name:
-              description: The name of the organization.
-              example: cloudflare
-              type: string
-          required:
-          - name
-          - identity_provider_id
-          type: object
-      required:
-      - github-organization
-      title: Github organization
+        email:
+          $ref: '#/components/schemas/access_email'
+        id:
+          $ref: '#/components/schemas/access_uuid'
+        name:
+          $ref: '#/components/schemas/access_users_components-schemas-name'
+        status:
+          $ref: '#/components/schemas/access_user_result'
       type: object
+    access_approval_groups:
+      description: Administrators who can approve a temporary authentication request.
+      example:
+      - approvals_needed: 1
+        email_addresses:
+        - test1@cloudflare.com
+        - test2@cloudflare.com
+      - approvals_needed: 3
+        email_list_uuid: 597147a1-976b-4ef2-9af0-81d5d007fc34
+      items:
+        $ref: '#/components/schemas/access_approval_group'
+      type: array
+    access_percent_approved:
+      description: The percentage of (processed) users approved based on policy evaluation results.
+      example: 25
+      type: integer
     access_country_rule:
       description: Matches a specific country
       properties:
@@ -526,61 +493,41 @@ components:
       - email_domain
       title: Email domain
       type: object
-    access_purpose_justification_prompt:
-      description: A custom message that will appear on the purpose justification screen.
-      example: Please enter a justification for entering this protected domain.
-      type: string
-    access_policy_users_resp:
-      description: Page of processed users.
-      items:
-        $ref: '#/components/schemas/access_policy_users'
-      type: array
-    access_schemas-require:
-      description: Rules evaluated with an AND logical operator. To match the policy, a user must meet all of the Require rules.
-      items:
-        $ref: '#/components/schemas/access_rule'
-      type: array
     access_percent_blocked:
       description: The percentage of (processed) users blocked based on policy evaluation results.
       example: 25
       type: integer
-    access_email:
-      description: The email of the user.
-      example: jdoe@example.com
-      format: email
-      type: string
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    access_external_evaluation_rule:
-      description: Create Allow or Block policies which evaluate the user based on custom criteria.
+    access_policy_resp:
       properties:
-        external_evaluation:
-          properties:
-            evaluate_url:
-              description: The API endpoint containing your business logic.
-              example: https://eval.example.com
-              type: string
-            keys_url:
-              description: The API endpoint containing the key that Access uses to verify that the response came from your API.
-              example: https://eval.example.com/keys
-              type: string
-          required:
-          - evaluate_url
-          - keys_url
-          type: object
-      required:
-      - external_evaluation
-      title: External Evaluation
+        approval_groups:
+          $ref: '#/components/schemas/access_approval_groups'
+        approval_required:
+          $ref: '#/components/schemas/access_approval_required'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        decision:
+          $ref: '#/components/schemas/access_decision'
+        exclude:
+          $ref: '#/components/schemas/access_schemas-exclude'
+        id:
+          $ref: '#/components/schemas/access_schemas-uuid'
+        include:
+          $ref: '#/components/schemas/access_include'
+        isolation_required:
+          $ref: '#/components/schemas/access_isolation_required'
+        name:
+          $ref: '#/components/schemas/access_policy_components-schemas-name'
+        purpose_justification_prompt:
+          $ref: '#/components/schemas/access_purpose_justification_prompt'
+        purpose_justification_required:
+          $ref: '#/components/schemas/access_purpose_justification_required'
+        require:
+          $ref: '#/components/schemas/access_schemas-require'
+        session_duration:
+          $ref: '#/components/schemas/access_components-schemas-session_duration'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
       type: object
-    access_user_result:
-      description: Policy evaluation result for an individual user.
-      enum:
-      - approved
-      - blocked
-      example: approved
-      type: string
     access_approval_group:
       description: A group of email addresses that can approve a temporary authentication request.
       properties:
@@ -603,15 +550,104 @@ components:
       required:
       - approvals_needed
       type: object
-    access_purpose_justification_required:
-      default: false
-      description: Require users to enter a justification when they log in to the application.
-      example: true
-      type: boolean
-    access_total_users:
-      description: The total number of users in the user base.
-      example: 20
+    access_percent_users_processed:
+      description: The percentage of users processed so far (of the entire user base).
+      example: 50
       type: integer
+    access_users_approved:
+      description: The number of (processed) users approved based on policy evaluation results.
+      example: 5
+      type: integer
+    access_pages_processed:
+      description: The number of pages of (processed) users.
+      example: 2
+      type: integer
+    access_github_organization_rule:
+      description: 'Matches a Github organization.
+
+        Requires a Github identity provider.'
+      properties:
+        github-organization:
+          properties:
+            identity_provider_id:
+              description: The ID of your Github identity provider.
+              example: ea85612a-29c8-46c2-bacb-669d65136971
+              type: string
+            name:
+              description: The name of the organization.
+              example: cloudflare
+              type: string
+          required:
+          - name
+          - identity_provider_id
+          type: object
+      required:
+      - github-organization
+      title: Github organization
+      type: object
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    access_azure_group_rule:
+      description: 'Matches an Azure group.
+
+        Requires an Azure identity provider.'
+      properties:
+        azureAD:
+          properties:
+            id:
+              description: The ID of an Azure group.
+              example: aa0a4aab-672b-4bdb-bc33-a59f1130a11f
+              type: string
+            identity_provider_id:
+              description: The ID of your Azure identity provider.
+              example: ea85612a-29c8-46c2-bacb-669d65136971
+              type: string
+          required:
+          - id
+          - identity_provider_id
+          type: object
+      required:
+      - azureAD
+      title: Azure group
+      type: object
+    access_include:
+      description: Rules evaluated with an OR logical operator. A user needs to meet only one of the Include rules.
+      items:
+        $ref: '#/components/schemas/access_rule'
+      type: array
+    access_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/access_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/access_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     access_ip_list_rule:
       description: Matches an IP address from a list.
       properties:
@@ -628,49 +664,36 @@ components:
       - ip_list
       title: IP list
       type: object
-    access_users_blocked:
-      description: The number of (processed) users blocked based on policy evaluation results.
-      example: 5
-      type: integer
-    access_percent_users_processed:
-      description: The percentage of users processed so far (of the entire user base).
-      example: 50
-      type: integer
-    access_certificate_rule:
-      description: Matches any valid client certificate.
-      example:
-        certificate: {}
-      properties:
-        certificate:
-          example: {}
-          type: object
-      required:
-      - certificate
-      title: Valid certificate
-      type: object
-    access_okta_group_rule:
-      description: 'Matches an Okta group.
-
-        Requires an Okta identity provider.'
-      properties:
-        okta:
-          properties:
-            identity_provider_id:
-              description: The ID of your Okta identity provider.
-              example: ea85612a-29c8-46c2-bacb-669d65136971
-              type: string
-            name:
-              description: The name of the Okta group.
-              example: devs
-              type: string
-          required:
-          - name
-          - identity_provider_id
-          type: object
-      required:
-      - okta
-      title: Okta group
-      type: object
+    access_purpose_justification_required:
+      default: false
+      description: Require users to enter a justification when they log in to the application.
+      example: true
+      type: boolean
+    access_components-schemas-session_duration:
+      default: 24h
+      description: 'The amount of time that tokens issued for the application will be valid. Must be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms, s, m, h.'
+      example: 24h
+      type: string
+    access_approval_required:
+      default: false
+      description: Requires the user to request access from an administrator at the start of each session.
+      example: true
+      type: boolean
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     access_device_posture_rule:
       description: Enforces a device posture rule has run successfully
       properties:
@@ -687,91 +710,57 @@ components:
       - device_posture
       title: Device Posture
       type: object
-    access_approval_groups:
-      description: Administrators who can approve a temporary authentication request.
-      example:
-      - approvals_needed: 1
-        email_addresses:
-        - test1@cloudflare.com
-        - test2@cloudflare.com
-      - approvals_needed: 3
-        email_list_uuid: 597147a1-976b-4ef2-9af0-81d5d007fc34
-      items:
-        $ref: '#/components/schemas/access_approval_group'
-      type: array
-    access_include:
-      description: Rules evaluated with an OR logical operator. A user needs to meet only one of the Include rules.
-      items:
-        $ref: '#/components/schemas/access_rule'
-      type: array
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    access_schemas-uuid:
-      description: The UUID of the policy
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    access_email_list_rule:
-      description: Matches an email address from a list.
+    access_service_token_rule:
+      description: Matches a specific Access Service Token
       properties:
-        email_list:
+        service_token:
           properties:
-            id:
-              description: The ID of a previously created email list.
+            token_id:
+              description: The ID of a Service Token.
               example: aa0a4aab-672b-4bdb-bc33-a59f1130a11f
               type: string
           required:
-          - id
+          - token_id
           type: object
       required:
-      - email_list
-      title: Email list
+      - service_token
+      title: Service Token
       type: object
-    access_rule:
-      oneOf:
-      - $ref: '#/components/schemas/access_email_rule'
-      - $ref: '#/components/schemas/access_email_list_rule'
-      - $ref: '#/components/schemas/access_domain_rule'
-      - $ref: '#/components/schemas/access_everyone_rule'
-      - $ref: '#/components/schemas/access_ip_rule'
-      - $ref: '#/components/schemas/access_ip_list_rule'
-      - $ref: '#/components/schemas/access_certificate_rule'
-      - $ref: '#/components/schemas/access_access_group_rule'
-      - $ref: '#/components/schemas/access_azure_group_rule'
-      - $ref: '#/components/schemas/access_github_organization_rule'
-      - $ref: '#/components/schemas/access_gsuite_group_rule'
-      - $ref: '#/components/schemas/access_okta_group_rule'
-      - $ref: '#/components/schemas/access_saml_group_rule'
-      - $ref: '#/components/schemas/access_service_token_rule'
-      - $ref: '#/components/schemas/access_any_valid_service_token_rule'
-      - $ref: '#/components/schemas/access_external_evaluation_rule'
-      - $ref: '#/components/schemas/access_country_rule'
-      - $ref: '#/components/schemas/access_authentication_method_rule'
-      - $ref: '#/components/schemas/access_device_posture_rule'
-      type: object
-    access_users_approved:
-      description: The number of (processed) users approved based on policy evaluation results.
-      example: 5
-      type: integer
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    access_status:
-      description: The status of the policy test request.
+    access_user_result:
+      description: Policy evaluation result for an individual user.
       enum:
-      - success
-      example: success
+      - approved
+      - blocked
+      example: approved
       type: string
-    access_isolation_required:
-      default: false
-      description: Require this application to be served in an isolated browser for users matching this policy. 'Client Web Isolation' must be on for the account in order to use this feature.
-      example: false
-      type: boolean
+    access_saml_group_rule:
+      description: 'Matches a SAML group.
+
+        Requires a SAML identity provider.'
+      properties:
+        saml:
+          properties:
+            attribute_name:
+              description: The name of the SAML attribute.
+              example: group
+              type: string
+            attribute_value:
+              description: The SAML attribute value to look for.
+              example: devs@cloudflare.com
+              type: string
+            identity_provider_id:
+              description: The ID of your SAML identity provider.
+              example: ea85612a-29c8-46c2-bacb-669d65136971
+              type: string
+          required:
+          - attribute_name
+          - attribute_value
+          - identity_provider_id
+          type: object
+      required:
+      - saml
+      title: SAML group
+      type: object
   securitySchemes:
     api_email:
       in: header

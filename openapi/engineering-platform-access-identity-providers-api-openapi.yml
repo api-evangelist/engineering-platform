@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Access Identity Providers API
+  title: Cloudflare Access Identity Providers API
   version: 4.0.0
 tags:
 - name: Access Identity Providers
@@ -203,32 +192,212 @@ paths:
       - 'Access: Organizations, Identity Providers, and Groups Write'
 components:
   schemas:
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
+    access_components-schemas-name:
+      description: The name of the identity provider, shown to users on the login page.
+      example: Widget Corps IDP
+      type: string
+    access_google-apps:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+            - properties:
+                apps_domain:
+                  description: Your companies TLD
+                  example: mycompany.com
+                  type: string
+              type: object
         type: object
-        uniqueItems: true
-      type: array
-    access_generic-oauth-config:
+      title: Google Workspace
+      type: object
+    access_azureAD:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+            - properties:
+                conditional_access_enabled:
+                  description: Should Cloudflare try to load authentication contexts from your account
+                  type: boolean
+                directory_id:
+                  description: Your Azure directory uuid
+                  example: <your azure directory uuid>
+                  type: string
+                prompt:
+                  description: Indicates the type of user interaction that is required. prompt=login forces the user to enter their credentials on that request, negating single-sign on. prompt=none is the opposite. It ensures that the user isn't presented with any interactive prompt. If the request can't be completed silently by using single-sign on, the Microsoft identity platform returns an interaction_required error. prompt=select_account interrupts single sign-on providing account selection experience listing all the accounts either in session or any remembered account or an option to choose to use a different account altogether.
+                  enum:
+                  - login
+                  - select_account
+                  - none
+                  type: string
+                support_groups:
+                  description: Should Cloudflare try to load groups from your account
+                  type: boolean
+              type: object
+        type: object
+      title: Azure AD
+      type: object
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
+    access_facebook:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            $ref: '#/components/schemas/access_generic-oauth-config'
+        type: object
+      title: Facebook
+      type: object
+    access_google:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+        type: object
+      title: Google
+      type: object
+    access_id_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/access_uuid'
+            type: object
+    access_yandex:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            $ref: '#/components/schemas/access_generic-oauth-config'
+        type: object
+      title: Yandex
+      type: object
+    access_centrify:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+            - properties:
+                centrify_account:
+                  description: Your centrify account url
+                  example: https://abc123.my.centrify.com/
+                  type: string
+                centrify_app_id:
+                  description: Your centrify app id
+                  example: exampleapp
+                  type: string
+              type: object
+        type: object
+      title: Centrify
+      type: object
+    access_github:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            $ref: '#/components/schemas/access_generic-oauth-config'
+        type: object
+      title: GitHub
+      type: object
+    access_identity-providers:
+      anyOf:
+      - $ref: '#/components/schemas/access_azureAD'
+      - $ref: '#/components/schemas/access_centrify'
+      - $ref: '#/components/schemas/access_facebook'
+      - $ref: '#/components/schemas/access_github'
+      - $ref: '#/components/schemas/access_google'
+      - $ref: '#/components/schemas/access_google-apps'
+      - $ref: '#/components/schemas/access_linkedin'
+      - $ref: '#/components/schemas/access_oidc'
+      - $ref: '#/components/schemas/access_okta'
+      - $ref: '#/components/schemas/access_onelogin'
+      - $ref: '#/components/schemas/access_pingone'
+      - $ref: '#/components/schemas/access_saml'
+      - $ref: '#/components/schemas/access_yandex'
+      - $ref: '#/components/schemas/access_onetimepin'
+    access_custom-claims-support:
       properties:
-        client_id:
-          description: Your OAuth Client ID
-          example: <your client id>
-          type: string
-        client_secret:
-          description: Your OAuth Client Secret
-          example: <your client secret>
+        claims:
+          description: Custom claims
+          example:
+          - email_verified
+          - preferred_username
+          - custom_claim_name
+          items:
+            type: string
+          type: array
+        email_claim_name:
+          description: The claim name for email in the id_token response.
+          example: custom_claim_name
           type: string
       type: object
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    access_onelogin:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+            - properties:
+                onelogin_account:
+                  description: Your OneLogin account url
+                  example: https://mycompany.onelogin.com
+                  type: string
+              type: object
+        type: object
+      title: OneLogin
+      type: object
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
     access_response_collection:
       allOf:
       - $ref: '#/components/schemas/access_api-response-collection'
@@ -252,6 +421,138 @@ components:
             type: array
         type: object
       type: object
+    access_generic-oauth-config:
+      properties:
+        client_id:
+          description: Your OAuth Client ID
+          example: <your client id>
+          type: string
+        client_secret:
+          description: Your OAuth Client Secret
+          example: <your client secret>
+          type: string
+      type: object
+    access_oidc:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+            - properties:
+                auth_url:
+                  description: The authorization_endpoint URL of your IdP
+                  example: https://accounts.google.com/o/oauth2/auth
+                  type: string
+                certs_url:
+                  description: The jwks_uri endpoint of your IdP to allow the IdP keys to sign the tokens
+                  example: https://www.googleapis.com/oauth2/v3/certs
+                  type: string
+                scopes:
+                  description: OAuth scopes
+                  example:
+                  - openid
+                  - email
+                  - profile
+                  items:
+                    type: string
+                  type: array
+                token_url:
+                  description: The token_endpoint URL of your IdP
+                  example: https://accounts.google.com/o/oauth2/token
+                  type: string
+              type: object
+        type: object
+      title: Generic OAuth
+      type: object
+    access_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    access_saml:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            properties:
+              attributes:
+                description: A list of SAML attribute names that will be added to your signed JWT token and can be used in SAML policy rules.
+                example:
+                - group
+                - department_code
+                - divison
+                items:
+                  type: string
+                type: array
+              email_attribute_name:
+                description: The attribute name for email in the SAML response.
+                example: Email
+                type: string
+              header_attributes:
+                description: Add a list of attribute names that will be returned in the response header from the Access callback.
+                items:
+                  properties:
+                    attribute_name:
+                      description: attribute name from the IDP
+                      type: string
+                    header_name:
+                      description: header that will be added on the request to the origin
+                      type: string
+                  type: object
+                type: array
+              idp_public_certs:
+                description: X509 certificate to verify the signature in the SAML authentication response
+                items:
+                  type: string
+                type: array
+              issuer_url:
+                description: IdP Entity ID or Issuer URL
+                example: https://whoami.com
+                type: string
+              sign_request:
+                description: Sign the SAML authentication request with Access credentials. To verify the signature, use the public key from the Access certs endpoints.
+                type: boolean
+              sso_target_url:
+                description: URL to send the SAML authentication requests to
+                example: https://edgeaccess.org/idp/saml/login
+                type: string
+            type: object
+        type: object
+      title: Generic SAML
+      type: object
+    access_onetimepin:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            type: object
+          type:
+            enum:
+            - onetimepin
+      title: One Time Pin
+      type: object
+    access_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/access_identity-providers'
     access_api-response-common-failure:
       properties:
         errors:
@@ -282,83 +583,6 @@ components:
       - errors
       - messages
       - result
-      type: object
-    access_onelogin:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-            - properties:
-                onelogin_account:
-                  description: Your OneLogin account url
-                  example: https://mycompany.onelogin.com
-                  type: string
-              type: object
-        type: object
-      title: OneLogin
-      type: object
-    access_facebook:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            $ref: '#/components/schemas/access_generic-oauth-config'
-        type: object
-      title: Facebook
-      type: object
-    access_identity-providers:
-      anyOf:
-      - $ref: '#/components/schemas/access_azureAD'
-      - $ref: '#/components/schemas/access_centrify'
-      - $ref: '#/components/schemas/access_facebook'
-      - $ref: '#/components/schemas/access_github'
-      - $ref: '#/components/schemas/access_google'
-      - $ref: '#/components/schemas/access_google-apps'
-      - $ref: '#/components/schemas/access_linkedin'
-      - $ref: '#/components/schemas/access_oidc'
-      - $ref: '#/components/schemas/access_okta'
-      - $ref: '#/components/schemas/access_onelogin'
-      - $ref: '#/components/schemas/access_pingone'
-      - $ref: '#/components/schemas/access_saml'
-      - $ref: '#/components/schemas/access_yandex'
-      - $ref: '#/components/schemas/access_onetimepin'
-    access_yandex:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            $ref: '#/components/schemas/access_generic-oauth-config'
-        type: object
-      title: Yandex
-      type: object
-    access_id_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/access_uuid'
-            type: object
-    access_google-apps:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-            - properties:
-                apps_domain:
-                  description: Your companies TLD
-                  example: mycompany.com
-                  type: string
-              type: object
-        type: object
-      title: Google Workspace
       type: object
     access_identity-provider:
       properties:
@@ -412,16 +636,7 @@ components:
       - type
       - config
       type: object
-    access_github:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            $ref: '#/components/schemas/access_generic-oauth-config'
-        type: object
-      title: GitHub
-      type: object
-    access_azureAD:
+    access_okta:
       allOf:
       - $ref: '#/components/schemas/access_identity-provider'
       - properties:
@@ -430,61 +645,33 @@ components:
             - $ref: '#/components/schemas/access_generic-oauth-config'
             - $ref: '#/components/schemas/access_custom-claims-support'
             - properties:
-                conditional_access_enabled:
-                  description: Should Cloudflare try to load authentication contexts from your account
-                  type: boolean
-                directory_id:
-                  description: Your Azure directory uuid
-                  example: <your azure directory uuid>
+                authorization_server_id:
+                  description: Your okta authorization server id
+                  example: aus9o8wzkhckw9TLa0h7z
                   type: string
-                prompt:
-                  description: Indicates the type of user interaction that is required. prompt=login forces the user to enter their credentials on that request, negating single-sign on. prompt=none is the opposite. It ensures that the user isn't presented with any interactive prompt. If the request can't be completed silently by using single-sign on, the Microsoft identity platform returns an interaction_required error. prompt=select_account interrupts single sign-on providing account selection experience listing all the accounts either in session or any remembered account or an option to choose to use a different account altogether.
-                  enum:
-                  - login
-                  - select_account
-                  - none
-                  type: string
-                support_groups:
-                  description: Should Cloudflare try to load groups from your account
-                  type: boolean
-              type: object
-        type: object
-      title: Azure AD
-      type: object
-    access_oidc:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-            - properties:
-                auth_url:
-                  description: The authorization_endpoint URL of your IdP
-                  example: https://accounts.google.com/o/oauth2/auth
-                  type: string
-                certs_url:
-                  description: The jwks_uri endpoint of your IdP to allow the IdP keys to sign the tokens
-                  example: https://www.googleapis.com/oauth2/v3/certs
-                  type: string
-                scopes:
-                  description: OAuth scopes
-                  example:
-                  - openid
-                  - email
-                  - profile
-                  items:
-                    type: string
-                  type: array
-                token_url:
-                  description: The token_endpoint URL of your IdP
-                  example: https://accounts.google.com/o/oauth2/token
+                okta_account:
+                  description: Your okta account url
+                  example: https://dev-abc123.oktapreview.com
                   type: string
               type: object
         type: object
-      title: Generic OAuth
+      title: Okta
       type: object
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     access_pingone:
       allOf:
       - $ref: '#/components/schemas/access_identity-provider'
@@ -511,204 +698,6 @@ components:
         type: object
       title: LinkedIn
       type: object
-    access_centrify:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-            - properties:
-                centrify_account:
-                  description: Your centrify account url
-                  example: https://abc123.my.centrify.com/
-                  type: string
-                centrify_app_id:
-                  description: Your centrify app id
-                  example: exampleapp
-                  type: string
-              type: object
-        type: object
-      title: Centrify
-      type: object
-    access_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/access_identity-providers'
-    access_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    access_google:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-        type: object
-      title: Google
-      type: object
-    access_onetimepin:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            type: object
-          type:
-            enum:
-            - onetimepin
-      title: One Time Pin
-      type: object
-    access_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/access_messages'
-        messages:
-          $ref: '#/components/schemas/access_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
-    access_custom-claims-support:
-      properties:
-        claims:
-          description: Custom claims
-          example:
-          - email_verified
-          - preferred_username
-          - custom_claim_name
-          items:
-            type: string
-          type: array
-        email_claim_name:
-          description: The claim name for email in the id_token response.
-          example: custom_claim_name
-          type: string
-      type: object
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
-      type: object
-    access_components-schemas-name:
-      description: The name of the identity provider, shown to users on the login page.
-      example: Widget Corps IDP
-      type: string
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    access_saml:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            properties:
-              attributes:
-                description: A list of SAML attribute names that will be added to your signed JWT token and can be used in SAML policy rules.
-                example:
-                - group
-                - department_code
-                - divison
-                items:
-                  type: string
-                type: array
-              email_attribute_name:
-                description: The attribute name for email in the SAML response.
-                example: Email
-                type: string
-              header_attributes:
-                description: Add a list of attribute names that will be returned in the response header from the Access callback.
-                items:
-                  properties:
-                    attribute_name:
-                      description: attribute name from the IDP
-                      type: string
-                    header_name:
-                      description: header that will be added on the request to the origin
-                      type: string
-                  type: object
-                type: array
-              idp_public_certs:
-                description: X509 certificate to verify the signature in the SAML authentication response
-                items:
-                  type: string
-                type: array
-              issuer_url:
-                description: IdP Entity ID or Issuer URL
-                example: https://whoami.com
-                type: string
-              sign_request:
-                description: Sign the SAML authentication request with Access credentials. To verify the signature, use the public key from the Access certs endpoints.
-                type: boolean
-              sso_target_url:
-                description: URL to send the SAML authentication requests to
-                example: https://edgeaccess.org/idp/saml/login
-                type: string
-            type: object
-        type: object
-      title: Generic SAML
-      type: object
-    access_okta:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-            - properties:
-                authorization_server_id:
-                  description: Your okta authorization server id
-                  example: aus9o8wzkhckw9TLa0h7z
-                  type: string
-                okta_account:
-                  description: Your okta account url
-                  example: https://dev-abc123.oktapreview.com
-                  type: string
-              type: object
-        type: object
-      title: Okta
-      type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
   securitySchemes:
     api_email:
       in: header

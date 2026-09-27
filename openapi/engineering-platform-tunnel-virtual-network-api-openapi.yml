@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Tunnel Virtual Network API
+  title: Cloudflare Tunnel Virtual Network API
   version: 4.0.0
 tags:
 - name: Tunnel Virtual Network
@@ -276,34 +265,6 @@ paths:
       - Argo Tunnel Write
 components:
   schemas:
-    tunnel_created_at:
-      description: Timestamp of when the resource was created.
-      example: '2021-01-25T18:22:34.317854Z'
-      format: date-time
-      type: string
-    tunnel_api-response-single:
-      $ref: '#/components/schemas/tunnel_api-response-common'
-    tunnel_virtual_network_id:
-      description: UUID of the virtual network.
-      example: f70ff985-a4ef-4643-bbbc-4a0ed4fc8415
-      format: uuid
-      type: string
-    tunnel_is_default_network:
-      description: If `true`, this virtual network is the default for the account.
-      example: true
-      type: boolean
-    tunnel_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/tunnel_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/tunnel_result_info'
-      type: object
     tunnel_messages:
       example: []
       items:
@@ -319,6 +280,65 @@ components:
         type: object
         uniqueItems: true
       type: array
+    tunnel_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/tunnel_messages'
+        messages:
+          $ref: '#/components/schemas/tunnel_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    tunnel_virtual_network_name:
+      description: A user-friendly name for the virtual network.
+      example: us-east-1-vpc
+      maxLength: 256
+      type: string
+    tunnel_is_default_network:
+      description: If `true`, this virtual network is the default for the account.
+      example: true
+      type: boolean
+    tunnel_account_id:
+      description: Cloudflare account ID
+      example: 699d98642c564d2e855e9661899b7252
+      maxLength: 32
+      type: string
+    tunnel_vnet_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/tunnel_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/tunnel_virtual-network'
+            type: array
+        type: object
+    tunnel_virtual_network_id:
+      description: UUID of the virtual network.
+      example: f70ff985-a4ef-4643-bbbc-4a0ed4fc8415
+      format: uuid
+      type: string
+    tunnel_api-response-single:
+      $ref: '#/components/schemas/tunnel_api-response-common'
+    tunnel_virtual_network_comment:
+      description: Optional remark describing the virtual network.
+      example: Staging VPC for data science
+      maxLength: 256
+      type: string
     tunnel_api-response-common-failure:
       properties:
         errors:
@@ -350,15 +370,11 @@ components:
       - messages
       - result
       type: object
-    tunnel_vnet_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/tunnel_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/tunnel_virtual-network'
-            type: array
-        type: object
+    tunnel_deleted_at:
+      description: Timestamp of when the resource was deleted. If `null`, the resource has not been deleted.
+      example: '2009-11-10T23:00:00Z'
+      format: date-time
+      type: string
     tunnel_vnet_response_single:
       allOf:
       - $ref: '#/components/schemas/tunnel_api-response-single'
@@ -366,39 +382,17 @@ components:
           result:
             $ref: '#/components/schemas/tunnel_virtual-network'
         type: object
-    tunnel_virtual_network_name:
-      description: A user-friendly name for the virtual network.
-      example: us-east-1-vpc
-      maxLength: 256
-      type: string
-    tunnel_deleted_at:
-      description: Timestamp of when the resource was deleted. If `null`, the resource has not been deleted.
-      example: '2009-11-10T23:00:00Z'
-      format: date-time
-      type: string
-    tunnel_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/tunnel_messages'
-        messages:
-          $ref: '#/components/schemas/tunnel_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
+    tunnel_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/tunnel_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/tunnel_result_info'
       type: object
     tunnel_result_info:
       properties:
@@ -419,10 +413,10 @@ components:
           example: 2000
           type: number
       type: object
-    tunnel_account_id:
-      description: Cloudflare account ID
-      example: 699d98642c564d2e855e9661899b7252
-      maxLength: 32
+    tunnel_created_at:
+      description: Timestamp of when the resource was created.
+      example: '2021-01-25T18:22:34.317854Z'
+      format: date-time
       type: string
     tunnel_virtual-network:
       properties:
@@ -445,11 +439,6 @@ components:
       - comment
       - created_at
       type: object
-    tunnel_virtual_network_comment:
-      description: Optional remark describing the virtual network.
-      example: Staging VPC for data science
-      maxLength: 256
-      type: string
   securitySchemes:
     api_email:
       in: header

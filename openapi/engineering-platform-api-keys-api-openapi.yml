@@ -2,8 +2,10 @@ openapi: 3.2.0
 info:
   version: 2015-07-09
   x-release: v4
-  title: APIs.io Engineering Platform Amazon API Gateway Apikeys API
-  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  title: Amazon API Gateway Apikeys API
+  description: 'Amazon API Gateway
+
+    Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.'
   x-logo:
     url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
     backgroundColor: '#FFFFFF'
@@ -112,7 +114,7 @@ servers:
 security:
 - hmac: []
 tags:
-- name: Apikeys
+- name: API Keys
 paths:
   /apikeys:
     parameters:
@@ -125,7 +127,7 @@ paths:
     - $ref: '#/components/parameters/X-Amz-SignedHeaders'
     post:
       operationId: CreateApiKey
-      description: 'Create an ApiKey resource. '
+      description: Create an ApiKey resource.
       responses:
         '201':
           description: Success
@@ -206,7 +208,9 @@ paths:
                   additionalProperties:
                     $ref: '#/components/schemas/String'
       tags:
-      - Apikeys
+      - API Keys
+      summary: Create api key
+      x-summary-source: derived
     get:
       operationId: GetApiKeys
       description: Gets information about the current ApiKeys resource.
@@ -273,7 +277,9 @@ paths:
         schema:
           type: boolean
       tags:
-      - Apikeys
+      - API Keys
+      summary: Get api keys
+      x-summary-source: derived
   /apikeys/{api_Key}:
     parameters:
     - $ref: '#/components/parameters/X-Amz-Content-Sha256'
@@ -327,7 +333,9 @@ paths:
         schema:
           type: string
       tags:
-      - Apikeys
+      - API Keys
+      summary: Delete api key
+      x-summary-source: derived
     get:
       operationId: GetApiKey
       description: Gets information about the current ApiKey resource.
@@ -376,7 +384,9 @@ paths:
         schema:
           type: boolean
       tags:
-      - Apikeys
+      - API Keys
+      summary: Get api key
+      x-summary-source: derived
     patch:
       operationId: UpdateApiKey
       description: Changes information about an ApiKey resource.
@@ -443,13 +453,54 @@ paths:
                   items:
                     $ref: '#/components/schemas/PatchOperation'
       tags:
-      - Apikeys
+      - API Keys
+      summary: Update api key
+      x-summary-source: derived
 components:
   schemas:
+    ListOfApiKey:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApiKey'
+    ApiKeys:
+      type: object
+      properties:
+        warnings:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of warning messages logged during the import of API keys when the <code>failOnWarnings</code> option is set to true.
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfApiKey'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of API keys as represented by an ApiKeys resource.
     MapOfStringToString:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/String'
+    BadRequestException: {}
+    NotFoundException: {}
+    UnauthorizedException: {}
+    StageKey:
+      type: object
+      properties:
+        restApiId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The string identifier of the associated RestApi.
+        stageName:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The stage name associated with the stage key.
+      description: A reference to a unique stage identified in the format <code>{restApiId}/{stage}</code>.
+    ConflictException: {}
+    Timestamp:
+      type: string
+      format: date-time
     ApiKey:
       type: object
       properties:
@@ -494,37 +545,9 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: A resource that can be distributed to callers for executing Method resources that require an API key. API keys can be mapped to any Stage on any RestApi, which indicates that the callers with the API key can make requests to that stage.
-    ListOfApiKey:
-      type: array
-      items:
-        $ref: '#/components/schemas/ApiKey'
-    TooManyRequestsException: {}
-    NotFoundException: {}
-    UnauthorizedException: {}
-    ConflictException: {}
-    Timestamp:
-      type: string
-      format: date-time
-    StageKey:
-      type: object
-      properties:
-        restApiId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The string identifier of the associated RestApi.
-        stageName:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The stage name associated with the stage key.
-      description: A reference to a unique stage identified in the format <code>{restApiId}/{stage}</code>.
-    ListOfString:
-      type: array
-      items:
-        $ref: '#/components/schemas/String'
-    BadRequestException: {}
     LimitExceededException: {}
-    String:
-      type: string
+    Boolean:
+      type: boolean
     PatchOperation:
       type: object
       properties:
@@ -545,22 +568,13 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
       description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
-    ApiKeys:
-      type: object
-      properties:
-        warnings:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of warning messages logged during the import of API keys when the <code>failOnWarnings</code> option is set to true.
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfApiKey'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of API keys as represented by an ApiKeys resource.
+    String:
+      type: string
+    ListOfString:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
+    TooManyRequestsException: {}
     Op:
       type: string
       enum:
@@ -570,8 +584,6 @@ components:
       - move
       - copy
       - test
-    Boolean:
-      type: boolean
   parameters:
     X-Amz-Credential:
       name: X-Amz-Credential
@@ -579,8 +591,26 @@ components:
       schema:
         type: string
       required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
     X-Amz-Date:
       name: X-Amz-Date
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
       in: header
       schema:
         type: string
@@ -593,24 +623,6 @@ components:
       required: false
     X-Amz-Security-Token:
       name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
       in: header
       schema:
         type: string

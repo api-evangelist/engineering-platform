@@ -1,24 +1,13 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Notification Webhooks API
+  title: Cloudflare Notification Webhooks API
   version: 4.0.0
 tags:
-- name: Notification Webhooks
+- name: Notification Web Hooks
 paths:
   /accounts/{account_id}/alerting/v3/destinations/webhooks:
     get:
@@ -51,7 +40,7 @@ paths:
         api_key: []
       summary: APIs.io Engineering Platform List webhooks
       tags:
-      - Notification Webhooks
+      - Notification Web Hooks
       x-api-token-group:
       - Cloudflare Zero Trust PII Read
       - Notifications Write
@@ -108,7 +97,7 @@ paths:
         api_key: []
       summary: APIs.io Engineering Platform Create a webhook
       tags:
-      - Notification Webhooks
+      - Notification Web Hooks
       x-api-token-group:
       - Notifications Write
       - Account Settings Write
@@ -153,7 +142,7 @@ paths:
         api_key: []
       summary: APIs.io Engineering Platform Delete a webhook
       tags:
-      - Notification Webhooks
+      - Notification Web Hooks
       x-api-token-group:
       - Notifications Write
       - Account Settings Write
@@ -197,7 +186,7 @@ paths:
         api_key: []
       summary: APIs.io Engineering Platform Get a webhook
       tags:
-      - Notification Webhooks
+      - Notification Web Hooks
       x-api-token-group:
       - Cloudflare Zero Trust PII Read
       - Notifications Write
@@ -259,7 +248,7 @@ paths:
         api_key: []
       summary: APIs.io Engineering Platform Update a webhook
       tags:
-      - Notification Webhooks
+      - Notification Web Hooks
       x-api-token-group:
       - Notifications Write
       - Account Settings Write
@@ -270,21 +259,58 @@ paths:
         pro: true
 components:
   schemas:
+    aaa_account-id:
+      description: The account id
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    aaa_schemas-api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example: []
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
     aaa_url:
       description: The POST endpoint to call when dispatching a notification.
       example: https://hooks.slack.com/services/REDACTED
-      type: string
-    aaa_webhooks_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/aaa_webhooks'
-            type: array
-    aaa_components-schemas-name:
-      description: The name of the webhook destination. This will be included in the request body when you receive a webhook notification.
-      example: Slack Webhook
       type: string
     aaa_webhooks:
       properties:
@@ -320,47 +346,10 @@ components:
         type: object
         uniqueItems: true
       type: array
-    aaa_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      readOnly: true
-      type: string
-      x-auditable: true
-    aaa_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-common'
-      type: object
-    aaa_schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/aaa_webhooks'
-    aaa_components-schemas-type:
-      description: Type of webhook endpoint.
-      enum:
-      - slack
-      - generic
-      - gchat
-      example: slack
-      type: string
-    aaa_created_at:
-      description: Timestamp of when the webhook destination was created.
-      example: '2020-10-26T18:25:04.532316Z'
-      format: date-time
-      readOnly: true
-      type: string
     aaa_last_failure:
       description: Timestamp of the last time an attempt to dispatch a notification to this webhook failed.
       example: '2020-10-26T18:25:04.532316Z'
       format: date-time
-      readOnly: true
-      type: string
-    aaa_webhook-id:
-      description: The unique identifier of a webhook
-      example: b115d5ec-15c6-41ee-8b76-92c449b5227b
-      maxLength: 36
       readOnly: true
       type: string
     aaa_api-response-common:
@@ -380,9 +369,41 @@ components:
       - errors
       - messages
       type: object
-    aaa_secret:
-      description: Optional secret that will be passed in the `cf-webhook-auth` header when dispatching generic webhook notifications or formatted for supported destinations. Secrets are not returned in any API response body.
+    aaa_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/aaa_result_info'
+      type: object
+    aaa_webhooks_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/aaa_webhooks'
+            type: array
+    aaa_components-schemas-type:
+      description: Type of webhook endpoint.
+      enum:
+      - slack
+      - generic
+      - gchat
+      example: slack
       type: string
+    aaa_created_at:
+      description: Timestamp of when the webhook destination was created.
+      example: '2020-10-26T18:25:04.532316Z'
+      format: date-time
+      readOnly: true
+      type: string
+    aaa_schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/aaa_webhooks'
     aaa_id_response:
       allOf:
       - $ref: '#/components/schemas/aaa_api-response-single'
@@ -392,68 +413,36 @@ components:
               id:
                 $ref: '#/components/schemas/aaa_uuid'
             type: object
-    aaa_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    aaa_account-id:
-      description: The account id
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    aaa_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
       readOnly: true
       type: string
-    aaa_schemas-api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/aaa_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/aaa_messages'
-          example: []
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    aaa_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/aaa_result_info'
-      type: object
+      x-auditable: true
     aaa_last_success:
       description: Timestamp of the last time Cloudflare was able to successfully dispatch a notification using this webhook.
       example: '2020-10-26T18:25:04.532316Z'
       format: date-time
       readOnly: true
       type: string
+    aaa_secret:
+      description: Optional secret that will be passed in the `cf-webhook-auth` header when dispatching generic webhook notifications or formatted for supported destinations. Secrets are not returned in any API response body.
+      type: string
+    aaa_components-schemas-name:
+      description: The name of the webhook destination. This will be included in the request body when you receive a webhook notification.
+      example: Slack Webhook
+      type: string
+    aaa_webhook-id:
+      description: The unique identifier of a webhook
+      example: b115d5ec-15c6-41ee-8b76-92c449b5227b
+      maxLength: 36
+      readOnly: true
+      type: string
+    aaa_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-common'
+      type: object
   securitySchemes:
     api_email:
       in: header

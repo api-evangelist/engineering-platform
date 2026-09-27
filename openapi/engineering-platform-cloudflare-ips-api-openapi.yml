@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Cloudflare IPs API
+  title: Cloudflare IPs API
   version: 4.0.0
 tags:
 - name: Cloudflare IPs
@@ -64,15 +53,32 @@ paths:
       - Cloudflare IPs
 components:
   schemas:
-    addressing_ips:
-      properties:
-        etag:
-          $ref: '#/components/schemas/addressing_etag'
-        ipv4_cidrs:
-          $ref: '#/components/schemas/addressing_ipv4_cidrs'
-        ipv6_cidrs:
-          $ref: '#/components/schemas/addressing_ipv6_cidrs'
-      type: object
+    addressing_etag:
+      description: A digest of the IP data. Useful for determining if the data has changed.
+      example: a8e453d9d129a3769407127936edfdb0
+      type: string
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_ipv4_cidrs:
+      description: List of Cloudflare IPv4 CIDR addresses.
+      items:
+        description: IPv4 CIDR.
+        example: 199.27.128.0/21
+        type: string
+      type: array
     addressing_ips_jdcloud:
       properties:
         etag:
@@ -84,13 +90,6 @@ components:
         jdcloud_cidrs:
           $ref: '#/components/schemas/addressing_jdcloud_cidrs'
       type: object
-    addressing_jdcloud_cidrs:
-      description: List IPv4 and IPv6 CIDRs, only populated if `?networks=jdcloud` is used.
-      items:
-        description: IPv4 or IPv6 CIDR.
-        example: 199.27.128.0/21
-        type: string
-      type: array
     addressing_api-response-common-failure:
       properties:
         errors:
@@ -122,10 +121,10 @@ components:
       - messages
       - result
       type: object
-    addressing_ipv4_cidrs:
-      description: List of Cloudflare IPv4 CIDR addresses.
+    addressing_jdcloud_cidrs:
+      description: List IPv4 and IPv6 CIDRs, only populated if `?networks=jdcloud` is used.
       items:
-        description: IPv4 CIDR.
+        description: IPv4 or IPv6 CIDR.
         example: 199.27.128.0/21
         type: string
       type: array
@@ -133,32 +132,6 @@ components:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-common'
       type: object
-    addressing_ipv6_cidrs:
-      description: List of Cloudflare IPv6 CIDR addresses.
-      items:
-        description: IPv6 CIDR.
-        example: 2400:cb00::/32
-        type: string
-      type: array
-    addressing_etag:
-      description: A digest of the IP data. Useful for determining if the data has changed.
-      example: a8e453d9d129a3769407127936edfdb0
-      type: string
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     addressing_api-response-common:
       properties:
         errors:
@@ -175,6 +148,22 @@ components:
       - success
       - errors
       - messages
+      type: object
+    addressing_ipv6_cidrs:
+      description: List of Cloudflare IPv6 CIDR addresses.
+      items:
+        description: IPv6 CIDR.
+        example: 2400:cb00::/32
+        type: string
+      type: array
+    addressing_ips:
+      properties:
+        etag:
+          $ref: '#/components/schemas/addressing_etag'
+        ipv4_cidrs:
+          $ref: '#/components/schemas/addressing_ipv4_cidrs'
+        ipv6_cidrs:
+          $ref: '#/components/schemas/addressing_ipv6_cidrs'
       type: object
   securitySchemes:
     api_email:

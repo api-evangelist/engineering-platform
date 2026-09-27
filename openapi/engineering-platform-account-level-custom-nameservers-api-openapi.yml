@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Account-Level Custom Nameservers API
+  title: Cloudflare Account-Level Custom Nameservers API
   version: 4.0.0
 tags:
 - name: Account-Level Custom Nameservers
@@ -189,6 +178,119 @@ paths:
         pro: false
 components:
   schemas:
+    dns-custom-nameservers_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/dns-custom-nameservers_result_info'
+      type: object
+    dns-custom-nameservers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/dns-custom-nameservers_messages'
+        messages:
+          $ref: '#/components/schemas/dns-custom-nameservers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    dns-custom-nameservers_ns_set:
+      default: 1
+      description: The number of the set that this name server belongs to.
+      example: 1
+      maximum: 5
+      minimum: 1
+      type: number
+    dns-custom-nameservers_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    dns-custom-nameservers_availability_response:
+      allOf:
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
+      - properties:
+          result:
+            items:
+              description: Name of zone based on which account custom nameservers can be created. For example, if example.com is returned, then ns1.example.com can be used as an account custom nameserver.
+              example: example.com
+              format: hostname
+              readOnly: true
+              type: string
+            type: array
+        type: object
+    dns-custom-nameservers_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-common'
+      type: object
+    dns-custom-nameservers_ns_name:
+      description: The FQDN of the name server.
+      example: ns1.example.com
+      format: hostname
+      type: string
+    dns-custom-nameservers_CustomNS:
+      description: A single account custom nameserver.
+      properties:
+        dns_records:
+          description: A and AAAA records associated with the nameserver.
+          items:
+            properties:
+              type:
+                description: DNS record type.
+                enum:
+                - A
+                - AAAA
+                example: A
+                type: string
+              value:
+                description: DNS record contents (an IPv4 or IPv6 address).
+                example: 1.1.1.1
+                type: string
+          type: array
+        ns_name:
+          $ref: '#/components/schemas/dns-custom-nameservers_ns_name'
+        ns_set:
+          $ref: '#/components/schemas/dns-custom-nameservers_ns_set'
+        status:
+          deprecated: true
+          description: Verification status of the nameserver.
+          enum:
+          - moved
+          - pending
+          - verified
+          example: verified
+          type: string
+        zone_tag:
+          $ref: '#/components/schemas/dns-custom-nameservers_schemas-identifier'
+      required:
+      - dns_records
+      - ns_name
+      - status
+      - zone_tag
+      title: Custom NS
+      type: object
     dns-custom-nameservers_acns_response_collection:
       allOf:
       - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
@@ -198,10 +300,37 @@ components:
               $ref: '#/components/schemas/dns-custom-nameservers_CustomNS'
             type: array
         type: object
-    dns-custom-nameservers_api-response-single:
+    dns-custom-nameservers_schemas-identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    dns-custom-nameservers_identifier:
+      description: Account identifier tag.
+      example: 372e67954025e0ba6aaa6d586b9e0b59
+      maxLength: 32
+      readOnly: true
+      type: string
+    dns-custom-nameservers_CustomNSInput:
+      properties:
+        ns_name:
+          $ref: '#/components/schemas/dns-custom-nameservers_ns_name'
+        ns_set:
+          $ref: '#/components/schemas/dns-custom-nameservers_ns_set'
+      required:
+      - ns_name
+      title: Custom NS Input
+    dns-custom-nameservers_empty_response:
       allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-common'
-      type: object
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
+      - properties:
+          result:
+            items:
+              description: Unused
+              type: string
+            maxItems: 0
+            type: array
+        type: object
     dns-custom-nameservers_api-response-common-failure:
       properties:
         errors:
@@ -248,141 +377,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    dns-custom-nameservers_empty_response:
-      allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
-      - properties:
-          result:
-            items:
-              description: Unused
-              type: string
-            maxItems: 0
-            type: array
-        type: object
-    dns-custom-nameservers_CustomNSInput:
-      properties:
-        ns_name:
-          $ref: '#/components/schemas/dns-custom-nameservers_ns_name'
-        ns_set:
-          $ref: '#/components/schemas/dns-custom-nameservers_ns_set'
-      required:
-      - ns_name
-      title: Custom NS Input
-    dns-custom-nameservers_CustomNS:
-      description: A single account custom nameserver.
-      properties:
-        dns_records:
-          description: A and AAAA records associated with the nameserver.
-          items:
-            properties:
-              type:
-                description: DNS record type.
-                enum:
-                - A
-                - AAAA
-                example: A
-                type: string
-              value:
-                description: DNS record contents (an IPv4 or IPv6 address).
-                example: 1.1.1.1
-                type: string
-          type: array
-        ns_name:
-          $ref: '#/components/schemas/dns-custom-nameservers_ns_name'
-        ns_set:
-          $ref: '#/components/schemas/dns-custom-nameservers_ns_set'
-        status:
-          deprecated: true
-          description: Verification status of the nameserver.
-          enum:
-          - moved
-          - pending
-          - verified
-          example: verified
-          type: string
-        zone_tag:
-          $ref: '#/components/schemas/dns-custom-nameservers_schemas-identifier'
-      required:
-      - dns_records
-      - ns_name
-      - status
-      - zone_tag
-      title: Custom NS
-      type: object
-    dns-custom-nameservers_identifier:
-      description: Account identifier tag.
-      example: 372e67954025e0ba6aaa6d586b9e0b59
-      maxLength: 32
-      readOnly: true
-      type: string
-    dns-custom-nameservers_ns_set:
-      default: 1
-      description: The number of the set that this name server belongs to.
-      example: 1
-      maximum: 5
-      minimum: 1
-      type: number
-    dns-custom-nameservers_schemas-identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    dns-custom-nameservers_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    dns-custom-nameservers_availability_response:
-      allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
-      - properties:
-          result:
-            items:
-              description: Name of zone based on which account custom nameservers can be created. For example, if example.com is returned, then ns1.example.com can be used as an account custom nameserver.
-              example: example.com
-              format: hostname
-              readOnly: true
-              type: string
-            type: array
-        type: object
-    dns-custom-nameservers_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/dns-custom-nameservers_messages'
-        messages:
-          $ref: '#/components/schemas/dns-custom-nameservers_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    dns-custom-nameservers_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/dns-custom-nameservers_result_info'
-      type: object
     dns-custom-nameservers_acns_response_single:
       allOf:
       - $ref: '#/components/schemas/dns-custom-nameservers_api-response-single'
@@ -390,11 +384,6 @@ components:
           result:
             $ref: '#/components/schemas/dns-custom-nameservers_CustomNS'
         type: object
-    dns-custom-nameservers_ns_name:
-      description: The FQDN of the name server.
-      example: ns1.example.com
-      format: hostname
-      type: string
   securitySchemes:
     api_email:
       in: header

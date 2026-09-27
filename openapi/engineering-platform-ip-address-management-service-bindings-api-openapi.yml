@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare IP Address Management Service Bindings API
+  title: Cloudflare IP Address Management Service Bindings API
   version: 4.0.0
 tags:
 - name: IP Address Management Service Bindings
@@ -24,9 +13,7 @@ paths:
     get:
       description: 'List the Cloudflare services this prefix is currently bound to. Traffic sent to an address within an IP prefix will be routed to the Cloudflare service of the most-specific Service Binding matching the address.
 
-        **Example:** binding `192.0.2.0/24` to Cloudflare Magic Transit and `192.0.2.1/32` to the Cloudflare CDN would route traffic for `192.0.2.1` to the CDN, and traffic for all other IPs in the prefix to Cloudflare Magic Transit.
-
-        '
+        **Example:** binding `192.0.2.0/24` to Cloudflare Magic Transit and `192.0.2.1/32` to the Cloudflare CDN would route traffic for `192.0.2.1` to the CDN, and traffic for all other IPs in the prefix to Cloudflare Magic Transit.'
       operationId: ip-address-management-service-bindings-list-service-bindings
       parameters:
       - in: path
@@ -70,9 +57,7 @@ paths:
     post:
       description: 'Creates a new Service Binding, routing traffic to IPs within the given CIDR to a service running on Cloudflare''s network.
 
-        **Note:** This API may only be used on prefixes currently configured with a Magic Transit service binding, and only allows creating service bindings for the Cloudflare CDN or Cloudflare Spectrum.
-
-        '
+        **Note:** This API may only be used on prefixes currently configured with a Magic Transit service binding, and only allows creating service bindings for the Cloudflare CDN or Cloudflare Spectrum.'
       operationId: ip-address-management-service-bindings-create-service-binding
       parameters:
       - in: path
@@ -203,9 +188,7 @@ paths:
       - 'IP Prefixes: Read'
   /accounts/{account_id}/addressing/services:
     get:
-      description: 'Bring-Your-Own IP (BYOIP) prefixes onboarded to Cloudflare must be bound to a service running on the Cloudflare network to enable a Cloudflare product on the IP addresses. This endpoint can be used as a reference of available services on the Cloudflare network, and their service IDs.
-
-        '
+      description: Bring-Your-Own IP (BYOIP) prefixes onboarded to Cloudflare must be bound to a service running on the Cloudflare network to enable a Cloudflare product on the IP addresses. This endpoint can be used as a reference of available services on the Cloudflare network, and their service IDs.
       operationId: ip-address-management-service-bindings-list-services
       parameters:
       - in: path
@@ -247,6 +230,48 @@ paths:
       - 'IP Prefixes: Read'
 components:
   schemas:
+    addressing_service_name:
+      description: Name of a service running on the Cloudflare network
+      example: Magic Transit
+      type: string
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_service_identifier:
+      description: Identifier
+      example: 2db684ee7ca04e159946fd05b99e1bcd
+      maxLength: 32
+      type: string
+    addressing_service_binding:
+      properties:
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        id:
+          $ref: '#/components/schemas/addressing_identifier'
+        provisioning:
+          $ref: '#/components/schemas/addressing_provisioning'
+        service_id:
+          $ref: '#/components/schemas/addressing_service_identifier'
+        service_name:
+          $ref: '#/components/schemas/addressing_service_name'
+      type: object
+    addressing_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     addressing_api-response-common-failure:
       properties:
         errors:
@@ -278,72 +303,6 @@ components:
       - messages
       - result
       type: object
-    addressing_provisioning:
-      description: Status of a Service Binding's deployment to the Cloudflare network
-      properties:
-        state:
-          description: 'When a binding has been deployed to a majority of Cloudflare datacenters, the binding will become active and can be used with its associated service.
-
-            '
-          enum:
-          - provisioning
-          - active
-          example: provisioning
-          type: string
-      type: object
-    addressing_create_binding_request:
-      properties:
-        cidr:
-          $ref: '#/components/schemas/addressing_cidr'
-        service_id:
-          $ref: '#/components/schemas/addressing_service_identifier'
-      type: object
-    addressing_service_name:
-      description: Name of a service running on the Cloudflare network
-      example: Magic Transit
-      type: string
-    addressing_service_binding:
-      properties:
-        cidr:
-          $ref: '#/components/schemas/addressing_cidr'
-        id:
-          $ref: '#/components/schemas/addressing_identifier'
-        provisioning:
-          $ref: '#/components/schemas/addressing_provisioning'
-        service_id:
-          $ref: '#/components/schemas/addressing_service_identifier'
-        service_name:
-          $ref: '#/components/schemas/addressing_service_name'
-      type: object
-    addressing_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    addressing_cidr:
-      description: IP Prefix in Classless Inter-Domain Routing format.
-      example: 192.0.2.0/24
-      type: string
-    addressing_service_identifier:
-      description: Identifier
-      example: 2db684ee7ca04e159946fd05b99e1bcd
-      maxLength: 32
-      type: string
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     addressing_api-response-common:
       properties:
         errors:
@@ -361,6 +320,30 @@ components:
       - errors
       - messages
       type: object
+    addressing_create_binding_request:
+      properties:
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        service_id:
+          $ref: '#/components/schemas/addressing_service_identifier'
+      type: object
+    addressing_provisioning:
+      description: Status of a Service Binding's deployment to the Cloudflare network
+      properties:
+        state:
+          description: 'When a binding has been deployed to a majority of Cloudflare datacenters, the binding will become active and can be used with its associated service.
+
+            '
+          enum:
+          - provisioning
+          - active
+          example: provisioning
+          type: string
+      type: object
+    addressing_cidr:
+      description: IP Prefix in Classless Inter-Domain Routing format.
+      example: 192.0.2.0/24
+      type: string
   securitySchemes:
     api_email:
       in: header

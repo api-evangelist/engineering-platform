@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Zero Trust Seats API
+  title: Cloudflare Zero Trust Seats API
   version: 4.0.0
 tags:
 - name: Zero Trust Seats
@@ -59,6 +48,109 @@ paths:
       - 'Zero Trust: Seats Write'
 components:
   schemas:
+    access_seat:
+      properties:
+        access_seat:
+          $ref: '#/components/schemas/access_access_seat'
+        gateway_seat:
+          $ref: '#/components/schemas/access_gateway_seat'
+        seat_uid:
+          $ref: '#/components/schemas/access_seat_uid'
+      required:
+      - seat_uid
+      - gateway_seat
+      - access_seat
+      type: object
+    access_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/access_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/access_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    access_gateway_seat:
+      description: True if the seat is part of Gateway.
+      example: false
+      type: boolean
+    access_access_seat:
+      description: True if the seat is part of Access.
+      example: false
+      type: boolean
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    access_seats_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_seats'
+            type: array
+    access_schemas-identifier:
+      allOf:
+      - $ref: '#/components/schemas/access_identifier'
+      - example: 699d98642c564d2e855e9661899b7252
+    access_seats_definition:
+      items:
+        $ref: '#/components/schemas/access_seat'
+      required:
+      - seat_uid
+      - gateway_seat
+      - access_seat
+      type: array
+    access_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
+    access_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
     access_seat_uid:
       description: The unique API identifier for the Zero Trust seat.
       example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
@@ -92,100 +184,10 @@ components:
         type: object
         uniqueItems: true
       type: array
-    access_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
-      type: object
-    access_access_seat:
-      description: True if the seat is part of Access.
-      example: false
-      type: boolean
-    access_gateway_seat:
-      description: True if the seat is part of Gateway.
-      example: false
-      type: boolean
-    access_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/access_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/access_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    access_schemas-identifier:
-      allOf:
-      - $ref: '#/components/schemas/access_identifier'
-      - example: 699d98642c564d2e855e9661899b7252
     access_timestamp:
       example: '2014-01-01T05:20:00.12345Z'
       format: date-time
       type: string
-    access_seats_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_seats'
-            type: array
-    access_seat:
-      properties:
-        access_seat:
-          $ref: '#/components/schemas/access_access_seat'
-        gateway_seat:
-          $ref: '#/components/schemas/access_gateway_seat'
-        seat_uid:
-          $ref: '#/components/schemas/access_seat_uid'
-      required:
-      - seat_uid
-      - gateway_seat
-      - access_seat
-      type: object
     access_api-response-common:
       properties:
         errors:
@@ -203,19 +205,6 @@ components:
       - errors
       - messages
       type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    access_seats_definition:
-      items:
-        $ref: '#/components/schemas/access_seat'
-      required:
-      - seat_uid
-      - gateway_seat
-      - access_seat
-      type: array
   securitySchemes:
     api_email:
       in: header

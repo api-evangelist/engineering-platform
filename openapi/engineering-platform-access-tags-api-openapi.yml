@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Access Tags API
+  title: Cloudflare Access Tags API
   version: 4.0.0
 tags:
 - name: Access Tags
@@ -202,62 +191,17 @@ paths:
       - 'Access: Apps and Policies Write'
 components:
   schemas:
-    access_tags_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/access_tag'
-        type: object
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    access_tags_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_tag'
-            type: array
-        type: object
-    access_result_info:
+    access_tag_without_app_count:
+      description: A tag
       properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        name:
+          $ref: '#/components/schemas/access_tags_components-schemas-name'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      required:
+      - name
       type: object
     access_api-response-common-failure:
       properties:
@@ -290,6 +234,26 @@ components:
       - messages
       - result
       type: object
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     access_tag:
       description: A tag
       properties:
@@ -306,9 +270,69 @@ components:
       required:
       - name
       type: object
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
+    access_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    access_name_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            properties:
+              name:
+                $ref: '#/components/schemas/access_tags_components-schemas-name'
+            type: object
+        type: object
+    access_tags_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/access_tag'
+        type: object
+    access_tags_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_tag'
+            type: array
+        type: object
     access_tags_components-schemas-name:
       description: The name of the tag
       example: engineers
+      type: string
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
       type: string
     access_api-response-common:
       properties:
@@ -327,41 +351,6 @@ components:
       - errors
       - messages
       type: object
-    access_tag_without_app_count:
-      description: A tag
-      properties:
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        name:
-          $ref: '#/components/schemas/access_tags_components-schemas-name'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      required:
-      - name
-      type: object
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    access_name_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            properties:
-              name:
-                $ref: '#/components/schemas/access_tags_components-schemas-name'
-            type: object
-        type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
   securitySchemes:
     api_email:
       in: header

@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Access Service Tokens API
+  title: Cloudflare Access Service Tokens API
   version: 4.0.0
 tags:
 - name: Access Service Tokens
@@ -283,77 +272,45 @@ paths:
       - Access Service Tokens
 components:
   schemas:
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    access_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    access_service-tokens:
-      properties:
-        client_id:
-          $ref: '#/components/schemas/access_client_id'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        duration:
-          $ref: '#/components/schemas/access_duration'
-        expires_at:
-          $ref: '#/components/schemas/access_timestamp'
-        id:
-          allOf:
-          - description: The ID of the service token.
-          - $ref: '#/components/schemas/access_uuid'
-        name:
-          $ref: '#/components/schemas/access_schemas-name'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      type: object
-    access_duration:
-      default: 8760h
-      description: 'The duration for how long the service token will be valid. Must be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms, s, m, h. The default is 1 year in hours (8760h).'
-      example: 60m
-      type: string
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
-      type: object
     access_schemas-single_response:
       allOf:
       - $ref: '#/components/schemas/access_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/access_service-tokens'
+    access_schemas-name:
+      description: The name of the service token.
+      example: CI/CD token
+      type: string
+    access_create_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            properties:
+              client_id:
+                $ref: '#/components/schemas/access_client_id'
+              client_secret:
+                $ref: '#/components/schemas/access_client_secret'
+              created_at:
+                $ref: '#/components/schemas/access_timestamp'
+              duration:
+                $ref: '#/components/schemas/access_duration'
+              id:
+                description: The ID of the service token.
+                type: string
+              name:
+                $ref: '#/components/schemas/access_schemas-name'
+              updated_at:
+                $ref: '#/components/schemas/access_timestamp'
+    access_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_service-tokens'
+            type: array
     access_api-response-common-failure:
       properties:
         errors:
@@ -385,35 +342,92 @@ components:
       - messages
       - result
       type: object
+    access_client_secret:
+      description: The Client Secret for the service token. Access will check for this value in the `CF-Access-Client-Secret` request header.
+      example: bdd31cbc4dec990953e39163fbbb194c93313ca9f0a6e420346af9d326b1d2a5
+      type: string
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    access_duration:
+      default: 8760h
+      description: 'The duration for how long the service token will be valid. Must be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms, s, m, h. The default is 1 year in hours (8760h).'
+      example: 60m
+      type: string
+    access_client_id:
+      description: The Client ID for the service token. Access will check for this value in the `CF-Access-Client-ID` request header.
+      example: 88bf3b6d86161464f6509f7219099e57.access.example.com
+      type: string
+    access_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
+    access_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
+      type: object
+    access_service-tokens:
+      properties:
+        client_id:
+          $ref: '#/components/schemas/access_client_id'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        duration:
+          $ref: '#/components/schemas/access_duration'
+        expires_at:
+          $ref: '#/components/schemas/access_timestamp'
+        id:
+          allOf:
+          - description: The ID of the service token.
+          - $ref: '#/components/schemas/access_uuid'
+        name:
+          $ref: '#/components/schemas/access_schemas-name'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      type: object
     access_uuid:
       description: UUID
       example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
       maxLength: 36
-      type: string
-    access_create_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            properties:
-              client_id:
-                $ref: '#/components/schemas/access_client_id'
-              client_secret:
-                $ref: '#/components/schemas/access_client_secret'
-              created_at:
-                $ref: '#/components/schemas/access_timestamp'
-              duration:
-                $ref: '#/components/schemas/access_duration'
-              id:
-                description: The ID of the service token.
-                type: string
-              name:
-                $ref: '#/components/schemas/access_schemas-name'
-              updated_at:
-                $ref: '#/components/schemas/access_timestamp'
-    access_client_id:
-      description: The Client ID for the service token. Access will check for this value in the `CF-Access-Client-ID` request header.
-      example: 88bf3b6d86161464f6509f7219099e57.access.example.com
       type: string
     access_timestamp:
       example: '2014-01-01T05:20:00.12345Z'
@@ -436,31 +450,6 @@ components:
       - errors
       - messages
       type: object
-    access_client_secret:
-      description: The Client Secret for the service token. Access will check for this value in the `CF-Access-Client-Secret` request header.
-      example: bdd31cbc4dec990953e39163fbbb194c93313ca9f0a6e420346af9d326b1d2a5
-      type: string
-    access_schemas-name:
-      description: The name of the service token.
-      example: CI/CD token
-      type: string
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    access_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_service-tokens'
-            type: array
   securitySchemes:
     api_email:
       in: header

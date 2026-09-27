@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare User Billing History API
+  title: Cloudflare User Billing History API
   version: 4.0.0
 tags:
 - name: User Billing History
@@ -106,6 +95,103 @@ paths:
         pro: true
 components:
   schemas:
+    bill-subs-api_schemas-zone:
+      properties:
+        name:
+          readOnly: true
+          type: string
+      type: object
+    bill-subs-api_type:
+      description: The billing item type.
+      example: charge
+      maxLength: 30
+      readOnly: true
+      type: string
+    bill-subs-api_amount:
+      description: The amount associated with this billing item.
+      example: 20.99
+      readOnly: true
+      type: number
+    bill-subs-api_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/bill-subs-api_messages'
+        messages:
+          $ref: '#/components/schemas/bill-subs-api_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    bill-subs-api_billing_history_collection:
+      allOf:
+      - $ref: '#/components/schemas/bill-subs-api_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/bill-subs-api_billing-history'
+            type: array
+    bill-subs-api_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    bill-subs-api_occurred_at:
+      description: When the billing item was created.
+      example: '2014-03-01T12:21:59.3456Z'
+      format: date-time
+      readOnly: true
+      type: string
+    bill-subs-api_currency:
+      description: The monetary unit in which pricing information is displayed.
+      example: USD
+      readOnly: true
+      type: string
+    bill-subs-api_action:
+      description: The billing item action.
+      example: subscription
+      maxLength: 30
+      readOnly: true
+      type: string
+    bill-subs-api_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/bill-subs-api_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/bill-subs-api_result_info'
+      type: object
     bill-subs-api_messages:
       example: []
       items:
@@ -121,30 +207,46 @@ components:
         type: object
         uniqueItems: true
       type: array
-    bill-subs-api_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/bill-subs-api_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/bill-subs-api_result_info'
-      type: object
-    bill-subs-api_action:
-      description: The billing item action.
-      example: subscription
-      maxLength: 30
+    bill-subs-api_description:
+      description: The billing item description.
+      example: The billing item description
+      maxLength: 255
       readOnly: true
       type: string
-    bill-subs-api_schemas-zone:
+    bill-subs-api_billing-history:
       properties:
-        name:
-          readOnly: true
-          type: string
+        action:
+          $ref: '#/components/schemas/bill-subs-api_action'
+        amount:
+          $ref: '#/components/schemas/bill-subs-api_amount'
+        currency:
+          $ref: '#/components/schemas/bill-subs-api_currency'
+        description:
+          $ref: '#/components/schemas/bill-subs-api_description'
+        id:
+          $ref: '#/components/schemas/bill-subs-api_components-schemas-identifier'
+        occurred_at:
+          $ref: '#/components/schemas/bill-subs-api_occurred_at'
+        type:
+          $ref: '#/components/schemas/bill-subs-api_type'
+        zone:
+          $ref: '#/components/schemas/bill-subs-api_schemas-zone'
+      required:
+      - id
+      - type
+      - action
+      - description
+      - occurred_at
+      - amount
+      - currency
+      - zone
       type: object
+    bill-subs-api_components-schemas-identifier:
+      description: Billing item identifier tag.
+      example: b69a9f3492637782896352daae219e7d
+      maxLength: 32
+      readOnly: true
+      type: string
     bill-subs-api_api-response-common-failure:
       properties:
         errors:
@@ -176,119 +278,6 @@ components:
       - messages
       - result
       type: object
-    bill-subs-api_billing-history:
-      properties:
-        action:
-          $ref: '#/components/schemas/bill-subs-api_action'
-        amount:
-          $ref: '#/components/schemas/bill-subs-api_amount'
-        currency:
-          $ref: '#/components/schemas/bill-subs-api_currency'
-        description:
-          $ref: '#/components/schemas/bill-subs-api_description'
-        id:
-          $ref: '#/components/schemas/bill-subs-api_components-schemas-identifier'
-        occurred_at:
-          $ref: '#/components/schemas/bill-subs-api_occurred_at'
-        type:
-          $ref: '#/components/schemas/bill-subs-api_type'
-        zone:
-          $ref: '#/components/schemas/bill-subs-api_schemas-zone'
-      required:
-      - id
-      - type
-      - action
-      - description
-      - occurred_at
-      - amount
-      - currency
-      - zone
-      type: object
-    bill-subs-api_amount:
-      description: The amount associated with this billing item.
-      example: 20.99
-      readOnly: true
-      type: number
-    bill-subs-api_occurred_at:
-      description: When the billing item was created.
-      example: '2014-03-01T12:21:59.3456Z'
-      format: date-time
-      readOnly: true
-      type: string
-    bill-subs-api_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/bill-subs-api_messages'
-        messages:
-          $ref: '#/components/schemas/bill-subs-api_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    bill-subs-api_currency:
-      description: The monetary unit in which pricing information is displayed.
-      example: USD
-      readOnly: true
-      type: string
-    bill-subs-api_description:
-      description: The billing item description.
-      example: The billing item description
-      maxLength: 255
-      readOnly: true
-      type: string
-    bill-subs-api_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    bill-subs-api_billing_history_collection:
-      allOf:
-      - $ref: '#/components/schemas/bill-subs-api_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/bill-subs-api_billing-history'
-            type: array
-    bill-subs-api_components-schemas-identifier:
-      description: Billing item identifier tag.
-      example: b69a9f3492637782896352daae219e7d
-      maxLength: 32
-      readOnly: true
-      type: string
-    bill-subs-api_type:
-      description: The billing item type.
-      example: charge
-      maxLength: 30
-      readOnly: true
-      type: string
   securitySchemes:
     api_email:
       in: header

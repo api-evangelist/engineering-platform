@@ -2,8 +2,10 @@ openapi: 3.2.0
 info:
   version: 2015-07-09
   x-release: v4
-  title: APIs.io Engineering Platform Amazon API Gateway Account API
-  description: <fullname>Amazon API Gateway</fullname> <p>Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.</p>
+  title: Amazon API Gateway Account API
+  description: 'Amazon API Gateway
+
+    Amazon API Gateway helps developers deliver robust, secure, and scalable mobile and web application back ends. API Gateway allows developers to securely connect mobile and web applications to APIs that run on AWS Lambda, Amazon EC2, or other publicly addressable web services that are hosted outside of AWS.'
   x-logo:
     url: https://api.apis.guru/v2/cache/logo/https_twitter.com_awscloud_profile_image.png
     backgroundColor: '#FFFFFF'
@@ -160,6 +162,8 @@ paths:
       parameters: []
       tags:
       - Account
+      summary: Get account
+      x-summary-source: derived
     patch:
       operationId: UpdateAccount
       description: Changes information about the current Account resource.
@@ -221,41 +225,57 @@ paths:
                     $ref: '#/components/schemas/PatchOperation'
       tags:
       - Account
+      summary: Update account
+      x-summary-source: derived
 components:
+  parameters:
+    X-Amz-Credential:
+      name: X-Amz-Credential
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
+      in: header
+      schema:
+        type: string
+      required: false
   schemas:
-    TooManyRequestsException: {}
+    BadRequestException: {}
     NotFoundException: {}
     UnauthorizedException: {}
     ConflictException: {}
-    Account:
-      type: object
-      properties:
-        cloudwatchRoleArn:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The ARN of an Amazon CloudWatch role for the current Account. '
-        throttleSettings:
-          allOf:
-          - $ref: '#/components/schemas/ThrottleSettings'
-          - description: Specifies the API request limits configured for the current Account.
-        features:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of features supported for the account. When usage plans are enabled, the features list will include an entry of <code>"UsagePlans"</code>.
-        apiKeyVersion:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The version of the API keys used for the account.
-      description: Represents an AWS account that is associated with API Gateway.
-    Double:
-      type: number
-      format: double
-    ListOfString:
-      type: array
-      items:
-        $ref: '#/components/schemas/String'
-    BadRequestException: {}
-    LimitExceededException: {}
     ThrottleSettings:
       type: object
       properties:
@@ -268,8 +288,7 @@ components:
           - $ref: '#/components/schemas/Double'
           - description: The API target request rate limit.
       description: ' The API request rate limits.'
-    String:
-      type: string
+    LimitExceededException: {}
     PatchOperation:
       type: object
       properties:
@@ -290,6 +309,38 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
       description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
+    String:
+      type: string
+    Double:
+      type: number
+      format: double
+    Account:
+      type: object
+      properties:
+        cloudwatchRoleArn:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The ARN of an Amazon CloudWatch role for the current Account. '
+        throttleSettings:
+          allOf:
+          - $ref: '#/components/schemas/ThrottleSettings'
+          - description: Specifies the API request limits configured for the current Account.
+        features:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of features supported for the account. When usage plans are enabled, the features list will include an entry of <code>"UsagePlans"</code>.
+        apiKeyVersion:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The version of the API keys used for the account.
+      description: Represents an AWS account that is associated with API Gateway.
+    ListOfString:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
+    TooManyRequestsException: {}
+    Integer:
+      type: integer
     Op:
       type: string
       enum:
@@ -299,51 +350,6 @@ components:
       - move
       - copy
       - test
-    Integer:
-      type: integer
-  parameters:
-    X-Amz-Credential:
-      name: X-Amz-Credential
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Date:
-      name: X-Amz-Date
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
   securitySchemes:
     hmac:
       type: apiKey

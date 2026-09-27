@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
-  title: APIs.io Engineering Platform News Search Client News Category API
-  description: The News Search API lets you send a search query to Bing and get back a list of news that are relevant to the search query. This section provides technical details about the query parameters and headers that you use to request news and the JSON response objects that contain them. For examples that show how to make requests, see [Searching the web for news](https://docs.microsoft.com/en-us/azure/cognitive-services/bing-news-search/search-the-web).
+  title: Client News Search API
+  description: The News Search API lets you send a search query to Bing and get back a list of news that are relevant to the search query. This section provides technical details about the query parameters and headers that you use to request news and the JSON response objects that contain them. For examples that show how to make requests, see Searching the web for news.
   contact: {}
   version: '1.0'
   x-apisguru-categories:
@@ -22,14 +22,14 @@ servers:
 security:
 - apiKeyHeader: []
 tags:
-- name: NewsCategory
+- name: News Search
 paths:
-  /news:
+  /news/search:
     get:
       tags:
-      - NewsCategory
-      summary: APIs.io Engineering Platform The News Category API lets you search on Bing and get back a list of top news articles by category. This section provides technical details about the query parameters and headers that you use to request news and the JSON response objects that contain them.  For examples that show how to make requests, see [Searching the web for news](https://docs.microsoft.com/en-us/azure/cognitive-services/bing-news-search/search-the-web).
-      operationId: News_Category
+      - News Search
+      summary: APIs.io Engineering Platform The News Search API lets you send a search query…
+      operationId: News_Search
       parameters:
       - name: X-BingApis-SDK
         in: header
@@ -94,29 +94,31 @@ paths:
           type: string
           x-ms-client-name: CountryCode
         x-ms-client-name: CountryCode
-      - name: category
-        in: query
-        description: 'The category of articles to return. For example, Sports articles or Entertainment articles. For a list of possible categories, see [News Categories by Market](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#categories-by-market). Use this parameter only with News Category API. If you do not specify this parameter, the response includes both: Headline articles typically published in the last 24 hours from any category and articles from each parent category (up to four articles). If the article is a headline, the article''s headline field is set to true. By default, the response includes up to 12 headline articles. To specify the number of headline articles to return, set the [headlineCount](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#headlineCount) query parameter.'
-        schema:
-          type: string
-          x-ms-client-name: Category
-        x-ms-client-name: Category
       - name: count
         in: query
-        description: The number of news articles to return in the response. The actual number delivered may be less than requested. The default is 10 and the maximum value is 100. The actual number delivered may be less than requested.You may use this parameter along with the offset parameter to page results. For example, if your user interface displays 20 articles per page, set count to 20 and offset to 0 to get the first page of results. For each subsequent page, increment offset by 20 (for example, 0, 20, 40). It is possible for multiple pages to include some overlap in results. If you do not specify the [category](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#category) parameter, Bing ignores this parameter.
+        description: The number of news articles to return in the response. The actual number delivered may be less than requested. The default is 10 and the maximum value is 100. The actual number delivered may be less than requested.You may use this parameter along with the offset parameter to page results. For example, if your user interface displays 20 articles per page, set count to 20 and offset to 0 to get the first page of results. For each subsequent page, increment offset by 20 (for example, 0, 20, 40). It is possible for multiple pages to include some overlap in results.
         schema:
           type: integer
           format: int32
           x-ms-client-name: Count
         x-ms-client-name: Count
-      - name: headlineCount
+      - name: freshness
         in: query
-        description: The number of headline articles to return in the response. The default is 12. Specify this parameter only if you do not specify the [category](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#category) parameter.
+        description: 'Filter news by the date and time that Bing discovered the news. The following are the possible filter values. Day: Return news discovered within the last 24 hours. Week: Return news discovered within the last 7 days. Month: Return news discovered within the last 30 days. Use this parameter only with the News Search API. Do not specify this parameter when calling the News Category API or the Trending Topics API.'
         schema:
-          type: integer
-          format: int32
-          x-ms-client-name: HeadlineCount
-        x-ms-client-name: HeadlineCount
+          type: string
+          enum:
+          - Day
+          - Week
+          - Month
+          x-ms-client-name: Freshness
+          x-ms-enum:
+            modelAsString: true
+            name: Freshness
+        x-ms-client-name: Freshness
+        x-ms-enum:
+          modelAsString: true
+          name: Freshness
       - name: mkt
         in: query
         description: 'The market where the results come from. Typically, mkt is the country where the user is making the request from. However, it could be a different country if the user is not located in a country where Bing delivers results. The market must be in the form <language code>-<country code>. For example, en-US. The string is case insensitive. For a list of possible market values, see [Market Codes](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#market-codes). NOTE: If known, you are encouraged to always specify the market. Specifying the market helps Bing route the request and return an appropriate and optimal response. If you specify a market that is not listed in [Market Codes](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#market-codes), Bing uses a best fit market code based on an internal mapping that is subject to change. This parameter and the [cc](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#cc) query parameter are mutually exclusive—do not specify both.'
@@ -126,7 +128,7 @@ paths:
         x-ms-client-name: Market
       - name: offset
         in: query
-        description: The zero-based offset that indicates the number of news to skip before returning news. The default is 0. The offset should be less than ([totalEstimatedMatches](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#news-totalmatches) - count). Use this parameter along with the count parameter to page results. For example, if your user interface displays 20 news per page, set count to 20 and offset to 0 to get the first page of results. For each subsequent page, increment offset by 20 (for example, 0, 20, 40). It is possible for multiple pages to include some overlap in results. If you do not specify the [category](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#category) parameter, Bing ignores this parameter.
+        description: The zero-based offset that indicates the number of news to skip before returning news. The default is 0. The offset should be less than ([totalEstimatedMatches](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#news-totalmatches) - count). Use this parameter along with the count parameter to page results. For example, if your user interface displays 20 news per page, set count to 20 and offset to 0 to get the first page of results. For each subsequent page, increment offset by 20 (for example, 0, 20, 40). It is possible for multiple pages to include some overlap in results.
         schema:
           type: integer
           format: int32
@@ -134,11 +136,19 @@ paths:
         x-ms-client-name: Offset
       - name: originalImg
         in: query
-        description: A Boolean value that determines whether the image's contentUrl contains a URL that points to a thumbnail of the original article's image or the image itself. If the article includes an image, and this parameter is set to true, the image's contentUrl property contains a URL that you may use to download the original image from the publisher's website. Otherwise, if this parameter is false, the image's contentUrl and thumbnailUrl URLs both point to the same thumbnail image. Use this parameter only with the News Search API or News Category API. Trending Topics API ignore this parameter.
+        description: A Boolean value that determines whether the image's contentUrl contains a URL that points to a thumbnail of the original article's image or the image itself. If the article includes an image, and this parameter is set to true, the image's contentUrl property contains a URL that you may use to download the original image from the publisher's website. Otherwise, if this parameter is false, the image's contentUrl and thumbnailUrl URLs both point to the same thumbnail image. Use this parameter only with the News Search API. Do not specify this parameter when calling the Trending Topics API or News Category API.
         schema:
           type: boolean
           x-ms-client-name: OriginalImage
         x-ms-client-name: OriginalImage
+      - name: q
+        in: query
+        description: The user's search query string. The query string cannot be empty. The query string may contain [Bing Advanced Operators](http://msdn.microsoft.com/library/ff795620.aspx). For example, to limit news to a specific domain, use the [site:](http://msdn.microsoft.com/library/ff795613.aspx) operator. Use this parameter only with the News Search API. Do not specify this parameter when calling the Trending Topics API or News Category API.
+        required: true
+        schema:
+          type: string
+          x-ms-client-name: Query
+        x-ms-client-name: Query
       - name: safeSearch
         in: query
         description: 'Filter news for adult content. The following are the possible filter values. Off: Return news articles with adult text, images, or videos. Moderate: Return news articles with adult text but not adult images or videos. Strict: Do not return news articles with adult text, images, or videos. If the request comes from a market that Bing''s adult policy requires that safeSearch is set to Strict, Bing ignores the safeSearch value and uses Strict. If you use the site: query operator, there is the chance that the response may contain adult content regardless of what the safeSearch query parameter is set to. Use site: only if you are aware of the content on the site and your scenario supports the possibility of adult content.'
@@ -163,6 +173,13 @@ paths:
           type: string
           x-ms-client-name: SetLang
         x-ms-client-name: SetLang
+      - name: sortBy
+        in: query
+        description: 'The order to return the news in. The following are the possible case-insensitive values. Date: If the request is through the News Search API, the response returns news articles sorted by date from the most recent to the oldest. If the request is through the News Trending Topics API, the response returns trending topics sorted by date from the most recent to the oldest.'
+        schema:
+          type: string
+          x-ms-client-name: SortBy
+        x-ms-client-name: SortBy
       - name: textDecorations
         in: query
         description: A Boolean value that determines whether display strings contain decoration markers such as hit highlighting characters. If true, the strings may include markers. The default is false. To specify whether to use Unicode characters or HTML tags as the markers, see the [textFormat](https://docs.microsoft.com/en-us/rest/api/cognitiveservices/bing-news-api-v7-reference#textformat) query parameter. For information about hit highlighting, see [Hit Highlighting](https://docs.microsoft.com/azure/cognitive-services/bing-news-search/hit-highlighting).
@@ -209,98 +226,95 @@ paths:
             X-BingApis-SDK: 'true'
             X-MS-EdgeClientIP: '{IP AddresS}'
             X-MSEdge-ClientID: '{Client ID}'
-            category: sports
             cc: US
             mkt: en-us
+            q: microsoft
             setLang: en
           responses:
             '200':
               body:
                 _type: News
+                totalEstimatedMatches: 46
                 value:
                 - _type: NewsArticle
-                  category: Sports
-                  datePublished: 2017-11-17 07:19:00+00:00
-                  description: The sixth question on the same subject pushed Fred Hoiberg over the edge. “Guys, I’m going to try to get our guys ready to play a game,” the Bulls coach said Tuesday. Until Nikola Mirotic speaks to Bobby Portis — or at least to reporters to ...
+                  category: ScienceAndTechnology
+                  datePublished: 2017-11-16 14:15:00+00:00
+                  description: Don&#39;t call it Surface Pro 5. The latest iteration of the Surface Pro loses the model number, keeps the kickstand, and adds mostly subtle refinements. Read More For the past five days, I&#39;ve been using a Surface Book 2 in place of my everyday PC, a first ...
+                  name: 'Surface Book 2 (15-inch): <b>Microsoft</b> supersizes its most powerful portable PC'
+                  provider:
+                  - _type: Organization
+                    name: ZDNet
+                  url: http://www.zdnet.com/product/microsoft-surface-book-2/
+                - _type: NewsArticle
+                  category: ScienceAndTechnology
+                  datePublished: 2017-11-17 06:13:00+00:00
+                  description: <b>Microsoft</b> Surface Book 2 - 15&quot; - Core i7 8650U - 16 GB RAM - 512 GB SSD - English - North America fux00001 $2,899.00 <b>Microsoft</b> Surface Book 2 - 15&quot; - Core i7 8650U - 16 GB RAM - 256 GB SSD - English - North America hnr00001 $2,499.00 <b>Microsoft</b> Surface Book ...
                   image:
                     _type: ImageObject
                     thumbnail:
                       _type: ImageObject
-                      contentUrl: https://www.bing.com/th?id=ON.372546C0684230BBFABBE735B0D85E0E&pid=News
+                      contentUrl: https://www.bing.com/th?id=ON.4A5C3F257DA120C0D7778A4A764A0292&pid=News
                       height: 393
                       width: 700
-                  name: '''It’s a very difficult situation:'' Bulls try to focus as Nikola Mirotic-Bobby Portis drama continues'
+                  name: '<b>Microsoft</b> Surface Book 2 (15-inch) review:'
                   provider:
                   - _type: Organization
-                    image:
+                    name: CNET
+                  url: https://www.cnet.com/products/microsoft-surface-book-2/review/
+                  video:
+                    _type: VideoObject
+                    allowHttpsEmbed: true
+                    name: Microsoft Surface Book 2 (15-inch)
+                    thumbnail:
                       _type: ImageObject
-                      thumbnail:
-                        _type: ImageObject
-                        contentUrl: https://www.bing.com/th?id=ON.SIR111219528389e4ac0552cd50a9f07f86e23462e7&pid=News
-                    name: Chicago Tribune
-                  url: http://www.chicagotribune.com/sports/basketball/bulls/ct-spt-bulls-nikola-mirotic-bobby-portis-fallout-20171115-story.html
+                      height: 269
+                      width: 480
+                    thumbnailUrl: https://www.bing.com/th?id=ON.C362047C8A293C48E4DBF9FCF1C99DD2&pid=News
                 - _type: NewsArticle
-                  category: Sports
-                  datePublished: 2017-11-16 19:15:00+00:00
-                  description: The ratings for NBC’s Sunday Night Football broadcasts are down 8 percent compared to last year. And while there are several explanations for the decline (i.e. cord cutting), NFL player protests of racial injustice during the national anthem continue to ...
+                  category: ScienceAndTechnology
+                  datePublished: 2017-11-17 04:27:00+00:00
+                  description: At just two years old, Edge is the new kid on the web browser block, but what it lacks in maturity, it makes up for in speed and convenience. Development has been swift. With each major Windows 10 release, Edge improves. Windows 10 Fall Creators Update ...
                   image:
                     _type: ImageObject
                     thumbnail:
                       _type: ImageObject
-                      contentUrl: https://www.bing.com/th?id=ON.C88D0D1DA5DB60A88B6E2062EC498ACE&pid=News
-                      height: 393
+                      contentUrl: https://www.bing.com/th?id=ON.D6CC6169ECD49465AACCC1327B37283E&pid=News
+                      height: 394
                       width: 700
-                  name: 'Al Michaels: Player protests and Donald Trump contributed to NFL ratings decline'
+                  name: 12 Reasons <b>Microsoft</b>&#39;s Edge Browser Rocks (No, Really)
                   provider:
                   - _type: Organization
-                    image:
-                      _type: ImageObject
-                      thumbnail:
-                        _type: ImageObject
-                        contentUrl: https://www.bing.com/th?id=ON.SIR111219423d8564095bc699fb54aa46bd19819288&pid=News
-                    name: USA Today Sports For The Win
-                  url: http://ftw.usatoday.com/2017/11/al-michaels-nbc-nfl-ratings-sunday-night-football-player-protests-donald-trump-decline
+                    name: PC Magazine
+                  url: https://www.pcmag.com/feature/357262/12-reasons-microsoft-s-edge-browser-rocks-no-really
                 - _type: NewsArticle
-                  category: Sports
-                  datePublished: 2017-11-17 00:35:00+00:00
-                  description: Dallas Cowboys owner Jerry Jones has asked for a special league meeting with NFL owners to talk about commissioner Roger Goodell's contract extension negotiations, but an ownership source told ESPN's Jim Trotter that owners currently have no plans to act ...
+                  category: ScienceAndTechnology
+                  clusteredArticles:
+                  - _type: NewsArticle
+                    category: ScienceAndTechnology
+                    datePublished: 2017-11-17 01:59:00+00:00
+                    description: It may have been the company&#39;s first-ever laptop, but when I tested it last year a few months after it debuted, I immediately liked it better than any of Apple&#39;s MacBooks that I&#39;d ever used. I now have a new favorite computer, and it&#39;s the successor to my ...
+                    name: 'REVIEW: <b>Microsoft</b>&#39;s newest laptop is my new favorite computer (MSFT)'
+                    provider:
+                    - _type: Organization
+                      name: Business Insider on MSN.com
+                    url: https://www.msn.com/en-us/money/other/review-microsofts-newest-laptop-is-my-new-favorite-computer-msft/ar-BBF2svf
+                  datePublished: 2017-11-16 23:58:00+00:00
+                  description: <b>Microsoft</b>&#39;s original Surface Book was my favorite computer. It may have been the company&#39;s first-ever laptop, but when I tested it last year a few months after it debuted, I immediately liked it better than any of Apple&#39;s MacBooks that I&#39;d ever used.
                   image:
                     _type: ImageObject
                     thumbnail:
                       _type: ImageObject
-                      contentUrl: https://www.bing.com/th?id=ON.0D5611D738B0DE113E9EE80CC2A26BDD&pid=News
-                      height: 324
-                      width: 576
-                  name: 'Source: Owners don''t plan to act on Jerry Jones'' sit-down request'
+                      contentUrl: https://www.bing.com/th?id=ON.7CEEFC996C222EA79BC65ABFE9356D63&pid=News
+                      height: 524
+                      width: 700
+                  name: 'REVIEW: <b>Microsoft</b>&#39;s newest laptop is a powerful alternative to any of Apple&#39;s MacBooks or iPads'
                   provider:
                   - _type: Organization
-                    image:
-                      _type: ImageObject
-                      thumbnail:
-                        _type: ImageObject
-                        contentUrl: https://www.bing.com/th?id=ON.SIR11122011f8b32789f686c3f36f3ef26bff413db4&pid=News
-                    name: ABC News
-                  url: http://abcnews.go.com/Sports/source-owners-plan-act-jerry-jones-sit-request/story?id=51210517
-                webSearchUrl: https://www.bing.com/news/search?q=sports+news&form=TNSA02
+                    name: Business Insider
+                  url: http://www.businessinsider.com/microsoft-surface-book-2-review-2017-11
               headers: {}
 components:
   schemas:
-    News:
-      required:
-      - value
-      properties:
-        location:
-          type: string
-          description: Location of local news
-          readOnly: true
-        value:
-          type: array
-          description: An array of NewsArticle objects that contain information about news articles that are relevant to the query. If there are no results to return for the request, the array is empty.
-          items:
-            $ref: '#/components/schemas/NewsArticle'
-      description: Defines a news answer.
-      allOf:
-      - $ref: '#/components/schemas/SearchResultsAnswer'
     Error:
       required:
       - code
@@ -356,27 +370,35 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    CreativeWork:
+    ResponseBase:
+      required:
+      - _type
+      type: object
       properties:
-        datePublished:
+        _type:
           type: string
-          description: The date on which the CreativeWork was published.
+      description: Response base
+      discriminator:
+        propertyName: _type
+    NewsArticle:
+      properties:
+        category:
+          type: string
+          description: The news category that the article belongs to. For example, Sports. If the news category cannot be determined, the article does not include this field.
           readOnly: true
-        provider:
+        clusteredArticles:
           type: array
-          description: The source of the creative work.
+          description: A list of related news articles.
           readOnly: true
           items:
-            $ref: '#/components/schemas/Thing'
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
+            $ref: '#/components/schemas/NewsArticle'
+        headline:
+          type: boolean
+          description: A Boolean value that indicates whether the news article is a headline. If true, the article is a headline. The article includes this field only for news categories requests that do not specify the category query parameter.
           readOnly: true
-        video:
-          $ref: '#/components/schemas/VideoObject'
-      description: The most generic kind of creative work, including books, movies, photographs, software programs, etc.
+      description: Defines a news article.
       allOf:
-      - $ref: '#/components/schemas/Thing'
+      - $ref: '#/components/schemas/Article'
     Query:
       required:
       - text
@@ -400,25 +422,18 @@ components:
           description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
           readOnly: true
       description: Defines a search query.
-    NewsArticle:
+    ErrorResponse:
+      required:
+      - errors
       properties:
-        category:
-          type: string
-          description: The news category that the article belongs to. For example, Sports. If the news category cannot be determined, the article does not include this field.
-          readOnly: true
-        clusteredArticles:
+        errors:
           type: array
-          description: A list of related news articles.
-          readOnly: true
+          description: A list of errors that describe the reasons why the request failed.
           items:
-            $ref: '#/components/schemas/NewsArticle'
-        headline:
-          type: boolean
-          description: A Boolean value that indicates whether the news article is a headline. If true, the article is a headline. The article includes this field only for news categories requests that do not specify the category query parameter.
-          readOnly: true
-      description: Defines a news article.
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
       allOf:
-      - $ref: '#/components/schemas/Article'
+      - $ref: '#/components/schemas/Response'
     Article:
       properties:
         wordCount:
@@ -428,33 +443,6 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/CreativeWork'
-    Thing:
-      properties:
-        alternateName:
-          type: string
-          description: An alias for the item
-          readOnly: true
-        bingId:
-          type: string
-          description: An ID that uniquely identifies this item.
-          readOnly: true
-        description:
-          type: string
-          description: A short description of the item.
-          readOnly: true
-        image:
-          $ref: '#/components/schemas/ImageObject'
-        name:
-          type: string
-          description: The name of the thing represented by this object.
-          readOnly: true
-        url:
-          type: string
-          description: The URL to get more information about the thing represented by this object.
-          readOnly: true
-      description: Defines a thing.
-      allOf:
-      - $ref: '#/components/schemas/Response'
     Identifiable:
       properties:
         id:
@@ -464,32 +452,6 @@ components:
       description: Defines the identity of a resource.
       allOf:
       - $ref: '#/components/schemas/ResponseBase'
-    ImageObject:
-      properties:
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
-    Answer:
-      properties:
-        followUpQueries:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-      description: Defines an answer.
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
     MediaObject:
       properties:
         contentUrl:
@@ -541,18 +503,6 @@ components:
       description: Defines a video object that is relevant to the query.
       allOf:
       - $ref: '#/components/schemas/MediaObject'
-    ErrorResponse:
-      required:
-      - errors
-      properties:
-        errors:
-          type: array
-          description: A list of errors that describe the reasons why the request failed.
-          items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
-      allOf:
-      - $ref: '#/components/schemas/Response'
     SearchResultsAnswer:
       properties:
         totalEstimatedMatches:
@@ -563,16 +513,96 @@ components:
       description: Defines a search result answer.
       allOf:
       - $ref: '#/components/schemas/Answer'
-    ResponseBase:
-      required:
-      - _type
-      type: object
+    Answer:
       properties:
-        _type:
+        followUpQueries:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Query'
+      description: Defines an answer.
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    News:
+      required:
+      - value
+      properties:
+        location:
           type: string
-      description: Response base
-      discriminator:
-        propertyName: _type
+          description: Location of local news
+          readOnly: true
+        value:
+          type: array
+          description: An array of NewsArticle objects that contain information about news articles that are relevant to the query. If there are no results to return for the request, the array is empty.
+          items:
+            $ref: '#/components/schemas/NewsArticle'
+      description: Defines a news answer.
+      allOf:
+      - $ref: '#/components/schemas/SearchResultsAnswer'
+    Response:
+      properties:
+        webSearchUrl:
+          type: string
+          description: The URL To Bing's search result for this item.
+          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
+    Thing:
+      properties:
+        alternateName:
+          type: string
+          description: An alias for the item
+          readOnly: true
+        bingId:
+          type: string
+          description: An ID that uniquely identifies this item.
+          readOnly: true
+        description:
+          type: string
+          description: A short description of the item.
+          readOnly: true
+        image:
+          $ref: '#/components/schemas/ImageObject'
+        name:
+          type: string
+          description: The name of the thing represented by this object.
+          readOnly: true
+        url:
+          type: string
+          description: The URL to get more information about the thing represented by this object.
+          readOnly: true
+      description: Defines a thing.
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    CreativeWork:
+      properties:
+        datePublished:
+          type: string
+          description: The date on which the CreativeWork was published.
+          readOnly: true
+        provider:
+          type: array
+          description: The source of the creative work.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Thing'
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
+        video:
+          $ref: '#/components/schemas/VideoObject'
+      description: The most generic kind of creative work, including books, movies, photographs, software programs, etc.
+      allOf:
+      - $ref: '#/components/schemas/Thing'
   securitySchemes:
     apiKeyHeader:
       type: apiKey

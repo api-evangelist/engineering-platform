@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Email Security API
+  title: Cloudflare Email Security API
   version: 4.0.0
 tags:
 - name: Email Security
@@ -783,87 +772,67 @@ paths:
       - Email Security
 components:
   schemas:
-    email-security_PostfixId:
-      description: Message identifier
-      example: 4Njp3P0STMz2c02Q
-      title: postfix_id
-      type: string
-    email-security_MessageHeader:
+    email-security_TraceLine:
       properties:
-        name:
-          type: string
-        value:
-          type: string
-      required:
-      - name
-      - value
-      type: object
-    email-security_PhishGuardReport:
-      properties:
-        content:
-          type: string
-        disposition:
-          $ref: '#/components/schemas/email-security_DispositionLabel'
-        fields:
-          properties:
-            from:
-              type:
-              - string
-              - 'null'
-            postfix_id:
-              type: string
-            to:
-              items:
-                type: string
-              type: array
-            ts:
-              format: date-time
-              type: string
-          required:
-          - to
-          - ts
-          - postfix_id
-          type: object
-        id:
-          format: int32
+        lineno:
+          format: int64
           type: integer
-        priority:
-          type: string
-        tags:
-          items:
-            $ref: '#/components/schemas/email-security_PhishGuardReportTag'
-          type:
-          - array
-          - 'null'
-        title:
+        message:
           type: string
         ts:
           format: date-time
           type: string
       required:
-      - id
       - ts
-      - title
-      - content
-      - fields
-      - priority
-      - disposition
+      - lineno
+      - message
       type: object
-    email-security_ThreatCategory:
+    email-security_ValidationStatus:
+      enum:
+      - pass
+      - neutral
+      - fail
+      - error
+      - none
+      type: string
+    email-security_DispositionLabel:
+      enum:
+      - MALICIOUS
+      - MALICIOUS-BEC
+      - SUSPICIOUS
+      - SPOOF
+      - SPAM
+      - BULK
+      - ENCRYPTED
+      - EXTERNAL
+      - UNKNOWN
+      - NONE
+      type: string
+    email-security_Attachment:
       properties:
-        description:
+        content_type:
           type:
           - string
           - 'null'
-        id:
-          format: int64
-          type: integer
+        detection:
+          allOf:
+          - $ref: '#/components/schemas/email-security_DispositionLabel'
+          - type:
+            - string
+            - 'null'
+        encrypted:
+          type:
+          - boolean
+          - 'null'
         name:
           type:
           - string
           - 'null'
+        size:
+          minimum: 0
+          type: integer
       required:
-      - id
+      - size
       type: object
     email-security_ResultInfo:
       properties:
@@ -892,143 +861,6 @@ components:
       - page
       - per_page
       - total_count
-      type: object
-    email-security_DispositionLabel:
-      enum:
-      - MALICIOUS
-      - MALICIOUS-BEC
-      - SUSPICIOUS
-      - SPOOF
-      - SPAM
-      - BULK
-      - ENCRYPTED
-      - EXTERNAL
-      - UNKNOWN
-      - NONE
-      type: string
-    email-security_AccountId:
-      description: Account Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      minLength: 32
-      readOnly: true
-      title: account_id
-      type: string
-    email-security_TraceLine:
-      properties:
-        lineno:
-          format: int64
-          type: integer
-        message:
-          type: string
-        ts:
-          format: date-time
-          type: string
-      required:
-      - ts
-      - lineno
-      - message
-      type: object
-    email-security_ApiResponseCommon:
-      properties:
-        errors:
-          example: []
-          items:
-            $ref: '#/components/schemas/email-security_Message'
-          type: array
-        messages:
-          example: []
-          items:
-            $ref: '#/components/schemas/email-security_Message'
-          type: array
-        success:
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    email-security_ValidationStatus:
-      enum:
-      - pass
-      - neutral
-      - fail
-      - error
-      - none
-      type: string
-    email-security_Message:
-      properties:
-        code:
-          format: int32
-          minimum: 1000
-          type: integer
-        message:
-          type: string
-      required:
-      - code
-      - message
-      type: object
-    email-security_MessageDeliveryMode:
-      enum:
-      - DIRECT
-      - BCC
-      - JOURNAL
-      - REVIEW_SUBMISSION
-      - DMARC_UNVERIFIED
-      - DMARC_FAILURE_REPORT
-      - DMARC_AGGREGATE_REPORT
-      - THREAT_INTEL_SUBMISSION
-      - SIMULATION_SUBMISSION
-      - API
-      - RETRO_SCAN
-      type: string
-    email-security_Link:
-      properties:
-        href:
-          type: string
-        text:
-          type:
-          - string
-          - 'null'
-      required:
-      - href
-      type: object
-    email-security_Attachment:
-      properties:
-        content_type:
-          type:
-          - string
-          - 'null'
-        detection:
-          allOf:
-          - $ref: '#/components/schemas/email-security_DispositionLabel'
-          - type:
-            - string
-            - 'null'
-        encrypted:
-          type:
-          - boolean
-          - 'null'
-        name:
-          type:
-          - string
-          - 'null'
-        size:
-          minimum: 0
-          type: integer
-      required:
-      - size
-      type: object
-    email-security_PhishGuardReportTag:
-      properties:
-        category:
-          type: string
-        value:
-          type: string
-      required:
-      - category
-      - value
       type: object
     email-security_MailsearchMessage:
       allOf:
@@ -1183,6 +1015,163 @@ components:
           dkim: pass
           dmarc: none
           spf: fail
+    email-security_Link:
+      properties:
+        href:
+          type: string
+        text:
+          type:
+          - string
+          - 'null'
+      required:
+      - href
+      type: object
+    email-security_AccountId:
+      description: Account Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      minLength: 32
+      readOnly: true
+      title: account_id
+      type: string
+    email-security_PostfixId:
+      description: Message identifier
+      example: 4Njp3P0STMz2c02Q
+      title: postfix_id
+      type: string
+    email-security_PhishGuardReportTag:
+      properties:
+        category:
+          type: string
+        value:
+          type: string
+      required:
+      - category
+      - value
+      type: object
+    email-security_Message:
+      properties:
+        code:
+          format: int32
+          minimum: 1000
+          type: integer
+        message:
+          type: string
+      required:
+      - code
+      - message
+      type: object
+    email-security_ThreatCategory:
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        id:
+          format: int64
+          type: integer
+        name:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      type: object
+    email-security_MessageDeliveryMode:
+      enum:
+      - DIRECT
+      - BCC
+      - JOURNAL
+      - REVIEW_SUBMISSION
+      - DMARC_UNVERIFIED
+      - DMARC_FAILURE_REPORT
+      - DMARC_AGGREGATE_REPORT
+      - THREAT_INTEL_SUBMISSION
+      - SIMULATION_SUBMISSION
+      - API
+      - RETRO_SCAN
+      type: string
+    email-security_ApiResponseCommon:
+      properties:
+        errors:
+          example: []
+          items:
+            $ref: '#/components/schemas/email-security_Message'
+          type: array
+        messages:
+          example: []
+          items:
+            $ref: '#/components/schemas/email-security_Message'
+          type: array
+        success:
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    email-security_MessageHeader:
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+      required:
+      - name
+      - value
+      type: object
+    email-security_PhishGuardReport:
+      properties:
+        content:
+          type: string
+        disposition:
+          $ref: '#/components/schemas/email-security_DispositionLabel'
+        fields:
+          properties:
+            from:
+              type:
+              - string
+              - 'null'
+            postfix_id:
+              type: string
+            to:
+              items:
+                type: string
+              type: array
+            ts:
+              format: date-time
+              type: string
+          required:
+          - to
+          - ts
+          - postfix_id
+          type: object
+        id:
+          format: int32
+          type: integer
+        priority:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/email-security_PhishGuardReportTag'
+          type:
+          - array
+          - 'null'
+        title:
+          type: string
+        ts:
+          format: date-time
+          type: string
+      required:
+      - id
+      - ts
+      - title
+      - content
+      - fields
+      - priority
+      - disposition
+      type: object
   responses:
     email-security_ClientError:
       content:

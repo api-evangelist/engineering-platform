@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Magic Connectors API
+  title: Cloudflare Magic Connectors API
   version: 4.0.0
 tags:
 - name: Magic Connectors
@@ -255,6 +244,22 @@ paths:
         pro: false
 components:
   schemas:
+    mconn_customer_connector_list_response:
+      allOf:
+      - $ref: '#/components/schemas/mconn_good_response'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/mconn_customer_connector'
+            type: array
+    mconn_customer_connector_update_response:
+      allOf:
+      - $ref: '#/components/schemas/mconn_good_response'
+      - properties:
+          result:
+            $ref: '#/components/schemas/mconn_customer_connector'
+    mconn_customer_connector_update_request:
+      $ref: '#/components/schemas/mconn_customer_connector_fields'
     mconn_good_response:
       allOf:
       - $ref: '#/components/schemas/mconn_response'
@@ -264,34 +269,10 @@ components:
               $ref: '#/components/schemas/mconn_coded_message'
             maxLength: 0
             type: array
-    mconn_customer_connector_fields:
-      properties:
-        activated:
-          type: boolean
-        interrupt_window_duration_hours:
-          type: number
-        interrupt_window_hour_of_day:
-          type: number
-        notes:
-          type: string
-        timezone:
-          type: string
-      type: object
-    mconn_customer_device:
-      properties:
-        id:
-          $ref: '#/components/schemas/mconn_uuid'
-        serial_number:
-          type: string
-      required:
-      - id
-      type: object
-    mconn_account_id:
-      description: Account identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
+    mconn_none:
+      type:
+      - object
+      - 'null'
     mconn_coded_message:
       properties:
         code:
@@ -302,6 +283,20 @@ components:
       required:
       - code
       - message
+      type: object
+    mconn_response:
+      properties:
+        messages:
+          items:
+            $ref: '#/components/schemas/mconn_coded_message'
+          type: array
+        success:
+          type: boolean
+      required:
+      - result
+      - success
+      - errors
+      - messages
       type: object
     mconn_customer_connector:
       properties:
@@ -334,14 +329,36 @@ components:
       - interrupt_window_hour_of_day
       - interrupt_window_duration_hours
       type: object
-    mconn_customer_connector_update_request:
-      $ref: '#/components/schemas/mconn_customer_connector_fields'
     mconn_customer_connector_fetch_response:
       allOf:
       - $ref: '#/components/schemas/mconn_good_response'
       - properties:
           result:
             $ref: '#/components/schemas/mconn_customer_connector'
+    mconn_customer_device:
+      properties:
+        id:
+          $ref: '#/components/schemas/mconn_uuid'
+        serial_number:
+          type: string
+      required:
+      - id
+      type: object
+    mconn_uuid:
+      type: string
+    mconn_customer_connector_fields:
+      properties:
+        activated:
+          type: boolean
+        interrupt_window_duration_hours:
+          type: number
+        interrupt_window_hour_of_day:
+          type: number
+        notes:
+          type: string
+        timezone:
+          type: string
+      type: object
     mconn_bad_response:
       allOf:
       - $ref: '#/components/schemas/mconn_response'
@@ -353,40 +370,12 @@ components:
             type: array
           result:
             $ref: '#/components/schemas/mconn_none'
-    mconn_customer_connector_update_response:
-      allOf:
-      - $ref: '#/components/schemas/mconn_good_response'
-      - properties:
-          result:
-            $ref: '#/components/schemas/mconn_customer_connector'
-    mconn_uuid:
+    mconn_account_id:
+      description: Account identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
       type: string
-    mconn_response:
-      properties:
-        messages:
-          items:
-            $ref: '#/components/schemas/mconn_coded_message'
-          type: array
-        success:
-          type: boolean
-      required:
-      - result
-      - success
-      - errors
-      - messages
-      type: object
-    mconn_customer_connector_list_response:
-      allOf:
-      - $ref: '#/components/schemas/mconn_good_response'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/mconn_customer_connector'
-            type: array
-    mconn_none:
-      type:
-      - object
-      - 'null'
   securitySchemes:
     api_email:
       in: header

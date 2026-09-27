@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   version: 1.1.4
-  title: APIs.io Engineering Platform GitHub v3 REST Licenses API
+  title: GitHub v3 REST Licenses API
   description: GitHub's v3 REST API.
   license:
     name: MIT
@@ -28,7 +28,7 @@ paths:
   /licenses:
     get:
       summary: APIs.io Engineering Platform Get all commonly used licenses
-      description: Lists the most commonly used licenses on GitHub. For more information, see "[Licensing a repository ](https://docs.github.com/enterprise-server@3.9/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)."
+      description: Lists the most commonly used licenses on GitHub. For more information, see "Licensing a repository ."
       tags:
       - Licenses
       operationId: licenses/get-all-commonly-used
@@ -65,7 +65,7 @@ paths:
   /licenses/{license}:
     get:
       summary: APIs.io Engineering Platform Get a license
-      description: Gets information about a specific license. For more information, see "[Licensing a repository ](https://docs.github.com/enterprise-server@3.9/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)."
+      description: Gets information about a specific license. For more information, see "Licensing a repository ."
       tags:
       - Licenses
       operationId: licenses/get
@@ -105,12 +105,12 @@ paths:
       description: 'This method returns the contents of the repository''s license file, if one is detected.
 
 
-        This endpoint supports the following custom media types. For more information, see "[Media types](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types)."
+        This endpoint supports the following custom media types. For more information, see "Media types."
 
 
         - **`application/vnd.github.raw+json`**: Returns the raw contents of the license.
 
-        - **`application/vnd.github.html+json`**: Returns the license contents in HTML. Markup languages are rendered to HTML using GitHub''s open-source [Markup library](https://github.com/github/markup).'
+        - **`application/vnd.github.html+json`**: Returns the license contents in HTML. Markup languages are rendered to HTML using GitHub''s open-source Markup library.'
       tags:
       - Licenses
       operationId: licenses/get-for-repo
@@ -139,9 +139,23 @@ paths:
         subcategory: licenses
 components:
   parameters:
+    page:
+      name: page
+      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
+      in: query
+      schema:
+        type: integer
+        default: 1
     repo:
       name: repo
       description: The name of the repository without the `.git` extension. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    owner:
+      name: owner
+      description: The account owner of the repository. The name is not case sensitive.
       in: path
       required: true
       schema:
@@ -153,20 +167,296 @@ components:
       schema:
         type: integer
         default: 30
-    page:
-      name: page
-      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
-      in: query
-      schema:
-        type: integer
-        default: 1
-    owner:
-      name: owner
-      description: The account owner of the repository. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
+  responses:
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
+    not_found:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
+    not_modified:
+      description: Not modified
+  schemas:
+    license-simple:
+      title: License Simple
+      description: License Simple
+      type: object
+      properties:
+        key:
+          type: string
+          example: mit
+        name:
+          type: string
+          example: MIT License
+        url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          example: https://api.github.com/licenses/mit
+        spdx_id:
+          type:
+          - string
+          - 'null'
+          example: MIT
+        node_id:
+          type: string
+          example: MDc6TGljZW5zZW1pdA==
+        html_url:
+          type: string
+          format: uri
+      required:
+      - key
+      - name
+      - url
+      - spdx_id
+      - node_id
+    basic-error:
+      title: Basic Error
+      description: Basic Error
+      type: object
+      properties:
+        message:
+          type: string
+        documentation_url:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+    nullable-license-simple:
+      title: License Simple
+      description: License Simple
+      type:
+      - object
+      - 'null'
+      properties:
+        key:
+          type: string
+          example: mit
+        name:
+          type: string
+          example: MIT License
+        url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          example: https://api.github.com/licenses/mit
+        spdx_id:
+          type:
+          - string
+          - 'null'
+          example: MIT
+        node_id:
+          type: string
+          example: MDc6TGljZW5zZW1pdA==
+        html_url:
+          type: string
+          format: uri
+      required:
+      - key
+      - name
+      - url
+      - spdx_id
+      - node_id
+    license-content:
+      title: License Content
+      description: License Content
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        sha:
+          type: string
+        size:
+          type: integer
+        url:
+          type: string
+          format: uri
+        html_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+        git_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+        download_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+        type:
+          type: string
+        content:
+          type: string
+        encoding:
+          type: string
+        _links:
+          type: object
+          properties:
+            git:
+              type:
+              - string
+              - 'null'
+              format: uri
+            html:
+              type:
+              - string
+              - 'null'
+              format: uri
+            self:
+              type: string
+              format: uri
+          required:
+          - git
+          - html
+          - self
+        license:
+          $ref: '#/components/schemas/nullable-license-simple'
+      required:
+      - _links
+      - git_url
+      - html_url
+      - download_url
+      - name
+      - path
+      - sha
+      - size
+      - type
+      - url
+      - content
+      - encoding
+      - license
+    license:
+      title: License
+      description: License
+      type: object
+      properties:
+        key:
+          type: string
+          example: mit
+        name:
+          type: string
+          example: MIT License
+        spdx_id:
+          type:
+          - string
+          - 'null'
+          example: MIT
+        url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          example: https://api.github.com/licenses/mit
+        node_id:
+          type: string
+          example: MDc6TGljZW5zZW1pdA==
+        html_url:
+          type: string
+          format: uri
+          example: http://choosealicense.com/licenses/mit/
+        description:
+          type: string
+          example: A permissive license that is short and to the point. It lets people do anything with your code with proper attribution and without warranty.
+        implementation:
+          type: string
+          example: Create a text file (typically named LICENSE or LICENSE.txt) in the root of your source code and copy the text of the license into the file. Replace [year] with the current year and [fullname] with the name (or names) of the copyright holders.
+        permissions:
+          type: array
+          example:
+          - commercial-use
+          - modifications
+          - distribution
+          - sublicense
+          - private-use
+          items:
+            type: string
+        conditions:
+          type: array
+          example:
+          - include-copyright
+          items:
+            type: string
+        limitations:
+          type: array
+          example:
+          - no-liability
+          items:
+            type: string
+        body:
+          type: string
+          example: '
+
+
+            The MIT License (MIT)
+
+
+            Copyright (c) [year] [fullname]
+
+
+            Permission is hereby granted, free of charge, to any person obtaining a copy
+
+            of this software and associated documentation files (the "Software"), to deal
+
+            in the Software without restriction, including without limitation the rights
+
+            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+
+            copies of the Software, and to permit persons to whom the Software is
+
+            furnished to do so, subject to the following conditions:
+
+
+            The above copyright notice and this permission notice shall be included in all
+
+            copies or substantial portions of the Software.
+
+
+            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+
+            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+
+            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+
+            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+
+            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+
+            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+
+            SOFTWARE.
+
+            '
+        featured:
+          type: boolean
+          example: true
+      required:
+      - key
+      - name
+      - url
+      - spdx_id
+      - node_id
+      - html_url
+      - description
+      - implementation
+      - permissions
+      - conditions
+      - limitations
+      - body
+      - featured
   examples:
     license-content:
       value:
@@ -339,296 +629,6 @@ components:
         spdx_id: GPL-3.0
         url: https://api.github.com/licenses/gpl-3.0
         node_id: MDc6TGljZW5zZW1pdA==
-  schemas:
-    nullable-license-simple:
-      title: License Simple
-      description: License Simple
-      type:
-      - object
-      - 'null'
-      properties:
-        key:
-          type: string
-          example: mit
-        name:
-          type: string
-          example: MIT License
-        url:
-          type:
-          - string
-          - 'null'
-          format: uri
-          example: https://api.github.com/licenses/mit
-        spdx_id:
-          type:
-          - string
-          - 'null'
-          example: MIT
-        node_id:
-          type: string
-          example: MDc6TGljZW5zZW1pdA==
-        html_url:
-          type: string
-          format: uri
-      required:
-      - key
-      - name
-      - url
-      - spdx_id
-      - node_id
-    license-simple:
-      title: License Simple
-      description: License Simple
-      type: object
-      properties:
-        key:
-          type: string
-          example: mit
-        name:
-          type: string
-          example: MIT License
-        url:
-          type:
-          - string
-          - 'null'
-          format: uri
-          example: https://api.github.com/licenses/mit
-        spdx_id:
-          type:
-          - string
-          - 'null'
-          example: MIT
-        node_id:
-          type: string
-          example: MDc6TGljZW5zZW1pdA==
-        html_url:
-          type: string
-          format: uri
-      required:
-      - key
-      - name
-      - url
-      - spdx_id
-      - node_id
-    license:
-      title: License
-      description: License
-      type: object
-      properties:
-        key:
-          type: string
-          example: mit
-        name:
-          type: string
-          example: MIT License
-        spdx_id:
-          type:
-          - string
-          - 'null'
-          example: MIT
-        url:
-          type:
-          - string
-          - 'null'
-          format: uri
-          example: https://api.github.com/licenses/mit
-        node_id:
-          type: string
-          example: MDc6TGljZW5zZW1pdA==
-        html_url:
-          type: string
-          format: uri
-          example: http://choosealicense.com/licenses/mit/
-        description:
-          type: string
-          example: A permissive license that is short and to the point. It lets people do anything with your code with proper attribution and without warranty.
-        implementation:
-          type: string
-          example: Create a text file (typically named LICENSE or LICENSE.txt) in the root of your source code and copy the text of the license into the file. Replace [year] with the current year and [fullname] with the name (or names) of the copyright holders.
-        permissions:
-          type: array
-          example:
-          - commercial-use
-          - modifications
-          - distribution
-          - sublicense
-          - private-use
-          items:
-            type: string
-        conditions:
-          type: array
-          example:
-          - include-copyright
-          items:
-            type: string
-        limitations:
-          type: array
-          example:
-          - no-liability
-          items:
-            type: string
-        body:
-          type: string
-          example: '
-
-
-            The MIT License (MIT)
-
-
-            Copyright (c) [year] [fullname]
-
-
-            Permission is hereby granted, free of charge, to any person obtaining a copy
-
-            of this software and associated documentation files (the "Software"), to deal
-
-            in the Software without restriction, including without limitation the rights
-
-            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-
-            copies of the Software, and to permit persons to whom the Software is
-
-            furnished to do so, subject to the following conditions:
-
-
-            The above copyright notice and this permission notice shall be included in all
-
-            copies or substantial portions of the Software.
-
-
-            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-
-            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-
-            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-
-            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-
-            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-
-            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-
-            SOFTWARE.
-
-            '
-        featured:
-          type: boolean
-          example: true
-      required:
-      - key
-      - name
-      - url
-      - spdx_id
-      - node_id
-      - html_url
-      - description
-      - implementation
-      - permissions
-      - conditions
-      - limitations
-      - body
-      - featured
-    basic-error:
-      title: Basic Error
-      description: Basic Error
-      type: object
-      properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        url:
-          type: string
-        status:
-          type: string
-    license-content:
-      title: License Content
-      description: License Content
-      type: object
-      properties:
-        name:
-          type: string
-        path:
-          type: string
-        sha:
-          type: string
-        size:
-          type: integer
-        url:
-          type: string
-          format: uri
-        html_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-        git_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-        download_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-        type:
-          type: string
-        content:
-          type: string
-        encoding:
-          type: string
-        _links:
-          type: object
-          properties:
-            git:
-              type:
-              - string
-              - 'null'
-              format: uri
-            html:
-              type:
-              - string
-              - 'null'
-              format: uri
-            self:
-              type: string
-              format: uri
-          required:
-          - git
-          - html
-          - self
-        license:
-          $ref: '#/components/schemas/nullable-license-simple'
-      required:
-      - _links
-      - git_url
-      - html_url
-      - download_url
-      - name
-      - path
-      - sha
-      - size
-      - type
-      - url
-      - content
-      - encoding
-      - license
-  responses:
-    not_modified:
-      description: Not modified
-    not_found:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/basic-error'
-    forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/basic-error'
 externalDocs:
   description: GitHub Enterprise Developer Docs
   url: https://docs.github.com/enterprise-server@3.9/rest/

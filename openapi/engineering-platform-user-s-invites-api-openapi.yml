@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare User's Invites API
+  title: Cloudflare User's Invites API
   version: 4.0.0
 tags:
 - name: User's Invites
@@ -132,27 +121,57 @@ paths:
         pro: false
 components:
   schemas:
-    iam_invited_member_email:
-      description: Email address of the user to add to the organization.
-      example: user@example.com
-      maxLength: 90
-      type: string
-    iam_role_components-schemas-identifier:
-      description: Role identifier tag.
-      example: 3536bcfad5faccb999b47003c79917fb
-      maxLength: 32
-      type: string
-    iam_invite_components-schemas-identifier:
-      description: Invite identifier tag.
-      example: 4f5f0c14a2a41d5063dd301b2f829f04
-      maxLength: 32
-      readOnly: true
-      type: string
     iam_components-schemas-name:
       description: Role Name.
       example: Organization Admin
       maxLength: 120
       readOnly: true
+      type: string
+    iam_schemas-permissions:
+      description: Access permissions for this User.
+      items:
+        example: '#zones:read'
+        maxLength: 160
+        type: string
+      readOnly: true
+      type: array
+    iam_schemas-expires_on:
+      description: When the invite is no longer active.
+      example: '2014-01-01T05:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    iam_schemas-invite:
+      allOf:
+      - $ref: '#/components/schemas/iam_user_invite'
+      type: object
+    iam_invited_by:
+      description: The email address of the user who created the invite.
+      example: user@example.com
+      maxLength: 90
+      type: string
+    iam_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/iam_result_info'
+      type: object
+    iam_invited_on:
+      description: When the invite was sent.
+      example: '2014-01-01T05:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    iam_invited_member_email:
+      description: Email address of the user to add to the organization.
+      example: user@example.com
+      maxLength: 90
       type: string
     iam_api-response-common:
       properties:
@@ -171,6 +190,27 @@ components:
       - errors
       - messages
       type: object
+    iam_user_invite:
+      allOf:
+      - $ref: '#/components/schemas/iam_base'
+      - properties:
+          status:
+            description: Current status of the invitation.
+            enum:
+            - pending
+            - accepted
+            - rejected
+            - expired
+            example: accepted
+    iam_schemas-collection_invite_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/iam_schemas-invite'
+            type: array
+        type: object
     iam_messages:
       example: []
       items:
@@ -186,75 +226,11 @@ components:
         type: object
         uniqueItems: true
       type: array
-    iam_schemas-expires_on:
-      description: When the invite is no longer active.
-      example: '2014-01-01T05:20:00Z'
-      format: date-time
+    iam_description:
+      description: Description of role's permissions.
+      example: Administrative access to the entire Organization
       readOnly: true
       type: string
-    iam_invited_by:
-      description: The email address of the user who created the invite.
-      example: user@example.com
-      maxLength: 90
-      type: string
-    iam_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/iam_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/iam_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    iam_invited_on:
-      description: When the invite was sent.
-      example: '2014-01-01T05:20:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    iam_schemas-collection_invite_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/iam_schemas-invite'
-            type: array
-        type: object
-    iam_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/iam_result_info'
-      type: object
     iam_result_info:
       properties:
         count:
@@ -274,53 +250,6 @@ components:
           example: 2000
           type: number
       type: object
-    iam_schemas-role:
-      properties:
-        description:
-          $ref: '#/components/schemas/iam_description'
-        id:
-          $ref: '#/components/schemas/iam_role_components-schemas-identifier'
-        name:
-          $ref: '#/components/schemas/iam_components-schemas-name'
-        permissions:
-          $ref: '#/components/schemas/iam_schemas-permissions'
-      required:
-      - id
-      - name
-      - description
-      - permissions
-      type: object
-    iam_schemas-invite:
-      allOf:
-      - $ref: '#/components/schemas/iam_user_invite'
-      type: object
-    iam_user_invite:
-      allOf:
-      - $ref: '#/components/schemas/iam_base'
-      - properties:
-          status:
-            description: Current status of the invitation.
-            enum:
-            - pending
-            - accepted
-            - rejected
-            - expired
-            example: accepted
-    iam_schemas-permissions:
-      description: Access permissions for this User.
-      items:
-        example: '#zones:read'
-        maxLength: 160
-        type: string
-      readOnly: true
-      type: array
-    iam_single_invite_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-single'
-      - properties:
-          result:
-            type: object
-        type: object
     iam_base:
       properties:
         expires_on:
@@ -366,11 +295,71 @@ components:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-common'
       type: object
-    iam_description:
-      description: Description of role's permissions.
-      example: Administrative access to the entire Organization
+    iam_role_components-schemas-identifier:
+      description: Role identifier tag.
+      example: 3536bcfad5faccb999b47003c79917fb
+      maxLength: 32
+      type: string
+    iam_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/iam_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/iam_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    iam_single_invite_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-single'
+      - properties:
+          result:
+            type: object
+        type: object
+    iam_invite_components-schemas-identifier:
+      description: Invite identifier tag.
+      example: 4f5f0c14a2a41d5063dd301b2f829f04
+      maxLength: 32
       readOnly: true
       type: string
+    iam_schemas-role:
+      properties:
+        description:
+          $ref: '#/components/schemas/iam_description'
+        id:
+          $ref: '#/components/schemas/iam_role_components-schemas-identifier'
+        name:
+          $ref: '#/components/schemas/iam_components-schemas-name'
+        permissions:
+          $ref: '#/components/schemas/iam_schemas-permissions'
+      required:
+      - id
+      - name
+      - description
+      - permissions
+      type: object
   securitySchemes:
     api_email:
       in: header

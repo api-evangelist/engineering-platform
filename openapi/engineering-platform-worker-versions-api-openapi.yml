@@ -1,21 +1,10 @@
 openapi: 3.2.0
 info:
-  description: 'To get started using Cloudflare''s products and services via the API, refer to [how to interact with Cloudflare](https://developers.cloudflare.com/fundamentals/basic-tasks/interact-with-cloudflare/), which covers using tools like [Terraform](https://developers.cloudflare.com/terraform/#cloudflare-terraform) and the [official SDKs](https://developers.cloudflare.com/fundamentals/api/reference/sdks/) to maintain your Cloudflare resources.
-
-
-    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
-
-
-    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
-
-    our [API fundamentals](https://developers.cloudflare.com/fundamentals/api/).
-
-
-    Totally new to Cloudflare? [Start here](https://developers.cloudflare.com/fundamentals/get-started/).'
+  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  title: APIs.io Engineering Platform Cloudflare Worker Versions API
+  title: Cloudflare Worker Versions API
   version: 4.0.0
 tags:
 - name: Worker Versions
@@ -174,6 +163,28 @@ paths:
         - com.cloudflare.edge.worker.deployment.read
 components:
   schemas:
+    workers_version-item-full:
+      allOf:
+      - $ref: '#/components/schemas/workers_version-item-short'
+      - properties:
+          resources:
+            example:
+              bindings:
+              - json: example_binding
+                name: JSON_VAR
+                type: json
+              script:
+                etag: 13a3240e8fb414561b0366813b0b8f42b3e6cfa0d9e70e99835dae83d0d8a794
+                handlers:
+                - fetch
+                last_deployed_from: api
+              script_runtime:
+                usage_model: bundled
+            readOnly: true
+            type: object
+        required:
+        - resources
+        type: object
     workers_version-item-short:
       properties:
         id:
@@ -194,6 +205,43 @@ components:
           readOnly: true
           type: number
       type: object
+    workers_schemas-script_name:
+      description: Name of the script.
+      example: this-is_my_script-01
+      pattern: ^[a-z0-9_][a-z0-9-_]*$
+      type: string
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    workers_versions-upload-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/workers_version-item-uploaded'
+    workers_versions-list-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            properties:
+              items:
+                items:
+                  $ref: '#/components/schemas/workers_version-item-short'
+                type: array
+            type: object
     workers_api-response-common:
       properties:
         errors:
@@ -211,6 +259,11 @@ components:
       - errors
       - messages
       type: object
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     workers_api-response-common-failure:
       properties:
         errors:
@@ -242,81 +295,17 @@ components:
       - messages
       - result
       type: object
-    workers_version-item-full:
-      allOf:
-      - $ref: '#/components/schemas/workers_version-item-short'
-      - properties:
-          resources:
-            example:
-              bindings:
-              - json: example_binding
-                name: JSON_VAR
-                type: json
-              script:
-                etag: 13a3240e8fb414561b0366813b0b8f42b3e6cfa0d9e70e99835dae83d0d8a794
-                handlers:
-                - fetch
-                last_deployed_from: api
-              script_runtime:
-                usage_model: bundled
-            readOnly: true
-            type: object
-        required:
-        - resources
-        type: object
     workers_version_identifier:
       example: bcf48806-b317-4351-9ee7-36e7d557d4de
       maxLength: 36
       readOnly: true
       type: string
-    workers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    workers_schemas-script_name:
-      description: Name of the script.
-      example: this-is_my_script-01
-      pattern: ^[a-z0-9_][a-z0-9-_]*$
-      type: string
-    workers_versions-list-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            properties:
-              items:
-                items:
-                  $ref: '#/components/schemas/workers_version-item-short'
-                type: array
-            type: object
     workers_versions-single-response:
       allOf:
       - $ref: '#/components/schemas/workers_api-response-common'
       - properties:
           result:
             $ref: '#/components/schemas/workers_version-item-full'
-    workers_versions-upload-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/workers_version-item-uploaded'
     workers_version-item-uploaded:
       allOf:
       - $ref: '#/components/schemas/workers_version-item-full'
