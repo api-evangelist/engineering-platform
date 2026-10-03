@@ -178,6 +178,10 @@ paths:
         pro: false
 components:
   schemas:
+    dns-custom-nameservers_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-common'
+      type: object
     dns-custom-nameservers_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/dns-custom-nameservers_api-response-common'
@@ -185,6 +189,13 @@ components:
           result_info:
             $ref: '#/components/schemas/dns-custom-nameservers_result_info'
       type: object
+    dns-custom-nameservers_acns_response_single:
+      allOf:
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/dns-custom-nameservers_CustomNS'
+        type: object
     dns-custom-nameservers_api-response-common:
       properties:
         errors:
@@ -202,13 +213,85 @@ components:
       - errors
       - messages
       type: object
-    dns-custom-nameservers_ns_set:
-      default: 1
-      description: The number of the set that this name server belongs to.
-      example: 1
-      maximum: 5
-      minimum: 1
-      type: number
+    dns-custom-nameservers_empty_response:
+      allOf:
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
+      - properties:
+          result:
+            items:
+              description: Unused
+              type: string
+            maxItems: 0
+            type: array
+        type: object
+    dns-custom-nameservers_acns_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/dns-custom-nameservers_CustomNS'
+            type: array
+        type: object
+    dns-custom-nameservers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dns-custom-nameservers_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/dns-custom-nameservers_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/dns-custom-nameservers_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    dns-custom-nameservers_availability_response:
+      allOf:
+      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
+      - properties:
+          result:
+            items:
+              description: Name of zone based on which account custom nameservers can be created. For example, if example.com is returned, then ns1.example.com can be used as an account custom nameserver.
+              example: example.com
+              format: hostname
+              readOnly: true
+              type: string
+            type: array
+        type: object
     dns-custom-nameservers_result_info:
       properties:
         count:
@@ -228,28 +311,6 @@ components:
           example: 2000
           type: number
       type: object
-    dns-custom-nameservers_availability_response:
-      allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
-      - properties:
-          result:
-            items:
-              description: Name of zone based on which account custom nameservers can be created. For example, if example.com is returned, then ns1.example.com can be used as an account custom nameserver.
-              example: example.com
-              format: hostname
-              readOnly: true
-              type: string
-            type: array
-        type: object
-    dns-custom-nameservers_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-common'
-      type: object
-    dns-custom-nameservers_ns_name:
-      description: The FQDN of the name server.
-      example: ns1.example.com
-      format: hostname
-      type: string
     dns-custom-nameservers_CustomNS:
       description: A single account custom nameserver.
       properties:
@@ -291,15 +352,18 @@ components:
       - zone_tag
       title: Custom NS
       type: object
-    dns-custom-nameservers_acns_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/dns-custom-nameservers_CustomNS'
-            type: array
-        type: object
+    dns-custom-nameservers_ns_set:
+      default: 1
+      description: The number of the set that this name server belongs to.
+      example: 1
+      maximum: 5
+      minimum: 1
+      type: number
+    dns-custom-nameservers_ns_name:
+      description: The FQDN of the name server.
+      example: ns1.example.com
+      format: hostname
+      type: string
     dns-custom-nameservers_schemas-identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
@@ -320,70 +384,6 @@ components:
       required:
       - ns_name
       title: Custom NS Input
-    dns-custom-nameservers_empty_response:
-      allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-collection'
-      - properties:
-          result:
-            items:
-              description: Unused
-              type: string
-            maxItems: 0
-            type: array
-        type: object
-    dns-custom-nameservers_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/dns-custom-nameservers_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/dns-custom-nameservers_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    dns-custom-nameservers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    dns-custom-nameservers_acns_response_single:
-      allOf:
-      - $ref: '#/components/schemas/dns-custom-nameservers_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/dns-custom-nameservers_CustomNS'
-        type: object
   securitySchemes:
     api_email:
       in: header

@@ -116,6 +116,21 @@ paths:
       - Stream Write
 components:
   schemas:
+    stream_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     stream_deleted_response:
       allOf:
       - $ref: '#/components/schemas/stream_api-response-single'
@@ -123,32 +138,33 @@ components:
           result:
             example: ok
             type: string
-    stream_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
+    stream_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
       type: object
     stream_account_identifier:
       description: The account identifier tag.
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       type: string
-    stream_webhook_request:
-      properties:
-        notificationUrl:
-          $ref: '#/components/schemas/stream_notificationUrl'
-      required:
-      - notificationUrl
     stream_notificationUrl:
       description: The URL where webhooks will be sent.
       example: https://example.com
       format: uri
       type: string
-    stream_webhook_response_single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-single'
-      - properties:
-          result:
-            type: object
     stream_api-response-common-failure:
       properties:
         errors:
@@ -180,38 +196,22 @@ components:
       - messages
       - result
       type: object
-    stream_api-response-common:
+    stream_webhook_request:
       properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
+        notificationUrl:
+          $ref: '#/components/schemas/stream_notificationUrl'
       required:
-      - success
-      - errors
-      - messages
+      - notificationUrl
+    stream_webhook_response_single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-single'
+      - properties:
+          result:
+            type: object
+    stream_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
       type: object
-    stream_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
   securitySchemes:
     api_email:
       in: header

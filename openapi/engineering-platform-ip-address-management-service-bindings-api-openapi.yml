@@ -230,30 +230,6 @@ paths:
       - 'IP Prefixes: Read'
 components:
   schemas:
-    addressing_service_name:
-      description: Name of a service running on the Cloudflare network
-      example: Magic Transit
-      type: string
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    addressing_service_identifier:
-      description: Identifier
-      example: 2db684ee7ca04e159946fd05b99e1bcd
-      maxLength: 32
-      type: string
     addressing_service_binding:
       properties:
         cidr:
@@ -267,11 +243,19 @@ components:
         service_name:
           $ref: '#/components/schemas/addressing_service_name'
       type: object
-    addressing_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
+    addressing_provisioning:
+      description: Status of a Service Binding's deployment to the Cloudflare network
+      properties:
+        state:
+          description: 'When a binding has been deployed to a majority of Cloudflare datacenters, the binding will become active and can be used with its associated service.
+
+            '
+          enum:
+          - provisioning
+          - active
+          example: provisioning
+          type: string
+      type: object
     addressing_api-response-common-failure:
       properties:
         errors:
@@ -303,6 +287,39 @@ components:
       - messages
       - result
       type: object
+    addressing_service_identifier:
+      description: Identifier
+      example: 2db684ee7ca04e159946fd05b99e1bcd
+      maxLength: 32
+      type: string
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_service_name:
+      description: Name of a service running on the Cloudflare network
+      example: Magic Transit
+      type: string
+    addressing_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    addressing_cidr:
+      description: IP Prefix in Classless Inter-Domain Routing format.
+      example: 192.0.2.0/24
+      type: string
     addressing_api-response-common:
       properties:
         errors:
@@ -327,23 +344,6 @@ components:
         service_id:
           $ref: '#/components/schemas/addressing_service_identifier'
       type: object
-    addressing_provisioning:
-      description: Status of a Service Binding's deployment to the Cloudflare network
-      properties:
-        state:
-          description: 'When a binding has been deployed to a majority of Cloudflare datacenters, the binding will become active and can be used with its associated service.
-
-            '
-          enum:
-          - provisioning
-          - active
-          example: provisioning
-          type: string
-      type: object
-    addressing_cidr:
-      description: IP Prefix in Classless Inter-Domain Routing format.
-      example: 192.0.2.0/24
-      type: string
   securitySchemes:
     api_email:
       in: header

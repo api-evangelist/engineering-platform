@@ -154,64 +154,11 @@ paths:
         - com.cloudflare.edge.worker.tail.create
 components:
   schemas:
-    workers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     workers_script_name:
       description: Name of the script, used in URLs and route configuration.
       example: this-is_my_script-01
       pattern: ^[a-z0-9_][a-z0-9-_]*$
       type: string
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    workers_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/workers_messages'
-        messages:
-          $ref: '#/components/schemas/workers_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    workers_tail-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            properties:
-              expires_at:
-                readOnly: true
-                type: string
-              id:
-                readOnly: true
-                type: string
-              url:
-                readOnly: true
-                type: string
-            type: object
     workers_api-response-common-failure:
       properties:
         errors:
@@ -243,9 +190,62 @@ components:
       - messages
       - result
       type: object
+    workers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers_messages'
+        messages:
+          $ref: '#/components/schemas/workers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     workers_id:
       description: Identifier for the tail.
       example: 03dc9f77817b488fb26c5861ec18f791
+      type: string
+    workers_tail-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            properties:
+              expires_at:
+                readOnly: true
+                type: string
+              id:
+                readOnly: true
+                type: string
+              url:
+                readOnly: true
+                type: string
+            type: object
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
   securitySchemes:
     api_email:

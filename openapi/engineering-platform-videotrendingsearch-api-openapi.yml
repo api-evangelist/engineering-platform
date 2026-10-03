@@ -1022,6 +1022,23 @@ paths:
               headers: {}
 components:
   schemas:
+    CreativeWork:
+      properties:
+        provider:
+          type: array
+          description: The source of the creative work.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Thing'
+        text:
+          type: string
+          readOnly: true
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Thing'
     Error:
       required:
       - code
@@ -1077,19 +1094,22 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    TrendingVideosSubcategory:
-      required:
-      - tiles
-      - title
-      type: object
+    Response:
       properties:
-        tiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/TrendingVideosTile'
-        title:
+        webSearchUrl:
           type: string
-      x-ms-discriminator-value: TrendingVideos/Subcategory
+          description: The URL To Bing's search result for this item.
+          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
     TrendingVideosCategory:
       required:
       - subcategories
@@ -1103,37 +1123,6 @@ components:
         title:
           type: string
       x-ms-discriminator-value: TrendingVideos/Category
-    ResponseBase:
-      required:
-      - _type
-      type: object
-      properties:
-        _type:
-          type: string
-      discriminator:
-        propertyName: _type
-    Query:
-      required:
-      - text
-      type: object
-      properties:
-        displayText:
-          type: string
-          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
-          readOnly: true
-        searchLink:
-          type: string
-          readOnly: true
-        text:
-          type: string
-          description: The query string. Use this string as the query term in a new search request.
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-        webSearchUrl:
-          type: string
-          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
-          readOnly: true
-      description: Defines a search query.
     ErrorResponse:
       required:
       - errors
@@ -1146,30 +1135,6 @@ components:
       description: The top-level response that represents a failed request.
       allOf:
       - $ref: '#/components/schemas/Response'
-    TrendingVideos:
-      required:
-      - bannerTiles
-      - categories
-      properties:
-        bannerTiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/TrendingVideosTile'
-        categories:
-          type: array
-          items:
-            $ref: '#/components/schemas/TrendingVideosCategory'
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    Identifiable:
-      properties:
-        id:
-          type: string
-          description: A String identifier.
-          readOnly: true
-      description: Defines the identity of a resource.
-      allOf:
-      - $ref: '#/components/schemas/ResponseBase'
     Thing:
       properties:
         alternateName:
@@ -1195,22 +1160,24 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/Response'
-    Response:
+    ResponseBase:
+      required:
+      - _type
+      type: object
       properties:
-        webSearchUrl:
+        _type:
           type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
-    ImageObject:
+      discriminator:
+        propertyName: _type
+    Identifiable:
       properties:
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
+        id:
+          type: string
+          description: A String identifier.
+          readOnly: true
+      description: Defines the identity of a resource.
       allOf:
-      - $ref: '#/components/schemas/MediaObject'
+      - $ref: '#/components/schemas/ResponseBase'
     TrendingVideosTile:
       required:
       - image
@@ -1222,6 +1189,43 @@ components:
         query:
           $ref: '#/components/schemas/Query'
       x-ms-discriminator-value: TrendingVideos/Tile
+    TrendingVideos:
+      required:
+      - bannerTiles
+      - categories
+      properties:
+        bannerTiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendingVideosTile'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendingVideosCategory'
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    Query:
+      required:
+      - text
+      type: object
+      properties:
+        displayText:
+          type: string
+          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
+          readOnly: true
+        searchLink:
+          type: string
+          readOnly: true
+        text:
+          type: string
+          description: The query string. Use this string as the query term in a new search request.
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+        webSearchUrl:
+          type: string
+          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
+          readOnly: true
+      description: Defines a search query.
     MediaObject:
       properties:
         contentUrl:
@@ -1244,23 +1248,19 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/CreativeWork'
-    CreativeWork:
+    TrendingVideosSubcategory:
+      required:
+      - tiles
+      - title
+      type: object
       properties:
-        provider:
+        tiles:
           type: array
-          description: The source of the creative work.
-          readOnly: true
           items:
-            $ref: '#/components/schemas/Thing'
-        text:
+            $ref: '#/components/schemas/TrendingVideosTile'
+        title:
           type: string
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Thing'
+      x-ms-discriminator-value: TrendingVideos/Subcategory
   securitySchemes:
     apiKeyHeader:
       type: apiKey

@@ -65,21 +65,14 @@ paths:
       - 'Load Balancing: Monitors and Pools Read'
 components:
   schemas:
-    load-balancing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    load-balancing_search:
+      properties:
+        resources:
+          description: A list of resources matching the search query.
+          items:
+            $ref: '#/components/schemas/load-balancing_resource_reference'
+          type: array
+      type: object
     load-balancing_api-response-common:
       properties:
         errors:
@@ -98,6 +91,50 @@ components:
       - messages
       - result
       type: object
+    load-balancing_search_result:
+      properties:
+        result:
+          $ref: '#/components/schemas/load-balancing_search'
+      type: object
+    load-balancing_search_params:
+      properties:
+        query:
+          default: ''
+          description: Search query term.
+          example: primary
+          type: string
+        references:
+          default: ''
+          description: The type of references to include ("*" for all).
+          enum:
+          - ''
+          - '*'
+          - referral
+          - referrer
+          example: '*'
+          type: string
+      type: object
+    load-balancing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    load-balancing_components-schemas-identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     load-balancing_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/load-balancing_api-response-common'
@@ -123,11 +160,6 @@ components:
           description: Total results available without any search parameters
           example: 2000
           type: number
-      type: object
-    load-balancing_search_result:
-      properties:
-        result:
-          $ref: '#/components/schemas/load-balancing_search'
       type: object
     load-balancing_resource_reference:
       description: A reference to a load balancer resource.
@@ -168,14 +200,6 @@ components:
           example: pool
           type: string
       type: object
-    load-balancing_search:
-      properties:
-        resources:
-          description: A list of resources matching the search query.
-          items:
-            $ref: '#/components/schemas/load-balancing_resource_reference'
-          type: array
-      type: object
     load-balancing_api-response-common-failure:
       properties:
         errors:
@@ -207,30 +231,6 @@ components:
       - messages
       - result
       type: object
-    load-balancing_search_params:
-      properties:
-        query:
-          default: ''
-          description: Search query term.
-          example: primary
-          type: string
-        references:
-          default: ''
-          description: The type of references to include ("*" for all).
-          enum:
-          - ''
-          - '*'
-          - referral
-          - referrer
-          example: '*'
-          type: string
-      type: object
-    load-balancing_components-schemas-identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
   securitySchemes:
     api_email:
       in: header

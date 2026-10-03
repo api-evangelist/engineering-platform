@@ -190,6 +190,48 @@ paths:
       - 'Access: Custom Page Write'
 components:
   schemas:
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    access_single_response_without_html:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/access_custom_page_without_html'
+    access_custom-pages_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/access_custom_page_without_html'
+            type: array
+    access_custom_page:
+      properties:
+        app_count:
+          $ref: '#/components/schemas/access_schemas-app_count'
+        created_at:
+          $ref: '#/components/schemas/access_timestamp'
+        custom_html:
+          description: Custom page HTML.
+          example: <html><body><h1>Access Denied</h1></body></html>
+          type: string
+        name:
+          $ref: '#/components/schemas/access_custom-pages_components-schemas-name'
+        type:
+          $ref: '#/components/schemas/access_schemas-type'
+        uid:
+          $ref: '#/components/schemas/access_uuid'
+        updated_at:
+          $ref: '#/components/schemas/access_timestamp'
+      required:
+      - name
+      - custom_html
+      - type
+      type: object
     access_components-schemas-id_response:
       allOf:
       - $ref: '#/components/schemas/access_api-response-common'
@@ -233,22 +275,11 @@ components:
     access_schemas-app_count:
       description: Number of apps the custom page is assigned to.
       type: integer
-    access_custom-pages_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/access_custom_page_without_html'
-            type: array
     access_schemas-type:
       description: Custom page type.
       enum:
       - identity_denied
       - forbidden
-      type: string
-    access_custom-pages_components-schemas-name:
-      description: Custom page name.
       type: string
     access_custom_page_without_html:
       properties:
@@ -267,26 +298,6 @@ components:
       required:
       - name
       - type
-      type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    access_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    access_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      type: object
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
       type: object
     access_result_info:
       properties:
@@ -324,28 +335,19 @@ components:
       - errors
       - messages
       type: object
-    access_custom_page:
-      properties:
-        app_count:
-          $ref: '#/components/schemas/access_schemas-app_count'
-        created_at:
-          $ref: '#/components/schemas/access_timestamp'
-        custom_html:
-          description: Custom page HTML.
-          example: <html><body><h1>Access Denied</h1></body></html>
-          type: string
-        name:
-          $ref: '#/components/schemas/access_custom-pages_components-schemas-name'
-        type:
-          $ref: '#/components/schemas/access_schemas-type'
-        uid:
-          $ref: '#/components/schemas/access_uuid'
-        updated_at:
-          $ref: '#/components/schemas/access_timestamp'
-      required:
-      - name
-      - custom_html
-      - type
+    access_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    access_custom-pages_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/access_custom_page'
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
       type: object
     access_messages:
       example: []
@@ -362,23 +364,21 @@ components:
         type: object
         uniqueItems: true
       type: array
-    access_custom-pages_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/access_custom_page'
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
-    access_single_response_without_html:
+    access_custom-pages_components-schemas-name:
+      description: Custom page name.
+      type: string
+    access_api-response-collection:
       allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
+      - $ref: '#/components/schemas/access_api-response-common'
       - properties:
-          result:
-            $ref: '#/components/schemas/access_custom_page_without_html'
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
   securitySchemes:
     api_email:
       in: header

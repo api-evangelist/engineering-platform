@@ -329,135 +329,57 @@ paths:
       - Pages Deployment
 components:
   schemas:
-    pages_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    pages_project_name:
-      description: Name of the project.
-      example: this-is-my-project-01
-      pattern: ^[a-z0-9][a-z0-9-]*$
-      type: string
-    pages_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/pages_messages'
-          example:
-          - code: 7003
-            message: No route for the URI.
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/pages_messages'
-          example: []
-        result:
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
+    pages_deployment-new-deployment:
+      allOf:
+      - $ref: '#/components/schemas/pages_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/pages_deployments'
     pages_deployment-response-details:
       allOf:
       - $ref: '#/components/schemas/pages_api-response-common'
       - properties:
           result:
             $ref: '#/components/schemas/pages_deployments'
-    pages_source:
+    pages_build_config:
+      description: Configs for the project build process.
       properties:
-        config:
-          properties:
-            deployments_enabled:
-              type: boolean
-            owner:
-              type: string
-            path_excludes:
-              items:
-                type: string
-              type: array
-            path_includes:
-              items:
-                type: string
-              type: array
-            pr_comments_enabled:
-              type: boolean
-            preview_branch_excludes:
-              items:
-                type: string
-              type: array
-            preview_branch_includes:
-              items:
-                type: string
-              type: array
-            preview_deployment_setting:
-              enum:
-              - all
-              - none
-              - custom
-              type: string
-            production_branch:
-              type: string
-            production_deployments_enabled:
-              type: boolean
-            repo_name:
-              type: string
-          type: object
-        type:
-          type: string
-      readOnly: true
-      type: object
-    pages_stage:
-      description: The status of the deployment.
-      properties:
-        ended_on:
-          description: When the stage ended.
-          example: 2021-03-09 00:58:59.045655
-          format: date-time
-          readOnly: true
+        build_caching:
+          description: Enable build caching for the project.
+          example: true
+          type:
+          - boolean
+          - 'null'
+        build_command:
+          description: Command used to build project.
+          example: npm run build
           type:
           - string
           - 'null'
-        name:
-          description: The current build stage.
-          example: deploy
-          pattern: queued|initialize|clone_repo|build|deploy
-          type: string
-        started_on:
-          description: When the stage started.
-          example: '2021-03-09T00:55:03.923456Z'
-          format: date-time
-          readOnly: true
+        destination_dir:
+          description: Output directory of the build.
+          example: build
           type:
           - string
           - 'null'
-        status:
-          description: State of the current stage.
-          example: success
-          pattern: success|idle|active|failure|canceled
-          readOnly: true
-          type: string
-      readOnly: true
+        root_dir:
+          description: Directory to run the command.
+          example: /
+          type:
+          - string
+          - 'null'
+        web_analytics_tag:
+          description: The classifying tag for analytics.
+          example: cee1c73f6e4743d0b5e6bb1a0bcaabcc
+          type:
+          - string
+          - 'null'
+        web_analytics_token:
+          description: The auth token for analytics.
+          example: 021e1057c18547eca7b79f2516f06o7x
+          type:
+          - string
+          - 'null'
       type: object
     pages_deployment-response-logs:
       allOf:
@@ -548,92 +470,87 @@ components:
                 type: integer
             type: object
         type: object
-    pages_build_config:
-      description: Configs for the project build process.
+    pages_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    pages_source:
       properties:
-        build_caching:
-          description: Enable build caching for the project.
-          example: true
-          type:
-          - boolean
-          - 'null'
-        build_command:
-          description: Command used to build project.
-          example: npm run build
-          type:
-          - string
-          - 'null'
-        destination_dir:
-          description: Output directory of the build.
-          example: build
-          type:
-          - string
-          - 'null'
-        root_dir:
-          description: Directory to run the command.
-          example: /
-          type:
-          - string
-          - 'null'
-        web_analytics_tag:
-          description: The classifying tag for analytics.
-          example: cee1c73f6e4743d0b5e6bb1a0bcaabcc
-          type:
-          - string
-          - 'null'
-        web_analytics_token:
-          description: The auth token for analytics.
-          example: 021e1057c18547eca7b79f2516f06o7x
-          type:
-          - string
-          - 'null'
-      type: object
-    pages_api-response-pagination:
-      properties:
-        result_info:
+        config:
           properties:
-            count:
-              description: The number of items on the current page.
-              example: 1
-              type: integer
-            page:
-              description: The page currently being requested.
-              example: 1
-              type: integer
-            per_page:
-              description: The number of items per page being returned.
-              example: 100
-              type: integer
-            total_count:
-              description: The total count of items.
-              example: 1
-              type: integer
-            total_pages:
-              description: The total count of pages.
-              example: 1
-              type: integer
-          required:
-          - page
-          - per_page
-          - count
-          - total_count
+            deployments_enabled:
+              type: boolean
+            owner:
+              type: string
+            path_excludes:
+              items:
+                type: string
+              type: array
+            path_includes:
+              items:
+                type: string
+              type: array
+            pr_comments_enabled:
+              type: boolean
+            preview_branch_excludes:
+              items:
+                type: string
+              type: array
+            preview_branch_includes:
+              items:
+                type: string
+              type: array
+            preview_deployment_setting:
+              enum:
+              - all
+              - none
+              - custom
+              type: string
+            production_branch:
+              type: string
+            production_deployments_enabled:
+              type: boolean
+            repo_name:
+              type: string
           type: object
+        type:
+          type: string
+      readOnly: true
       type: object
-    pages_deployment-new-deployment:
-      allOf:
-      - $ref: '#/components/schemas/pages_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/pages_deployments'
-    pages_deployment-list-response:
-      allOf:
-      - $ref: '#/components/schemas/pages_api-response-common'
-      - $ref: '#/components/schemas/pages_api-response-pagination'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/pages_deployments'
-            type: array
+    pages_stage:
+      description: The status of the deployment.
+      properties:
+        ended_on:
+          description: When the stage ended.
+          example: 2021-03-09 00:58:59.045655
+          format: date-time
+          readOnly: true
+          type:
+          - string
+          - 'null'
+        name:
+          description: The current build stage.
+          example: deploy
+          pattern: queued|initialize|clone_repo|build|deploy
+          type: string
+        started_on:
+          description: When the stage started.
+          example: '2021-03-09T00:55:03.923456Z'
+          format: date-time
+          readOnly: true
+          type:
+          - string
+          - 'null'
+        status:
+          description: State of the current stage.
+          example: success
+          pattern: success|idle|active|failure|canceled
+          readOnly: true
+          type: string
+      readOnly: true
+      type: object
     pages_deployments:
       properties:
         aliases:
@@ -781,12 +698,51 @@ components:
           readOnly: true
           type: string
       type: object
-    pages_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
+    pages_api-response-pagination:
+      properties:
+        result_info:
+          properties:
+            count:
+              description: The number of items on the current page.
+              example: 1
+              type: integer
+            page:
+              description: The page currently being requested.
+              example: 1
+              type: integer
+            per_page:
+              description: The number of items per page being returned.
+              example: 100
+              type: integer
+            total_count:
+              description: The total count of items.
+              example: 1
+              type: integer
+            total_pages:
+              description: The total count of pages.
+              example: 1
+              type: integer
+          required:
+          - page
+          - per_page
+          - count
+          - total_count
+          type: object
+      type: object
+    pages_project_name:
+      description: Name of the project.
+      example: this-is-my-project-01
+      pattern: ^[a-z0-9][a-z0-9-]*$
       type: string
+    pages_deployment-list-response:
+      allOf:
+      - $ref: '#/components/schemas/pages_api-response-common'
+      - $ref: '#/components/schemas/pages_api-response-pagination'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/pages_deployments'
+            type: array
     pages_api-response-common:
       properties:
         errors:
@@ -806,6 +762,50 @@ components:
       - messages
       - result
       type: object
+    pages_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/pages_messages'
+          example:
+          - code: 7003
+            message: No route for the URI.
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/pages_messages'
+          example: []
+        result:
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    pages_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
   securitySchemes:
     api_email:
       in: header

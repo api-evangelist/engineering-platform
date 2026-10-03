@@ -931,9 +931,107 @@ paths:
     - url: https://api.getpostman.com
     - url: https://api.eu.postman.com
 components:
+  parameters:
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Credential:
+      name: X-Amz-Credential
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    tagsEntityType:
+      name: entityType
+      in: query
+      description: Filter results for the given entity type.
+      schema:
+        type: string
+        enum:
+        - api
+        - collection
+        - workspace
+        example: collection
+    tagsEntitiesLimit:
+      name: limit
+      in: query
+      description: The maximum number of tagged elements to return in a single call.
+      schema:
+        type: integer
+        default: 10
+        maximum: 50
+        example: 2
+    tagsEntitiesDirection:
+      name: direction
+      in: query
+      description: The ascending (`asc`) or descending (`desc`) order to sort the results by, based on the time of the entity's tagging.
+      schema:
+        $ref: '#/components/schemas/ascDescDefaultDesc'
+    tagsSlug:
+      name: slug
+      in: path
+      required: true
+      description: The tag's ID within a team or individual (non-team) user scope.
+      schema:
+        type: string
+        pattern: ^[a-z][a-z0-9-]*[a-z0-9]+$
+        maxLength: 64
+        minLength: 2
+        example: needs-review
+    tagsCursor:
+      name: cursor
+      in: query
+      description: The cursor to get the next set of results in the paginated response. If you pass an invalid value, the API only returns the first set of results.
+      schema:
+        type: string
+        format: base64
+        example: eyJpZCI6ODYsImVudGl0eVR5cGUiOiJhcGkifQ==
   schemas:
-    TooManyRequestsException: {}
+    ConflictException: {}
+    BadRequestException: {}
+    MapOfStringToString:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    String:
+      type: string
+    UnauthorizedException: {}
     LimitExceededException: {}
+    TooManyRequestsException: {}
+    NotFoundException: {}
     Tags:
       type: object
       properties:
@@ -942,18 +1040,6 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: The collection of tags. Each tag element is associated with a given resource.
-    NotFoundException: {}
-    String:
-      type: string
-    UnauthorizedException: {}
-    BadRequestException: {}
-    ConflictException: {}
-    MapOfStringToString:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/String'
-    TagKey:
-      type: string
     ListTagsResponse:
       type: object
       properties:
@@ -961,64 +1047,18 @@ components:
           allOf:
           - $ref: '#/components/schemas/Tags_2'
           - description: The function's tags.
+    ServiceException: {}
+    TagValue:
+      type: string
+    TagKey:
+      type: string
+    ResourceConflictException: {}
+    ResourceNotFoundException: {}
     Tags_2:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/TagValue'
-    ResourceConflictException: {}
-    TagValue:
-      type: string
-    ResourceNotFoundException: {}
     InvalidParameterValueException: {}
-    ServiceException: {}
-    tag401Error:
-      title: Unauthorized
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/unauthorized
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Unauthorized
-        detail:
-          type: string
-          description: Information about the error.
-          example: The request lacks valid credentials.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 401
-    tag404Error:
-      title: Not Found
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/not-found
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Resource Not Found
-        detail:
-          type: string
-          description: Information about the error.
-          example: Slug 'needs-review' does not exist.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 404
-        instance:
-          type: string
-          description: The URI reference that identifies the specific occurrence of the problem.
-          example: /tags/needs-review/entities
     tag403Error:
       title: Forbidden
       type: object
@@ -1041,30 +1081,6 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 403
-    ascDescDefaultDesc:
-      type: string
-      default: desc
-      enum:
-      - asc
-      - desc
-      example: desc
-    tagElement400Error:
-      title: Bad Request
-      type: object
-      properties:
-        error:
-          type: string
-          description: A short summary of the problem.
-          example: Bad Request
-        message:
-          type: string
-          description: The error message.
-          example: params/slug must match pattern \"^[a-z][a-z0-9-]*[a-z0-9]+$\"
-        statusCode:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 400
     getTaggedEntities:
       title: Successful Response
       type: object
@@ -1135,108 +1151,90 @@ components:
           type: string
           example: /tags/hello-world/entities
           description: The URI reference that identifies the specific occurrence of the problem.
-  parameters:
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Credential:
-      name: X-Amz-Credential
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Date:
-      name: X-Amz-Date
-      in: header
-      schema:
-        type: string
-      required: false
-    tagsSlug:
-      name: slug
-      in: path
-      required: true
-      description: The tag's ID within a team or individual (non-team) user scope.
-      schema:
-        type: string
-        pattern: ^[a-z][a-z0-9-]*[a-z0-9]+$
-        maxLength: 64
-        minLength: 2
-        example: needs-review
-    tagsEntityType:
-      name: entityType
-      in: query
-      description: Filter results for the given entity type.
-      schema:
-        type: string
-        enum:
-        - api
-        - collection
-        - workspace
-        example: collection
-    tagsCursor:
-      name: cursor
-      in: query
-      description: The cursor to get the next set of results in the paginated response. If you pass an invalid value, the API only returns the first set of results.
-      schema:
-        type: string
-        format: base64
-        example: eyJpZCI6ODYsImVudGl0eVR5cGUiOiJhcGkifQ==
-    tagsEntitiesDirection:
-      name: direction
-      in: query
-      description: The ascending (`asc`) or descending (`desc`) order to sort the results by, based on the time of the entity's tagging.
-      schema:
-        $ref: '#/components/schemas/ascDescDefaultDesc'
-    tagsEntitiesLimit:
-      name: limit
-      in: query
-      description: The maximum number of tagged elements to return in a single call.
-      schema:
-        type: integer
-        default: 10
-        maximum: 50
-        example: 2
+    tag401Error:
+      title: Unauthorized
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/unauthorized
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Unauthorized
+        detail:
+          type: string
+          description: Information about the error.
+          example: The request lacks valid credentials.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 401
+    tag404Error:
+      title: Not Found
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/not-found
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Resource Not Found
+        detail:
+          type: string
+          description: Information about the error.
+          example: Slug 'needs-review' does not exist.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 404
+        instance:
+          type: string
+          description: The URI reference that identifies the specific occurrence of the problem.
+          example: /tags/needs-review/entities
+    tagElement400Error:
+      title: Bad Request
+      type: object
+      properties:
+        error:
+          type: string
+          description: A short summary of the problem.
+          example: Bad Request
+        message:
+          type: string
+          description: The error message.
+          example: params/slug must match pattern \"^[a-z][a-z0-9-]*[a-z0-9]+$\"
+        statusCode:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 400
+    ascDescDefaultDesc:
+      type: string
+      default: desc
+      enum:
+      - asc
+      - desc
+      example: desc
   responses:
-    getTaggedEntities:
-      description: Successful Response
+    tag403Error:
+      description: Forbidden
       content:
-        application/json:
+        application/problem+json:
           schema:
-            $ref: '#/components/schemas/getTaggedEntities'
+            $ref: '#/components/schemas/tag403Error'
           example:
-            data:
-              entities:
-              - entityId: 8b86dfe8-de72-44e6-81ea-79d19805bc6a
-                entityType: api
-            meta:
-              count: 1
+            type: https://api.postman.com/problems/forbidden
+            title: Access Denied
+            detail: The tags feature is only available to enterprise teams
+            status: 403
     tagElement400Error:
       description: Bad Request
       content:
@@ -1259,17 +1257,6 @@ components:
             detail: Slug 'needs-review' does not exist.
             status: 404
             instance: /tags/needs-review/entities
-    tag401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/tag401Error'
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: The request lacks valid credentials.
-            status: 401
     tag500Error:
       description: Unexpected Error
       content:
@@ -1282,17 +1269,30 @@ components:
             detail: Something went wrong while fetching entities having the provided slug.
             status: 500
             instance: /tags/needs-review/entities
-    tag403Error:
-      description: Forbidden
+    tag401Error:
+      description: Unauthorized
       content:
         application/problem+json:
           schema:
-            $ref: '#/components/schemas/tag403Error'
+            $ref: '#/components/schemas/tag401Error'
           example:
-            type: https://api.postman.com/problems/forbidden
-            title: Access Denied
-            detail: The tags feature is only available to enterprise teams
-            status: 403
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: The request lacks valid credentials.
+            status: 401
+    getTaggedEntities:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getTaggedEntities'
+          example:
+            data:
+              entities:
+              - entityId: 8b86dfe8-de72-44e6-81ea-79d19805bc6a
+                entityType: api
+            meta:
+              count: 1
   securitySchemes:
     hmac:
       type: apiKey

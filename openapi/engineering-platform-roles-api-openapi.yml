@@ -151,7 +151,277 @@ paths:
       parameters:
       - $ref: '#/components/parameters/workspaceIncludeScimQuery'
 components:
+  examples:
+    updateRoleGroupSCIMId:
+      value:
+        roles:
+        - op: add
+          path: /user
+          value:
+          - id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+            role: '3'
+        - op: add
+          path: /usergroup
+          value:
+          - id: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+            role: '3'
+    userRoleGroupUpdatedSCIMId:
+      value:
+        roles:
+        - id: '3'
+          displayName: Admin
+          user:
+          - e982929dadd02cf627e8c111925fc37a93dbc86f510840db
+          group:
+          - 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+    updateRoleSCIMId:
+      value:
+        roles:
+        - op: add
+          path: /user
+          value:
+          - id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+            role: '1'
+    updateUserRole:
+      value:
+        roles:
+        - op: add
+          path: /user
+          value:
+          - id: '12345678'
+            role: '1'
+          - id: '87654321'
+            role: '2'
+        - op: remove
+          path: /user
+          value:
+          - id: '87612345'
+            role: '1'
+        - op: add
+          path: /usergroup
+          value:
+          - id: '123'
+            role: '2'
+        - op: remove
+          path: /usergroup
+          value:
+          - id: '312'
+            role: '3'
+    userRoleUpdatedSCIMId:
+      value:
+        roles:
+        - id: '1'
+          displayName: Viewer
+          user:
+          - 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+    workspaceRoles:
+      value:
+        roles:
+        - id: '3'
+          displayName: Admin
+          user:
+          - '12345678'
+          group:
+          - '123'
+    userRoleUpdated:
+      value:
+        roles:
+        - id: '1'
+          displayName: Viewer
+          user:
+          - '12345678'
+          group:
+          - '123'
+        - id: '2'
+          displayName: Editor
+          user:
+          - '87654321'
+          group:
+          - '123'
+        - id: '3'
+          displayName: Admin
+          user:
+          - '13428756'
+          group:
+          - '132'
+    workspaceRolesScimIds:
+      value:
+        roles:
+        - id: '3'
+          displayName: Admin
+          user:
+          - 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+          group:
+          - 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+  parameters:
+    workspaceIncludeScimQuery:
+      name: include
+      in: query
+      description: 'Include the following information in the endpoint''s response:
+
+        - `scim` — Return IDs as SCIM user and group IDs.
+
+        '
+      schema:
+        type: string
+        example: scim
+        enum:
+        - scim
+    identifierType:
+      name: identifierType
+      in: header
+      description: Use SCIM user IDs instead of Postman user IDs.
+      schema:
+        type: string
+        example: scim
+    collectionId:
+      name: collectionId
+      in: path
+      required: true
+      description: The collection's ID.
+      schema:
+        type: string
+        example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+    workspaceId:
+      name: workspaceId
+      in: path
+      required: true
+      description: The workspace's ID.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
   responses:
+    collectionRoles400ErrorMissingProperty:
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    format: uri-reference
+                    description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                    example: https://api.postman.com/problems/bad-request
+                  title:
+                    type: string
+                    description: A short summary of the problem.
+                    example: 'Missing properties: ''path'''
+                  detail:
+                    type: string
+                    description: Information about the error.
+                    example: 'PATCH request body for ''/collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/roles/roles'' failed to validate schema. Location: /properties/roles/items/required'
+                  status:
+                    type: number
+                    format: http-status-code
+                    description: The error's HTTP status code.
+                    example: 400
+          example:
+            type: https://api.postman.com/problems/bad-request
+            title: 'Missing properties: ''path'''
+            detail: 'PATCH request body for ''/collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/roles/roles'' failed to validate schema. Location: /properties/roles/items/required'
+            status: 400
+    getWorkspaceRoles:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getWorkspaceRoles'
+          examples:
+            Successful Response:
+              $ref: '#/components/examples/workspaceRoles'
+            Return SCIM IDs:
+              $ref: '#/components/examples/workspaceRolesScimIds'
+    resourceNotFound404Error:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/not-found
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Resource not found
+              detail:
+                type: string
+                description: Information about the error.
+                example: ''
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 404
+          example:
+            type: https://api.postman.com/problems/not-found
+            title: Resource not found
+            detail: ''
+            status: 404
+    workspaceRoles400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The error type.
+                example: invalidParamError
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: body.roles[0] should have required property 'op'
+              detail:
+                type: string
+                description: Information about the error.
+                example: ''
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 400
+          example:
+            type: invalidParamError
+            title: body.roles[0] should have required property 'op'
+            detail: ''
+            status: 400
+    workspaceRoles422UnsupportRoleError:
+      description: Partner and Personal Workspace Roles Unsupported
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+                description: Information about the error.
+                example: Roles are not supported for personal and partner workspaces.
+              link:
+                type: string
+                description: The error type.
+                example: https://api.postman.com/problems/unprocessable-entity
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 422
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Cannot process the request.
+          example:
+            detail: Roles are not supported for personal and partner workspaces.
+            link: https://api.postman.com/problems/unprocessable-entity
+            status: 422
+            title: Cannot process the request.
     getAllWorkspaceRoles:
       description: Successful Response
       content:
@@ -223,233 +493,51 @@ components:
               - id: '2'
                 displayName: Editor
                 description: Can create and edit workspace resources.
-    resourceNotFound404Error:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/not-found
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Resource not found
-              detail:
-                type: string
-                description: Information about the error.
-                example: ''
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 404
-          example:
-            type: https://api.postman.com/problems/not-found
-            title: Resource not found
-            detail: ''
-            status: 404
-    unauthorizedError:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: An API key must be provided in the request header or query string
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: An API key must be provided in the request header or query string
-            status: 401
-    getWorkspaceRoles:
+    updateWorkspaceRoles:
       description: Successful Response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/getWorkspaceRoles'
+            type: object
+            properties:
+              roles:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The role's ID.
+                      example: '1'
+                    user:
+                      type: array
+                      description: A list of user IDs assigned to the role.
+                      items:
+                        type: string
+                        description: The user's ID or SCIM ID.
+                        example: '12345678'
+                    group:
+                      type: array
+                      description: A list of user group IDs assigned to the role.
+                      items:
+                        type: string
+                        description: The user group's ID or SCIM ID.
+                        example: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+                    displayName:
+                      type: string
+                      description: The role's display name.
+                      enum:
+                      - Admin
+                      - Viewer
+                      - Editor
+                      example: Viewer
           examples:
-            Successful Response:
-              $ref: '#/components/examples/workspaceRoles'
-            Return SCIM IDs:
-              $ref: '#/components/examples/workspaceRolesScimIds'
-    workspaceRoles422UnsupportRoleError:
-      description: Partner and Personal Workspace Roles Unsupported
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              detail:
-                type: string
-                description: Information about the error.
-                example: Roles are not supported for personal and partner workspaces.
-              link:
-                type: string
-                description: The error type.
-                example: https://api.postman.com/problems/unprocessable-entity
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 422
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Cannot process the request.
-          example:
-            detail: Roles are not supported for personal and partner workspaces.
-            link: https://api.postman.com/problems/unprocessable-entity
-            status: 422
-            title: Cannot process the request.
-    api401ErrorUnauthorized:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: An API key must be provided in the request header or query string
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-              instance:
-                type: string
-                description: The URI reference that identifies the specific occurrence of the problem.
-                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: An API key must be provided in the request header or query string
-            status: 401
-            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
-    common500ErrorInternalServer:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Sever Error
-              detail:
-                type: string
-                description: An explanation about the problem.
-                example: Internal Sever Error
-              status:
-                type: integer
-                format: http-status-code
-                description: The HTTP status code generated by the origin server.
-                example: 500
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-            status: 500
-    collectionRoles400ErrorMissingProperty:
-      description: Bad Request
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    format: uri-reference
-                    description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                    example: https://api.postman.com/problems/bad-request
-                  title:
-                    type: string
-                    description: A short summary of the problem.
-                    example: 'Missing properties: ''path'''
-                  detail:
-                    type: string
-                    description: Information about the error.
-                    example: 'PATCH request body for ''/collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/roles/roles'' failed to validate schema. Location: /properties/roles/items/required'
-                  status:
-                    type: number
-                    format: http-status-code
-                    description: The error's HTTP status code.
-                    example: 400
-          example:
-            type: https://api.postman.com/problems/bad-request
-            title: 'Missing properties: ''path'''
-            detail: 'PATCH request body for ''/collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/roles/roles'' failed to validate schema. Location: /properties/roles/items/required'
-            status: 400
-    workspaceRoles400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The error type.
-                example: invalidParamError
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: body.roles[0] should have required property 'op'
-              detail:
-                type: string
-                description: Information about the error.
-                example: ''
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 400
-          example:
-            type: invalidParamError
-            title: body.roles[0] should have required property 'op'
-            detail: ''
-            status: 400
+            Update User Role:
+              $ref: '#/components/examples/userRoleUpdated'
+            Update Role with SCIM ID:
+              $ref: '#/components/examples/userRoleUpdatedSCIMId'
+            Update Role and Group with SCIM IDs:
+              $ref: '#/components/examples/userRoleGroupUpdatedSCIMId'
     getCollectionRoles:
       description: Successful Response
       content:
@@ -542,51 +630,122 @@ components:
               id: 12345678
             - role: EDITOR
               id: 87654321
-    updateWorkspaceRoles:
-      description: Successful Response
+    unauthorizedError:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: An API key must be provided in the request header or query string
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: An API key must be provided in the request header or query string
+            status: 401
+    collection404ErrorInstanceNotFound:
+      description: Instance Not Found
       content:
         application/json:
           schema:
             type: object
             properties:
-              roles:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: The role's ID.
-                      example: '1'
-                    user:
-                      type: array
-                      description: A list of user IDs assigned to the role.
-                      items:
-                        type: string
-                        description: The user's ID or SCIM ID.
-                        example: '12345678'
-                    group:
-                      type: array
-                      description: A list of user group IDs assigned to the role.
-                      items:
-                        type: string
-                        description: The user group's ID or SCIM ID.
-                        example: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-                    displayName:
-                      type: string
-                      description: The role's display name.
-                      enum:
-                      - Admin
-                      - Viewer
-                      - Editor
-                      example: Viewer
-          examples:
-            Update User Role:
-              $ref: '#/components/examples/userRoleUpdated'
-            Update Role with SCIM ID:
-              $ref: '#/components/examples/userRoleUpdatedSCIMId'
-            Update Role and Group with SCIM IDs:
-              $ref: '#/components/examples/userRoleGroupUpdatedSCIMId'
+              error:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: A short summary of the problem.
+                    example: We could not find the collection you are looking for
+                  type:
+                    type: string
+                    description: The type of error.
+                    example: instanceNotFoundError
+          example:
+            title: We could not find the collection you are looking for
+            type: instanceNotFoundError
+    common500ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Sever Error
+              detail:
+                type: string
+                description: An explanation about the problem.
+                example: Internal Sever Error
+              status:
+                type: integer
+                format: http-status-code
+                description: The HTTP status code generated by the origin server.
+                example: 500
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
+            status: 500
+    api401ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: An API key must be provided in the request header or query string
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+              instance:
+                type: string
+                description: The URI reference that identifies the specific occurrence of the problem.
+                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: An API key must be provided in the request header or query string
+            status: 401
+            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
     common403ErrorPermissions:
       description: Forbidden
       content:
@@ -617,165 +776,47 @@ components:
             title: Resource cannot be accessed
             detail: Inadequate permissions. Resource access forbidden.
             status: 403
-    collection404ErrorInstanceNotFound:
-      description: Instance Not Found
-      content:
-        application/json:
-          schema:
+  schemas:
+    workspaceId:
+      type: string
+      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+    getWorkspaceRoles:
+      title: Workspace Roles
+      type: object
+      description: Information about the workspace's roles.
+      properties:
+        roles:
+          type: array
+          description: A list of workspace roles and the users and groups assigned to them.
+          items:
             type: object
             properties:
-              error:
-                type: object
-                properties:
-                  title:
-                    type: string
-                    description: A short summary of the problem.
-                    example: We could not find the collection you are looking for
-                  type:
-                    type: string
-                    description: The type of error.
-                    example: instanceNotFoundError
-          example:
-            title: We could not find the collection you are looking for
-            type: instanceNotFoundError
-  examples:
-    userRoleUpdated:
-      value:
-        roles:
-        - id: '1'
-          displayName: Viewer
-          user:
-          - '12345678'
-          group:
-          - '123'
-        - id: '2'
-          displayName: Editor
-          user:
-          - '87654321'
-          group:
-          - '123'
-        - id: '3'
-          displayName: Admin
-          user:
-          - '13428756'
-          group:
-          - '132'
-    userRoleGroupUpdatedSCIMId:
-      value:
-        roles:
-        - id: '3'
-          displayName: Admin
-          user:
-          - e982929dadd02cf627e8c111925fc37a93dbc86f510840db
-          group:
-          - 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-    updateRoleGroupSCIMId:
-      value:
-        roles:
-        - op: add
-          path: /user
-          value:
-          - id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-            role: '3'
-        - op: add
-          path: /usergroup
-          value:
-          - id: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-            role: '3'
-    updateUserRole:
-      value:
-        roles:
-        - op: add
-          path: /user
-          value:
-          - id: '12345678'
-            role: '1'
-          - id: '87654321'
-            role: '2'
-        - op: remove
-          path: /user
-          value:
-          - id: '87612345'
-            role: '1'
-        - op: add
-          path: /usergroup
-          value:
-          - id: '123'
-            role: '2'
-        - op: remove
-          path: /usergroup
-          value:
-          - id: '312'
-            role: '3'
-    workspaceRolesScimIds:
-      value:
-        roles:
-        - id: '3'
-          displayName: Admin
-          user:
-          - 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-          group:
-          - 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-    workspaceRoles:
-      value:
-        roles:
-        - id: '3'
-          displayName: Admin
-          user:
-          - '12345678'
-          group:
-          - '123'
-    updateRoleSCIMId:
-      value:
-        roles:
-        - op: add
-          path: /user
-          value:
-          - id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-            role: '1'
-    userRoleUpdatedSCIMId:
-      value:
-        roles:
-        - id: '1'
-          displayName: Viewer
-          user:
-          - 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-  parameters:
-    workspaceId:
-      name: workspaceId
-      in: path
-      required: true
-      description: The workspace's ID.
-      schema:
-        $ref: '#/components/schemas/workspaceId'
-    collectionId:
-      name: collectionId
-      in: path
-      required: true
-      description: The collection's ID.
-      schema:
-        type: string
-        example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-    identifierType:
-      name: identifierType
-      in: header
-      description: Use SCIM user IDs instead of Postman user IDs.
-      schema:
-        type: string
-        example: scim
-    workspaceIncludeScimQuery:
-      name: include
-      in: query
-      description: 'Include the following information in the endpoint''s response:
-
-        - `scim` — Return IDs as SCIM user and group IDs.
-
-        '
-      schema:
-        type: string
-        example: scim
-        enum:
-        - scim
+              id:
+                type: string
+                description: The role's ID.
+                example: '3'
+              user:
+                type: array
+                description: A list of user IDs assigned to the role.
+                items:
+                  type: string
+                  description: The user's ID or SCIM ID.
+                  example: '12345678'
+              group:
+                type: array
+                description: A list of user group IDs assigned to the role.
+                items:
+                  type: string
+                  description: The group's ID.
+                  example: '123'
+              displayName:
+                type: string
+                description: The role's display name.
+                enum:
+                - Admin
+                - Viewer
+                - Editor
+                example: Viewer
   requestBodies:
     updateCollectionRoles:
       content:
@@ -917,47 +958,6 @@ components:
               $ref: '#/components/examples/updateRoleSCIMId'
             Update Role and Group with SCIM IDs:
               $ref: '#/components/examples/updateRoleGroupSCIMId'
-  schemas:
-    workspaceId:
-      type: string
-      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-    getWorkspaceRoles:
-      title: Workspace Roles
-      type: object
-      description: Information about the workspace's roles.
-      properties:
-        roles:
-          type: array
-          description: A list of workspace roles and the users and groups assigned to them.
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: The role's ID.
-                example: '3'
-              user:
-                type: array
-                description: A list of user IDs assigned to the role.
-                items:
-                  type: string
-                  description: The user's ID or SCIM ID.
-                  example: '12345678'
-              group:
-                type: array
-                description: A list of user group IDs assigned to the role.
-                items:
-                  type: string
-                  description: The group's ID.
-                  example: '123'
-              displayName:
-                type: string
-                description: The role's display name.
-                enum:
-                - Admin
-                - Viewer
-                - Editor
-                example: Viewer
   securitySchemes:
     PostmanApiKey:
       type: apiKey

@@ -116,6 +116,13 @@ paths:
     - url: https://api.eu.postman.com
 components:
   schemas:
+    iam_telephone:
+      description: User's telephone number
+      example: +1 123-123-1234
+      maxLength: 20
+      type:
+      - string
+      - 'null'
     iam_api-response-common:
       properties:
         errors:
@@ -133,10 +140,53 @@ components:
       - errors
       - messages
       type: object
+    iam_first_name:
+      description: User's first name
+      example: John
+      maxLength: 60
+      type:
+      - string
+      - 'null'
+    iam_zipcode:
+      description: The zipcode or postal code where the user lives.
+      example: '12345'
+      maxLength: 20
+      type:
+      - string
+      - 'null'
     iam_api-response-single:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-common'
       type: object
+    iam_single_user_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-single'
+      - properties:
+          result:
+            type: object
+        type: object
+    iam_last_name:
+      description: User's last name
+      example: Appleseed
+      maxLength: 60
+      type:
+      - string
+      - 'null'
+    iam_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     iam_country:
       description: The country in which the user lives.
       example: US
@@ -175,56 +225,6 @@ components:
       - messages
       - result
       type: object
-    iam_single_user_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-single'
-      - properties:
-          result:
-            type: object
-        type: object
-    iam_zipcode:
-      description: The zipcode or postal code where the user lives.
-      example: '12345'
-      maxLength: 20
-      type:
-      - string
-      - 'null'
-    iam_telephone:
-      description: User's telephone number
-      example: +1 123-123-1234
-      maxLength: 20
-      type:
-      - string
-      - 'null'
-    iam_last_name:
-      description: User's last name
-      example: Appleseed
-      maxLength: 60
-      type:
-      - string
-      - 'null'
-    iam_first_name:
-      description: User's first name
-      example: John
-      maxLength: 60
-      type:
-      - string
-      - 'null'
-    iam_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     getAuthenticatedUser:
       title: Successful Response
       type: object
@@ -303,28 +303,6 @@ components:
                 description: The operation's current usage value.
                 example: 110276
   responses:
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
     getAuthenticatedUser:
       description: Successful Response
       content:
@@ -395,6 +373,28 @@ components:
               limit: 1000000
               usage: 10788
               overage: 0
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
     common401Error:
       description: Unauthorized
       content:

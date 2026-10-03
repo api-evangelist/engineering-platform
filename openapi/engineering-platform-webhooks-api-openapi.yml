@@ -55,31 +55,28 @@ components:
               collection: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
               webhookUrl: https://newman-api.getpostman.com/run/12345678/267a6e99-b6da-407c-a96f-03be2d6282fb
               uid: 12345678-1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-    featureUnavailable403Error:
-      description: Feature Unavailable
+    common500ErrorServerError:
+      description: Internal Server Error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/featureUnavailable403Error'
-          example:
-            value:
-              type: https://api.postman.com/problems/forbidden
-              title: Forbidden
-              detail: This feature isn't available in your region.
-              status: 403
-    createWebhookParamMissing400Error:
-      description: Missing Parameter
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/createWebhookParamMissing400Error'
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
           example:
             error:
-              name: paramMissingError
-              message: Parameter is missing in the request.
-              details:
-                param:
-                - collection
+              name: serverError
+              message: An error has occurred on the server.
     common401Error:
       description: Unauthorized
       content:
@@ -110,29 +107,88 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
-    common500ErrorServerError:
-      description: Internal Server Error
+    featureUnavailable403Error:
+      description: Feature Unavailable
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
+            $ref: '#/components/schemas/featureUnavailable403Error'
+          example:
+            value:
+              type: https://api.postman.com/problems/forbidden
+              title: Forbidden
+              detail: This feature isn't available in your region.
+              status: 403
+    createWebhookParamMissing400Error:
+      description: Missing Parameter
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/createWebhookParamMissing400Error'
           example:
             error:
-              name: serverError
-              message: An error has occurred on the server.
+              name: paramMissingError
+              message: Parameter is missing in the request.
+              details:
+                param:
+                - collection
+  parameters:
+    workspaceQuery:
+      name: workspace
+      in: query
+      description: The workspace's ID.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
   schemas:
+    featureUnavailable403Error:
+      title: Feature Unavailable
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Forbidden
+        detail:
+          type: string
+          description: Information about the error.
+          example: This feature isn't available in your region.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+    workspaceId:
+      type: string
+      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+    createWebhookRequest:
+      title: Create Webhook Request Body
+      type: object
+      properties:
+        webhook:
+          type: object
+          required:
+          - name
+          - collection
+          properties:
+            collection:
+              type: string
+              format: uid
+              description: The unique ID of the collection to trigger when calling this webhook.
+              example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+            environment:
+              type: string
+              format: uid
+              description: The unique ID of the environment to trigger when calling this webhook.
+              example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+            name:
+              type: string
+              description: The webhook's name. On success, the system creates a new monitor with this name in the **Monitors** tab.
+              example: Test Webhook
     createWebhookResponse:
       title: Successful Response
       type: object
@@ -162,33 +218,6 @@ components:
               format: uid
               description: The webhook's unique ID.
               example: 12345678-1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-    createWebhookRequest:
-      title: Create Webhook Request Body
-      type: object
-      properties:
-        webhook:
-          type: object
-          required:
-          - name
-          - collection
-          properties:
-            collection:
-              type: string
-              format: uid
-              description: The unique ID of the collection to trigger when calling this webhook.
-              example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-            environment:
-              type: string
-              format: uid
-              description: The unique ID of the environment to trigger when calling this webhook.
-              example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-            name:
-              type: string
-              description: The webhook's name. On success, the system creates a new monitor with this name in the **Monitors** tab.
-              example: Test Webhook
-    workspaceId:
-      type: string
-      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
     createWebhookParamMissing400Error:
       type: object
       properties:
@@ -214,28 +243,6 @@ components:
                     type: string
                   example:
                   - collection
-    featureUnavailable403Error:
-      title: Feature Unavailable
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/forbidden
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Forbidden
-        detail:
-          type: string
-          description: Information about the error.
-          example: This feature isn't available in your region.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
   requestBodies:
     createWebhook:
       content:
@@ -246,13 +253,6 @@ components:
             webhook:
               name: Test Webhook
               collection: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-  parameters:
-    workspaceQuery:
-      name: workspace
-      in: query
-      description: The workspace's ID.
-      schema:
-        $ref: '#/components/schemas/workspaceId'
   securitySchemes:
     PostmanApiKey:
       type: apiKey

@@ -2315,65 +2315,63 @@ paths:
         subcategory: issues
 components:
   schemas:
-    pull-request-review-comment:
-      title: Pull Request Review Comment
-      description: Pull Request Review Comments are comments on a portion of the Pull Request's diff.
+    timeline-issue-events:
+      title: Timeline Event
+      description: Timeline Event
+      type: object
+      anyOf:
+      - $ref: '#/components/schemas/labeled-issue-event'
+      - $ref: '#/components/schemas/unlabeled-issue-event'
+      - $ref: '#/components/schemas/milestoned-issue-event'
+      - $ref: '#/components/schemas/demilestoned-issue-event'
+      - $ref: '#/components/schemas/renamed-issue-event'
+      - $ref: '#/components/schemas/review-requested-issue-event'
+      - $ref: '#/components/schemas/review-request-removed-issue-event'
+      - $ref: '#/components/schemas/review-dismissed-issue-event'
+      - $ref: '#/components/schemas/locked-issue-event'
+      - $ref: '#/components/schemas/added-to-project-issue-event'
+      - $ref: '#/components/schemas/moved-column-in-project-issue-event'
+      - $ref: '#/components/schemas/removed-from-project-issue-event'
+      - $ref: '#/components/schemas/converted-note-to-issue-issue-event'
+      - $ref: '#/components/schemas/timeline-comment-event'
+      - $ref: '#/components/schemas/timeline-cross-referenced-event'
+      - $ref: '#/components/schemas/timeline-committed-event'
+      - $ref: '#/components/schemas/timeline-reviewed-event'
+      - $ref: '#/components/schemas/timeline-line-commented-event'
+      - $ref: '#/components/schemas/timeline-commit-commented-event'
+      - $ref: '#/components/schemas/timeline-assigned-issue-event'
+      - $ref: '#/components/schemas/timeline-unassigned-issue-event'
+      - $ref: '#/components/schemas/state-change-issue-event'
+    issue-comment:
+      title: Issue Comment
+      description: Comments provide a way for people to collaborate on an issue.
       type: object
       properties:
-        url:
-          description: URL for the pull request review comment
-          example: https://api.github.com/repos/octocat/Hello-World/pulls/comments/1
-          type: string
-        pull_request_review_id:
-          description: The ID of the pull request review to which the comment belongs.
-          type:
-          - integer
-          - 'null'
-          format: int64
-          example: 42
         id:
-          description: The ID of the pull request review comment.
+          description: Unique identifier of the issue comment
+          example: 42
           type: integer
           format: int64
-          example: 1
         node_id:
-          description: The node ID of the pull request review comment.
           type: string
-          example: MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDEw
-        diff_hunk:
-          description: The diff of the line that the comment refers to.
+        url:
+          description: URL for the issue comment
+          example: https://api.github.com/repositories/42/issues/comments/1
           type: string
-          example: '@@ -16,33 +16,40 @@ public class Connection : IConnection...'
-        path:
-          description: The relative path of the file to which the comment applies.
-          example: config/database.yaml
-          type: string
-        position:
-          description: The line index in the diff to which the comment applies. This field is deprecated; use `line` instead.
-          example: 1
-          type: integer
-        original_position:
-          description: The index of the original line in the diff to which the comment applies. This field is deprecated; use `original_line` instead.
-          example: 4
-          type: integer
-        commit_id:
-          description: The SHA of the commit to which the comment applies.
-          example: 6dcb09b5b57875f334f61aebed695e2e4193db5e
-          type: string
-        original_commit_id:
-          description: The SHA of the original commit to which the comment applies.
-          example: 9c48853fa3dc5c1c3d6f1f1cd1f2743e72652840
-          type: string
-        in_reply_to_id:
-          description: The comment ID to reply to.
-          example: 8
-          type: integer
-        user:
-          $ref: '#/components/schemas/simple-user'
+          format: uri
         body:
-          description: The text of the comment.
-          example: We should probably include a check for null values here.
+          description: Contents of the issue comment
+          example: What version of Safari were you using when you observed this bug?
           type: string
+        body_text:
+          type: string
+        body_html:
+          type: string
+        html_url:
+          type: string
+          format: uri
+        user:
+          $ref: '#/components/schemas/nullable-simple-user'
         created_at:
           type: string
           format: date-time
@@ -2382,119 +2380,333 @@ components:
           type: string
           format: date-time
           example: '2011-04-14T16:00:49Z'
-        html_url:
-          description: HTML URL for the pull request review comment.
+        issue_url:
           type: string
           format: uri
-          example: https://github.com/octocat/Hello-World/pull/1#discussion-diff-1
-        pull_request_url:
-          description: URL for the pull request that the review comment belongs to.
-          type: string
-          format: uri
-          example: https://api.github.com/repos/octocat/Hello-World/pulls/1
         author_association:
           $ref: '#/components/schemas/author-association'
-        _links:
-          type: object
-          properties:
-            self:
-              type: object
-              properties:
-                href:
-                  type: string
-                  format: uri
-                  example: https://api.github.com/repos/octocat/Hello-World/pulls/comments/1
-              required:
-              - href
-            html:
-              type: object
-              properties:
-                href:
-                  type: string
-                  format: uri
-                  example: https://github.com/octocat/Hello-World/pull/1#discussion-diff-1
-              required:
-              - href
-            pull_request:
-              type: object
-              properties:
-                href:
-                  type: string
-                  format: uri
-                  example: https://api.github.com/repos/octocat/Hello-World/pulls/1
-              required:
-              - href
-          required:
-          - self
-          - html
-          - pull_request
-        start_line:
-          type:
-          - integer
-          - 'null'
-          description: The first line of the range for a multi-line comment.
-          example: 2
-        original_start_line:
-          type:
-          - integer
-          - 'null'
-          description: The first line of the range for a multi-line comment.
-          example: 2
-        start_side:
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        reactions:
+          $ref: '#/components/schemas/reaction-rollup'
+      required:
+      - id
+      - node_id
+      - html_url
+      - issue_url
+      - author_association
+      - user
+      - url
+      - created_at
+      - updated_at
+    moved-column-in-project-issue-event:
+      title: Moved Column in Project Issue Event
+      description: Moved Column in Project Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
           type:
           - string
           - 'null'
-          description: The side of the first line of the range for a multi-line comment.
-          enum:
-          - LEFT
-          - RIGHT
-          default: RIGHT
-        line:
-          description: The line of the blob to which the comment applies. The last line of the range for a multi-line comment
-          example: 2
-          type: integer
-        original_line:
-          description: The line of the blob to which the comment applies. The last line of the range for a multi-line comment
-          example: 2
-          type: integer
-        side:
-          description: The side of the diff to which the comment applies. The side of the last line of the range for a multi-line comment
-          enum:
-          - LEFT
-          - RIGHT
-          default: RIGHT
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
           type: string
-        subject_type:
-          description: The level at which the comment is targeted, can be a diff line or a file.
-          type: string
-          enum:
-          - line
-          - file
-        reactions:
-          $ref: '#/components/schemas/reaction-rollup'
-        body_html:
-          type: string
-          example: '"<p>comment body</p>"'
-        body_text:
-          type: string
-          example: '"comment body"'
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        project_card:
+          type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+              format: uri
+            project_id:
+              type: integer
+            project_url:
+              type: string
+              format: uri
+            column_name:
+              type: string
+            previous_column_name:
+              type: string
+          required:
+          - id
+          - url
+          - project_id
+          - project_url
+          - column_name
       required:
-      - url
       - id
       - node_id
-      - pull_request_review_id
-      - diff_hunk
-      - path
+      - url
+      - actor
+      - event
       - commit_id
-      - original_commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+    issue:
+      title: Issue
+      description: Issues are a great way to keep track of tasks, enhancements, and bugs for your projects.
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        node_id:
+          type: string
+        url:
+          description: URL for the issue
+          example: https://api.github.com/repositories/42/issues/1
+          type: string
+          format: uri
+        repository_url:
+          type: string
+          format: uri
+        labels_url:
+          type: string
+        comments_url:
+          type: string
+          format: uri
+        events_url:
+          type: string
+          format: uri
+        html_url:
+          type: string
+          format: uri
+        number:
+          description: Number uniquely identifying the issue within its repository
+          example: 42
+          type: integer
+        state:
+          description: State of the issue; either 'open' or 'closed'
+          example: open
+          type: string
+        state_reason:
+          description: The reason for the current state
+          example: not_planned
+          type:
+          - string
+          - 'null'
+          enum:
+          - completed
+          - reopened
+          - not_planned
+        title:
+          description: Title of the issue
+          example: Widget creation fails in Safari on OS X 10.8
+          type: string
+        body:
+          description: Contents of the issue
+          example: It looks like the new widget form is broken on Safari. When I try and create the widget, Safari crashes. This is reproducible on 10.8, but not 10.9. Maybe a browser bug?
+          type:
+          - string
+          - 'null'
+        user:
+          $ref: '#/components/schemas/nullable-simple-user'
+        labels:
+          description: Labels to associate with this issue; pass one or more label names to replace the set of labels on this issue; send an empty array to clear all labels from the issue; note that the labels are silently dropped for users without push access to the repository
+          example:
+          - bug
+          - registration
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: object
+              properties:
+                id:
+                  type: integer
+                  format: int64
+                node_id:
+                  type: string
+                url:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+                description:
+                  type:
+                  - string
+                  - 'null'
+                color:
+                  type:
+                  - string
+                  - 'null'
+                default:
+                  type: boolean
+        assignee:
+          $ref: '#/components/schemas/nullable-simple-user'
+        assignees:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/simple-user'
+        milestone:
+          $ref: '#/components/schemas/nullable-milestone'
+        locked:
+          type: boolean
+        active_lock_reason:
+          type:
+          - string
+          - 'null'
+        comments:
+          type: integer
+        pull_request:
+          type: object
+          properties:
+            merged_at:
+              type:
+              - string
+              - 'null'
+              format: date-time
+            diff_url:
+              type:
+              - string
+              - 'null'
+              format: uri
+            html_url:
+              type:
+              - string
+              - 'null'
+              format: uri
+            patch_url:
+              type:
+              - string
+              - 'null'
+              format: uri
+            url:
+              type:
+              - string
+              - 'null'
+              format: uri
+          required:
+          - diff_url
+          - html_url
+          - patch_url
+          - url
+        closed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        draft:
+          type: boolean
+        closed_by:
+          $ref: '#/components/schemas/nullable-simple-user'
+        body_html:
+          type: string
+        body_text:
+          type: string
+        timeline_url:
+          type: string
+          format: uri
+        repository:
+          $ref: '#/components/schemas/repository'
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        author_association:
+          $ref: '#/components/schemas/author-association'
+        reactions:
+          $ref: '#/components/schemas/reaction-rollup'
+      required:
+      - assignee
+      - closed_at
+      - comments
+      - comments_url
+      - events_url
+      - html_url
+      - id
+      - node_id
+      - labels
+      - labels_url
+      - milestone
+      - number
+      - repository_url
+      - state
+      - locked
+      - title
+      - url
       - user
-      - body
+      - author_association
       - created_at
       - updated_at
-      - html_url
-      - pull_request_url
-      - author_association
-      - _links
+    review-dismissed-issue-event:
+      title: Review Dismissed Issue Event
+      description: Review Dismissed Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        dismissed_review:
+          type: object
+          properties:
+            state:
+              type: string
+            review_id:
+              type: integer
+            dismissal_message:
+              type:
+              - string
+              - 'null'
+            dismissal_commit_id:
+              type: string
+          required:
+          - state
+          - review_id
+          - dismissal_message
+      required:
+      - dismissed_review
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
     team:
       title: Team
       description: Groups of organization members that gives permissions on specified repositories.
@@ -2561,9 +2773,9 @@ components:
       - repositories_url
       - slug
       - parent
-    timeline-unassigned-issue-event:
-      title: Timeline Unassigned Issue Event
-      description: Timeline Unassigned Issue Event
+    labeled-issue-event:
+      title: Labeled Issue Event
+      description: Labeled Issue Event
       type: object
       properties:
         id:
@@ -2588,9 +2800,18 @@ components:
           type: string
         performed_via_github_app:
           $ref: '#/components/schemas/nullable-integration'
-        assignee:
-          $ref: '#/components/schemas/simple-user'
+        label:
+          type: object
+          properties:
+            name:
+              type: string
+            color:
+              type: string
+          required:
+          - name
+          - color
       required:
+      - label
       - id
       - node_id
       - url
@@ -2600,7 +2821,6 @@ components:
       - commit_url
       - created_at
       - performed_via_github_app
-      - assignee
     timeline-reviewed-event:
       title: Timeline Reviewed Event
       description: Timeline Reviewed Event
@@ -2679,112 +2899,6 @@ components:
       - pull_request_url
       - _links
       - author_association
-    labeled-issue-event:
-      title: Labeled Issue Event
-      description: Labeled Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        label:
-          type: object
-          properties:
-            name:
-              type: string
-            color:
-              type: string
-          required:
-          - name
-          - color
-      required:
-      - label
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    locked-issue-event:
-      title: Locked Issue Event
-      description: Locked Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        lock_reason:
-          type:
-          - string
-          - 'null'
-          example: '"off-topic"'
-      required:
-      - lock_reason
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    timeline-commit-commented-event:
-      title: Timeline Commit Commented Event
-      description: Timeline Commit Commented Event
-      type: object
-      properties:
-        event:
-          type: string
-        node_id:
-          type: string
-        commit_id:
-          type: string
-        comments:
-          type: array
-          items:
-            $ref: '#/components/schemas/commit-comment'
     simple-user:
       title: Simple User
       description: A GitHub user.
@@ -2884,278 +2998,36 @@ components:
       - subscriptions_url
       - type
       - url
-    review-dismissed-issue-event:
-      title: Review Dismissed Issue Event
-      description: Review Dismissed Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        dismissed_review:
-          type: object
-          properties:
-            state:
-              type: string
-            review_id:
-              type: integer
-            dismissal_message:
-              type:
-              - string
-              - 'null'
-            dismissal_commit_id:
-              type: string
-          required:
-          - state
-          - review_id
-          - dismissal_message
-      required:
-      - dismissed_review
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    nullable-milestone:
-      title: Milestone
-      description: A collection of related issues and pull requests.
-      type:
-      - object
-      - 'null'
-      properties:
-        url:
-          type: string
-          format: uri
-          example: https://api.github.com/repos/octocat/Hello-World/milestones/1
-        html_url:
-          type: string
-          format: uri
-          example: https://github.com/octocat/Hello-World/milestones/v1.0
-        labels_url:
-          type: string
-          format: uri
-          example: https://api.github.com/repos/octocat/Hello-World/milestones/1/labels
-        id:
-          type: integer
-          example: 1002604
-        node_id:
-          type: string
-          example: MDk6TWlsZXN0b25lMTAwMjYwNA==
-        number:
-          description: The number of the milestone.
-          type: integer
-          example: 42
-        state:
-          description: The state of the milestone.
-          example: open
-          type: string
-          enum:
-          - open
-          - closed
-          default: open
-        title:
-          description: The title of the milestone.
-          example: v1.0
-          type: string
-        description:
-          type:
-          - string
-          - 'null'
-          example: Tracking milestone for version 1.0
-        creator:
-          $ref: '#/components/schemas/nullable-simple-user'
-        open_issues:
-          type: integer
-          example: 4
-        closed_issues:
-          type: integer
-          example: 8
-        created_at:
-          type: string
-          format: date-time
-          example: '2011-04-10T20:09:31Z'
-        updated_at:
-          type: string
-          format: date-time
-          example: '2014-03-03T18:58:10Z'
-        closed_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2013-02-12T13:22:01Z'
-        due_on:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2012-10-09T23:39:01Z'
-      required:
-      - closed_issues
-      - creator
-      - description
-      - due_on
-      - closed_at
-      - id
-      - node_id
-      - labels_url
-      - html_url
-      - number
-      - open_issues
-      - state
-      - title
-      - url
-      - created_at
-      - updated_at
-    unlabeled-issue-event:
-      title: Unlabeled Issue Event
-      description: Unlabeled Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        label:
-          type: object
-          properties:
-            name:
-              type: string
-            color:
-              type: string
-          required:
-          - name
-          - color
-      required:
-      - label
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    basic-error:
-      title: Basic Error
-      description: Basic Error
+    scim-error:
+      title: Scim Error
+      description: Scim Error
       type: object
       properties:
         message:
-          type: string
+          type:
+          - string
+          - 'null'
         documentation_url:
-          type: string
-        url:
-          type: string
+          type:
+          - string
+          - 'null'
+        detail:
+          type:
+          - string
+          - 'null'
         status:
-          type: string
-    timeline-comment-event:
-      title: Timeline Comment Event
-      description: Timeline Comment Event
-      type: object
-      properties:
-        event:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        id:
-          description: Unique identifier of the issue comment
-          example: 42
           type: integer
-        node_id:
-          type: string
-        url:
-          description: URL for the issue comment
-          example: https://api.github.com/repositories/42/issues/comments/1
-          type: string
-          format: uri
-        body:
-          description: Contents of the issue comment
-          example: What version of Safari were you using when you observed this bug?
-          type: string
-        body_text:
-          type: string
-        body_html:
-          type: string
-        html_url:
-          type: string
-          format: uri
-        user:
-          $ref: '#/components/schemas/simple-user'
-        created_at:
-          type: string
-          format: date-time
-          example: '2011-04-14T16:00:49Z'
-        updated_at:
-          type: string
-          format: date-time
-          example: '2011-04-14T16:00:49Z'
-        issue_url:
-          type: string
-          format: uri
-        author_association:
-          $ref: '#/components/schemas/author-association'
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        reactions:
-          $ref: '#/components/schemas/reaction-rollup'
-      required:
-      - event
-      - actor
-      - id
-      - node_id
-      - html_url
-      - issue_url
-      - author_association
-      - user
-      - url
-      - created_at
-      - updated_at
-    assigned-issue-event:
-      title: Assigned Issue Event
-      description: Assigned Issue Event
+        scimType:
+          type:
+          - string
+          - 'null'
+        schemas:
+          type: array
+          items:
+            type: string
+    demilestoned-issue-event:
+      title: Demilestoned Issue Event
+      description: Demilestoned Issue Event
       type: object
       properties:
         id:
@@ -3179,12 +3051,16 @@ components:
         created_at:
           type: string
         performed_via_github_app:
-          $ref: '#/components/schemas/integration'
-        assignee:
-          $ref: '#/components/schemas/simple-user'
-        assigner:
-          $ref: '#/components/schemas/simple-user'
+          $ref: '#/components/schemas/nullable-integration'
+        milestone:
+          type: object
+          properties:
+            title:
+              type: string
+          required:
+          - title
       required:
+      - milestone
       - id
       - node_id
       - url
@@ -3194,65 +3070,19 @@ components:
       - commit_url
       - created_at
       - performed_via_github_app
-      - assignee
-      - assigner
-    issue-comment:
-      title: Issue Comment
-      description: Comments provide a way for people to collaborate on an issue.
+    timeline-line-commented-event:
+      title: Timeline Line Commented Event
+      description: Timeline Line Commented Event
       type: object
       properties:
-        id:
-          description: Unique identifier of the issue comment
-          example: 42
-          type: integer
-          format: int64
+        event:
+          type: string
         node_id:
           type: string
-        url:
-          description: URL for the issue comment
-          example: https://api.github.com/repositories/42/issues/comments/1
-          type: string
-          format: uri
-        body:
-          description: Contents of the issue comment
-          example: What version of Safari were you using when you observed this bug?
-          type: string
-        body_text:
-          type: string
-        body_html:
-          type: string
-        html_url:
-          type: string
-          format: uri
-        user:
-          $ref: '#/components/schemas/nullable-simple-user'
-        created_at:
-          type: string
-          format: date-time
-          example: '2011-04-14T16:00:49Z'
-        updated_at:
-          type: string
-          format: date-time
-          example: '2011-04-14T16:00:49Z'
-        issue_url:
-          type: string
-          format: uri
-        author_association:
-          $ref: '#/components/schemas/author-association'
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        reactions:
-          $ref: '#/components/schemas/reaction-rollup'
-      required:
-      - id
-      - node_id
-      - html_url
-      - issue_url
-      - author_association
-      - user
-      - url
-      - created_at
-      - updated_at
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/pull-request-review-comment'
     repository:
       title: Repository
       description: A repository on GitHub.
@@ -3791,6 +3621,416 @@ components:
       - commit_url
       - created_at
       - performed_via_github_app
+    assigned-issue-event:
+      title: Assigned Issue Event
+      description: Assigned Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/integration'
+        assignee:
+          $ref: '#/components/schemas/simple-user'
+        assigner:
+          $ref: '#/components/schemas/simple-user'
+      required:
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+      - assignee
+      - assigner
+    added-to-project-issue-event:
+      title: Added to Project Issue Event
+      description: Added to Project Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        project_card:
+          type: object
+          properties:
+            id:
+              type: integer
+            url:
+              type: string
+              format: uri
+            project_id:
+              type: integer
+            project_url:
+              type: string
+              format: uri
+            column_name:
+              type: string
+            previous_column_name:
+              type: string
+          required:
+          - id
+          - url
+          - project_id
+          - project_url
+          - column_name
+      required:
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+    nullable-team-simple:
+      title: Team Simple
+      description: Groups of organization members that gives permissions on specified repositories.
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          description: Unique identifier of the team
+          type: integer
+          example: 1
+        node_id:
+          type: string
+          example: MDQ6VGVhbTE=
+        url:
+          description: URL for the team
+          type: string
+          format: uri
+          example: https://api.github.com/organizations/1/team/1
+        members_url:
+          type: string
+          example: https://api.github.com/organizations/1/team/1/members{/member}
+        name:
+          description: Name of the team
+          type: string
+          example: Justice League
+        description:
+          description: Description of the team
+          type:
+          - string
+          - 'null'
+          example: A great team.
+        permission:
+          description: Permission that the team will have for its repositories
+          type: string
+          example: admin
+        privacy:
+          description: The level of privacy this team should have
+          type: string
+          example: closed
+        html_url:
+          type: string
+          format: uri
+          example: https://github.com/orgs/rails/teams/core
+        repositories_url:
+          type: string
+          format: uri
+          example: https://api.github.com/organizations/1/team/1/repos
+        slug:
+          type: string
+          example: justice-league
+        ldap_dn:
+          description: Distinguished Name (DN) that team maps to within LDAP environment
+          example: uid=example,ou=users,dc=github,dc=com
+          type: string
+      required:
+      - id
+      - node_id
+      - url
+      - members_url
+      - name
+      - description
+      - permission
+      - html_url
+      - repositories_url
+      - slug
+    commit-comment:
+      title: Commit Comment
+      description: Commit Comment
+      type: object
+      properties:
+        html_url:
+          type: string
+          format: uri
+        url:
+          type: string
+          format: uri
+        id:
+          type: integer
+        node_id:
+          type: string
+        body:
+          type: string
+        path:
+          type:
+          - string
+          - 'null'
+        position:
+          type:
+          - integer
+          - 'null'
+        line:
+          type:
+          - integer
+          - 'null'
+        commit_id:
+          type: string
+        user:
+          $ref: '#/components/schemas/nullable-simple-user'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        author_association:
+          $ref: '#/components/schemas/author-association'
+        reactions:
+          $ref: '#/components/schemas/reaction-rollup'
+      required:
+      - url
+      - html_url
+      - id
+      - node_id
+      - user
+      - position
+      - line
+      - path
+      - commit_id
+      - body
+      - author_association
+      - created_at
+      - updated_at
+    issue-event-rename:
+      title: Issue Event Rename
+      description: Issue Event Rename
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+      required:
+      - from
+      - to
+    nullable-license-simple:
+      title: License Simple
+      description: License Simple
+      type:
+      - object
+      - 'null'
+      properties:
+        key:
+          type: string
+          example: mit
+        name:
+          type: string
+          example: MIT License
+        url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          example: https://api.github.com/licenses/mit
+        spdx_id:
+          type:
+          - string
+          - 'null'
+          example: MIT
+        node_id:
+          type: string
+          example: MDc6TGljZW5zZW1pdA==
+        html_url:
+          type: string
+          format: uri
+      required:
+      - key
+      - name
+      - url
+      - spdx_id
+      - node_id
+    state-change-issue-event:
+      title: State Change Issue Event
+      description: State Change Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        state_reason:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+    review-request-removed-issue-event:
+      title: Review Request Removed Issue Event
+      description: Review Request Removed Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        review_requester:
+          $ref: '#/components/schemas/simple-user'
+        requested_team:
+          $ref: '#/components/schemas/team'
+        requested_reviewer:
+          $ref: '#/components/schemas/simple-user'
+      required:
+      - review_requester
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+    issue-event-milestone:
+      title: Issue Event Milestone
+      description: Issue Event Milestone
+      type: object
+      properties:
+        title:
+          type: string
+      required:
+      - title
+    validation-error:
+      title: Validation Error
+      description: Validation Error
+      type: object
+      required:
+      - message
+      - documentation_url
+      properties:
+        message:
+          type: string
+        documentation_url:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+            - code
+            properties:
+              resource:
+                type: string
+              field:
+                type: string
+              message:
+                type: string
+              code:
+                type: string
+              index:
+                type: integer
+              value:
+                oneOf:
+                - type:
+                  - string
+                  - 'null'
+                - type:
+                  - integer
+                  - 'null'
+                - type:
+                  - array
+                  - 'null'
+                  items:
+                    type: string
     removed-from-project-issue-event:
       title: Removed from Project Issue Event
       description: Removed from Project Issue Event
@@ -3851,244 +4091,315 @@ components:
       - commit_url
       - created_at
       - performed_via_github_app
-    timeline-issue-events:
-      title: Timeline Event
-      description: Timeline Event
-      type: object
-      anyOf:
-      - $ref: '#/components/schemas/labeled-issue-event'
-      - $ref: '#/components/schemas/unlabeled-issue-event'
-      - $ref: '#/components/schemas/milestoned-issue-event'
-      - $ref: '#/components/schemas/demilestoned-issue-event'
-      - $ref: '#/components/schemas/renamed-issue-event'
-      - $ref: '#/components/schemas/review-requested-issue-event'
-      - $ref: '#/components/schemas/review-request-removed-issue-event'
-      - $ref: '#/components/schemas/review-dismissed-issue-event'
-      - $ref: '#/components/schemas/locked-issue-event'
-      - $ref: '#/components/schemas/added-to-project-issue-event'
-      - $ref: '#/components/schemas/moved-column-in-project-issue-event'
-      - $ref: '#/components/schemas/removed-from-project-issue-event'
-      - $ref: '#/components/schemas/converted-note-to-issue-issue-event'
-      - $ref: '#/components/schemas/timeline-comment-event'
-      - $ref: '#/components/schemas/timeline-cross-referenced-event'
-      - $ref: '#/components/schemas/timeline-committed-event'
-      - $ref: '#/components/schemas/timeline-reviewed-event'
-      - $ref: '#/components/schemas/timeline-line-commented-event'
-      - $ref: '#/components/schemas/timeline-commit-commented-event'
-      - $ref: '#/components/schemas/timeline-assigned-issue-event'
-      - $ref: '#/components/schemas/timeline-unassigned-issue-event'
-      - $ref: '#/components/schemas/state-change-issue-event'
-    milestoned-issue-event:
-      title: Milestoned Issue Event
-      description: Milestoned Issue Event
+    timeline-committed-event:
+      title: Timeline Committed Event
+      description: Timeline Committed Event
       type: object
       properties:
-        id:
-          type: integer
+        event:
+          type: string
+        sha:
+          description: SHA for the commit
+          example: 7638417db6d59f3c431d3e1f261cc637155684cd
+          type: string
         node_id:
           type: string
         url:
           type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        milestone:
+          format: uri
+        author:
+          description: Identifying information for the git-user
           type: object
           properties:
-            title:
+            date:
+              description: Timestamp of the commit
+              example: '2014-08-09T08:02:04+12:00'
+              format: date-time
+              type: string
+            email:
+              type: string
+              description: Git email address of the user
+              example: monalisa.octocat@example.com
+            name:
+              description: Name of the git user
+              example: Monalisa Octocat
               type: string
           required:
-          - title
+          - email
+          - name
+          - date
+        committer:
+          description: Identifying information for the git-user
+          type: object
+          properties:
+            date:
+              description: Timestamp of the commit
+              example: '2014-08-09T08:02:04+12:00'
+              format: date-time
+              type: string
+            email:
+              type: string
+              description: Git email address of the user
+              example: monalisa.octocat@example.com
+            name:
+              description: Name of the git user
+              example: Monalisa Octocat
+              type: string
+          required:
+          - email
+          - name
+          - date
+        message:
+          description: Message describing the purpose of the commit
+          example: 'Fix #42'
+          type: string
+        tree:
+          type: object
+          properties:
+            sha:
+              description: SHA for the commit
+              example: 7638417db6d59f3c431d3e1f261cc637155684cd
+              type: string
+            url:
+              type: string
+              format: uri
+          required:
+          - sha
+          - url
+        parents:
+          type: array
+          items:
+            type: object
+            properties:
+              sha:
+                description: SHA for the commit
+                example: 7638417db6d59f3c431d3e1f261cc637155684cd
+                type: string
+              url:
+                type: string
+                format: uri
+              html_url:
+                type: string
+                format: uri
+            required:
+            - sha
+            - url
+            - html_url
+        verification:
+          type: object
+          properties:
+            verified:
+              type: boolean
+            reason:
+              type: string
+            signature:
+              type:
+              - string
+              - 'null'
+            payload:
+              type:
+              - string
+              - 'null'
+          required:
+          - verified
+          - reason
+          - signature
+          - payload
+        html_url:
+          type: string
+          format: uri
       required:
-      - milestone
-      - id
+      - sha
       - node_id
       - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    review-request-removed-issue-event:
-      title: Review Request Removed Issue Event
-      description: Review Request Removed Issue Event
+      - html_url
+      - author
+      - committer
+      - tree
+      - message
+      - parents
+      - verification
+    reaction-rollup:
+      title: Reaction Rollup
       type: object
       properties:
-        id:
-          type: integer
-        node_id:
-          type: string
         url:
           type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        review_requester:
-          $ref: '#/components/schemas/simple-user'
-        requested_team:
-          $ref: '#/components/schemas/team'
-        requested_reviewer:
-          $ref: '#/components/schemas/simple-user'
+          format: uri
+        total_count:
+          type: integer
+        '+1':
+          type: integer
+        '-1':
+          type: integer
+        laugh:
+          type: integer
+        confused:
+          type: integer
+        heart:
+          type: integer
+        hooray:
+          type: integer
+        eyes:
+          type: integer
+        rocket:
+          type: integer
       required:
-      - review_requester
-      - id
-      - node_id
       - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    issue-event-dismissed-review:
-      title: Issue Event Dismissed Review
+      - total_count
+      - '+1'
+      - '-1'
+      - laugh
+      - confused
+      - heart
+      - hooray
+      - eyes
+      - rocket
+    label:
+      title: Label
+      description: Color-coded labels help you categorize and filter your issues (just like labels in Gmail).
       type: object
       properties:
-        state:
-          type: string
-        review_id:
-          type: integer
-        dismissal_message:
-          type:
-          - string
-          - 'null'
-        dismissal_commit_id:
-          type:
-          - string
-          - 'null'
-      required:
-      - state
-      - review_id
-      - dismissal_message
-    nullable-integration:
-      title: GitHub app
-      description: GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub.
-      type:
-      - object
-      - 'null'
-      properties:
         id:
-          description: Unique identifier of the GitHub app
-          example: 37
           type: integer
-        slug:
-          description: The slug name of the GitHub app
-          example: probot-owners
-          type: string
+          format: int64
+          example: 208045946
         node_id:
           type: string
-          example: MDExOkludGVncmF0aW9uMQ==
-        owner:
-          $ref: '#/components/schemas/nullable-simple-user'
+          example: MDU6TGFiZWwyMDgwNDU5NDY=
+        url:
+          description: URL for the label
+          example: https://api.github.com/repositories/42/labels/bug
+          type: string
+          format: uri
         name:
-          description: The name of the GitHub app
-          example: Probot Owners
+          description: The name of the label.
+          example: bug
           type: string
         description:
           type:
           - string
           - 'null'
-          example: The description of the app.
-        external_url:
+          example: Something isn't working
+        color:
+          description: '6-character hex code, without the leading #, identifying the color'
+          example: FFFFFF
           type: string
-          format: uri
-          example: https://example.com
-        html_url:
-          type: string
-          format: uri
-          example: https://github.com/apps/super-ci
-        created_at:
-          type: string
-          format: date-time
-          example: '2017-07-08T16:18:44-04:00'
-        updated_at:
-          type: string
-          format: date-time
-          example: '2017-07-08T16:18:44-04:00'
-        permissions:
-          description: The set of permissions for the GitHub app
-          type: object
-          properties:
-            issues:
-              type: string
-            checks:
-              type: string
-            metadata:
-              type: string
-            contents:
-              type: string
-            deployments:
-              type: string
-          additionalProperties:
-            type: string
-          example:
-            issues: read
-            deployments: write
-        events:
-          description: The list of events for the GitHub app
-          example:
-          - label
-          - deployment
-          type: array
-          items:
-            type: string
-        installations_count:
-          description: The number of installations associated with the GitHub app
-          example: 5
-          type: integer
-        client_id:
-          type: string
-          example: '"Iv1.25b5d1e65ffc4022"'
-        client_secret:
-          type: string
-          example: '"1d4b2097ac622ba702d19de498f005747a8b21d3"'
-        webhook_secret:
-          type:
-          - string
-          - 'null'
-          example: '"6fba8f2fc8a7e8f2cca5577eddd82ca7586b3b6b"'
-        pem:
-          type: string
-          example: '"REDACTED_PRIVATE_KEY_EXAMPLE\n"'
+        default:
+          type: boolean
+          example: true
       required:
       - id
       - node_id
-      - owner
+      - url
       - name
       - description
-      - external_url
+      - color
+      - default
+    basic-error:
+      title: Basic Error
+      description: Basic Error
+      type: object
+      properties:
+        message:
+          type: string
+        documentation_url:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+    nullable-milestone:
+      title: Milestone
+      description: A collection of related issues and pull requests.
+      type:
+      - object
+      - 'null'
+      properties:
+        url:
+          type: string
+          format: uri
+          example: https://api.github.com/repos/octocat/Hello-World/milestones/1
+        html_url:
+          type: string
+          format: uri
+          example: https://github.com/octocat/Hello-World/milestones/v1.0
+        labels_url:
+          type: string
+          format: uri
+          example: https://api.github.com/repos/octocat/Hello-World/milestones/1/labels
+        id:
+          type: integer
+          example: 1002604
+        node_id:
+          type: string
+          example: MDk6TWlsZXN0b25lMTAwMjYwNA==
+        number:
+          description: The number of the milestone.
+          type: integer
+          example: 42
+        state:
+          description: The state of the milestone.
+          example: open
+          type: string
+          enum:
+          - open
+          - closed
+          default: open
+        title:
+          description: The title of the milestone.
+          example: v1.0
+          type: string
+        description:
+          type:
+          - string
+          - 'null'
+          example: Tracking milestone for version 1.0
+        creator:
+          $ref: '#/components/schemas/nullable-simple-user'
+        open_issues:
+          type: integer
+          example: 4
+        closed_issues:
+          type: integer
+          example: 8
+        created_at:
+          type: string
+          format: date-time
+          example: '2011-04-10T20:09:31Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2014-03-03T18:58:10Z'
+        closed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2013-02-12T13:22:01Z'
+        due_on:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2012-10-09T23:39:01Z'
+      required:
+      - closed_issues
+      - creator
+      - description
+      - due_on
+      - closed_at
+      - id
+      - node_id
+      - labels_url
       - html_url
+      - number
+      - open_issues
+      - state
+      - title
+      - url
       - created_at
       - updated_at
-      - permissions
-      - events
     renamed-issue-event:
       title: Renamed Issue Event
       description: Renamed Issue Event
@@ -4226,647 +4537,71 @@ components:
       - url
       - created_at
       - updated_at
-    validation-error:
-      title: Validation Error
-      description: Validation Error
-      type: object
-      required:
-      - message
-      - documentation_url
-      properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        errors:
-          type: array
-          items:
-            type: object
-            required:
-            - code
-            properties:
-              resource:
-                type: string
-              field:
-                type: string
-              message:
-                type: string
-              code:
-                type: string
-              index:
-                type: integer
-              value:
-                oneOf:
-                - type:
-                  - string
-                  - 'null'
-                - type:
-                  - integer
-                  - 'null'
-                - type:
-                  - array
-                  - 'null'
-                  items:
-                    type: string
-    issue:
-      title: Issue
-      description: Issues are a great way to keep track of tasks, enhancements, and bugs for your projects.
+    timeline-comment-event:
+      title: Timeline Comment Event
+      description: Timeline Comment Event
       type: object
       properties:
+        event:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
         id:
+          description: Unique identifier of the issue comment
+          example: 42
           type: integer
-          format: int64
         node_id:
           type: string
         url:
-          description: URL for the issue
-          example: https://api.github.com/repositories/42/issues/1
+          description: URL for the issue comment
+          example: https://api.github.com/repositories/42/issues/comments/1
           type: string
           format: uri
-        repository_url:
-          type: string
-          format: uri
-        labels_url:
-          type: string
-        comments_url:
-          type: string
-          format: uri
-        events_url:
-          type: string
-          format: uri
-        html_url:
-          type: string
-          format: uri
-        number:
-          description: Number uniquely identifying the issue within its repository
-          example: 42
-          type: integer
-        state:
-          description: State of the issue; either 'open' or 'closed'
-          example: open
-          type: string
-        state_reason:
-          description: The reason for the current state
-          example: not_planned
-          type:
-          - string
-          - 'null'
-          enum:
-          - completed
-          - reopened
-          - not_planned
-        title:
-          description: Title of the issue
-          example: Widget creation fails in Safari on OS X 10.8
-          type: string
         body:
-          description: Contents of the issue
-          example: It looks like the new widget form is broken on Safari. When I try and create the widget, Safari crashes. This is reproducible on 10.8, but not 10.9. Maybe a browser bug?
-          type:
-          - string
-          - 'null'
-        user:
-          $ref: '#/components/schemas/nullable-simple-user'
-        labels:
-          description: Labels to associate with this issue; pass one or more label names to replace the set of labels on this issue; send an empty array to clear all labels from the issue; note that the labels are silently dropped for users without push access to the repository
-          example:
-          - bug
-          - registration
-          type: array
-          items:
-            oneOf:
-            - type: string
-            - type: object
-              properties:
-                id:
-                  type: integer
-                  format: int64
-                node_id:
-                  type: string
-                url:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-                description:
-                  type:
-                  - string
-                  - 'null'
-                color:
-                  type:
-                  - string
-                  - 'null'
-                default:
-                  type: boolean
-        assignee:
-          $ref: '#/components/schemas/nullable-simple-user'
-        assignees:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/simple-user'
-        milestone:
-          $ref: '#/components/schemas/nullable-milestone'
-        locked:
-          type: boolean
-        active_lock_reason:
-          type:
-          - string
-          - 'null'
-        comments:
-          type: integer
-        pull_request:
-          type: object
-          properties:
-            merged_at:
-              type:
-              - string
-              - 'null'
-              format: date-time
-            diff_url:
-              type:
-              - string
-              - 'null'
-              format: uri
-            html_url:
-              type:
-              - string
-              - 'null'
-              format: uri
-            patch_url:
-              type:
-              - string
-              - 'null'
-              format: uri
-            url:
-              type:
-              - string
-              - 'null'
-              format: uri
-          required:
-          - diff_url
-          - html_url
-          - patch_url
-          - url
-        closed_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        draft:
-          type: boolean
-        closed_by:
-          $ref: '#/components/schemas/nullable-simple-user'
-        body_html:
+          description: Contents of the issue comment
+          example: What version of Safari were you using when you observed this bug?
           type: string
         body_text:
           type: string
-        timeline_url:
+        body_html:
           type: string
-          format: uri
-        repository:
-          $ref: '#/components/schemas/repository'
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        author_association:
-          $ref: '#/components/schemas/author-association'
-        reactions:
-          $ref: '#/components/schemas/reaction-rollup'
-      required:
-      - assignee
-      - closed_at
-      - comments
-      - comments_url
-      - events_url
-      - html_url
-      - id
-      - node_id
-      - labels
-      - labels_url
-      - milestone
-      - number
-      - repository_url
-      - state
-      - locked
-      - title
-      - url
-      - user
-      - author_association
-      - created_at
-      - updated_at
-    reaction-rollup:
-      title: Reaction Rollup
-      type: object
-      properties:
-        url:
-          type: string
-          format: uri
-        total_count:
-          type: integer
-        '+1':
-          type: integer
-        '-1':
-          type: integer
-        laugh:
-          type: integer
-        confused:
-          type: integer
-        heart:
-          type: integer
-        hooray:
-          type: integer
-        eyes:
-          type: integer
-        rocket:
-          type: integer
-      required:
-      - url
-      - total_count
-      - '+1'
-      - '-1'
-      - laugh
-      - confused
-      - heart
-      - hooray
-      - eyes
-      - rocket
-    timeline-assigned-issue-event:
-      title: Timeline Assigned Issue Event
-      description: Timeline Assigned Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        assignee:
-          $ref: '#/components/schemas/simple-user'
-      required:
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-      - assignee
-    issue-event-for-issue:
-      title: Issue Event for Issue
-      description: Issue Event for Issue
-      anyOf:
-      - $ref: '#/components/schemas/labeled-issue-event'
-      - $ref: '#/components/schemas/unlabeled-issue-event'
-      - $ref: '#/components/schemas/assigned-issue-event'
-      - $ref: '#/components/schemas/unassigned-issue-event'
-      - $ref: '#/components/schemas/milestoned-issue-event'
-      - $ref: '#/components/schemas/demilestoned-issue-event'
-      - $ref: '#/components/schemas/renamed-issue-event'
-      - $ref: '#/components/schemas/review-requested-issue-event'
-      - $ref: '#/components/schemas/review-request-removed-issue-event'
-      - $ref: '#/components/schemas/review-dismissed-issue-event'
-      - $ref: '#/components/schemas/locked-issue-event'
-      - $ref: '#/components/schemas/added-to-project-issue-event'
-      - $ref: '#/components/schemas/moved-column-in-project-issue-event'
-      - $ref: '#/components/schemas/removed-from-project-issue-event'
-      - $ref: '#/components/schemas/converted-note-to-issue-issue-event'
-    issue-event-rename:
-      title: Issue Event Rename
-      description: Issue Event Rename
-      type: object
-      properties:
-        from:
-          type: string
-        to:
-          type: string
-      required:
-      - from
-      - to
-    timeline-line-commented-event:
-      title: Timeline Line Commented Event
-      description: Timeline Line Commented Event
-      type: object
-      properties:
-        event:
-          type: string
-        node_id:
-          type: string
-        comments:
-          type: array
-          items:
-            $ref: '#/components/schemas/pull-request-review-comment'
-    integration:
-      title: GitHub app
-      description: GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub.
-      type:
-      - object
-      - 'null'
-      properties:
-        id:
-          description: Unique identifier of the GitHub app
-          example: 37
-          type: integer
-        slug:
-          description: The slug name of the GitHub app
-          example: probot-owners
-          type: string
-        node_id:
-          type: string
-          example: MDExOkludGVncmF0aW9uMQ==
-        owner:
-          $ref: '#/components/schemas/nullable-simple-user'
-        name:
-          description: The name of the GitHub app
-          example: Probot Owners
-          type: string
-        description:
-          type:
-          - string
-          - 'null'
-          example: The description of the app.
-        external_url:
-          type: string
-          format: uri
-          example: https://example.com
         html_url:
           type: string
           format: uri
-          example: https://github.com/apps/super-ci
-        created_at:
-          type: string
-          format: date-time
-          example: '2017-07-08T16:18:44-04:00'
-        updated_at:
-          type: string
-          format: date-time
-          example: '2017-07-08T16:18:44-04:00'
-        permissions:
-          description: The set of permissions for the GitHub app
-          type: object
-          properties:
-            issues:
-              type: string
-            checks:
-              type: string
-            metadata:
-              type: string
-            contents:
-              type: string
-            deployments:
-              type: string
-          additionalProperties:
-            type: string
-          example:
-            issues: read
-            deployments: write
-        events:
-          description: The list of events for the GitHub app
-          example:
-          - label
-          - deployment
-          type: array
-          items:
-            type: string
-        installations_count:
-          description: The number of installations associated with the GitHub app
-          example: 5
-          type: integer
-        client_id:
-          type: string
-          example: '"Iv1.25b5d1e65ffc4022"'
-        client_secret:
-          type: string
-          example: '"1d4b2097ac622ba702d19de498f005747a8b21d3"'
-        webhook_secret:
-          type:
-          - string
-          - 'null'
-          example: '"6fba8f2fc8a7e8f2cca5577eddd82ca7586b3b6b"'
-        pem:
-          type: string
-          example: '"REDACTED_PRIVATE_KEY_EXAMPLE\n"'
-      required:
-      - id
-      - node_id
-      - owner
-      - name
-      - description
-      - external_url
-      - html_url
-      - created_at
-      - updated_at
-      - permissions
-      - events
-    demilestoned-issue-event:
-      title: Demilestoned Issue Event
-      description: Demilestoned Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        milestone:
-          type: object
-          properties:
-            title:
-              type: string
-          required:
-          - title
-      required:
-      - milestone
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    nullable-license-simple:
-      title: License Simple
-      description: License Simple
-      type:
-      - object
-      - 'null'
-      properties:
-        key:
-          type: string
-          example: mit
-        name:
-          type: string
-          example: MIT License
-        url:
-          type:
-          - string
-          - 'null'
-          format: uri
-          example: https://api.github.com/licenses/mit
-        spdx_id:
-          type:
-          - string
-          - 'null'
-          example: MIT
-        node_id:
-          type: string
-          example: MDc6TGljZW5zZW1pdA==
-        html_url:
-          type: string
-          format: uri
-      required:
-      - key
-      - name
-      - url
-      - spdx_id
-      - node_id
-    unassigned-issue-event:
-      title: Unassigned Issue Event
-      description: Unassigned Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        assignee:
-          $ref: '#/components/schemas/simple-user'
-        assigner:
-          $ref: '#/components/schemas/simple-user'
-      required:
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-      - assignee
-      - assigner
-    commit-comment:
-      title: Commit Comment
-      description: Commit Comment
-      type: object
-      properties:
-        html_url:
-          type: string
-          format: uri
-        url:
-          type: string
-          format: uri
-        id:
-          type: integer
-        node_id:
-          type: string
-        body:
-          type: string
-        path:
-          type:
-          - string
-          - 'null'
-        position:
-          type:
-          - integer
-          - 'null'
-        line:
-          type:
-          - integer
-          - 'null'
-        commit_id:
-          type: string
         user:
-          $ref: '#/components/schemas/nullable-simple-user'
+          $ref: '#/components/schemas/simple-user'
         created_at:
           type: string
           format: date-time
+          example: '2011-04-14T16:00:49Z'
         updated_at:
           type: string
           format: date-time
+          example: '2011-04-14T16:00:49Z'
+        issue_url:
+          type: string
+          format: uri
         author_association:
           $ref: '#/components/schemas/author-association'
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
         reactions:
           $ref: '#/components/schemas/reaction-rollup'
       required:
-      - url
-      - html_url
+      - event
+      - actor
       - id
       - node_id
-      - user
-      - position
-      - line
-      - path
-      - commit_id
-      - body
+      - html_url
+      - issue_url
       - author_association
+      - user
+      - url
       - created_at
       - updated_at
-    state-change-issue-event:
-      title: State Change Issue Event
-      description: State Change Issue Event
+    locked-issue-event:
+      title: Locked Issue Event
+      description: Locked Issue Event
       type: object
       properties:
         id:
@@ -4891,11 +4626,13 @@ components:
           type: string
         performed_via_github_app:
           $ref: '#/components/schemas/nullable-integration'
-        state_reason:
+        lock_reason:
           type:
           - string
           - 'null'
+          example: '"off-topic"'
       required:
+      - lock_reason
       - id
       - node_id
       - url
@@ -5006,200 +4743,41 @@ components:
       - subscriptions_url
       - type
       - url
-    nullable-team-simple:
-      title: Team Simple
-      description: Groups of organization members that gives permissions on specified repositories.
-      type:
-      - object
-      - 'null'
+    issue-event-dismissed-review:
+      title: Issue Event Dismissed Review
+      type: object
       properties:
-        id:
-          description: Unique identifier of the team
+        state:
+          type: string
+        review_id:
           type: integer
-          example: 1
-        node_id:
-          type: string
-          example: MDQ6VGVhbTE=
-        url:
-          description: URL for the team
-          type: string
-          format: uri
-          example: https://api.github.com/organizations/1/team/1
-        members_url:
-          type: string
-          example: https://api.github.com/organizations/1/team/1/members{/member}
-        name:
-          description: Name of the team
-          type: string
-          example: Justice League
-        description:
-          description: Description of the team
+        dismissal_message:
           type:
           - string
           - 'null'
-          example: A great team.
-        permission:
-          description: Permission that the team will have for its repositories
-          type: string
-          example: admin
-        privacy:
-          description: The level of privacy this team should have
-          type: string
-          example: closed
-        html_url:
-          type: string
-          format: uri
-          example: https://github.com/orgs/rails/teams/core
-        repositories_url:
-          type: string
-          format: uri
-          example: https://api.github.com/organizations/1/team/1/repos
-        slug:
-          type: string
-          example: justice-league
-        ldap_dn:
-          description: Distinguished Name (DN) that team maps to within LDAP environment
-          example: uid=example,ou=users,dc=github,dc=com
-          type: string
+        dismissal_commit_id:
+          type:
+          - string
+          - 'null'
       required:
-      - id
-      - node_id
-      - url
-      - members_url
-      - name
-      - description
-      - permission
-      - html_url
-      - repositories_url
-      - slug
-    timeline-committed-event:
-      title: Timeline Committed Event
-      description: Timeline Committed Event
+      - state
+      - review_id
+      - dismissal_message
+    timeline-commit-commented-event:
+      title: Timeline Commit Commented Event
+      description: Timeline Commit Commented Event
       type: object
       properties:
         event:
           type: string
-        sha:
-          description: SHA for the commit
-          example: 7638417db6d59f3c431d3e1f261cc637155684cd
-          type: string
         node_id:
           type: string
-        url:
+        commit_id:
           type: string
-          format: uri
-        author:
-          description: Identifying information for the git-user
-          type: object
-          properties:
-            date:
-              description: Timestamp of the commit
-              example: '2014-08-09T08:02:04+12:00'
-              format: date-time
-              type: string
-            email:
-              type: string
-              description: Git email address of the user
-              example: monalisa.octocat@example.com
-            name:
-              description: Name of the git user
-              example: Monalisa Octocat
-              type: string
-          required:
-          - email
-          - name
-          - date
-        committer:
-          description: Identifying information for the git-user
-          type: object
-          properties:
-            date:
-              description: Timestamp of the commit
-              example: '2014-08-09T08:02:04+12:00'
-              format: date-time
-              type: string
-            email:
-              type: string
-              description: Git email address of the user
-              example: monalisa.octocat@example.com
-            name:
-              description: Name of the git user
-              example: Monalisa Octocat
-              type: string
-          required:
-          - email
-          - name
-          - date
-        message:
-          description: Message describing the purpose of the commit
-          example: 'Fix #42'
-          type: string
-        tree:
-          type: object
-          properties:
-            sha:
-              description: SHA for the commit
-              example: 7638417db6d59f3c431d3e1f261cc637155684cd
-              type: string
-            url:
-              type: string
-              format: uri
-          required:
-          - sha
-          - url
-        parents:
+        comments:
           type: array
           items:
-            type: object
-            properties:
-              sha:
-                description: SHA for the commit
-                example: 7638417db6d59f3c431d3e1f261cc637155684cd
-                type: string
-              url:
-                type: string
-                format: uri
-              html_url:
-                type: string
-                format: uri
-            required:
-            - sha
-            - url
-            - html_url
-        verification:
-          type: object
-          properties:
-            verified:
-              type: boolean
-            reason:
-              type: string
-            signature:
-              type:
-              - string
-              - 'null'
-            payload:
-              type:
-              - string
-              - 'null'
-          required:
-          - verified
-          - reason
-          - signature
-          - payload
-        html_url:
-          type: string
-          format: uri
-      required:
-      - sha
-      - node_id
-      - url
-      - html_url
-      - author
-      - committer
-      - tree
-      - message
-      - parents
-      - verification
+            $ref: '#/components/schemas/commit-comment'
     author-association:
       title: author_association
       type: string
@@ -5214,210 +4792,6 @@ components:
       - MEMBER
       - NONE
       - OWNER
-    timeline-cross-referenced-event:
-      title: Timeline Cross Referenced Event
-      description: Timeline Cross Referenced Event
-      type: object
-      properties:
-        event:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        source:
-          type: object
-          properties:
-            type:
-              type: string
-            issue:
-              $ref: '#/components/schemas/issue'
-      required:
-      - event
-      - created_at
-      - updated_at
-      - source
-    issue-event-label:
-      title: Issue Event Label
-      description: Issue Event Label
-      type: object
-      properties:
-        name:
-          type:
-          - string
-          - 'null'
-        color:
-          type:
-          - string
-          - 'null'
-      required:
-      - name
-      - color
-    issue-event:
-      title: Issue Event
-      description: Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        node_id:
-          type: string
-          example: MDEwOklzc3VlRXZlbnQx
-        url:
-          type: string
-          format: uri
-          example: https://api.github.com/repos/octocat/Hello-World/issues/events/1
-        actor:
-          $ref: '#/components/schemas/nullable-simple-user'
-        event:
-          type: string
-          example: closed
-        commit_id:
-          type:
-          - string
-          - 'null'
-          example: 6dcb09b5b57875f334f61aebed695e2e4193db5e
-        commit_url:
-          type:
-          - string
-          - 'null'
-          example: https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e
-        created_at:
-          type: string
-          format: date-time
-          example: '2011-04-14T16:00:49Z'
-        issue:
-          $ref: '#/components/schemas/nullable-issue'
-        label:
-          $ref: '#/components/schemas/issue-event-label'
-        assignee:
-          $ref: '#/components/schemas/nullable-simple-user'
-        assigner:
-          $ref: '#/components/schemas/nullable-simple-user'
-        review_requester:
-          $ref: '#/components/schemas/nullable-simple-user'
-        requested_reviewer:
-          $ref: '#/components/schemas/nullable-simple-user'
-        requested_team:
-          $ref: '#/components/schemas/team'
-        dismissed_review:
-          $ref: '#/components/schemas/issue-event-dismissed-review'
-        milestone:
-          $ref: '#/components/schemas/issue-event-milestone'
-        project_card:
-          $ref: '#/components/schemas/issue-event-project-card'
-        rename:
-          $ref: '#/components/schemas/issue-event-rename'
-        author_association:
-          $ref: '#/components/schemas/author-association'
-        lock_reason:
-          type:
-          - string
-          - 'null'
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-      required:
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-    moved-column-in-project-issue-event:
-      title: Moved Column in Project Issue Event
-      description: Moved Column in Project Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        project_card:
-          type: object
-          properties:
-            id:
-              type: integer
-            url:
-              type: string
-              format: uri
-            project_id:
-              type: integer
-            project_url:
-              type: string
-              format: uri
-            column_name:
-              type: string
-            previous_column_name:
-              type: string
-          required:
-          - id
-          - url
-          - project_id
-          - project_url
-          - column_name
-      required:
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    scim-error:
-      title: Scim Error
-      description: Scim Error
-      type: object
-      properties:
-        message:
-          type:
-          - string
-          - 'null'
-        documentation_url:
-          type:
-          - string
-          - 'null'
-        detail:
-          type:
-          - string
-          - 'null'
-        status:
-          type: integer
-        scimType:
-          type:
-          - string
-          - 'null'
-        schemas:
-          type: array
-          items:
-            type: string
     nullable-issue:
       title: Issue
       description: Issues are a great way to keep track of tasks, enhancements, and bugs for your projects.
@@ -5613,6 +4987,767 @@ components:
       - author_association
       - created_at
       - updated_at
+    nullable-integration:
+      title: GitHub app
+      description: GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub.
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          description: Unique identifier of the GitHub app
+          example: 37
+          type: integer
+        slug:
+          description: The slug name of the GitHub app
+          example: probot-owners
+          type: string
+        node_id:
+          type: string
+          example: MDExOkludGVncmF0aW9uMQ==
+        owner:
+          $ref: '#/components/schemas/nullable-simple-user'
+        name:
+          description: The name of the GitHub app
+          example: Probot Owners
+          type: string
+        description:
+          type:
+          - string
+          - 'null'
+          example: The description of the app.
+        external_url:
+          type: string
+          format: uri
+          example: https://example.com
+        html_url:
+          type: string
+          format: uri
+          example: https://github.com/apps/super-ci
+        created_at:
+          type: string
+          format: date-time
+          example: '2017-07-08T16:18:44-04:00'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2017-07-08T16:18:44-04:00'
+        permissions:
+          description: The set of permissions for the GitHub app
+          type: object
+          properties:
+            issues:
+              type: string
+            checks:
+              type: string
+            metadata:
+              type: string
+            contents:
+              type: string
+            deployments:
+              type: string
+          additionalProperties:
+            type: string
+          example:
+            issues: read
+            deployments: write
+        events:
+          description: The list of events for the GitHub app
+          example:
+          - label
+          - deployment
+          type: array
+          items:
+            type: string
+        installations_count:
+          description: The number of installations associated with the GitHub app
+          example: 5
+          type: integer
+        client_id:
+          type: string
+          example: '"Iv1.25b5d1e65ffc4022"'
+        client_secret:
+          type: string
+          example: '"1d4b2097ac622ba702d19de498f005747a8b21d3"'
+        webhook_secret:
+          type:
+          - string
+          - 'null'
+          example: '"6fba8f2fc8a7e8f2cca5577eddd82ca7586b3b6b"'
+        pem:
+          type: string
+          example: '"REDACTED_PRIVATE_KEY_EXAMPLE\n"'
+      required:
+      - id
+      - node_id
+      - owner
+      - name
+      - description
+      - external_url
+      - html_url
+      - created_at
+      - updated_at
+      - permissions
+      - events
+    timeline-assigned-issue-event:
+      title: Timeline Assigned Issue Event
+      description: Timeline Assigned Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        assignee:
+          $ref: '#/components/schemas/simple-user'
+      required:
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+      - assignee
+    milestoned-issue-event:
+      title: Milestoned Issue Event
+      description: Milestoned Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        milestone:
+          type: object
+          properties:
+            title:
+              type: string
+          required:
+          - title
+      required:
+      - milestone
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+    timeline-cross-referenced-event:
+      title: Timeline Cross Referenced Event
+      description: Timeline Cross Referenced Event
+      type: object
+      properties:
+        event:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        source:
+          type: object
+          properties:
+            type:
+              type: string
+            issue:
+              $ref: '#/components/schemas/issue'
+      required:
+      - event
+      - created_at
+      - updated_at
+      - source
+    unassigned-issue-event:
+      title: Unassigned Issue Event
+      description: Unassigned Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        assignee:
+          $ref: '#/components/schemas/simple-user'
+        assigner:
+          $ref: '#/components/schemas/simple-user'
+      required:
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+      - assignee
+      - assigner
+    issue-event-label:
+      title: Issue Event Label
+      description: Issue Event Label
+      type: object
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+        color:
+          type:
+          - string
+          - 'null'
+      required:
+      - name
+      - color
+    unlabeled-issue-event:
+      title: Unlabeled Issue Event
+      description: Unlabeled Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        label:
+          type: object
+          properties:
+            name:
+              type: string
+            color:
+              type: string
+          required:
+          - name
+          - color
+      required:
+      - label
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+    integration:
+      title: GitHub app
+      description: GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub.
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          description: Unique identifier of the GitHub app
+          example: 37
+          type: integer
+        slug:
+          description: The slug name of the GitHub app
+          example: probot-owners
+          type: string
+        node_id:
+          type: string
+          example: MDExOkludGVncmF0aW9uMQ==
+        owner:
+          $ref: '#/components/schemas/nullable-simple-user'
+        name:
+          description: The name of the GitHub app
+          example: Probot Owners
+          type: string
+        description:
+          type:
+          - string
+          - 'null'
+          example: The description of the app.
+        external_url:
+          type: string
+          format: uri
+          example: https://example.com
+        html_url:
+          type: string
+          format: uri
+          example: https://github.com/apps/super-ci
+        created_at:
+          type: string
+          format: date-time
+          example: '2017-07-08T16:18:44-04:00'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2017-07-08T16:18:44-04:00'
+        permissions:
+          description: The set of permissions for the GitHub app
+          type: object
+          properties:
+            issues:
+              type: string
+            checks:
+              type: string
+            metadata:
+              type: string
+            contents:
+              type: string
+            deployments:
+              type: string
+          additionalProperties:
+            type: string
+          example:
+            issues: read
+            deployments: write
+        events:
+          description: The list of events for the GitHub app
+          example:
+          - label
+          - deployment
+          type: array
+          items:
+            type: string
+        installations_count:
+          description: The number of installations associated with the GitHub app
+          example: 5
+          type: integer
+        client_id:
+          type: string
+          example: '"Iv1.25b5d1e65ffc4022"'
+        client_secret:
+          type: string
+          example: '"1d4b2097ac622ba702d19de498f005747a8b21d3"'
+        webhook_secret:
+          type:
+          - string
+          - 'null'
+          example: '"6fba8f2fc8a7e8f2cca5577eddd82ca7586b3b6b"'
+        pem:
+          type: string
+          example: '"REDACTED_PRIVATE_KEY_EXAMPLE\n"'
+      required:
+      - id
+      - node_id
+      - owner
+      - name
+      - description
+      - external_url
+      - html_url
+      - created_at
+      - updated_at
+      - permissions
+      - events
+    issue-event-for-issue:
+      title: Issue Event for Issue
+      description: Issue Event for Issue
+      anyOf:
+      - $ref: '#/components/schemas/labeled-issue-event'
+      - $ref: '#/components/schemas/unlabeled-issue-event'
+      - $ref: '#/components/schemas/assigned-issue-event'
+      - $ref: '#/components/schemas/unassigned-issue-event'
+      - $ref: '#/components/schemas/milestoned-issue-event'
+      - $ref: '#/components/schemas/demilestoned-issue-event'
+      - $ref: '#/components/schemas/renamed-issue-event'
+      - $ref: '#/components/schemas/review-requested-issue-event'
+      - $ref: '#/components/schemas/review-request-removed-issue-event'
+      - $ref: '#/components/schemas/review-dismissed-issue-event'
+      - $ref: '#/components/schemas/locked-issue-event'
+      - $ref: '#/components/schemas/added-to-project-issue-event'
+      - $ref: '#/components/schemas/moved-column-in-project-issue-event'
+      - $ref: '#/components/schemas/removed-from-project-issue-event'
+      - $ref: '#/components/schemas/converted-note-to-issue-issue-event'
+    timeline-unassigned-issue-event:
+      title: Timeline Unassigned Issue Event
+      description: Timeline Unassigned Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+        node_id:
+          type: string
+        url:
+          type: string
+        actor:
+          $ref: '#/components/schemas/simple-user'
+        event:
+          type: string
+        commit_id:
+          type:
+          - string
+          - 'null'
+        commit_url:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+        assignee:
+          $ref: '#/components/schemas/simple-user'
+      required:
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+      - performed_via_github_app
+      - assignee
+    issue-event:
+      title: Issue Event
+      description: Issue Event
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        node_id:
+          type: string
+          example: MDEwOklzc3VlRXZlbnQx
+        url:
+          type: string
+          format: uri
+          example: https://api.github.com/repos/octocat/Hello-World/issues/events/1
+        actor:
+          $ref: '#/components/schemas/nullable-simple-user'
+        event:
+          type: string
+          example: closed
+        commit_id:
+          type:
+          - string
+          - 'null'
+          example: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+        commit_url:
+          type:
+          - string
+          - 'null'
+          example: https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e
+        created_at:
+          type: string
+          format: date-time
+          example: '2011-04-14T16:00:49Z'
+        issue:
+          $ref: '#/components/schemas/nullable-issue'
+        label:
+          $ref: '#/components/schemas/issue-event-label'
+        assignee:
+          $ref: '#/components/schemas/nullable-simple-user'
+        assigner:
+          $ref: '#/components/schemas/nullable-simple-user'
+        review_requester:
+          $ref: '#/components/schemas/nullable-simple-user'
+        requested_reviewer:
+          $ref: '#/components/schemas/nullable-simple-user'
+        requested_team:
+          $ref: '#/components/schemas/team'
+        dismissed_review:
+          $ref: '#/components/schemas/issue-event-dismissed-review'
+        milestone:
+          $ref: '#/components/schemas/issue-event-milestone'
+        project_card:
+          $ref: '#/components/schemas/issue-event-project-card'
+        rename:
+          $ref: '#/components/schemas/issue-event-rename'
+        author_association:
+          $ref: '#/components/schemas/author-association'
+        lock_reason:
+          type:
+          - string
+          - 'null'
+        performed_via_github_app:
+          $ref: '#/components/schemas/nullable-integration'
+      required:
+      - id
+      - node_id
+      - url
+      - actor
+      - event
+      - commit_id
+      - commit_url
+      - created_at
+    issue-event-project-card:
+      title: Issue Event Project Card
+      description: Issue Event Project Card
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        id:
+          type: integer
+        project_url:
+          type: string
+          format: uri
+        project_id:
+          type: integer
+        column_name:
+          type: string
+        previous_column_name:
+          type: string
+      required:
+      - url
+      - id
+      - project_url
+      - project_id
+      - column_name
+    pull-request-review-comment:
+      title: Pull Request Review Comment
+      description: Pull Request Review Comments are comments on a portion of the Pull Request's diff.
+      type: object
+      properties:
+        url:
+          description: URL for the pull request review comment
+          example: https://api.github.com/repos/octocat/Hello-World/pulls/comments/1
+          type: string
+        pull_request_review_id:
+          description: The ID of the pull request review to which the comment belongs.
+          type:
+          - integer
+          - 'null'
+          format: int64
+          example: 42
+        id:
+          description: The ID of the pull request review comment.
+          type: integer
+          format: int64
+          example: 1
+        node_id:
+          description: The node ID of the pull request review comment.
+          type: string
+          example: MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDEw
+        diff_hunk:
+          description: The diff of the line that the comment refers to.
+          type: string
+          example: '@@ -16,33 +16,40 @@ public class Connection : IConnection...'
+        path:
+          description: The relative path of the file to which the comment applies.
+          example: config/database.yaml
+          type: string
+        position:
+          description: The line index in the diff to which the comment applies. This field is deprecated; use `line` instead.
+          example: 1
+          type: integer
+        original_position:
+          description: The index of the original line in the diff to which the comment applies. This field is deprecated; use `original_line` instead.
+          example: 4
+          type: integer
+        commit_id:
+          description: The SHA of the commit to which the comment applies.
+          example: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+          type: string
+        original_commit_id:
+          description: The SHA of the original commit to which the comment applies.
+          example: 9c48853fa3dc5c1c3d6f1f1cd1f2743e72652840
+          type: string
+        in_reply_to_id:
+          description: The comment ID to reply to.
+          example: 8
+          type: integer
+        user:
+          $ref: '#/components/schemas/simple-user'
+        body:
+          description: The text of the comment.
+          example: We should probably include a check for null values here.
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          example: '2011-04-14T16:00:49Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2011-04-14T16:00:49Z'
+        html_url:
+          description: HTML URL for the pull request review comment.
+          type: string
+          format: uri
+          example: https://github.com/octocat/Hello-World/pull/1#discussion-diff-1
+        pull_request_url:
+          description: URL for the pull request that the review comment belongs to.
+          type: string
+          format: uri
+          example: https://api.github.com/repos/octocat/Hello-World/pulls/1
+        author_association:
+          $ref: '#/components/schemas/author-association'
+        _links:
+          type: object
+          properties:
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: uri
+                  example: https://api.github.com/repos/octocat/Hello-World/pulls/comments/1
+              required:
+              - href
+            html:
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: uri
+                  example: https://github.com/octocat/Hello-World/pull/1#discussion-diff-1
+              required:
+              - href
+            pull_request:
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: uri
+                  example: https://api.github.com/repos/octocat/Hello-World/pulls/1
+              required:
+              - href
+          required:
+          - self
+          - html
+          - pull_request
+        start_line:
+          type:
+          - integer
+          - 'null'
+          description: The first line of the range for a multi-line comment.
+          example: 2
+        original_start_line:
+          type:
+          - integer
+          - 'null'
+          description: The first line of the range for a multi-line comment.
+          example: 2
+        start_side:
+          type:
+          - string
+          - 'null'
+          description: The side of the first line of the range for a multi-line comment.
+          enum:
+          - LEFT
+          - RIGHT
+          default: RIGHT
+        line:
+          description: The line of the blob to which the comment applies. The last line of the range for a multi-line comment
+          example: 2
+          type: integer
+        original_line:
+          description: The line of the blob to which the comment applies. The last line of the range for a multi-line comment
+          example: 2
+          type: integer
+        side:
+          description: The side of the diff to which the comment applies. The side of the last line of the range for a multi-line comment
+          enum:
+          - LEFT
+          - RIGHT
+          default: RIGHT
+          type: string
+        subject_type:
+          description: The level at which the comment is targeted, can be a diff line or a file.
+          type: string
+          enum:
+          - line
+          - file
+        reactions:
+          $ref: '#/components/schemas/reaction-rollup'
+        body_html:
+          type: string
+          example: '"<p>comment body</p>"'
+        body_text:
+          type: string
+          example: '"comment body"'
+      required:
+      - url
+      - id
+      - node_id
+      - pull_request_review_id
+      - diff_hunk
+      - path
+      - commit_id
+      - original_commit_id
+      - user
+      - body
+      - created_at
+      - updated_at
+      - html_url
+      - pull_request_url
+      - author_association
+      - _links
     review-requested-issue-event:
       title: Review Requested Issue Event
       description: Review Requested Issue Event
@@ -5657,141 +5792,6 @@ components:
       - commit_url
       - created_at
       - performed_via_github_app
-    label:
-      title: Label
-      description: Color-coded labels help you categorize and filter your issues (just like labels in Gmail).
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 208045946
-        node_id:
-          type: string
-          example: MDU6TGFiZWwyMDgwNDU5NDY=
-        url:
-          description: URL for the label
-          example: https://api.github.com/repositories/42/labels/bug
-          type: string
-          format: uri
-        name:
-          description: The name of the label.
-          example: bug
-          type: string
-        description:
-          type:
-          - string
-          - 'null'
-          example: Something isn't working
-        color:
-          description: '6-character hex code, without the leading #, identifying the color'
-          example: FFFFFF
-          type: string
-        default:
-          type: boolean
-          example: true
-      required:
-      - id
-      - node_id
-      - url
-      - name
-      - description
-      - color
-      - default
-    issue-event-milestone:
-      title: Issue Event Milestone
-      description: Issue Event Milestone
-      type: object
-      properties:
-        title:
-          type: string
-      required:
-      - title
-    added-to-project-issue-event:
-      title: Added to Project Issue Event
-      description: Added to Project Issue Event
-      type: object
-      properties:
-        id:
-          type: integer
-        node_id:
-          type: string
-        url:
-          type: string
-        actor:
-          $ref: '#/components/schemas/simple-user'
-        event:
-          type: string
-        commit_id:
-          type:
-          - string
-          - 'null'
-        commit_url:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-        performed_via_github_app:
-          $ref: '#/components/schemas/nullable-integration'
-        project_card:
-          type: object
-          properties:
-            id:
-              type: integer
-            url:
-              type: string
-              format: uri
-            project_id:
-              type: integer
-            project_url:
-              type: string
-              format: uri
-            column_name:
-              type: string
-            previous_column_name:
-              type: string
-          required:
-          - id
-          - url
-          - project_id
-          - project_url
-          - column_name
-      required:
-      - id
-      - node_id
-      - url
-      - actor
-      - event
-      - commit_id
-      - commit_url
-      - created_at
-      - performed_via_github_app
-    issue-event-project-card:
-      title: Issue Event Project Card
-      description: Issue Event Project Card
-      type: object
-      properties:
-        url:
-          type: string
-          format: uri
-        id:
-          type: integer
-        project_url:
-          type: string
-          format: uri
-        project_id:
-          type: integer
-        column_name:
-          type: string
-        previous_column_name:
-          type: string
-      required:
-      - url
-      - id
-      - project_url
-      - project_id
-      - column_name
   examples:
     milestone-items:
       value:
@@ -5829,6 +5829,156 @@ components:
         updated_at: '2014-03-03T18:58:10Z'
         closed_at: '2013-02-12T13:22:01Z'
         due_on: '2012-10-09T23:39:01Z'
+    timeline-issue-events:
+      value:
+      - id: 6430295168
+        node_id: LOE_lADODwFebM5HwC0kzwAAAAF_RoSA
+        url: https://api.github.com/repos/github/roadmap/issues/events/6430295168
+        actor:
+          login: github
+          id: 9919
+          node_id: MDEyOk9yZ2FuaXphdGlvbjk5MTk=
+          avatar_url: https://avatars.githubusercontent.com/u/9919?v=4
+          gravatar_id: ''
+          url: https://api.github.com/users/github
+          html_url: https://github.com/github
+          followers_url: https://api.github.com/users/github/followers
+          following_url: https://api.github.com/users/github/following{/other_user}
+          gists_url: https://api.github.com/users/github/gists{/gist_id}
+          starred_url: https://api.github.com/users/github/starred{/owner}{/repo}
+          subscriptions_url: https://api.github.com/users/github/subscriptions
+          organizations_url: https://api.github.com/users/github/orgs
+          repos_url: https://api.github.com/users/github/repos
+          events_url: https://api.github.com/users/github/events{/privacy}
+          received_events_url: https://api.github.com/users/github/received_events
+          type: Organization
+          site_admin: false
+        event: locked
+        commit_id: null
+        commit_url: null
+        created_at: '2022-04-13T20:49:13Z'
+        lock_reason: null
+        performed_via_github_app: null
+      - id: 6430296748
+        node_id: LE_lADODwFebM5HwC0kzwAAAAF_Roqs
+        url: https://api.github.com/repos/github/roadmap/issues/events/6430296748
+        actor:
+          login: github-product-roadmap
+          id: 67656570
+          node_id: MDQ6VXNlcjY3NjU2NTcw
+          avatar_url: https://avatars.githubusercontent.com/u/67656570?v=4
+          gravatar_id: ''
+          url: https://api.github.com/users/github-product-roadmap
+          html_url: https://github.com/github-product-roadmap
+          followers_url: https://api.github.com/users/github-product-roadmap/followers
+          following_url: https://api.github.com/users/github-product-roadmap/following{/other_user}
+          gists_url: https://api.github.com/users/github-product-roadmap/gists{/gist_id}
+          starred_url: https://api.github.com/users/github-product-roadmap/starred{/owner}{/repo}
+          subscriptions_url: https://api.github.com/users/github-product-roadmap/subscriptions
+          organizations_url: https://api.github.com/users/github-product-roadmap/orgs
+          repos_url: https://api.github.com/users/github-product-roadmap/repos
+          events_url: https://api.github.com/users/github-product-roadmap/events{/privacy}
+          received_events_url: https://api.github.com/users/github-product-roadmap/received_events
+          type: User
+          site_admin: false
+        event: labeled
+        commit_id: null
+        commit_url: null
+        created_at: '2022-04-13T20:49:34Z'
+        label:
+          name: beta
+          color: 99dd88
+        performed_via_github_app: null
+      - id: 6635165802
+        node_id: RTE_lADODwFebM5HwC0kzwAAAAGLfJhq
+        url: https://api.github.com/repos/github/roadmap/issues/events/6635165802
+        actor:
+          login: github-product-roadmap
+          id: 67656570
+          node_id: MDQ6VXNlcjY3NjU2NTcw
+          avatar_url: https://avatars.githubusercontent.com/u/67656570?v=4
+          gravatar_id: ''
+          url: https://api.github.com/users/github-product-roadmap
+          html_url: https://github.com/github-product-roadmap
+          followers_url: https://api.github.com/users/github-product-roadmap/followers
+          following_url: https://api.github.com/users/github-product-roadmap/following{/other_user}
+          gists_url: https://api.github.com/users/github-product-roadmap/gists{/gist_id}
+          starred_url: https://api.github.com/users/github-product-roadmap/starred{/owner}{/repo}
+          subscriptions_url: https://api.github.com/users/github-product-roadmap/subscriptions
+          organizations_url: https://api.github.com/users/github-product-roadmap/orgs
+          repos_url: https://api.github.com/users/github-product-roadmap/repos
+          events_url: https://api.github.com/users/github-product-roadmap/events{/privacy}
+          received_events_url: https://api.github.com/users/github-product-roadmap/received_events
+          type: User
+          site_admin: false
+        event: renamed
+        commit_id: null
+        commit_url: null
+        created_at: '2022-05-18T19:29:01Z'
+        rename:
+          from: 'Secret scanning: dry-runs for enterprise-level custom patterns (cloud)'
+          to: 'Secret scanning: dry-runs for enterprise-level custom patterns'
+        performed_via_github_app: null
+      - url: https://api.github.com/repos/github/roadmap/issues/comments/1130876857
+        html_url: https://github.com/github/roadmap/issues/493#issuecomment-1130876857
+        issue_url: https://api.github.com/repos/github/roadmap/issues/493
+        id: 1130876857
+        node_id: IC_kwDODwFebM5DZ8-5
+        user:
+          login: octocat
+          id: 94867353
+          node_id: U_kgDOBaePmQ
+          avatar_url: https://avatars.githubusercontent.com/u/94867353?v=4
+          gravatar_id: ''
+          url: https://api.github.com/users/octocat
+          html_url: https://github.com/octocat
+          followers_url: https://api.github.com/users/octocat/followers
+          following_url: https://api.github.com/users/octocat/following{/other_user}
+          gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+          starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+          subscriptions_url: https://api.github.com/users/octocat/subscriptions
+          organizations_url: https://api.github.com/users/octocat/orgs
+          repos_url: https://api.github.com/users/octocat/repos
+          events_url: https://api.github.com/users/octocat/events{/privacy}
+          received_events_url: https://api.github.com/users/octocat/received_events
+          type: User
+          site_admin: true
+        created_at: '2022-05-19T00:52:15Z'
+        updated_at: '2022-05-19T00:52:15Z'
+        author_association: COLLABORATOR
+        body: '🚢  Shipped to the cloud: https://github.blog/changelog/2022-05-12-secret-scanning-dry-runs-for-enterprise-level-custom-patterns/'
+        reactions:
+          url: https://api.github.com/repos/github/roadmap/issues/comments/1130876857/reactions
+          total_count: 0
+          '+1': 0
+          '-1': 0
+          laugh: 0
+          hooray: 0
+          confused: 0
+          heart: 0
+          rocket: 0
+          eyes: 0
+        performed_via_github_app: null
+        event: commented
+        actor:
+          login: octocat
+          id: 94867353
+          node_id: U_kgDOBaePmQ
+          avatar_url: https://avatars.githubusercontent.com/u/94867353?v=4
+          gravatar_id: ''
+          url: https://api.github.com/users/octocat
+          html_url: https://github.com/octocat
+          followers_url: https://api.github.com/users/octocat/followers
+          following_url: https://api.github.com/users/octocat/following{/other_user}
+          gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+          starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+          subscriptions_url: https://api.github.com/users/octocat/subscriptions
+          organizations_url: https://api.github.com/users/octocat/orgs
+          repos_url: https://api.github.com/users/octocat/repos
+          events_url: https://api.github.com/users/octocat/events{/privacy}
+          received_events_url: https://api.github.com/users/octocat/received_events
+          type: User
+          site_admin: true
     issue-event:
       value:
         id: 1
@@ -6019,106 +6169,204 @@ components:
           updated_at: '2011-04-22T13:33:48Z'
           author_association: COLLABORATOR
           state_reason: completed
-    timeline-issue-events:
+    issue-event-items:
       value:
-      - id: 6430295168
-        node_id: LOE_lADODwFebM5HwC0kzwAAAAF_RoSA
-        url: https://api.github.com/repos/github/roadmap/issues/events/6430295168
+      - id: 1
+        node_id: MDEwOklzc3VlRXZlbnQx
+        url: https://api.github.com/repos/octocat/Hello-World/issues/events/1
         actor:
-          login: github
-          id: 9919
-          node_id: MDEyOk9yZ2FuaXphdGlvbjk5MTk=
-          avatar_url: https://avatars.githubusercontent.com/u/9919?v=4
+          login: octocat
+          id: 1
+          node_id: MDQ6VXNlcjE=
+          avatar_url: https://github.com/images/error/octocat_happy.gif
           gravatar_id: ''
-          url: https://api.github.com/users/github
-          html_url: https://github.com/github
-          followers_url: https://api.github.com/users/github/followers
-          following_url: https://api.github.com/users/github/following{/other_user}
-          gists_url: https://api.github.com/users/github/gists{/gist_id}
-          starred_url: https://api.github.com/users/github/starred{/owner}{/repo}
-          subscriptions_url: https://api.github.com/users/github/subscriptions
-          organizations_url: https://api.github.com/users/github/orgs
-          repos_url: https://api.github.com/users/github/repos
-          events_url: https://api.github.com/users/github/events{/privacy}
-          received_events_url: https://api.github.com/users/github/received_events
-          type: Organization
-          site_admin: false
-        event: locked
-        commit_id: null
-        commit_url: null
-        created_at: '2022-04-13T20:49:13Z'
-        lock_reason: null
-        performed_via_github_app: null
-      - id: 6430296748
-        node_id: LE_lADODwFebM5HwC0kzwAAAAF_Roqs
-        url: https://api.github.com/repos/github/roadmap/issues/events/6430296748
-        actor:
-          login: github-product-roadmap
-          id: 67656570
-          node_id: MDQ6VXNlcjY3NjU2NTcw
-          avatar_url: https://avatars.githubusercontent.com/u/67656570?v=4
-          gravatar_id: ''
-          url: https://api.github.com/users/github-product-roadmap
-          html_url: https://github.com/github-product-roadmap
-          followers_url: https://api.github.com/users/github-product-roadmap/followers
-          following_url: https://api.github.com/users/github-product-roadmap/following{/other_user}
-          gists_url: https://api.github.com/users/github-product-roadmap/gists{/gist_id}
-          starred_url: https://api.github.com/users/github-product-roadmap/starred{/owner}{/repo}
-          subscriptions_url: https://api.github.com/users/github-product-roadmap/subscriptions
-          organizations_url: https://api.github.com/users/github-product-roadmap/orgs
-          repos_url: https://api.github.com/users/github-product-roadmap/repos
-          events_url: https://api.github.com/users/github-product-roadmap/events{/privacy}
-          received_events_url: https://api.github.com/users/github-product-roadmap/received_events
+          url: https://api.github.com/users/octocat
+          html_url: https://github.com/octocat
+          followers_url: https://api.github.com/users/octocat/followers
+          following_url: https://api.github.com/users/octocat/following{/other_user}
+          gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+          starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+          subscriptions_url: https://api.github.com/users/octocat/subscriptions
+          organizations_url: https://api.github.com/users/octocat/orgs
+          repos_url: https://api.github.com/users/octocat/repos
+          events_url: https://api.github.com/users/octocat/events{/privacy}
+          received_events_url: https://api.github.com/users/octocat/received_events
           type: User
           site_admin: false
-        event: labeled
-        commit_id: null
-        commit_url: null
-        created_at: '2022-04-13T20:49:34Z'
+        event: closed
+        commit_id: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+        commit_url: https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e
+        created_at: '2011-04-14T16:00:49Z'
+        issue:
+          id: 1
+          node_id: MDU6SXNzdWUx
+          url: https://api.github.com/repos/octocat/Hello-World/issues/1347
+          repository_url: https://api.github.com/repos/octocat/Hello-World
+          labels_url: https://api.github.com/repos/octocat/Hello-World/issues/1347/labels{/name}
+          comments_url: https://api.github.com/repos/octocat/Hello-World/issues/1347/comments
+          events_url: https://api.github.com/repos/octocat/Hello-World/issues/1347/events
+          html_url: https://github.com/octocat/Hello-World/issues/1347
+          number: 1347
+          state: open
+          title: Found a bug
+          body: I'm having a problem with this.
+          user:
+            login: octocat
+            id: 1
+            node_id: MDQ6VXNlcjE=
+            avatar_url: https://github.com/images/error/octocat_happy.gif
+            gravatar_id: ''
+            url: https://api.github.com/users/octocat
+            html_url: https://github.com/octocat
+            followers_url: https://api.github.com/users/octocat/followers
+            following_url: https://api.github.com/users/octocat/following{/other_user}
+            gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+            starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+            subscriptions_url: https://api.github.com/users/octocat/subscriptions
+            organizations_url: https://api.github.com/users/octocat/orgs
+            repos_url: https://api.github.com/users/octocat/repos
+            events_url: https://api.github.com/users/octocat/events{/privacy}
+            received_events_url: https://api.github.com/users/octocat/received_events
+            type: User
+            site_admin: false
+          labels:
+          - id: 208045946
+            node_id: MDU6TGFiZWwyMDgwNDU5NDY=
+            url: https://api.github.com/repos/octocat/Hello-World/labels/bug
+            name: bug
+            description: Something isn't working
+            color: f29513
+            default: true
+          assignee:
+            login: octocat
+            id: 1
+            node_id: MDQ6VXNlcjE=
+            avatar_url: https://github.com/images/error/octocat_happy.gif
+            gravatar_id: ''
+            url: https://api.github.com/users/octocat
+            html_url: https://github.com/octocat
+            followers_url: https://api.github.com/users/octocat/followers
+            following_url: https://api.github.com/users/octocat/following{/other_user}
+            gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+            starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+            subscriptions_url: https://api.github.com/users/octocat/subscriptions
+            organizations_url: https://api.github.com/users/octocat/orgs
+            repos_url: https://api.github.com/users/octocat/repos
+            events_url: https://api.github.com/users/octocat/events{/privacy}
+            received_events_url: https://api.github.com/users/octocat/received_events
+            type: User
+            site_admin: false
+          assignees:
+          - login: octocat
+            id: 1
+            node_id: MDQ6VXNlcjE=
+            avatar_url: https://github.com/images/error/octocat_happy.gif
+            gravatar_id: ''
+            url: https://api.github.com/users/octocat
+            html_url: https://github.com/octocat
+            followers_url: https://api.github.com/users/octocat/followers
+            following_url: https://api.github.com/users/octocat/following{/other_user}
+            gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+            starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+            subscriptions_url: https://api.github.com/users/octocat/subscriptions
+            organizations_url: https://api.github.com/users/octocat/orgs
+            repos_url: https://api.github.com/users/octocat/repos
+            events_url: https://api.github.com/users/octocat/events{/privacy}
+            received_events_url: https://api.github.com/users/octocat/received_events
+            type: User
+            site_admin: false
+          milestone:
+            url: https://api.github.com/repos/octocat/Hello-World/milestones/1
+            html_url: https://github.com/octocat/Hello-World/milestones/v1.0
+            labels_url: https://api.github.com/repos/octocat/Hello-World/milestones/1/labels
+            id: 1002604
+            node_id: MDk6TWlsZXN0b25lMTAwMjYwNA==
+            number: 1
+            state: open
+            title: v1.0
+            description: Tracking milestone for version 1.0
+            creator:
+              login: octocat
+              id: 1
+              node_id: MDQ6VXNlcjE=
+              avatar_url: https://github.com/images/error/octocat_happy.gif
+              gravatar_id: ''
+              url: https://api.github.com/users/octocat
+              html_url: https://github.com/octocat
+              followers_url: https://api.github.com/users/octocat/followers
+              following_url: https://api.github.com/users/octocat/following{/other_user}
+              gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+              starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+              subscriptions_url: https://api.github.com/users/octocat/subscriptions
+              organizations_url: https://api.github.com/users/octocat/orgs
+              repos_url: https://api.github.com/users/octocat/repos
+              events_url: https://api.github.com/users/octocat/events{/privacy}
+              received_events_url: https://api.github.com/users/octocat/received_events
+              type: User
+              site_admin: false
+            open_issues: 4
+            closed_issues: 8
+            created_at: '2011-04-10T20:09:31Z'
+            updated_at: '2014-03-03T18:58:10Z'
+            closed_at: '2013-02-12T13:22:01Z'
+            due_on: '2012-10-09T23:39:01Z'
+          locked: true
+          active_lock_reason: too heated
+          comments: 0
+          pull_request:
+            url: https://api.github.com/repos/octocat/Hello-World/pulls/1347
+            html_url: https://github.com/octocat/Hello-World/pull/1347
+            diff_url: https://github.com/octocat/Hello-World/pull/1347.diff
+            patch_url: https://github.com/octocat/Hello-World/pull/1347.patch
+          closed_at: null
+          created_at: '2011-04-22T13:33:48Z'
+          updated_at: '2011-04-22T13:33:48Z'
+          author_association: COLLABORATOR
+          state_reason: completed
+    issue-event-for-issue-items:
+      value:
+      - id: 1
+        node_id: MDEwOklzc3VlRXZlbnQx
+        url: https://api.github.com/repos/octocat/Hello-World/issues/events/1
+        actor:
+          login: octocat
+          id: 1
+          node_id: MDQ6VXNlcjE=
+          avatar_url: https://github.com/images/error/octocat_happy.gif
+          gravatar_id: ''
+          url: https://api.github.com/users/octocat
+          html_url: https://github.com/octocat
+          followers_url: https://api.github.com/users/octocat/followers
+          following_url: https://api.github.com/users/octocat/following{/other_user}
+          gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+          starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+          subscriptions_url: https://api.github.com/users/octocat/subscriptions
+          organizations_url: https://api.github.com/users/octocat/orgs
+          repos_url: https://api.github.com/users/octocat/repos
+          events_url: https://api.github.com/users/octocat/events{/privacy}
+          received_events_url: https://api.github.com/users/octocat/received_events
+          type: User
+          site_admin: false
+        event: closed
+        commit_id: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+        commit_url: https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e
+        created_at: '2011-04-14T16:00:49Z'
+        performed_via_github_app: null
         label:
-          name: beta
-          color: 99dd88
-        performed_via_github_app: null
-      - id: 6635165802
-        node_id: RTE_lADODwFebM5HwC0kzwAAAAGLfJhq
-        url: https://api.github.com/repos/github/roadmap/issues/events/6635165802
-        actor:
-          login: github-product-roadmap
-          id: 67656570
-          node_id: MDQ6VXNlcjY3NjU2NTcw
-          avatar_url: https://avatars.githubusercontent.com/u/67656570?v=4
-          gravatar_id: ''
-          url: https://api.github.com/users/github-product-roadmap
-          html_url: https://github.com/github-product-roadmap
-          followers_url: https://api.github.com/users/github-product-roadmap/followers
-          following_url: https://api.github.com/users/github-product-roadmap/following{/other_user}
-          gists_url: https://api.github.com/users/github-product-roadmap/gists{/gist_id}
-          starred_url: https://api.github.com/users/github-product-roadmap/starred{/owner}{/repo}
-          subscriptions_url: https://api.github.com/users/github-product-roadmap/subscriptions
-          organizations_url: https://api.github.com/users/github-product-roadmap/orgs
-          repos_url: https://api.github.com/users/github-product-roadmap/repos
-          events_url: https://api.github.com/users/github-product-roadmap/events{/privacy}
-          received_events_url: https://api.github.com/users/github-product-roadmap/received_events
-          type: User
-          site_admin: false
-        event: renamed
-        commit_id: null
-        commit_url: null
-        created_at: '2022-05-18T19:29:01Z'
-        rename:
-          from: 'Secret scanning: dry-runs for enterprise-level custom patterns (cloud)'
-          to: 'Secret scanning: dry-runs for enterprise-level custom patterns'
-        performed_via_github_app: null
-      - url: https://api.github.com/repos/github/roadmap/issues/comments/1130876857
-        html_url: https://github.com/github/roadmap/issues/493#issuecomment-1130876857
-        issue_url: https://api.github.com/repos/github/roadmap/issues/493
-        id: 1130876857
-        node_id: IC_kwDODwFebM5DZ8-5
+          name: label
+          color: red
+    issue-comment:
+      value:
+        id: 1
+        node_id: MDEyOklzc3VlQ29tbWVudDE=
+        url: https://api.github.com/repos/octocat/Hello-World/issues/comments/1
+        html_url: https://github.com/octocat/Hello-World/issues/1347#issuecomment-1
+        body: Me too
         user:
           login: octocat
-          id: 94867353
-          node_id: U_kgDOBaePmQ
-          avatar_url: https://avatars.githubusercontent.com/u/94867353?v=4
+          id: 1
+          node_id: MDQ6VXNlcjE=
+          avatar_url: https://github.com/images/error/octocat_happy.gif
           gravatar_id: ''
           url: https://api.github.com/users/octocat
           html_url: https://github.com/octocat
@@ -6132,72 +6380,11 @@ components:
           events_url: https://api.github.com/users/octocat/events{/privacy}
           received_events_url: https://api.github.com/users/octocat/received_events
           type: User
-          site_admin: true
-        created_at: '2022-05-19T00:52:15Z'
-        updated_at: '2022-05-19T00:52:15Z'
+          site_admin: false
+        created_at: '2011-04-14T16:00:49Z'
+        updated_at: '2011-04-14T16:00:49Z'
+        issue_url: https://api.github.com/repos/octocat/Hello-World/issues/1347
         author_association: COLLABORATOR
-        body: '🚢  Shipped to the cloud: https://github.blog/changelog/2022-05-12-secret-scanning-dry-runs-for-enterprise-level-custom-patterns/'
-        reactions:
-          url: https://api.github.com/repos/github/roadmap/issues/comments/1130876857/reactions
-          total_count: 0
-          '+1': 0
-          '-1': 0
-          laugh: 0
-          hooray: 0
-          confused: 0
-          heart: 0
-          rocket: 0
-          eyes: 0
-        performed_via_github_app: null
-        event: commented
-        actor:
-          login: octocat
-          id: 94867353
-          node_id: U_kgDOBaePmQ
-          avatar_url: https://avatars.githubusercontent.com/u/94867353?v=4
-          gravatar_id: ''
-          url: https://api.github.com/users/octocat
-          html_url: https://github.com/octocat
-          followers_url: https://api.github.com/users/octocat/followers
-          following_url: https://api.github.com/users/octocat/following{/other_user}
-          gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-          starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-          subscriptions_url: https://api.github.com/users/octocat/subscriptions
-          organizations_url: https://api.github.com/users/octocat/orgs
-          repos_url: https://api.github.com/users/octocat/repos
-          events_url: https://api.github.com/users/octocat/events{/privacy}
-          received_events_url: https://api.github.com/users/octocat/received_events
-          type: User
-          site_admin: true
-    label-2:
-      value:
-        id: 208045946
-        node_id: MDU6TGFiZWwyMDgwNDU5NDY=
-        url: 'https://api.github.com/repos/octocat/Hello-World/labels/bug%20:bug:'
-        name: 'bug :bug:'
-        description: Small bug fix required
-        color: b01f26
-        default: true
-    simple-user-items:
-      value:
-      - login: octocat
-        id: 1
-        node_id: MDQ6VXNlcjE=
-        avatar_url: https://github.com/images/error/octocat_happy.gif
-        gravatar_id: ''
-        url: https://api.github.com/users/octocat
-        html_url: https://github.com/octocat
-        followers_url: https://api.github.com/users/octocat/followers
-        following_url: https://api.github.com/users/octocat/following{/other_user}
-        gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-        starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-        subscriptions_url: https://api.github.com/users/octocat/subscriptions
-        organizations_url: https://api.github.com/users/octocat/orgs
-        repos_url: https://api.github.com/users/octocat/repos
-        events_url: https://api.github.com/users/octocat/events{/privacy}
-        received_events_url: https://api.github.com/users/octocat/received_events
-        type: User
-        site_admin: false
     milestone:
       value:
         url: https://api.github.com/repos/octocat/Hello-World/milestones/1
@@ -6234,25 +6421,9 @@ components:
         updated_at: '2014-03-03T18:58:10Z'
         closed_at: '2013-02-12T13:22:01Z'
         due_on: '2012-10-09T23:39:01Z'
-    label-items:
+    label-items-2:
       value:
       - id: 208045946
-        node_id: MDU6TGFiZWwyMDgwNDU5NDY=
-        url: https://api.github.com/repos/octocat/Hello-World/labels/bug
-        name: bug
-        description: Something isn't working
-        color: f29513
-        default: true
-      - id: 208045947
-        node_id: MDU6TGFiZWwyMDgwNDU5NDc=
-        url: https://api.github.com/repos/octocat/Hello-World/labels/enhancement
-        name: enhancement
-        description: New feature or request
-        color: a2eeef
-        default: false
-    label:
-      value:
-        id: 208045946
         node_id: MDU6TGFiZWwyMDgwNDU5NDY=
         url: https://api.github.com/repos/octocat/Hello-World/labels/bug
         name: bug
@@ -6405,12 +6576,23 @@ components:
           site_admin: false
         author_association: COLLABORATOR
         state_reason: completed
-    issue-event-for-issue-items:
+    label:
+      value:
+        id: 208045946
+        node_id: MDU6TGFiZWwyMDgwNDU5NDY=
+        url: https://api.github.com/repos/octocat/Hello-World/labels/bug
+        name: bug
+        description: Something isn't working
+        color: f29513
+        default: true
+    issue-comment-items:
       value:
       - id: 1
-        node_id: MDEwOklzc3VlRXZlbnQx
-        url: https://api.github.com/repos/octocat/Hello-World/issues/events/1
-        actor:
+        node_id: MDEyOklzc3VlQ29tbWVudDE=
+        url: https://api.github.com/repos/octocat/Hello-World/issues/comments/1
+        html_url: https://github.com/octocat/Hello-World/issues/1347#issuecomment-1
+        body: Me too
+        user:
           login: octocat
           id: 1
           node_id: MDQ6VXNlcjE=
@@ -6429,14 +6611,55 @@ components:
           received_events_url: https://api.github.com/users/octocat/received_events
           type: User
           site_admin: false
-        event: closed
-        commit_id: 6dcb09b5b57875f334f61aebed695e2e4193db5e
-        commit_url: https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e
         created_at: '2011-04-14T16:00:49Z'
-        performed_via_github_app: null
-        label:
-          name: label
-          color: red
+        updated_at: '2011-04-14T16:00:49Z'
+        issue_url: https://api.github.com/repos/octocat/Hello-World/issues/1347
+        author_association: COLLABORATOR
+    label-items:
+      value:
+      - id: 208045946
+        node_id: MDU6TGFiZWwyMDgwNDU5NDY=
+        url: https://api.github.com/repos/octocat/Hello-World/labels/bug
+        name: bug
+        description: Something isn't working
+        color: f29513
+        default: true
+      - id: 208045947
+        node_id: MDU6TGFiZWwyMDgwNDU5NDc=
+        url: https://api.github.com/repos/octocat/Hello-World/labels/enhancement
+        name: enhancement
+        description: New feature or request
+        color: a2eeef
+        default: false
+    label-2:
+      value:
+        id: 208045946
+        node_id: MDU6TGFiZWwyMDgwNDU5NDY=
+        url: 'https://api.github.com/repos/octocat/Hello-World/labels/bug%20:bug:'
+        name: 'bug :bug:'
+        description: Small bug fix required
+        color: b01f26
+        default: true
+    simple-user-items:
+      value:
+      - login: octocat
+        id: 1
+        node_id: MDQ6VXNlcjE=
+        avatar_url: https://github.com/images/error/octocat_happy.gif
+        gravatar_id: ''
+        url: https://api.github.com/users/octocat
+        html_url: https://github.com/octocat
+        followers_url: https://api.github.com/users/octocat/followers
+        following_url: https://api.github.com/users/octocat/following{/other_user}
+        gists_url: https://api.github.com/users/octocat/gists{/gist_id}
+        starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
+        subscriptions_url: https://api.github.com/users/octocat/subscriptions
+        organizations_url: https://api.github.com/users/octocat/orgs
+        repos_url: https://api.github.com/users/octocat/repos
+        events_url: https://api.github.com/users/octocat/events{/privacy}
+        received_events_url: https://api.github.com/users/octocat/received_events
+        type: User
+        site_admin: false
     issue-with-repo-items:
       value:
       - id: 1
@@ -6827,237 +7050,14 @@ components:
           site_admin: false
         author_association: COLLABORATOR
         state_reason: completed
-    issue-comment-items:
-      value:
-      - id: 1
-        node_id: MDEyOklzc3VlQ29tbWVudDE=
-        url: https://api.github.com/repos/octocat/Hello-World/issues/comments/1
-        html_url: https://github.com/octocat/Hello-World/issues/1347#issuecomment-1
-        body: Me too
-        user:
-          login: octocat
-          id: 1
-          node_id: MDQ6VXNlcjE=
-          avatar_url: https://github.com/images/error/octocat_happy.gif
-          gravatar_id: ''
-          url: https://api.github.com/users/octocat
-          html_url: https://github.com/octocat
-          followers_url: https://api.github.com/users/octocat/followers
-          following_url: https://api.github.com/users/octocat/following{/other_user}
-          gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-          starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-          subscriptions_url: https://api.github.com/users/octocat/subscriptions
-          organizations_url: https://api.github.com/users/octocat/orgs
-          repos_url: https://api.github.com/users/octocat/repos
-          events_url: https://api.github.com/users/octocat/events{/privacy}
-          received_events_url: https://api.github.com/users/octocat/received_events
-          type: User
-          site_admin: false
-        created_at: '2011-04-14T16:00:49Z'
-        updated_at: '2011-04-14T16:00:49Z'
-        issue_url: https://api.github.com/repos/octocat/Hello-World/issues/1347
-        author_association: COLLABORATOR
-    issue-event-items:
-      value:
-      - id: 1
-        node_id: MDEwOklzc3VlRXZlbnQx
-        url: https://api.github.com/repos/octocat/Hello-World/issues/events/1
-        actor:
-          login: octocat
-          id: 1
-          node_id: MDQ6VXNlcjE=
-          avatar_url: https://github.com/images/error/octocat_happy.gif
-          gravatar_id: ''
-          url: https://api.github.com/users/octocat
-          html_url: https://github.com/octocat
-          followers_url: https://api.github.com/users/octocat/followers
-          following_url: https://api.github.com/users/octocat/following{/other_user}
-          gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-          starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-          subscriptions_url: https://api.github.com/users/octocat/subscriptions
-          organizations_url: https://api.github.com/users/octocat/orgs
-          repos_url: https://api.github.com/users/octocat/repos
-          events_url: https://api.github.com/users/octocat/events{/privacy}
-          received_events_url: https://api.github.com/users/octocat/received_events
-          type: User
-          site_admin: false
-        event: closed
-        commit_id: 6dcb09b5b57875f334f61aebed695e2e4193db5e
-        commit_url: https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e
-        created_at: '2011-04-14T16:00:49Z'
-        issue:
-          id: 1
-          node_id: MDU6SXNzdWUx
-          url: https://api.github.com/repos/octocat/Hello-World/issues/1347
-          repository_url: https://api.github.com/repos/octocat/Hello-World
-          labels_url: https://api.github.com/repos/octocat/Hello-World/issues/1347/labels{/name}
-          comments_url: https://api.github.com/repos/octocat/Hello-World/issues/1347/comments
-          events_url: https://api.github.com/repos/octocat/Hello-World/issues/1347/events
-          html_url: https://github.com/octocat/Hello-World/issues/1347
-          number: 1347
-          state: open
-          title: Found a bug
-          body: I'm having a problem with this.
-          user:
-            login: octocat
-            id: 1
-            node_id: MDQ6VXNlcjE=
-            avatar_url: https://github.com/images/error/octocat_happy.gif
-            gravatar_id: ''
-            url: https://api.github.com/users/octocat
-            html_url: https://github.com/octocat
-            followers_url: https://api.github.com/users/octocat/followers
-            following_url: https://api.github.com/users/octocat/following{/other_user}
-            gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-            starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-            subscriptions_url: https://api.github.com/users/octocat/subscriptions
-            organizations_url: https://api.github.com/users/octocat/orgs
-            repos_url: https://api.github.com/users/octocat/repos
-            events_url: https://api.github.com/users/octocat/events{/privacy}
-            received_events_url: https://api.github.com/users/octocat/received_events
-            type: User
-            site_admin: false
-          labels:
-          - id: 208045946
-            node_id: MDU6TGFiZWwyMDgwNDU5NDY=
-            url: https://api.github.com/repos/octocat/Hello-World/labels/bug
-            name: bug
-            description: Something isn't working
-            color: f29513
-            default: true
-          assignee:
-            login: octocat
-            id: 1
-            node_id: MDQ6VXNlcjE=
-            avatar_url: https://github.com/images/error/octocat_happy.gif
-            gravatar_id: ''
-            url: https://api.github.com/users/octocat
-            html_url: https://github.com/octocat
-            followers_url: https://api.github.com/users/octocat/followers
-            following_url: https://api.github.com/users/octocat/following{/other_user}
-            gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-            starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-            subscriptions_url: https://api.github.com/users/octocat/subscriptions
-            organizations_url: https://api.github.com/users/octocat/orgs
-            repos_url: https://api.github.com/users/octocat/repos
-            events_url: https://api.github.com/users/octocat/events{/privacy}
-            received_events_url: https://api.github.com/users/octocat/received_events
-            type: User
-            site_admin: false
-          assignees:
-          - login: octocat
-            id: 1
-            node_id: MDQ6VXNlcjE=
-            avatar_url: https://github.com/images/error/octocat_happy.gif
-            gravatar_id: ''
-            url: https://api.github.com/users/octocat
-            html_url: https://github.com/octocat
-            followers_url: https://api.github.com/users/octocat/followers
-            following_url: https://api.github.com/users/octocat/following{/other_user}
-            gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-            starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-            subscriptions_url: https://api.github.com/users/octocat/subscriptions
-            organizations_url: https://api.github.com/users/octocat/orgs
-            repos_url: https://api.github.com/users/octocat/repos
-            events_url: https://api.github.com/users/octocat/events{/privacy}
-            received_events_url: https://api.github.com/users/octocat/received_events
-            type: User
-            site_admin: false
-          milestone:
-            url: https://api.github.com/repos/octocat/Hello-World/milestones/1
-            html_url: https://github.com/octocat/Hello-World/milestones/v1.0
-            labels_url: https://api.github.com/repos/octocat/Hello-World/milestones/1/labels
-            id: 1002604
-            node_id: MDk6TWlsZXN0b25lMTAwMjYwNA==
-            number: 1
-            state: open
-            title: v1.0
-            description: Tracking milestone for version 1.0
-            creator:
-              login: octocat
-              id: 1
-              node_id: MDQ6VXNlcjE=
-              avatar_url: https://github.com/images/error/octocat_happy.gif
-              gravatar_id: ''
-              url: https://api.github.com/users/octocat
-              html_url: https://github.com/octocat
-              followers_url: https://api.github.com/users/octocat/followers
-              following_url: https://api.github.com/users/octocat/following{/other_user}
-              gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-              starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-              subscriptions_url: https://api.github.com/users/octocat/subscriptions
-              organizations_url: https://api.github.com/users/octocat/orgs
-              repos_url: https://api.github.com/users/octocat/repos
-              events_url: https://api.github.com/users/octocat/events{/privacy}
-              received_events_url: https://api.github.com/users/octocat/received_events
-              type: User
-              site_admin: false
-            open_issues: 4
-            closed_issues: 8
-            created_at: '2011-04-10T20:09:31Z'
-            updated_at: '2014-03-03T18:58:10Z'
-            closed_at: '2013-02-12T13:22:01Z'
-            due_on: '2012-10-09T23:39:01Z'
-          locked: true
-          active_lock_reason: too heated
-          comments: 0
-          pull_request:
-            url: https://api.github.com/repos/octocat/Hello-World/pulls/1347
-            html_url: https://github.com/octocat/Hello-World/pull/1347
-            diff_url: https://github.com/octocat/Hello-World/pull/1347.diff
-            patch_url: https://github.com/octocat/Hello-World/pull/1347.patch
-          closed_at: null
-          created_at: '2011-04-22T13:33:48Z'
-          updated_at: '2011-04-22T13:33:48Z'
-          author_association: COLLABORATOR
-          state_reason: completed
-    issue-comment:
-      value:
-        id: 1
-        node_id: MDEyOklzc3VlQ29tbWVudDE=
-        url: https://api.github.com/repos/octocat/Hello-World/issues/comments/1
-        html_url: https://github.com/octocat/Hello-World/issues/1347#issuecomment-1
-        body: Me too
-        user:
-          login: octocat
-          id: 1
-          node_id: MDQ6VXNlcjE=
-          avatar_url: https://github.com/images/error/octocat_happy.gif
-          gravatar_id: ''
-          url: https://api.github.com/users/octocat
-          html_url: https://github.com/octocat
-          followers_url: https://api.github.com/users/octocat/followers
-          following_url: https://api.github.com/users/octocat/following{/other_user}
-          gists_url: https://api.github.com/users/octocat/gists{/gist_id}
-          starred_url: https://api.github.com/users/octocat/starred{/owner}{/repo}
-          subscriptions_url: https://api.github.com/users/octocat/subscriptions
-          organizations_url: https://api.github.com/users/octocat/orgs
-          repos_url: https://api.github.com/users/octocat/repos
-          events_url: https://api.github.com/users/octocat/events{/privacy}
-          received_events_url: https://api.github.com/users/octocat/received_events
-          type: User
-          site_admin: false
-        created_at: '2011-04-14T16:00:49Z'
-        updated_at: '2011-04-14T16:00:49Z'
-        issue_url: https://api.github.com/repos/octocat/Hello-World/issues/1347
-        author_association: COLLABORATOR
-    label-items-2:
-      value:
-      - id: 208045946
-        node_id: MDU6TGFiZWwyMDgwNDU5NDY=
-        url: https://api.github.com/repos/octocat/Hello-World/labels/bug
-        name: bug
-        description: Something isn't working
-        color: f29513
-        default: true
   parameters:
-    milestone-number:
-      name: milestone_number
-      description: The number that identifies the milestone.
+    owner:
+      name: owner
+      description: The account owner of the repository. The name is not case sensitive.
       in: path
       required: true
       schema:
-        type: integer
+        type: string
     direction:
       name: direction
       description: The direction to sort the results by.
@@ -7069,13 +7069,6 @@ components:
         - asc
         - desc
         default: desc
-    labels:
-      name: labels
-      description: 'A list of comma separated label names. Example: `bug,ui,@high`'
-      in: query
-      required: false
-      schema:
-        type: string
     per-page:
       name: per_page
       description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
@@ -7094,6 +7087,20 @@ components:
         - created
         - updated
         default: created
+    repo:
+      name: repo
+      description: The name of the repository without the `.git` extension. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
+      in: query
+      schema:
+        type: integer
+        default: 1
     org:
       name: org
       description: The organization name. The name is not case sensitive.
@@ -7101,6 +7108,34 @@ components:
       required: true
       schema:
         type: string
+    labels:
+      name: labels
+      description: 'A list of comma separated label names. Example: `bug,ui,@high`'
+      in: query
+      required: false
+      schema:
+        type: string
+    comment-id:
+      name: comment_id
+      description: The unique identifier of the comment.
+      in: path
+      required: true
+      schema:
+        type: integer
+    issue-number:
+      name: issue_number
+      description: The number that identifies the issue.
+      in: path
+      required: true
+      schema:
+        type: integer
+    milestone-number:
+      name: milestone_number
+      description: The number that identifies the milestone.
+      in: path
+      required: true
+      schema:
+        type: integer
     since:
       name: since
       description: 'Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`.'
@@ -7109,65 +7144,33 @@ components:
       schema:
         type: string
         format: date-time
-    issue-number:
-      name: issue_number
-      description: The number that identifies the issue.
-      in: path
-      required: true
-      schema:
-        type: integer
-    comment-id:
-      name: comment_id
-      description: The unique identifier of the comment.
-      in: path
-      required: true
-      schema:
-        type: integer
-    page:
-      name: page
-      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
-      in: query
-      schema:
-        type: integer
-        default: 1
-    repo:
-      name: repo
-      description: The name of the repository without the `.git` extension. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
-    owner:
-      name: owner
-      description: The account owner of the repository. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
   responses:
-    moved_permanently:
-      description: Moved permanently
+    not_found:
+      description: Resource not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
-    not_modified:
-      description: Not modified
-    bad_request:
-      description: Bad Request
+    validation_failed:
+      description: Validation failed, or the endpoint has been spammed.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/basic-error'
-        application/scim+json:
-          schema:
-            $ref: '#/components/schemas/scim-error'
+            $ref: '#/components/schemas/validation-error'
     forbidden:
       description: Forbidden
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
+    gone:
+      description: Gone
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
+    not_modified:
+      description: Not modified
     service_unavailable:
       description: Service unavailable
       content:
@@ -7181,24 +7184,21 @@ components:
                 type: string
               documentation_url:
                 type: string
-    gone:
-      description: Gone
+    bad_request:
+      description: Bad Request
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
-    not_found:
-      description: Resource not found
+        application/scim+json:
+          schema:
+            $ref: '#/components/schemas/scim-error'
+    moved_permanently:
+      description: Moved permanently
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
-    validation_failed:
-      description: Validation failed, or the endpoint has been spammed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/validation-error'
   headers:
     link:
       example: <https://api.github.com/resource?page=2>; rel="next", <https://api.github.com/resource?page=5>; rel="last"

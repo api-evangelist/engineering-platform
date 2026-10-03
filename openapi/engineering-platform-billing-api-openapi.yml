@@ -174,13 +174,6 @@ components:
       required: true
       schema:
         type: string
-    page:
-      name: page
-      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
-      in: query
-      schema:
-        type: integer
-        default: 1
     per-page:
       name: per_page
       description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
@@ -188,6 +181,13 @@ components:
       schema:
         type: integer
         default: 30
+    page:
+      name: page
+      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
+      in: query
+      schema:
+        type: integer
+        default: 1
     enterprise:
       name: enterprise
       description: The slug version of the enterprise name. You can also substitute this value with the enterprise id.
@@ -195,6 +195,14 @@ components:
       required: true
       schema:
         type: string
+    billingAccountId:
+      name: accountId
+      in: path
+      required: true
+      description: The account's ID.
+      schema:
+        type: string
+        example: '123456'
     billingAccountStatus:
       name: status
       in: query
@@ -205,180 +213,7 @@ components:
         enum:
         - PAID
         example: PAID
-    billingAccountId:
-      name: accountId
-      in: path
-      required: true
-      description: The account's ID.
-      schema:
-        type: string
-        example: '123456'
-  responses:
-    code_scanning_forbidden_read:
-      description: Response if GitHub Advanced Security is not enabled for this repository
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/basic-error'
-    unauthorizedError:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: An API key must be provided in the request header or query string
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: An API key must be provided in the request header or query string
-            status: 401
-    getAccounts:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/invoicesAccountInfo'
-          example:
-            billingEmail: taylor.lee@example.com
-            id: 372691
-            salesChannel: SELF_SERVE
-            slots:
-              available: 8
-              consumed: 2
-              total: 10
-              unbilled: 0
-            state: PAID
-            teamId: 380691
-    invoicesForbidden403Error:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/invoicesForbidden403Error'
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Forbidden
-            status: 403
-            detail: You are not authorized to perform this action
-    invoiceMissingStatus400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/invoiceMissingStatus400Error'
-          example:
-            type: https://api.postman.com/problems/bad-request
-            title: Malformed request
-            status: 400
-            detail: Please provide a valid status to fetch invoices
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    getAccountInvoices:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/getAccountInvoices'
-          example:
-            data:
-            - id: inv_7UDSYBJPGQU93N7M
-              status: PAID
-              issuedAt: '2023-10-12'
-              totalAmount:
-                value: 440
-                currency: USD
-              links:
-                web:
-                  href: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
-    invoicesNoTeam400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/invoicesNoTeam400Error'
-          example:
-            type: https://api.postman.com/problems/bad-request
-            title: Malformed request
-            status: 400
-            detail: You must be part of a team
   schemas:
-    advanced-security-active-committers-user:
-      type: object
-      properties:
-        user_login:
-          type: string
-        last_pushed_date:
-          type: string
-          example: '2021-11-03'
-      required:
-      - user_login
-      - last_pushed_date
-    basic-error:
-      title: Basic Error
-      description: Basic Error
-      type: object
-      properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        url:
-          type: string
-        status:
-          type: string
-    advanced-security-active-committers:
-      type: object
-      properties:
-        total_advanced_security_committers:
-          type: integer
-          example: 25
-        total_count:
-          type: integer
-          example: 2
-        repositories:
-          type: array
-          items:
-            $ref: '#/components/schemas/advanced-security-active-committers-repository'
-      required:
-      - repositories
     advanced-security-active-committers-repository:
       type: object
       properties:
@@ -396,6 +231,45 @@ components:
       - name
       - advanced_security_committers
       - advanced_security_committers_breakdown
+    advanced-security-active-committers-user:
+      type: object
+      properties:
+        user_login:
+          type: string
+        last_pushed_date:
+          type: string
+          example: '2021-11-03'
+      required:
+      - user_login
+      - last_pushed_date
+    advanced-security-active-committers:
+      type: object
+      properties:
+        total_advanced_security_committers:
+          type: integer
+          example: 25
+        total_count:
+          type: integer
+          example: 2
+        repositories:
+          type: array
+          items:
+            $ref: '#/components/schemas/advanced-security-active-committers-repository'
+      required:
+      - repositories
+    basic-error:
+      title: Basic Error
+      description: Basic Error
+      type: object
+      properties:
+        message:
+          type: string
+        documentation_url:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
     invoiceData:
       title: Account Invoice
       type: object
@@ -439,6 +313,81 @@ components:
                   format: url
                   description: A URL where you can download the invoice in PDF and view details.
                   example: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
+    invoicesNoTeam400Error:
+      title: Bad Request
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/bad-request
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Malformed request
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 400
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: You must be part of a team
+    invoicesForbidden403Error:
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Forbidden
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: You are not authorized to perform this action
+    getAccountInvoices:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/invoiceData'
+    invoiceMissingStatus400Error:
+      title: Missing Status
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/bad-request
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Malformed request
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 400
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: Please provide a valid status to fetch invoices
     invoicesAccountInfo:
       title: Account Information
       type: object
@@ -510,81 +459,132 @@ components:
               type: integer
               description: The number of unbilled slots if [auto-flex billing](https://learning.postman.com/auto-flex-policy/) is available.
               example: 0
+  responses:
+    code_scanning_forbidden_read:
+      description: Response if GitHub Advanced Security is not enabled for this repository
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
+    getAccounts:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoicesAccountInfo'
+          example:
+            billingEmail: taylor.lee@example.com
+            id: 372691
+            salesChannel: SELF_SERVE
+            slots:
+              available: 8
+              consumed: 2
+              total: 10
+              unbilled: 0
+            state: PAID
+            teamId: 380691
     getAccountInvoices:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/invoiceData'
-    invoicesForbidden403Error:
-      title: Forbidden
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/forbidden
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Forbidden
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: You are not authorized to perform this action
-    invoicesNoTeam400Error:
-      title: Bad Request
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/bad-request
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Malformed request
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 400
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: You must be part of a team
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getAccountInvoices'
+          example:
+            data:
+            - id: inv_7UDSYBJPGQU93N7M
+              status: PAID
+              issuedAt: '2023-10-12'
+              totalAmount:
+                value: 440
+                currency: USD
+              links:
+                web:
+                  href: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
     invoiceMissingStatus400Error:
-      title: Missing Status
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/bad-request
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Malformed request
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 400
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: Please provide a valid status to fetch invoices
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoiceMissingStatus400Error'
+          example:
+            type: https://api.postman.com/problems/bad-request
+            title: Malformed request
+            status: 400
+            detail: Please provide a valid status to fetch invoices
+    invoicesForbidden403Error:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoicesForbidden403Error'
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Forbidden
+            status: 403
+            detail: You are not authorized to perform this action
+    invoicesNoTeam400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoicesNoTeam400Error'
+          example:
+            type: https://api.postman.com/problems/bad-request
+            title: Malformed request
+            status: 400
+            detail: You must be part of a team
+    unauthorizedError:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: An API key must be provided in the request header or query string
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: An API key must be provided in the request header or query string
+            status: 401
   examples:
     advanced-security-active-committers:
       value:

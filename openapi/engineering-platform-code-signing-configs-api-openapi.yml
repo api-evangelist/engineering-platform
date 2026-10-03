@@ -457,50 +457,42 @@ paths:
       summary: List functions by code signing config
       x-summary-source: derived
 components:
-  parameters:
-    X-Amz-Credential:
-      name: X-Amz-Credential
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Date:
-      name: X-Amz-Date
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
   schemas:
+    Description:
+      type: string
+      minLength: 0
+      maxLength: 256
+    FunctionArn:
+      type: string
+      pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_]+(:(\$LATEST|[a-zA-Z0-9-_]+))?
+    AllowedPublishers:
+      type: object
+      required:
+      - SigningProfileVersionArns
+      properties:
+        SigningProfileVersionArns:
+          allOf:
+          - $ref: '#/components/schemas/SigningProfileVersionArns'
+          - description: 'The Amazon Resource Name (ARN) for each of the signing profiles. A signing profile defines a trusted user who can sign a code package. '
+      description: 'List of signing profiles that can sign a code package. '
+    CodeSigningPolicy:
+      type: string
+      enum:
+      - Warn
+      - Enforce
+    FunctionArnList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FunctionArn'
+    UpdateCodeSigningConfigResponse:
+      type: object
+      required:
+      - CodeSigningConfig
+      properties:
+        CodeSigningConfig:
+          allOf:
+          - $ref: '#/components/schemas/CodeSigningConfig'
+          - description: The code signing configuration
     CodeSigningPolicies:
       type: object
       properties:
@@ -509,23 +501,26 @@ components:
           - $ref: '#/components/schemas/CodeSigningPolicy'
           - description: '<p>Code signing configuration policy for deployment validation failure. If you set the policy to <code>Enforce</code>, Lambda blocks the deployment request if signature validation checks fail. If you set the policy to <code>Warn</code>, Lambda allows the deployment and creates a CloudWatch log. </p> <p>Default value: <code>Warn</code> </p>'
       description: Code signing configuration <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html#config-codesigning-policies">policies</a> specify the validation failure action for signature mismatch or expiry.
-    Arn:
+    ServiceException: {}
+    CodeSigningConfigId:
       type: string
-      pattern: arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-])+:([a-z]{2}(-gov)?-[a-z]+-\d{1})?:(\d{12})?:(.*)
-    Description:
+      pattern: csc-[a-zA-Z0-9-_\.]{17}
+    String:
       type: string
-      minLength: 0
-      maxLength: 256
-    CodeSigningPolicy:
+    GetCodeSigningConfigResponse:
+      type: object
+      required:
+      - CodeSigningConfig
+      properties:
+        CodeSigningConfig:
+          allOf:
+          - $ref: '#/components/schemas/CodeSigningConfig'
+          - description: The code signing configuration
+    DeleteCodeSigningConfigResponse:
+      type: object
+      properties: {}
+    Timestamp:
       type: string
-      enum:
-      - Warn
-      - Enforce
-    InvalidParameterValueException: {}
-    CodeSigningConfigList:
-      type: array
-      items:
-        $ref: '#/components/schemas/CodeSigningConfig'
     ListCodeSigningConfigsResponse:
       type: object
       properties:
@@ -537,6 +532,7 @@ components:
           allOf:
           - $ref: '#/components/schemas/CodeSigningConfigList'
           - description: The code signing configurations
+    ResourceConflictException: {}
     CodeSigningConfig:
       type: object
       required:
@@ -571,40 +567,13 @@ components:
           - $ref: '#/components/schemas/Timestamp'
           - description: 'The date and time that the Code signing configuration was last modified, in ISO-8601 format (YYYY-MM-DDThh:mm:ss.sTZD). '
       description: 'Details about a <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html">Code signing configuration</a>. '
-    ServiceException: {}
-    DeleteCodeSigningConfigResponse:
-      type: object
-      properties: {}
-    UpdateCodeSigningConfigResponse:
-      type: object
-      required:
-      - CodeSigningConfig
-      properties:
-        CodeSigningConfig:
-          allOf:
-          - $ref: '#/components/schemas/CodeSigningConfig'
-          - description: The code signing configuration
-    FunctionArnList:
-      type: array
-      items:
-        $ref: '#/components/schemas/FunctionArn'
-    ResourceConflictException: {}
+    Arn:
+      type: string
+      pattern: arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-])+:([a-z]{2}(-gov)?-[a-z]+-\d{1})?:(\d{12})?:(.*)
     CodeSigningConfigArn:
       type: string
       pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\d{1}:\d{12}:code-signing-config:csc-[a-z0-9]{17}
       maxLength: 200
-    Timestamp:
-      type: string
-    AllowedPublishers:
-      type: object
-      required:
-      - SigningProfileVersionArns
-      properties:
-        SigningProfileVersionArns:
-          allOf:
-          - $ref: '#/components/schemas/SigningProfileVersionArns'
-          - description: 'The Amazon Resource Name (ARN) for each of the signing profiles. A signing profile defines a trusted user who can sign a code package. '
-      description: 'List of signing profiles that can sign a code package. '
     ListFunctionsByCodeSigningConfigResponse:
       type: object
       properties:
@@ -616,6 +585,7 @@ components:
           allOf:
           - $ref: '#/components/schemas/FunctionArnList'
           - description: 'The function ARNs. '
+    InvalidParameterValueException: {}
     CreateCodeSigningConfigResponse:
       type: object
       required:
@@ -625,30 +595,60 @@ components:
           allOf:
           - $ref: '#/components/schemas/CodeSigningConfig'
           - description: The code signing configuration.
-    GetCodeSigningConfigResponse:
-      type: object
-      required:
-      - CodeSigningConfig
-      properties:
-        CodeSigningConfig:
-          allOf:
-          - $ref: '#/components/schemas/CodeSigningConfig'
-          - description: The code signing configuration
+    CodeSigningConfigList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CodeSigningConfig'
+    ResourceNotFoundException: {}
     SigningProfileVersionArns:
       type: array
       items:
         $ref: '#/components/schemas/Arn'
       minItems: 1
       maxItems: 20
-    String:
-      type: string
-    FunctionArn:
-      type: string
-      pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_]+(:(\$LATEST|[a-zA-Z0-9-_]+))?
-    CodeSigningConfigId:
-      type: string
-      pattern: csc-[a-zA-Z0-9-_\.]{17}
-    ResourceNotFoundException: {}
+  parameters:
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Credential:
+      name: X-Amz-Credential
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
+      in: header
+      schema:
+        type: string
+      required: false
   securitySchemes:
     hmac:
       type: apiKey

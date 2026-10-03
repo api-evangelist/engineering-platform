@@ -315,6 +315,37 @@ paths:
               headers: {}
 components:
   schemas:
+    CreativeWork:
+      properties:
+        datePublished:
+          type: string
+          description: The date on which the CreativeWork was published.
+          readOnly: true
+        provider:
+          type: array
+          description: The source of the creative work.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Thing'
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
+        video:
+          $ref: '#/components/schemas/VideoObject'
+      description: The most generic kind of creative work, including books, movies, photographs, software programs, etc.
+      allOf:
+      - $ref: '#/components/schemas/Thing'
+    SearchResultsAnswer:
+      properties:
+        totalEstimatedMatches:
+          type: integer
+          description: The estimated number of webpages that are relevant to the query. Use this number along with the count and offset query parameters to page the results.
+          format: int64
+          readOnly: true
+      description: Defines a search result answer.
+      allOf:
+      - $ref: '#/components/schemas/Answer'
     Error:
       required:
       - code
@@ -370,58 +401,31 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    ResponseBase:
-      required:
-      - _type
-      type: object
+    Response:
       properties:
-        _type:
-          type: string
-      description: Response base
-      discriminator:
-        propertyName: _type
-    NewsArticle:
-      properties:
-        category:
-          type: string
-          description: The news category that the article belongs to. For example, Sports. If the news category cannot be determined, the article does not include this field.
-          readOnly: true
-        clusteredArticles:
-          type: array
-          description: A list of related news articles.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/NewsArticle'
-        headline:
-          type: boolean
-          description: A Boolean value that indicates whether the news article is a headline. If true, the article is a headline. The article includes this field only for news categories requests that do not specify the category query parameter.
-          readOnly: true
-      description: Defines a news article.
-      allOf:
-      - $ref: '#/components/schemas/Article'
-    Query:
-      required:
-      - text
-      type: object
-      properties:
-        displayText:
-          type: string
-          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
-          readOnly: true
-        searchLink:
-          type: string
-          description: The URL that you use to get the results of the related search. Before using the URL, you must append query parameters as appropriate and include the Ocp-Apim-Subscription-Key header. Use this URL if you're displaying the results in your own user interface. Otherwise, use the webSearchUrl URL.
-          readOnly: true
-        text:
-          type: string
-          description: The query string. Use this string as the query term in a new search request.
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
         webSearchUrl:
           type: string
-          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
+          description: The URL To Bing's search result for this item.
           readOnly: true
-      description: Defines a search query.
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
+    Article:
+      properties:
+        wordCount:
+          type: integer
+          description: The number of words in the text of the Article.
+          format: int32
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
     ErrorResponse:
       required:
       - errors
@@ -434,43 +438,59 @@ components:
       description: The top-level response that represents a failed request.
       allOf:
       - $ref: '#/components/schemas/Response'
-    Article:
+    Thing:
       properties:
-        wordCount:
-          type: integer
-          description: The number of words in the text of the Article.
-          format: int32
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/CreativeWork'
-    Identifiable:
-      properties:
-        id:
+        alternateName:
           type: string
-          description: A String identifier.
+          description: An alias for the item
           readOnly: true
-      description: Defines the identity of a resource.
-      allOf:
-      - $ref: '#/components/schemas/ResponseBase'
-    MediaObject:
-      properties:
-        contentUrl:
+        bingId:
           type: string
-          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
+          description: An ID that uniquely identifies this item.
           readOnly: true
-        height:
-          type: integer
-          description: The height of the source media object, in pixels.
-          format: int32
+        description:
+          type: string
+          description: A short description of the item.
           readOnly: true
-        width:
-          type: integer
-          description: The width of the source media object, in pixels.
-          format: int32
+        image:
+          $ref: '#/components/schemas/ImageObject'
+        name:
+          type: string
+          description: The name of the thing represented by this object.
           readOnly: true
-      description: Defines a media object.
+        url:
+          type: string
+          description: The URL to get more information about the thing represented by this object.
+          readOnly: true
+      description: Defines a thing.
       allOf:
-      - $ref: '#/components/schemas/CreativeWork'
+      - $ref: '#/components/schemas/Response'
+    ResponseBase:
+      required:
+      - _type
+      type: object
+      properties:
+        _type:
+          type: string
+      description: Response base
+      discriminator:
+        propertyName: _type
+    News:
+      required:
+      - value
+      properties:
+        location:
+          type: string
+          description: Location of local news
+          readOnly: true
+        value:
+          type: array
+          description: An array of NewsArticle objects that contain information about news articles that are relevant to the query. If there are no results to return for the request, the array is empty.
+          items:
+            $ref: '#/components/schemas/NewsArticle'
+      description: Defines a news answer.
+      allOf:
+      - $ref: '#/components/schemas/SearchResultsAnswer'
     VideoObject:
       properties:
         allowHttpsEmbed:
@@ -503,16 +523,15 @@ components:
       description: Defines a video object that is relevant to the query.
       allOf:
       - $ref: '#/components/schemas/MediaObject'
-    SearchResultsAnswer:
+    Identifiable:
       properties:
-        totalEstimatedMatches:
-          type: integer
-          description: The estimated number of webpages that are relevant to the query. Use this number along with the count and offset query parameters to page the results.
-          format: int64
+        id:
+          type: string
+          description: A String identifier.
           readOnly: true
-      description: Defines a search result answer.
+      description: Defines the identity of a resource.
       allOf:
-      - $ref: '#/components/schemas/Answer'
+      - $ref: '#/components/schemas/ResponseBase'
     Answer:
       properties:
         followUpQueries:
@@ -523,86 +542,67 @@ components:
       description: Defines an answer.
       allOf:
       - $ref: '#/components/schemas/Response'
-    News:
-      required:
-      - value
+    NewsArticle:
       properties:
-        location:
+        category:
           type: string
-          description: Location of local news
+          description: The news category that the article belongs to. For example, Sports. If the news category cannot be determined, the article does not include this field.
           readOnly: true
-        value:
+        clusteredArticles:
           type: array
-          description: An array of NewsArticle objects that contain information about news articles that are relevant to the query. If there are no results to return for the request, the array is empty.
+          description: A list of related news articles.
+          readOnly: true
           items:
             $ref: '#/components/schemas/NewsArticle'
-      description: Defines a news answer.
-      allOf:
-      - $ref: '#/components/schemas/SearchResultsAnswer'
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
+        headline:
+          type: boolean
+          description: A Boolean value that indicates whether the news article is a headline. If true, the article is a headline. The article includes this field only for news categories requests that do not specify the category query parameter.
           readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      description: Defines a news article.
       allOf:
-      - $ref: '#/components/schemas/Identifiable'
-    ImageObject:
+      - $ref: '#/components/schemas/Article'
+    MediaObject:
       properties:
+        contentUrl:
+          type: string
+          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
+          readOnly: true
+        height:
+          type: integer
+          description: The height of the source media object, in pixels.
+          format: int32
+          readOnly: true
+        width:
+          type: integer
+          description: The width of the source media object, in pixels.
+          format: int32
+          readOnly: true
+      description: Defines a media object.
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
+    Query:
+      required:
+      - text
+      type: object
+      properties:
+        displayText:
+          type: string
+          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
+          readOnly: true
+        searchLink:
+          type: string
+          description: The URL that you use to get the results of the related search. Before using the URL, you must append query parameters as appropriate and include the Ocp-Apim-Subscription-Key header. Use this URL if you're displaying the results in your own user interface. Otherwise, use the webSearchUrl URL.
+          readOnly: true
+        text:
+          type: string
+          description: The query string. Use this string as the query term in a new search request.
         thumbnail:
           $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
-    Thing:
-      properties:
-        alternateName:
+        webSearchUrl:
           type: string
-          description: An alias for the item
+          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
           readOnly: true
-        bingId:
-          type: string
-          description: An ID that uniquely identifies this item.
-          readOnly: true
-        description:
-          type: string
-          description: A short description of the item.
-          readOnly: true
-        image:
-          $ref: '#/components/schemas/ImageObject'
-        name:
-          type: string
-          description: The name of the thing represented by this object.
-          readOnly: true
-        url:
-          type: string
-          description: The URL to get more information about the thing represented by this object.
-          readOnly: true
-      description: Defines a thing.
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    CreativeWork:
-      properties:
-        datePublished:
-          type: string
-          description: The date on which the CreativeWork was published.
-          readOnly: true
-        provider:
-          type: array
-          description: The source of the creative work.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Thing'
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
-          readOnly: true
-        video:
-          $ref: '#/components/schemas/VideoObject'
-      description: The most generic kind of creative work, including books, movies, photographs, software programs, etc.
-      allOf:
-      - $ref: '#/components/schemas/Thing'
+      description: Defines a search query.
   securitySchemes:
     apiKeyHeader:
       type: apiKey

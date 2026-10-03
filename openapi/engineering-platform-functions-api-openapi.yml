@@ -4153,112 +4153,201 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    LayerVersionArn:
+    FileSystemArn:
       type: string
-      pattern: arn:[a-zA-Z0-9-]+:lambda:[a-zA-Z0-9-]+:\d{12}:layer:[a-zA-Z0-9-_]+:[0-9]+
-      minLength: 1
-      maxLength: 140
-    CodeSigningConfigNotFoundException: {}
-    EphemeralStorage:
-      type: object
-      required:
-      - Size
-      properties:
-        Size:
-          allOf:
-          - $ref: '#/components/schemas/EphemeralStorageSize'
-          - description: The size of the function's <code>/tmp</code> directory.
-      description: The size of the function's <code>/tmp</code> directory in MB. The default value is 512, but it can be any whole number between 512 and 10,240 MB.
+      pattern: arn:aws[a-zA-Z-]*:elasticfilesystem:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\d{1}:\d{12}:access-point/fsap-[a-f0-9]{17}
+      maxLength: 200
+    FunctionArn:
+      type: string
+      pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_]+(:(\$LATEST|[a-zA-Z0-9-_]+))?
     Origin:
       type: string
       pattern: .*
       minLength: 1
       maxLength: 253
-    Arn:
+    Header:
       type: string
-      pattern: arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-])+:([a-z]{2}(-gov)?-[a-z]+-\d{1})?:(\d{12})?:(.*)
-    AliasConfiguration:
+      pattern: .*
+      maxLength: 1024
+    KMSNotFoundException: {}
+    GetPolicyResponse:
       type: object
       properties:
-        AliasArn:
+        Policy:
           allOf:
-          - $ref: '#/components/schemas/FunctionArn'
-          - description: The Amazon Resource Name (ARN) of the alias.
-        Name:
-          allOf:
-          - $ref: '#/components/schemas/Alias'
-          - description: The name of the alias.
-        FunctionVersion:
-          allOf:
-          - $ref: '#/components/schemas/Version'
-          - description: The function version that the alias invokes.
-        Description:
-          allOf:
-          - $ref: '#/components/schemas/Description'
-          - description: A description of the alias.
-        RoutingConfig:
-          allOf:
-          - $ref: '#/components/schemas/AliasRoutingConfiguration'
-          - description: The <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-traffic-shifting-using-aliases.html">routing configuration</a> of the alias.
+          - $ref: '#/components/schemas/String'
+          - description: The resource-based policy.
         RevisionId:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: A unique identifier that changes when you update the alias.
-      description: Provides configuration information about a Lambda function <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html">alias</a>.
-    InvalidCodeSignatureException: {}
-    ArchitecturesList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Architecture'
-      minItems: 1
-      maxItems: 1
-    FunctionList:
-      type: array
-      items:
-        $ref: '#/components/schemas/FunctionConfiguration'
-    InvalidSecurityGroupIDException: {}
-    GetRuntimeManagementConfigResponse:
+          - description: A unique identifier for the current revision of the policy.
+    AdditionalVersionWeights:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Weight'
+    KMSInvalidStateException: {}
+    S3Key:
+      type: string
+      minLength: 1
+      maxLength: 1024
+    DestinationConfig:
       type: object
       properties:
-        UpdateRuntimeOn:
+        OnSuccess:
           allOf:
-          - $ref: '#/components/schemas/UpdateRuntimeOn'
-          - description: The current runtime update mode of the function.
-        RuntimeVersionArn:
+          - $ref: '#/components/schemas/OnSuccess'
+          - description: The destination configuration for successful invocations.
+        OnFailure:
           allOf:
-          - $ref: '#/components/schemas/RuntimeVersionArn'
-          - description: The ARN of the runtime the function is configured to use. If the runtime update mode is <b>Manual</b>, the ARN is returned, otherwise <code>null</code> is returned.
-        FunctionArn:
-          allOf:
-          - $ref: '#/components/schemas/NameSpacedFunctionArn'
-          - description: The Amazon Resource Name (ARN) of your function.
+          - $ref: '#/components/schemas/OnFailure'
+          - description: The destination configuration for failed invocations.
+      description: A configuration object that specifies the destination of an event after Lambda processes it.
+    AliasList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AliasConfiguration'
+    KMSDisabledException: {}
     LocalMountPath:
       type: string
       pattern: ^/mnt/[a-zA-Z0-9-_.]+$
       maxLength: 160
-    KMSKeyArn:
-      type: string
-      pattern: (arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()
-    ServiceException: {}
-    ListVersionsByFunctionResponse:
+    AllowMethodsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Method'
+      maxItems: 6
+    DeadLetterConfig:
+      type: object
+      properties:
+        TargetArn:
+          allOf:
+          - $ref: '#/components/schemas/ResourceArn'
+          - description: The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic.
+      description: The <a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq">dead-letter queue</a> for failed asynchronous invocations.
+    Timeout:
+      type: integer
+      minimum: 1
+    SubnetIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SubnetId'
+      maxItems: 16
+    FileSystemConfig:
+      type: object
+      required:
+      - Arn
+      - LocalMountPath
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/FileSystemArn'
+          - description: The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.
+        LocalMountPath:
+          allOf:
+          - $ref: '#/components/schemas/LocalMountPath'
+          - description: The path where the function can access the file system, starting with <code>/mnt/</code>.
+      description: Details about the connection between a Lambda function and an <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html">Amazon EFS file system</a>.
+    InvalidZipFileException: {}
+    CodeStorageExceededException: {}
+    InvocationResponse:
+      type: object
+      properties:
+        StatusCode:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          - description: The HTTP status code is in the 200 range for a successful request. For the <code>RequestResponse</code> invocation type, this status code is 200. For the <code>Event</code> invocation type, this status code is 202. For the <code>DryRun</code> invocation type, the status code is 204.
+        Payload:
+          allOf:
+          - $ref: '#/components/schemas/Blob'
+          - description: The response from the function, or an error object.
+    ListAliasesResponse:
       type: object
       properties:
         NextMarker:
           allOf:
           - $ref: '#/components/schemas/String'
           - description: The pagination token that's included if more results are available.
-        Versions:
+        Aliases:
           allOf:
-          - $ref: '#/components/schemas/FunctionList'
-          - description: A list of Lambda function versions.
-    NonNegativeInteger:
-      type: integer
-      minimum: 0
-    FunctionUrlAuthType:
+          - $ref: '#/components/schemas/AliasList'
+          - description: A list of aliases.
+    LayerVersionArn:
+      type: string
+      pattern: arn:[a-zA-Z0-9-]+:lambda:[a-zA-Z0-9-]+:\d{12}:layer:[a-zA-Z0-9-_]+:[0-9]+
+      minLength: 1
+      maxLength: 140
+    AllowOriginsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Origin'
+      maxItems: 100
+    Architecture:
       type: string
       enum:
-      - NONE
-      - AWS_IAM
+      - x86_64
+      - arm64
+    AllowCredentials:
+      type: boolean
+    UpdateRuntimeOn:
+      type: string
+      enum:
+      - Auto
+      - Manual
+      - FunctionUpdate
+    StringList:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
+      maxItems: 1500
+    Method:
+      type: string
+      pattern: .*
+      maxLength: 6
+    PositiveInteger:
+      type: integer
+      minimum: 1
+    InvalidCodeSignatureException: {}
+    InvokeAsyncResponse:
+      type: object
+      deprecated: true
+      properties:
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/HttpStatus'
+          - description: The status code.
+      description: A success response (<code>202 Accepted</code>) indicates that the request is queued for invocation.
+    MemorySize:
+      type: integer
+      minimum: 128
+      maximum: 10240
+    PreconditionFailedException: {}
+    InvalidSubnetIDException: {}
+    PutRuntimeManagementConfigResponse:
+      type: object
+      required:
+      - UpdateRuntimeOn
+      - FunctionArn
+      properties:
+        UpdateRuntimeOn:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRuntimeOn'
+          - description: The runtime update mode.
+        FunctionArn:
+          allOf:
+          - $ref: '#/components/schemas/FunctionArn'
+          - description: The ARN of the function
+        RuntimeVersionArn:
+          allOf:
+          - $ref: '#/components/schemas/RuntimeVersionArn'
+          - description: The ARN of the runtime the function is configured to use. If the runtime update mode is <b>manual</b>, the ARN is returned, otherwise <code>null</code> is returned.
+    Integer:
+      type: integer
+    VpcId:
+      type: string
+    MaximumEventAgeInSeconds:
+      type: integer
+      minimum: 60
+      maximum: 21600
     ProvisionedConcurrencyConfigListItem:
       type: object
       properties:
@@ -4291,31 +4380,300 @@ components:
           - $ref: '#/components/schemas/Timestamp'
           - description: The date and time that a user last updated the configuration, in <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601 format</a>.
       description: Details about the provisioned concurrency configuration for a function alias or version.
-    S3ObjectVersion:
+    EC2ThrottledException: {}
+    Blob:
       type: string
-      minLength: 1
-      maxLength: 1024
-    ImageConfigError:
+      format: password
+    InvokeMode:
+      type: string
+      enum:
+      - BUFFERED
+      - RESPONSE_STREAM
+    StateReasonCode:
+      type: string
+      enum:
+      - Idle
+      - Creating
+      - Restoring
+      - EniLimitExceeded
+      - InsufficientRolePermissions
+      - InvalidConfiguration
+      - InternalError
+      - SubnetOutOfIPAddresses
+      - InvalidSubnet
+      - InvalidSecurityGroup
+      - ImageDeleted
+      - ImageAccessDenied
+      - InvalidImage
+      - KMSKeyAccessDenied
+      - KMSKeyNotFound
+      - InvalidStateKMSKey
+      - DisabledKMSKey
+      - EFSIOError
+      - EFSMountConnectivityError
+      - EFSMountFailure
+      - EFSMountTimeout
+      - InvalidRuntime
+      - InvalidZipFileException
+      - FunctionError
+    PolicyLengthExceededException: {}
+    ResourceArn:
+      type: string
+      pattern: (arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()
+    GetProvisionedConcurrencyConfigResponse:
+      type: object
+      properties:
+        RequestedProvisionedConcurrentExecutions:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          - description: The amount of provisioned concurrency requested.
+        AvailableProvisionedConcurrentExecutions:
+          allOf:
+          - $ref: '#/components/schemas/NonNegativeInteger'
+          - description: The amount of provisioned concurrency available.
+        AllocatedProvisionedConcurrentExecutions:
+          allOf:
+          - $ref: '#/components/schemas/NonNegativeInteger'
+          - description: The amount of provisioned concurrency allocated. When a weighted alias is used during linear and canary deployments, this value fluctuates depending on the amount of concurrency that is provisioned for the function versions.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ProvisionedConcurrencyStatusEnum'
+          - description: The status of the allocation process.
+        StatusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: For failed allocations, the reason that provisioned concurrency could not be allocated.
+        LastModified:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          - description: The date and time that a user last updated the configuration, in <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601 format</a>.
+    PackageType:
+      type: string
+      enum:
+      - Zip
+      - Image
+    EFSMountConnectivityException: {}
+    LastUpdateStatusReasonCode:
+      type: string
+      enum:
+      - EniLimitExceeded
+      - InsufficientRolePermissions
+      - InvalidConfiguration
+      - InternalError
+      - SubnetOutOfIPAddresses
+      - InvalidSubnet
+      - InvalidSecurityGroup
+      - ImageDeleted
+      - ImageAccessDenied
+      - InvalidImage
+      - KMSKeyAccessDenied
+      - KMSKeyNotFound
+      - InvalidStateKMSKey
+      - DisabledKMSKey
+      - EFSIOError
+      - EFSMountConnectivityError
+      - EFSMountFailure
+      - EFSMountTimeout
+      - InvalidRuntime
+      - InvalidZipFileException
+      - FunctionError
+    RequestTooLargeException: {}
+    CreateFunctionUrlConfigResponse:
+      type: object
+      required:
+      - FunctionUrl
+      - FunctionArn
+      - AuthType
+      - CreationTime
+      properties:
+        FunctionUrl:
+          allOf:
+          - $ref: '#/components/schemas/FunctionUrl'
+          - description: The HTTP URL endpoint for your function.
+        FunctionArn:
+          allOf:
+          - $ref: '#/components/schemas/FunctionArn'
+          - description: The Amazon Resource Name (ARN) of your function.
+        AuthType:
+          allOf:
+          - $ref: '#/components/schemas/FunctionUrlAuthType'
+          - description: The type of authentication that your function URL uses. Set to <code>AWS_IAM</code> if you want to restrict access to authenticated users only. Set to <code>NONE</code> if you want to bypass IAM authentication to create a public endpoint. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html">Security and auth model for Lambda function URLs</a>.
+        Cors:
+          allOf:
+          - $ref: '#/components/schemas/Cors'
+          - description: The <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin resource sharing (CORS)</a> settings for your function URL.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          - description: When the function URL was created, in <a href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a> (YYYY-MM-DDThh:mm:ss.sTZD).
+        InvokeMode:
+          allOf:
+          - $ref: '#/components/schemas/InvokeMode'
+          - description: <p>Use one of the following options:</p> <ul> <li> <p> <code>BUFFERED</code> â€“ This is the default option. Lambda invokes your function using the <code>Invoke</code> API operation. Invocation results are available when the payload is complete. The maximum payload size is 6 MB.</p> </li> <li> <p> <code>RESPONSE_STREAM</code> â€“ Your function streams payload results as they become available. Lambda invokes your function using the <code>InvokeWithResponseStream</code> API operation. The maximum response payload size is 20 MB, however, you can <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html">request a quota increase</a>.</p> </li> </ul>
+    ServiceException: {}
+    HttpStatus:
+      type: integer
+    RoleArn:
+      type: string
+      pattern: arn:(aws[a-zA-Z-]*)?:iam::\d{12}:role/?[a-zA-Z_0-9+=,.@\-_/]+
+    InvalidRequestContentException: {}
+    EphemeralStorageSize:
+      type: integer
+      minimum: 512
+      maximum: 10240
+    SubnetId:
+      type: string
+    Layer:
+      type: object
+      properties:
+        Arn:
+          allOf:
+          - $ref: '#/components/schemas/LayerVersionArn'
+          - description: The Amazon Resource Name (ARN) of the function layer.
+        CodeSize:
+          allOf:
+          - $ref: '#/components/schemas/Long'
+          - description: The size of the layer archive in bytes.
+        SigningProfileVersionArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          - description: The Amazon Resource Name (ARN) for a signing profile version.
+        SigningJobArn:
+          allOf:
+          - $ref: '#/components/schemas/Arn'
+          - description: The Amazon Resource Name (ARN) of a signing job.
+      description: An <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda layer</a>.
+    PutFunctionCodeSigningConfigResponse:
+      type: object
+      required:
+      - CodeSigningConfigArn
+      - FunctionName
+      properties:
+        CodeSigningConfigArn:
+          allOf:
+          - $ref: '#/components/schemas/CodeSigningConfigArn'
+          - description: The The Amazon Resource Name (ARN) of the code signing configuration.
+        FunctionName:
+          allOf:
+          - $ref: '#/components/schemas/FunctionName'
+          - description: <p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function name</b> - <code>MyFunction</code>.</p> </li> <li> <p> <b>Function ARN</b> - <code>arn:aws:lambda:us-west-2:123456789012:function:MyFunction</code>.</p> </li> <li> <p> <b>Partial ARN</b> - <code>123456789012:function:MyFunction</code>.</p> </li> </ul> <p>The length constraint applies only to the full ARN. If you specify only the function name, it is limited to 64 characters in length.</p>
+    UnsupportedMediaTypeException: {}
+    LayersReferenceList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Layer'
+    VpcConfigResponse:
+      type: object
+      properties:
+        SubnetIds:
+          allOf:
+          - $ref: '#/components/schemas/SubnetIds'
+          - description: A list of VPC subnet IDs.
+        SecurityGroupIds:
+          allOf:
+          - $ref: '#/components/schemas/SecurityGroupIds'
+          - description: A list of VPC security group IDs.
+        VpcId:
+          allOf:
+          - $ref: '#/components/schemas/VpcId'
+          - description: The ID of the VPC.
+      description: The VPC security groups and subnets that are attached to a Lambda function.
+    StateReason:
+      type: string
+    TagValue:
+      type: string
+    InvokeWithResponseStreamCompleteEvent:
       type: object
       properties:
         ErrorCode:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: Error code.
-        Message:
+          - description: An error code.
+        ErrorDetails:
           allOf:
-          - $ref: '#/components/schemas/SensitiveString'
-          - description: Error message.
-      description: Error response to <code>GetFunctionConfiguration</code>.
-    KMSAccessDeniedException: {}
-    SnapStartNotReadyException: {}
-    ResourceArn:
+          - $ref: '#/components/schemas/String'
+          - description: The details of any returned error.
+        LogResult:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The last 4 KB of the execution log, which is base64-encoded.
+      description: A response confirming that the event stream is complete.
+    TooManyRequestsException: {}
+    Version:
       type: string
-      pattern: (arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()
-    ProvisionedConcurrencyConfigList:
-      type: array
-      items:
-        $ref: '#/components/schemas/ProvisionedConcurrencyConfigListItem'
+      pattern: (\$LATEST|[0-9]+)
+      minLength: 1
+      maxLength: 1024
+    GetFunctionResponse:
+      type: object
+      properties:
+        Configuration:
+          allOf:
+          - $ref: '#/components/schemas/FunctionConfiguration'
+          - description: The configuration of the function or version.
+        Code:
+          allOf:
+          - $ref: '#/components/schemas/FunctionCodeLocation'
+          - description: The deployment package of the function or version.
+        Tags:
+          allOf:
+          - $ref: '#/components/schemas/Tags'
+          - description: The function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a>.
+        Concurrency:
+          allOf:
+          - $ref: '#/components/schemas/Concurrency'
+          - description: The function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/concurrent-executions.html">reserved concurrency</a>.
+    ImageConfig:
+      type: object
+      properties:
+        EntryPoint:
+          allOf:
+          - $ref: '#/components/schemas/StringList'
+          - description: Specifies the entry point to their application, which is typically the location of the runtime executable.
+        Command:
+          allOf:
+          - $ref: '#/components/schemas/StringList'
+          - description: Specifies parameters that you want to pass in with ENTRYPOINT.
+        WorkingDirectory:
+          allOf:
+          - $ref: '#/components/schemas/WorkingDirectory'
+          - description: Specifies the working directory.
+      description: Configuration values that override the container image Dockerfile settings. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms">Container image settings</a>.
+    AliasConfiguration:
+      type: object
+      properties:
+        AliasArn:
+          allOf:
+          - $ref: '#/components/schemas/FunctionArn'
+          - description: The Amazon Resource Name (ARN) of the alias.
+        Name:
+          allOf:
+          - $ref: '#/components/schemas/Alias'
+          - description: The name of the alias.
+        FunctionVersion:
+          allOf:
+          - $ref: '#/components/schemas/Version'
+          - description: The function version that the alias invokes.
+        Description:
+          allOf:
+          - $ref: '#/components/schemas/Description'
+          - description: A description of the alias.
+        RoutingConfig:
+          allOf:
+          - $ref: '#/components/schemas/AliasRoutingConfiguration'
+          - description: The <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-traffic-shifting-using-aliases.html">routing configuration</a> of the alias.
+        RevisionId:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: A unique identifier that changes when you update the alias.
+      description: Provides configuration information about a Lambda function <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html">alias</a>.
+    InvalidParameterValueException: {}
+    Alias:
+      type: string
+      pattern: (?!^[0-9]+$)([a-zA-Z0-9-_]+)
+      minLength: 1
+      maxLength: 128
+    EFSMountTimeoutException: {}
     EnvironmentError:
       type: object
       properties:
@@ -4328,20 +4686,498 @@ components:
           - $ref: '#/components/schemas/SensitiveString'
           - description: The error message.
       description: Error messages for environment variables that couldn't be applied.
+    SnapStartNotReadyException: {}
+    GetFunctionConcurrencyResponse:
+      type: object
+      properties:
+        ReservedConcurrentExecutions:
+          allOf:
+          - $ref: '#/components/schemas/ReservedConcurrentExecutions'
+          - description: The number of simultaneous executions that are reserved for the function.
+    SnapStartResponse:
+      type: object
+      properties:
+        ApplyOn:
+          allOf:
+          - $ref: '#/components/schemas/SnapStartApplyOn'
+          - description: When set to <code>PublishedVersions</code>, Lambda creates a snapshot of the execution environment when you publish a function version.
+        OptimizationStatus:
+          allOf:
+          - $ref: '#/components/schemas/SnapStartOptimizationStatus'
+          - description: When you provide a <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html#versioning-versions-using">qualified Amazon Resource Name (ARN)</a>, this response element indicates whether SnapStart is activated for the specified function version.
+      description: The function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html">SnapStart</a> setting.
+    SensitiveString:
+      type: string
+      format: password
+    WorkingDirectory:
+      type: string
+      maxLength: 1000
+    MaximumRetryAttempts:
+      type: integer
+      minimum: 0
+      maximum: 2
+    ENILimitReachedException: {}
+    ResourceNotReadyException: {}
+    MaxAge:
+      type: integer
+      minimum: 0
+      maximum: 86400
+    GetFunctionUrlConfigResponse:
+      type: object
+      required:
+      - FunctionUrl
+      - FunctionArn
+      - AuthType
+      - CreationTime
+      - LastModifiedTime
+      properties:
+        FunctionUrl:
+          allOf:
+          - $ref: '#/components/schemas/FunctionUrl'
+          - description: The HTTP URL endpoint for your function.
+        FunctionArn:
+          allOf:
+          - $ref: '#/components/schemas/FunctionArn'
+          - description: The Amazon Resource Name (ARN) of your function.
+        AuthType:
+          allOf:
+          - $ref: '#/components/schemas/FunctionUrlAuthType'
+          - description: The type of authentication that your function URL uses. Set to <code>AWS_IAM</code> if you want to restrict access to authenticated users only. Set to <code>NONE</code> if you want to bypass IAM authentication to create a public endpoint. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html">Security and auth model for Lambda function URLs</a>.
+        Cors:
+          allOf:
+          - $ref: '#/components/schemas/Cors'
+          - description: The <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin resource sharing (CORS)</a> settings for your function URL.
+        CreationTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          - description: When the function URL was created, in <a href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a> (YYYY-MM-DDThh:mm:ss.sTZD).
+        LastModifiedTime:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          - description: When the function URL configuration was last updated, in <a href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a> (YYYY-MM-DDThh:mm:ss.sTZD).
+        InvokeMode:
+          allOf:
+          - $ref: '#/components/schemas/InvokeMode'
+          - description: <p>Use one of the following options:</p> <ul> <li> <p> <code>BUFFERED</code> â€“ This is the default option. Lambda invokes your function using the <code>Invoke</code> API operation. Invocation results are available when the payload is complete. The maximum payload size is 6 MB.</p> </li> <li> <p> <code>RESPONSE_STREAM</code> â€“ Your function streams payload results as they become available. Lambda invokes your function using the <code>InvokeWithResponseStream</code> API operation. The maximum response payload size is 20 MB, however, you can <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html">request a quota increase</a>.</p> </li> </ul>
+    FunctionEventInvokeConfig:
+      type: object
+      properties:
+        LastModified:
+          allOf:
+          - $ref: '#/components/schemas/Date'
+          - description: The date and time that the configuration was last updated.
+        FunctionArn:
+          allOf:
+          - $ref: '#/components/schemas/FunctionArn'
+          - description: The Amazon Resource Name (ARN) of the function.
+        MaximumRetryAttempts:
+          allOf:
+          - $ref: '#/components/schemas/MaximumRetryAttempts'
+          - description: The maximum number of times to retry when the function returns an error.
+        MaximumEventAgeInSeconds:
+          allOf:
+          - $ref: '#/components/schemas/MaximumEventAgeInSeconds'
+          - description: The maximum age of a request that Lambda sends to a function for processing.
+        DestinationConfig:
+          allOf:
+          - $ref: '#/components/schemas/DestinationConfig'
+          - description: <p>A destination for events after they have been sent to a function for processing.</p> <p class="title"> <b>Destinations</b> </p> <ul> <li> <p> <b>Function</b> - The Amazon Resource Name (ARN) of a Lambda function.</p> </li> <li> <p> <b>Queue</b> - The ARN of a standard SQS queue.</p> </li> <li> <p> <b>Topic</b> - The ARN of a standard SNS topic.</p> </li> <li> <p> <b>Event Bus</b> - The ARN of an Amazon EventBridge event bus.</p> </li> </ul>
+    FunctionUrlConfigList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FunctionUrlConfig'
+    SubnetIPAddressLimitReachedException: {}
+    Runtime:
+      type: string
+      enum:
+      - nodejs
+      - nodejs4.3
+      - nodejs6.10
+      - nodejs8.10
+      - nodejs10.x
+      - nodejs12.x
+      - nodejs14.x
+      - nodejs16.x
+      - java8
+      - java8.al2
+      - java11
+      - python2.7
+      - python3.6
+      - python3.7
+      - python3.8
+      - python3.9
+      - dotnetcore1.0
+      - dotnetcore2.0
+      - dotnetcore2.1
+      - dotnetcore3.1
+      - dotnet6
+      - nodejs4.3-edge
+      - go1.x
+      - ruby2.5
+      - ruby2.7
+      - provided
+      - provided.al2
+      - nodejs18.x
+      - python3.10
+    ImageConfigError:
+      type: object
+      properties:
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: Error code.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          - description: Error message.
+      description: Error response to <code>GetFunctionConfiguration</code>.
+    DestinationArn:
+      type: string
+      pattern: ^$|arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-])+:([a-z]{2}(-gov)?-[a-z]+-\d{1})?:(\d{12})?:(.*)
+      minLength: 0
+      maxLength: 350
+    EnvironmentResponse:
+      type: object
+      properties:
+        Variables:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentVariables'
+          - description: Environment variable key-value pairs. Omitted from CloudTrail logs.
+        Error:
+          allOf:
+          - $ref: '#/components/schemas/EnvironmentError'
+          - description: Error messages for environment variables that couldn't be applied.
+      description: The results of an operation to update or read environment variables. If the operation succeeds, the response contains the environment variables. If it fails, the response contains details about the error.
+    SecurityGroupIds:
+      type: array
+      items:
+        $ref: '#/components/schemas/SecurityGroupId'
+      maxItems: 5
+    FileSystemConfigList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FileSystemConfig'
+      maxItems: 1
+    Long:
+      type: integer
+    ImageConfigResponse:
+      type: object
+      properties:
+        ImageConfig:
+          allOf:
+          - $ref: '#/components/schemas/ImageConfig'
+          - description: Configuration values that override the container image Dockerfile.
+        Error:
+          allOf:
+          - $ref: '#/components/schemas/ImageConfigError'
+          - description: Error response to <code>GetFunctionConfiguration</code>.
+      description: Response to a <code>GetFunctionConfiguration</code> request.
+    String:
+      type: string
+    OnFailure:
+      type: object
+      properties:
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          - description: The Amazon Resource Name (ARN) of the destination resource.
+      description: A destination for events that failed processing.
+    ListProvisionedConcurrencyConfigsResponse:
+      type: object
+      properties:
+        ProvisionedConcurrencyConfigs:
+          allOf:
+          - $ref: '#/components/schemas/ProvisionedConcurrencyConfigList'
+          - description: A list of provisioned concurrency configurations.
+        NextMarker:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The pagination token that's included if more results are available.
+    InvalidSecurityGroupIDException: {}
+    S3ObjectVersion:
+      type: string
+      minLength: 1
+      maxLength: 1024
+    GetFunctionCodeSigningConfigResponse:
+      type: object
+      required:
+      - CodeSigningConfigArn
+      - FunctionName
+      properties:
+        CodeSigningConfigArn:
+          allOf:
+          - $ref: '#/components/schemas/CodeSigningConfigArn'
+          - description: The The Amazon Resource Name (ARN) of the code signing configuration.
+        FunctionName:
+          allOf:
+          - $ref: '#/components/schemas/FunctionName'
+          - description: <p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function name</b> - <code>MyFunction</code>.</p> </li> <li> <p> <b>Function ARN</b> - <code>arn:aws:lambda:us-west-2:123456789012:function:MyFunction</code>.</p> </li> <li> <p> <b>Partial ARN</b> - <code>123456789012:function:MyFunction</code>.</p> </li> </ul> <p>The length constraint applies only to the full ARN. If you specify only the function name, it is limited to 64 characters in length.</p>
+    OnSuccess:
+      type: object
+      properties:
+        Destination:
+          allOf:
+          - $ref: '#/components/schemas/DestinationArn'
+          - description: The Amazon Resource Name (ARN) of the destination resource.
+      description: A destination for events that were processed successfully.
+    CodeSigningConfigNotFoundException: {}
+    Timestamp:
+      type: string
+    InvokeWithResponseStreamResponseEvent:
+      type: object
+      properties:
+        PayloadChunk:
+          allOf:
+          - $ref: '#/components/schemas/InvokeResponseStreamUpdate'
+          - description: A chunk of the streamed response payload.
+        InvokeComplete:
+          allOf:
+          - $ref: '#/components/schemas/InvokeWithResponseStreamCompleteEvent'
+          - description: An object that's returned when the stream has ended and all the payload chunks have been returned.
+      description: An object that includes a chunk of the response payload. When the stream has ended, Lambda includes a <code>InvokeComplete</code> object.
+    EC2AccessDeniedException: {}
+    FunctionName:
+      type: string
+      pattern: (arn:(aws[a-zA-Z-]*)?:lambda:)?([a-z]{2}(-gov)?-[a-z]+-\d{1}:)?(\d{12}:)?(function:)?([a-zA-Z0-9-_]+)(:(\$LATEST|[a-zA-Z0-9-_]+))?
+      minLength: 1
+      maxLength: 140
+    FunctionEventInvokeConfigList:
+      type: array
+      items:
+        $ref: '#/components/schemas/FunctionEventInvokeConfig'
+    RuntimeVersionConfig:
+      type: object
+      properties:
+        RuntimeVersionArn:
+          allOf:
+          - $ref: '#/components/schemas/RuntimeVersionArn'
+          - description: The ARN of the runtime version you want the function to use.
+        Error:
+          allOf:
+          - $ref: '#/components/schemas/RuntimeVersionError'
+          - description: Error response when Lambda is unable to retrieve the runtime version for a function.
+      description: The ARN of the runtime and any errors that occured.
+    ResourceConflictException: {}
+    KMSKeyArn:
+      type: string
+      pattern: (arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()
+    ProvisionedConcurrencyConfigList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProvisionedConcurrencyConfigListItem'
     NameSpacedFunctionArn:
       type: string
       pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_\.]+(:(\$LATEST|[a-zA-Z0-9-_]+))?
-    SubnetIPAddressLimitReachedException: {}
-    Blob:
+    CodeSigningConfigArn:
       type: string
-      format: password
-    EnvironmentVariableValue:
+      pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\d{1}:\d{12}:code-signing-config:csc-[a-z0-9]{17}
+      maxLength: 200
+    Handler:
       type: string
-      format: password
-    AliasList:
+      pattern: '[^\s]+'
+      maxLength: 128
+    Cors:
+      type: object
+      properties:
+        AllowCredentials:
+          allOf:
+          - $ref: '#/components/schemas/AllowCredentials'
+          - description: Whether to allow cookies or other credentials in requests to your function URL. The default is <code>false</code>.
+        AllowHeaders:
+          allOf:
+          - $ref: '#/components/schemas/HeadersList'
+          - description: 'The HTTP headers that origins can include in requests to your function URL. For example: <code>Date</code>, <code>Keep-Alive</code>, <code>X-Custom-Header</code>.'
+        AllowMethods:
+          allOf:
+          - $ref: '#/components/schemas/AllowMethodsList'
+          - description: 'The HTTP methods that are allowed when calling your function URL. For example: <code>GET</code>, <code>POST</code>, <code>DELETE</code>, or the wildcard character (<code>*</code>).'
+        AllowOrigins:
+          allOf:
+          - $ref: '#/components/schemas/AllowOriginsList'
+          - description: '<p>The origins that can access your function URL. You can list any number of specific origins, separated by a comma. For example: <code>https://www.example.com</code>, <code>http://localhost:60905</code>.</p> <p>Alternatively, you can grant access to all origins using the wildcard character (<code>*</code>).</p>'
+        ExposeHeaders:
+          allOf:
+          - $ref: '#/components/schemas/HeadersList'
+          - description: 'The HTTP headers in your function response that you want to expose to origins that call your function URL. For example: <code>Date</code>, <code>Keep-Alive</code>, <code>X-Custom-Header</code>.'
+        MaxAge:
+          allOf:
+          - $ref: '#/components/schemas/MaxAge'
+          - description: The maximum amount of time, in seconds, that web browsers can cache results of a preflight request. By default, this is set to <code>0</code>, which means that the browser doesn't cache results.
+      description: The <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin resource sharing (CORS)</a> settings for your Lambda function URL. Use CORS to grant access to your function URL from any origin. You can also use CORS to control access for specific HTTP headers and methods in requests to your function URL.
+    S3Bucket:
+      type: string
+      pattern: ^[0-9A-Za-z\.\-_]*(?<!\.)$
+      minLength: 3
+      maxLength: 63
+    FunctionList:
       type: array
       items:
-        $ref: '#/components/schemas/AliasConfiguration'
+        $ref: '#/components/schemas/FunctionConfiguration'
+    SnapStartException: {}
+    InvalidRuntimeException: {}
+    PutProvisionedConcurrencyConfigResponse:
+      type: object
+      properties:
+        RequestedProvisionedConcurrentExecutions:
+          allOf:
+          - $ref: '#/components/schemas/PositiveInteger'
+          - description: The amount of provisioned concurrency requested.
+        AvailableProvisionedConcurrentExecutions:
+          allOf:
+          - $ref: '#/components/schemas/NonNegativeInteger'
+          - description: The amount of provisioned concurrency available.
+        AllocatedProvisionedConcurrentExecutions:
+          allOf:
+          - $ref: '#/components/schemas/NonNegativeInteger'
+          - description: The amount of provisioned concurrency allocated. When a weighted alias is used during linear and canary deployments, this value fluctuates depending on the amount of concurrency that is provisioned for the function versions.
+        Status:
+          allOf:
+          - $ref: '#/components/schemas/ProvisionedConcurrencyStatusEnum'
+          - description: The status of the allocation process.
+        StatusReason:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: For failed allocations, the reason that provisioned concurrency could not be allocated.
+        LastModified:
+          allOf:
+          - $ref: '#/components/schemas/Timestamp'
+          - description: The date and time that a user last updated the configuration, in <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601 format</a>.
+    SecurityGroupId:
+      type: string
+    ResourceNotFoundException: {}
+    CodeVerificationFailedException: {}
+    AliasRoutingConfiguration:
+      type: object
+      properties:
+        AdditionalVersionWeights:
+          allOf:
+          - $ref: '#/components/schemas/AdditionalVersionWeights'
+          - description: The second version, and the percentage of traffic that's routed to it.
+      description: The <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-traffic-shifting-using-aliases.html">traffic-shifting</a> configuration of a Lambda function alias.
+    ArchitecturesList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Architecture'
+      minItems: 1
+      maxItems: 1
+    SnapStartTimeoutException: {}
+    ListFunctionsResponse:
+      type: object
+      properties:
+        NextMarker:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The pagination token that's included if more results are available.
+        Functions:
+          allOf:
+          - $ref: '#/components/schemas/FunctionList'
+          - description: A list of Lambda functions.
+      description: A list of Lambda functions.
+    Description:
+      type: string
+      minLength: 0
+      maxLength: 256
+    AddPermissionResponse:
+      type: object
+      properties:
+        Statement:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The permission statement that's added to the function policy.
+    KMSAccessDeniedException: {}
+    FunctionUrl:
+      type: string
+      minLength: 40
+      maxLength: 100
+    SnapStartOptimizationStatus:
+      type: string
+      enum:
+      - 'On'
+      - 'Off'
+    Concurrency:
+      type: object
+      properties:
+        ReservedConcurrentExecutions:
+          allOf:
+          - $ref: '#/components/schemas/ReservedConcurrentExecutions'
+          - description: The number of concurrent executions that are reserved for this function. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html">Managing Lambda reserved concurrency</a>.
+    NamespacedFunctionName:
+      type: string
+      pattern: (arn:(aws[a-zA-Z-]*)?:lambda:)?([a-z]{2}(-gov)?-[a-z]+-\d{1}:)?(\d{12}:)?(function:)?([a-zA-Z0-9-_\.]+)(:(\$LATEST|[a-zA-Z0-9-_]+))?
+      minLength: 1
+      maxLength: 170
+    HeadersList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Header'
+      maxItems: 100
+    State:
+      type: string
+      enum:
+      - Pending
+      - Active
+      - Inactive
+      - Failed
+    EC2UnexpectedException: {}
+    ListFunctionEventInvokeConfigsResponse:
+      type: object
+      properties:
+        FunctionEventInvokeConfigs:
+          allOf:
+          - $ref: '#/components/schemas/FunctionEventInvokeConfigList'
+          - description: A list of configurations.
+        NextMarker:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The pagination token that's included if more results are available.
+    GetRuntimeManagementConfigResponse:
+      type: object
+      properties:
+        UpdateRuntimeOn:
+          allOf:
+          - $ref: '#/components/schemas/UpdateRuntimeOn'
+          - description: The current runtime update mode of the function.
+        RuntimeVersionArn:
+          allOf:
+          - $ref: '#/components/schemas/RuntimeVersionArn'
+          - description: The ARN of the runtime the function is configured to use. If the runtime update mode is <b>Manual</b>, the ARN is returned, otherwise <code>null</code> is returned.
+        FunctionArn:
+          allOf:
+          - $ref: '#/components/schemas/NameSpacedFunctionArn'
+          - description: The Amazon Resource Name (ARN) of your function.
+    SnapStartApplyOn:
+      type: string
+      enum:
+      - PublishedVersions
+      - None
+    RuntimeVersionError:
+      type: object
+      properties:
+        ErrorCode:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The error code.
+        Message:
+          allOf:
+          - $ref: '#/components/schemas/SensitiveString'
+          - description: The error message.
+      description: Any error returned when the runtime version information for the function could not be retrieved.
+    LastUpdateStatusReason:
+      type: string
+    InvokeResponseStreamUpdate:
+      type: object
+      properties:
+        Payload:
+          allOf:
+          - $ref: '#/components/schemas/Blob'
+          - description: Data returned by your Lambda function.
+      description: A chunk of the streamed response payload.
+    ProvisionedConcurrencyStatusEnum:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - READY
+      - FAILED
     FunctionUrlConfig:
       type: object
       required:
@@ -4380,694 +5216,37 @@ components:
           - $ref: '#/components/schemas/InvokeMode'
           - description: <p>Use one of the following options:</p> <ul> <li> <p> <code>BUFFERED</code> â€“ This is the default option. Lambda invokes your function using the <code>Invoke</code> API operation. Invocation results are available when the payload is complete. The maximum payload size is 6 MB.</p> </li> <li> <p> <code>RESPONSE_STREAM</code> â€“ Your function streams payload results as they become available. Lambda invokes your function using the <code>InvokeWithResponseStream</code> API operation. The maximum response payload size is 20 MB, however, you can <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html">request a quota increase</a>.</p> </li> </ul>
       description: Details about a Lambda function URL.
-    EFSMountConnectivityException: {}
-    String:
-      type: string
-    InvalidRuntimeException: {}
-    CreateFunctionUrlConfigResponse:
-      type: object
-      required:
-      - FunctionUrl
-      - FunctionArn
-      - AuthType
-      - CreationTime
-      properties:
-        FunctionUrl:
-          allOf:
-          - $ref: '#/components/schemas/FunctionUrl'
-          - description: The HTTP URL endpoint for your function.
-        FunctionArn:
-          allOf:
-          - $ref: '#/components/schemas/FunctionArn'
-          - description: The Amazon Resource Name (ARN) of your function.
-        AuthType:
-          allOf:
-          - $ref: '#/components/schemas/FunctionUrlAuthType'
-          - description: The type of authentication that your function URL uses. Set to <code>AWS_IAM</code> if you want to restrict access to authenticated users only. Set to <code>NONE</code> if you want to bypass IAM authentication to create a public endpoint. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html">Security and auth model for Lambda function URLs</a>.
-        Cors:
-          allOf:
-          - $ref: '#/components/schemas/Cors'
-          - description: The <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin resource sharing (CORS)</a> settings for your function URL.
-        CreationTime:
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
-          - description: When the function URL was created, in <a href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a> (YYYY-MM-DDThh:mm:ss.sTZD).
-        InvokeMode:
-          allOf:
-          - $ref: '#/components/schemas/InvokeMode'
-          - description: <p>Use one of the following options:</p> <ul> <li> <p> <code>BUFFERED</code> â€“ This is the default option. Lambda invokes your function using the <code>Invoke</code> API operation. Invocation results are available when the payload is complete. The maximum payload size is 6 MB.</p> </li> <li> <p> <code>RESPONSE_STREAM</code> â€“ Your function streams payload results as they become available. Lambda invokes your function using the <code>InvokeWithResponseStream</code> API operation. The maximum response payload size is 20 MB, however, you can <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html">request a quota increase</a>.</p> </li> </ul>
-    FunctionEventInvokeConfig:
-      type: object
-      properties:
-        LastModified:
-          allOf:
-          - $ref: '#/components/schemas/Date'
-          - description: The date and time that the configuration was last updated.
-        FunctionArn:
-          allOf:
-          - $ref: '#/components/schemas/FunctionArn'
-          - description: The Amazon Resource Name (ARN) of the function.
-        MaximumRetryAttempts:
-          allOf:
-          - $ref: '#/components/schemas/MaximumRetryAttempts'
-          - description: The maximum number of times to retry when the function returns an error.
-        MaximumEventAgeInSeconds:
-          allOf:
-          - $ref: '#/components/schemas/MaximumEventAgeInSeconds'
-          - description: The maximum age of a request that Lambda sends to a function for processing.
-        DestinationConfig:
-          allOf:
-          - $ref: '#/components/schemas/DestinationConfig'
-          - description: <p>A destination for events after they have been sent to a function for processing.</p> <p class="title"> <b>Destinations</b> </p> <ul> <li> <p> <b>Function</b> - The Amazon Resource Name (ARN) of a Lambda function.</p> </li> <li> <p> <b>Queue</b> - The ARN of a standard SQS queue.</p> </li> <li> <p> <b>Topic</b> - The ARN of a standard SNS topic.</p> </li> <li> <p> <b>Event Bus</b> - The ARN of an Amazon EventBridge event bus.</p> </li> </ul>
-    ENILimitReachedException: {}
-    FileSystemConfig:
-      type: object
-      required:
-      - Arn
-      - LocalMountPath
-      properties:
-        Arn:
-          allOf:
-          - $ref: '#/components/schemas/FileSystemArn'
-          - description: The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.
-        LocalMountPath:
-          allOf:
-          - $ref: '#/components/schemas/LocalMountPath'
-          - description: The path where the function can access the file system, starting with <code>/mnt/</code>.
-      description: Details about the connection between a Lambda function and an <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html">Amazon EFS file system</a>.
-    InvokeWithResponseStreamResponseEvent:
-      type: object
-      properties:
-        PayloadChunk:
-          allOf:
-          - $ref: '#/components/schemas/InvokeResponseStreamUpdate'
-          - description: A chunk of the streamed response payload.
-        InvokeComplete:
-          allOf:
-          - $ref: '#/components/schemas/InvokeWithResponseStreamCompleteEvent'
-          - description: An object that's returned when the stream has ended and all the payload chunks have been returned.
-      description: An object that includes a chunk of the response payload. When the stream has ended, Lambda includes a <code>InvokeComplete</code> object.
-    Integer:
-      type: integer
-    Cors:
-      type: object
-      properties:
-        AllowCredentials:
-          allOf:
-          - $ref: '#/components/schemas/AllowCredentials'
-          - description: Whether to allow cookies or other credentials in requests to your function URL. The default is <code>false</code>.
-        AllowHeaders:
-          allOf:
-          - $ref: '#/components/schemas/HeadersList'
-          - description: 'The HTTP headers that origins can include in requests to your function URL. For example: <code>Date</code>, <code>Keep-Alive</code>, <code>X-Custom-Header</code>.'
-        AllowMethods:
-          allOf:
-          - $ref: '#/components/schemas/AllowMethodsList'
-          - description: 'The HTTP methods that are allowed when calling your function URL. For example: <code>GET</code>, <code>POST</code>, <code>DELETE</code>, or the wildcard character (<code>*</code>).'
-        AllowOrigins:
-          allOf:
-          - $ref: '#/components/schemas/AllowOriginsList'
-          - description: '<p>The origins that can access your function URL. You can list any number of specific origins, separated by a comma. For example: <code>https://www.example.com</code>, <code>http://localhost:60905</code>.</p> <p>Alternatively, you can grant access to all origins using the wildcard character (<code>*</code>).</p>'
-        ExposeHeaders:
-          allOf:
-          - $ref: '#/components/schemas/HeadersList'
-          - description: 'The HTTP headers in your function response that you want to expose to origins that call your function URL. For example: <code>Date</code>, <code>Keep-Alive</code>, <code>X-Custom-Header</code>.'
-        MaxAge:
-          allOf:
-          - $ref: '#/components/schemas/MaxAge'
-          - description: The maximum amount of time, in seconds, that web browsers can cache results of a preflight request. By default, this is set to <code>0</code>, which means that the browser doesn't cache results.
-      description: The <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin resource sharing (CORS)</a> settings for your Lambda function URL. Use CORS to grant access to your function URL from any origin. You can also use CORS to control access for specific HTTP headers and methods in requests to your function URL.
-    DestinationConfig:
-      type: object
-      properties:
-        OnSuccess:
-          allOf:
-          - $ref: '#/components/schemas/OnSuccess'
-          - description: The destination configuration for successful invocations.
-        OnFailure:
-          allOf:
-          - $ref: '#/components/schemas/OnFailure'
-          - description: The destination configuration for failed invocations.
-      description: A configuration object that specifies the destination of an event after Lambda processes it.
-    KMSInvalidStateException: {}
-    ProvisionedConcurrencyConfigNotFoundException: {}
-    EFSMountTimeoutException: {}
-    InvokeResponseStreamUpdate:
-      type: object
-      properties:
-        Payload:
-          allOf:
-          - $ref: '#/components/schemas/Blob'
-          - description: Data returned by your Lambda function.
-      description: A chunk of the streamed response payload.
-    FileSystemConfigList:
-      type: array
-      items:
-        $ref: '#/components/schemas/FileSystemConfig'
-      maxItems: 1
-    Concurrency:
-      type: object
-      properties:
-        ReservedConcurrentExecutions:
-          allOf:
-          - $ref: '#/components/schemas/ReservedConcurrentExecutions'
-          - description: The number of concurrent executions that are reserved for this function. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html">Managing Lambda reserved concurrency</a>.
-    CodeVerificationFailedException: {}
-    GetPolicyResponse:
-      type: object
-      properties:
-        Policy:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The resource-based policy.
-        RevisionId:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: A unique identifier for the current revision of the policy.
-    FunctionUrl:
-      type: string
-      minLength: 40
-      maxLength: 100
-    LastUpdateStatusReasonCode:
-      type: string
-      enum:
-      - EniLimitExceeded
-      - InsufficientRolePermissions
-      - InvalidConfiguration
-      - InternalError
-      - SubnetOutOfIPAddresses
-      - InvalidSubnet
-      - InvalidSecurityGroup
-      - ImageDeleted
-      - ImageAccessDenied
-      - InvalidImage
-      - KMSKeyAccessDenied
-      - KMSKeyNotFound
-      - InvalidStateKMSKey
-      - DisabledKMSKey
-      - EFSIOError
-      - EFSMountConnectivityError
-      - EFSMountFailure
-      - EFSMountTimeout
-      - InvalidRuntime
-      - InvalidZipFileException
-      - FunctionError
-    Runtime:
-      type: string
-      enum:
-      - nodejs
-      - nodejs4.3
-      - nodejs6.10
-      - nodejs8.10
-      - nodejs10.x
-      - nodejs12.x
-      - nodejs14.x
-      - nodejs16.x
-      - java8
-      - java8.al2
-      - java11
-      - python2.7
-      - python3.6
-      - python3.7
-      - python3.8
-      - python3.9
-      - dotnetcore1.0
-      - dotnetcore2.0
-      - dotnetcore2.1
-      - dotnetcore3.1
-      - dotnet6
-      - nodejs4.3-edge
-      - go1.x
-      - ruby2.5
-      - ruby2.7
-      - provided
-      - provided.al2
-      - nodejs18.x
-      - python3.10
-    StringList:
-      type: array
-      items:
-        $ref: '#/components/schemas/String'
-      maxItems: 1500
-    LayersReferenceList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Layer'
-    State:
-      type: string
-      enum:
-      - Pending
-      - Active
-      - Inactive
-      - Failed
-    SnapStartApplyOn:
-      type: string
-      enum:
-      - PublishedVersions
-      - None
-    ResourceConflictException: {}
-    InvalidRequestContentException: {}
-    KMSNotFoundException: {}
-    PreconditionFailedException: {}
-    AdditionalVersionWeights:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/Weight'
-    Header:
-      type: string
-      pattern: .*
-      maxLength: 1024
-    OnFailure:
-      type: object
-      properties:
-        Destination:
-          allOf:
-          - $ref: '#/components/schemas/DestinationArn'
-          - description: The Amazon Resource Name (ARN) of the destination resource.
-      description: A destination for events that failed processing.
-    Date:
-      type: string
-      format: date-time
-    SnapStartOptimizationStatus:
-      type: string
-      enum:
-      - true
-      - false
-    InvalidSubnetIDException: {}
-    Tags:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/TagValue'
-    ListFunctionsResponse:
-      type: object
-      properties:
-        NextMarker:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The pagination token that's included if more results are available.
-        Functions:
-          allOf:
-          - $ref: '#/components/schemas/FunctionList'
-          - description: A list of Lambda functions.
-      description: A list of Lambda functions.
-    StateReason:
-      type: string
-    FunctionName:
-      type: string
-      pattern: (arn:(aws[a-zA-Z-]*)?:lambda:)?([a-z]{2}(-gov)?-[a-z]+-\d{1}:)?(\d{12}:)?(function:)?([a-zA-Z0-9-_]+)(:(\$LATEST|[a-zA-Z0-9-_]+))?
-      minLength: 1
-      maxLength: 140
-    SecurityGroupIds:
-      type: array
-      items:
-        $ref: '#/components/schemas/SecurityGroupId'
-      maxItems: 5
-    ImageConfig:
-      type: object
-      properties:
-        EntryPoint:
-          allOf:
-          - $ref: '#/components/schemas/StringList'
-          - description: Specifies the entry point to their application, which is typically the location of the runtime executable.
-        Command:
-          allOf:
-          - $ref: '#/components/schemas/StringList'
-          - description: Specifies parameters that you want to pass in with ENTRYPOINT.
-        WorkingDirectory:
-          allOf:
-          - $ref: '#/components/schemas/WorkingDirectory'
-          - description: Specifies the working directory.
-      description: Configuration values that override the container image Dockerfile settings. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms">Container image settings</a>.
-    KMSDisabledException: {}
-    InvocationResponse:
+    InvokeWithResponseStreamResponse:
       type: object
       properties:
         StatusCode:
           allOf:
           - $ref: '#/components/schemas/Integer'
-          - description: The HTTP status code is in the 200 range for a successful request. For the <code>RequestResponse</code> invocation type, this status code is 200. For the <code>Event</code> invocation type, this status code is 202. For the <code>DryRun</code> invocation type, the status code is 204.
-        Payload:
+          - description: For a successful request, the HTTP status code is in the 200 range. For the <code>RequestResponse</code> invocation type, this status code is 200. For the <code>DryRun</code> invocation type, this status code is 204.
+        EventStream:
           allOf:
-          - $ref: '#/components/schemas/Blob'
-          - description: The response from the function, or an error object.
-    S3Bucket:
-      type: string
-      pattern: ^[0-9A-Za-z\.\-_]*(?<!\.)$
-      minLength: 3
-      maxLength: 63
-    UnsupportedMediaTypeException: {}
-    PutFunctionCodeSigningConfigResponse:
+          - $ref: '#/components/schemas/InvokeWithResponseStreamResponseEvent'
+          - description: The stream of response payloads.
+    FunctionCodeLocation:
       type: object
-      required:
-      - CodeSigningConfigArn
-      - FunctionName
       properties:
-        CodeSigningConfigArn:
-          allOf:
-          - $ref: '#/components/schemas/CodeSigningConfigArn'
-          - description: The The Amazon Resource Name (ARN) of the code signing configuration.
-        FunctionName:
-          allOf:
-          - $ref: '#/components/schemas/FunctionName'
-          - description: <p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function name</b> - <code>MyFunction</code>.</p> </li> <li> <p> <b>Function ARN</b> - <code>arn:aws:lambda:us-west-2:123456789012:function:MyFunction</code>.</p> </li> <li> <p> <b>Partial ARN</b> - <code>123456789012:function:MyFunction</code>.</p> </li> </ul> <p>The length constraint applies only to the full ARN. If you specify only the function name, it is limited to 64 characters in length.</p>
-    ListFunctionUrlConfigsResponse:
-      type: object
-      required:
-      - FunctionUrlConfigs
-      properties:
-        FunctionUrlConfigs:
-          allOf:
-          - $ref: '#/components/schemas/FunctionUrlConfigList'
-          - description: A list of function URL configurations.
-        NextMarker:
+        RepositoryType:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The pagination token that's included if more results are available.
-    RoleArn:
-      type: string
-      pattern: arn:(aws[a-zA-Z-]*)?:iam::\d{12}:role/?[a-zA-Z_0-9+=,.@\-_/]+
-    InvokeWithResponseStreamCompleteEvent:
-      type: object
-      properties:
-        ErrorCode:
+          - description: The service that's hosting the file.
+        Location:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: An error code.
-        ErrorDetails:
+          - description: A presigned URL that you can use to download the deployment package.
+        ImageUri:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The details of any returned error.
-        LogResult:
+          - description: URI of a container image in the Amazon ECR registry.
+        ResolvedImageUri:
           allOf:
           - $ref: '#/components/schemas/String'
-          - description: The last 4 KB of the execution log, which is base64-encoded.
-      description: A response confirming that the event stream is complete.
-    Weight:
-      type: number
-      format: double
-      minimum: 0
-      maximum: 1
-    SnapStartResponse:
-      type: object
-      properties:
-        ApplyOn:
-          allOf:
-          - $ref: '#/components/schemas/SnapStartApplyOn'
-          - description: When set to <code>PublishedVersions</code>, Lambda creates a snapshot of the execution environment when you publish a function version.
-        OptimizationStatus:
-          allOf:
-          - $ref: '#/components/schemas/SnapStartOptimizationStatus'
-          - description: When you provide a <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html#versioning-versions-using">qualified Amazon Resource Name (ARN)</a>, this response element indicates whether SnapStart is activated for the specified function version.
-      description: The function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html">SnapStart</a> setting.
-    EFSIOException: {}
-    FileSystemArn:
-      type: string
-      pattern: arn:aws[a-zA-Z-]*:elasticfilesystem:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\d{1}:\d{12}:access-point/fsap-[a-f0-9]{17}
-      maxLength: 200
-    EC2ThrottledException: {}
-    HeadersList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Header'
-      maxItems: 100
-    Version:
-      type: string
-      pattern: (\$LATEST|[0-9]+)
-      minLength: 1
-      maxLength: 1024
-    NamespacedFunctionName:
-      type: string
-      pattern: (arn:(aws[a-zA-Z-]*)?:lambda:)?([a-z]{2}(-gov)?-[a-z]+-\d{1}:)?(\d{12}:)?(function:)?([a-zA-Z0-9-_\.]+)(:(\$LATEST|[a-zA-Z0-9-_]+))?
-      minLength: 1
-      maxLength: 170
-    PositiveInteger:
-      type: integer
-      minimum: 1
-    Description:
-      type: string
-      minLength: 0
-      maxLength: 256
-    EFSMountFailureException: {}
-    InvalidParameterValueException: {}
-    RuntimeVersionError:
-      type: object
-      properties:
-        ErrorCode:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The error code.
-        Message:
-          allOf:
-          - $ref: '#/components/schemas/SensitiveString'
-          - description: The error message.
-      description: Any error returned when the runtime version information for the function could not be retrieved.
-    Long:
-      type: integer
-    WorkingDirectory:
-      type: string
-      maxLength: 1000
-    FunctionUrlConfigList:
-      type: array
-      items:
-        $ref: '#/components/schemas/FunctionUrlConfig'
-    GetFunctionCodeSigningConfigResponse:
-      type: object
-      required:
-      - CodeSigningConfigArn
-      - FunctionName
-      properties:
-        CodeSigningConfigArn:
-          allOf:
-          - $ref: '#/components/schemas/CodeSigningConfigArn'
-          - description: The The Amazon Resource Name (ARN) of the code signing configuration.
-        FunctionName:
-          allOf:
-          - $ref: '#/components/schemas/FunctionName'
-          - description: <p>The name of the Lambda function.</p> <p class="title"> <b>Name formats</b> </p> <ul> <li> <p> <b>Function name</b> - <code>MyFunction</code>.</p> </li> <li> <p> <b>Function ARN</b> - <code>arn:aws:lambda:us-west-2:123456789012:function:MyFunction</code>.</p> </li> <li> <p> <b>Partial ARN</b> - <code>123456789012:function:MyFunction</code>.</p> </li> </ul> <p>The length constraint applies only to the full ARN. If you specify only the function name, it is limited to 64 characters in length.</p>
-    DeadLetterConfig:
-      type: object
-      properties:
-        TargetArn:
-          allOf:
-          - $ref: '#/components/schemas/ResourceArn'
-          - description: The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic.
-      description: The <a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq">dead-letter queue</a> for failed asynchronous invocations.
-    VpcConfigResponse:
-      type: object
-      properties:
-        SubnetIds:
-          allOf:
-          - $ref: '#/components/schemas/SubnetIds'
-          - description: A list of VPC subnet IDs.
-        SecurityGroupIds:
-          allOf:
-          - $ref: '#/components/schemas/SecurityGroupIds'
-          - description: A list of VPC security group IDs.
-        VpcId:
-          allOf:
-          - $ref: '#/components/schemas/VpcId'
-          - description: The ID of the VPC.
-      description: The VPC security groups and subnets that are attached to a Lambda function.
-    MaximumRetryAttempts:
-      type: integer
-      minimum: 0
-      maximum: 2
-    CodeSigningConfigArn:
-      type: string
-      pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\d{1}:\d{12}:code-signing-config:csc-[a-z0-9]{17}
-      maxLength: 200
-    TracingMode:
-      type: string
-      enum:
-      - Active
-      - PassThrough
-    ProvisionedConcurrencyStatusEnum:
-      type: string
-      enum:
-      - IN_PROGRESS
-      - READY
-      - FAILED
-    AllowOriginsList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Origin'
-      maxItems: 100
-    ImageConfigResponse:
-      type: object
-      properties:
-        ImageConfig:
-          allOf:
-          - $ref: '#/components/schemas/ImageConfig'
-          - description: Configuration values that override the container image Dockerfile.
-        Error:
-          allOf:
-          - $ref: '#/components/schemas/ImageConfigError'
-          - description: Error response to <code>GetFunctionConfiguration</code>.
-      description: Response to a <code>GetFunctionConfiguration</code> request.
-    EnvironmentVariables:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/EnvironmentVariableValue'
-    MaximumEventAgeInSeconds:
-      type: integer
-      minimum: 60
-      maximum: 21600
-    AllowCredentials:
-      type: boolean
-    RuntimeVersionConfig:
-      type: object
-      properties:
-        RuntimeVersionArn:
-          allOf:
-          - $ref: '#/components/schemas/RuntimeVersionArn'
-          - description: The ARN of the runtime version you want the function to use.
-        Error:
-          allOf:
-          - $ref: '#/components/schemas/RuntimeVersionError'
-          - description: Error response when Lambda is unable to retrieve the runtime version for a function.
-      description: The ARN of the runtime and any errors that occured.
-    GetFunctionConcurrencyResponse:
-      type: object
-      properties:
-        ReservedConcurrentExecutions:
-          allOf:
-          - $ref: '#/components/schemas/ReservedConcurrentExecutions'
-          - description: The number of simultaneous executions that are reserved for the function.
-    MemorySize:
-      type: integer
-      minimum: 128
-      maximum: 10240
-    InvokeAsyncResponse:
-      type: object
-      deprecated: true
-      properties:
-        Status:
-          allOf:
-          - $ref: '#/components/schemas/HttpStatus'
-          - description: The status code.
-      description: A success response (<code>202 Accepted</code>) indicates that the request is queued for invocation.
-    ResourceNotReadyException: {}
-    ListAliasesResponse:
-      type: object
-      properties:
-        NextMarker:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The pagination token that's included if more results are available.
-        Aliases:
-          allOf:
-          - $ref: '#/components/schemas/AliasList'
-          - description: A list of aliases.
-    EC2AccessDeniedException: {}
-    StateReasonCode:
-      type: string
-      enum:
-      - Idle
-      - Creating
-      - Restoring
-      - EniLimitExceeded
-      - InsufficientRolePermissions
-      - InvalidConfiguration
-      - InternalError
-      - SubnetOutOfIPAddresses
-      - InvalidSubnet
-      - InvalidSecurityGroup
-      - ImageDeleted
-      - ImageAccessDenied
-      - InvalidImage
-      - KMSKeyAccessDenied
-      - KMSKeyNotFound
-      - InvalidStateKMSKey
-      - DisabledKMSKey
-      - EFSIOError
-      - EFSMountConnectivityError
-      - EFSMountFailure
-      - EFSMountTimeout
-      - InvalidRuntime
-      - InvalidZipFileException
-      - FunctionError
-    Handler:
-      type: string
-      pattern: '[^\s]+'
-      maxLength: 128
-    OnSuccess:
-      type: object
-      properties:
-        Destination:
-          allOf:
-          - $ref: '#/components/schemas/DestinationArn'
-          - description: The Amazon Resource Name (ARN) of the destination resource.
-      description: A destination for events that were processed successfully.
-    HttpStatus:
-      type: integer
-    AddPermissionResponse:
-      type: object
-      properties:
-        Statement:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The permission statement that's added to the function policy.
-    Timeout:
-      type: integer
-      minimum: 1
-    Alias:
-      type: string
-      pattern: (?!^[0-9]+$)([a-zA-Z0-9-_]+)
-      minLength: 1
-      maxLength: 128
-    EphemeralStorageSize:
-      type: integer
-      minimum: 512
-      maximum: 10240
-    UpdateRuntimeOn:
-      type: string
-      enum:
-      - Auto
-      - Manual
-      - FunctionUpdate
-    SubnetIds:
-      type: array
-      items:
-        $ref: '#/components/schemas/SubnetId'
-      maxItems: 16
-    ResourceNotFoundException: {}
-    AliasRoutingConfiguration:
-      type: object
-      properties:
-        AdditionalVersionWeights:
-          allOf:
-          - $ref: '#/components/schemas/AdditionalVersionWeights'
-          - description: The second version, and the percentage of traffic that's routed to it.
-      description: The <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-traffic-shifting-using-aliases.html">traffic-shifting</a> configuration of a Lambda function alias.
-    LastUpdateStatusReason:
-      type: string
-    PutProvisionedConcurrencyConfigResponse:
-      type: object
-      properties:
-        RequestedProvisionedConcurrentExecutions:
-          allOf:
-          - $ref: '#/components/schemas/PositiveInteger'
-          - description: The amount of provisioned concurrency requested.
-        AvailableProvisionedConcurrentExecutions:
-          allOf:
-          - $ref: '#/components/schemas/NonNegativeInteger'
-          - description: The amount of provisioned concurrency available.
-        AllocatedProvisionedConcurrentExecutions:
-          allOf:
-          - $ref: '#/components/schemas/NonNegativeInteger'
-          - description: The amount of provisioned concurrency allocated. When a weighted alias is used during linear and canary deployments, this value fluctuates depending on the amount of concurrency that is provisioned for the function versions.
-        Status:
-          allOf:
-          - $ref: '#/components/schemas/ProvisionedConcurrencyStatusEnum'
-          - description: The status of the allocation process.
-        StatusReason:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: For failed allocations, the reason that provisioned concurrency could not be allocated.
-        LastModified:
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
-          - description: The date and time that a user last updated the configuration, in <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601 format</a>.
+          - description: The resolved URI for the image.
+      description: Details about a function's deployment package.
     FunctionConfiguration:
       type: object
       properties:
@@ -5212,166 +5391,50 @@ components:
           - $ref: '#/components/schemas/RuntimeVersionConfig'
           - description: The ARN of the runtime and any errors that occured.
       description: Details about a function's configuration.
-    EnvironmentResponse:
+    ProvisionedConcurrencyConfigNotFoundException: {}
+    ListVersionsByFunctionResponse:
       type: object
       properties:
-        Variables:
-          allOf:
-          - $ref: '#/components/schemas/EnvironmentVariables'
-          - description: Environment variable key-value pairs. Omitted from CloudTrail logs.
-        Error:
-          allOf:
-          - $ref: '#/components/schemas/EnvironmentError'
-          - description: Error messages for environment variables that couldn't be applied.
-      description: The results of an operation to update or read environment variables. If the operation succeeds, the response contains the environment variables. If it fails, the response contains details about the error.
-    InvokeWithResponseStreamResponse:
-      type: object
-      properties:
-        StatusCode:
-          allOf:
-          - $ref: '#/components/schemas/Integer'
-          - description: For a successful request, the HTTP status code is in the 200 range. For the <code>RequestResponse</code> invocation type, this status code is 200. For the <code>DryRun</code> invocation type, this status code is 204.
-        EventStream:
-          allOf:
-          - $ref: '#/components/schemas/InvokeWithResponseStreamResponseEvent'
-          - description: The stream of response payloads.
-    GetFunctionUrlConfigResponse:
-      type: object
-      required:
-      - FunctionUrl
-      - FunctionArn
-      - AuthType
-      - CreationTime
-      - LastModifiedTime
-      properties:
-        FunctionUrl:
-          allOf:
-          - $ref: '#/components/schemas/FunctionUrl'
-          - description: The HTTP URL endpoint for your function.
-        FunctionArn:
-          allOf:
-          - $ref: '#/components/schemas/FunctionArn'
-          - description: The Amazon Resource Name (ARN) of your function.
-        AuthType:
-          allOf:
-          - $ref: '#/components/schemas/FunctionUrlAuthType'
-          - description: The type of authentication that your function URL uses. Set to <code>AWS_IAM</code> if you want to restrict access to authenticated users only. Set to <code>NONE</code> if you want to bypass IAM authentication to create a public endpoint. For more information, see <a href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html">Security and auth model for Lambda function URLs</a>.
-        Cors:
-          allOf:
-          - $ref: '#/components/schemas/Cors'
-          - description: The <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin resource sharing (CORS)</a> settings for your function URL.
-        CreationTime:
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
-          - description: When the function URL was created, in <a href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a> (YYYY-MM-DDThh:mm:ss.sTZD).
-        LastModifiedTime:
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
-          - description: When the function URL configuration was last updated, in <a href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a> (YYYY-MM-DDThh:mm:ss.sTZD).
-        InvokeMode:
-          allOf:
-          - $ref: '#/components/schemas/InvokeMode'
-          - description: <p>Use one of the following options:</p> <ul> <li> <p> <code>BUFFERED</code> â€“ This is the default option. Lambda invokes your function using the <code>Invoke</code> API operation. Invocation results are available when the payload is complete. The maximum payload size is 6 MB.</p> </li> <li> <p> <code>RESPONSE_STREAM</code> â€“ Your function streams payload results as they become available. Lambda invokes your function using the <code>InvokeWithResponseStream</code> API operation. The maximum response payload size is 20 MB, however, you can <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html">request a quota increase</a>.</p> </li> </ul>
-    ListProvisionedConcurrencyConfigsResponse:
-      type: object
-      properties:
-        ProvisionedConcurrencyConfigs:
-          allOf:
-          - $ref: '#/components/schemas/ProvisionedConcurrencyConfigList'
-          - description: A list of provisioned concurrency configurations.
         NextMarker:
           allOf:
           - $ref: '#/components/schemas/String'
           - description: The pagination token that's included if more results are available.
-    InvalidZipFileException: {}
-    ReservedConcurrentExecutions:
-      type: integer
-      minimum: 0
-    DestinationArn:
+        Versions:
+          allOf:
+          - $ref: '#/components/schemas/FunctionList'
+          - description: A list of Lambda function versions.
+    EnvironmentVariableValue:
       type: string
-      pattern: ^$|arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-])+:([a-z]{2}(-gov)?-[a-z]+-\d{1})?:(\d{12})?:(.*)
-      minLength: 0
-      maxLength: 350
-    FunctionCodeLocation:
-      type: object
-      properties:
-        RepositoryType:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The service that's hosting the file.
-        Location:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: A presigned URL that you can use to download the deployment package.
-        ImageUri:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: URI of a container image in the Amazon ECR registry.
-        ResolvedImageUri:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The resolved URI for the image.
-      description: Details about a function's deployment package.
-    SnapStartException: {}
-    SnapStartTimeoutException: {}
-    Architecture:
-      type: string
-      enum:
-      - x86_64
-      - arm64
-    SecurityGroupId:
-      type: string
-    PutRuntimeManagementConfigResponse:
+      format: password
+    ListFunctionUrlConfigsResponse:
       type: object
       required:
-      - UpdateRuntimeOn
-      - FunctionArn
+      - FunctionUrlConfigs
       properties:
-        UpdateRuntimeOn:
+        FunctionUrlConfigs:
           allOf:
-          - $ref: '#/components/schemas/UpdateRuntimeOn'
-          - description: The runtime update mode.
-        FunctionArn:
+          - $ref: '#/components/schemas/FunctionUrlConfigList'
+          - description: A list of function URL configurations.
+        NextMarker:
           allOf:
-          - $ref: '#/components/schemas/FunctionArn'
-          - description: The ARN of the function
-        RuntimeVersionArn:
-          allOf:
-          - $ref: '#/components/schemas/RuntimeVersionArn'
-          - description: The ARN of the runtime the function is configured to use. If the runtime update mode is <b>manual</b>, the ARN is returned, otherwise <code>null</code> is returned.
-    Layer:
-      type: object
-      properties:
-        Arn:
-          allOf:
-          - $ref: '#/components/schemas/LayerVersionArn'
-          - description: The Amazon Resource Name (ARN) of the function layer.
-        CodeSize:
-          allOf:
-          - $ref: '#/components/schemas/Long'
-          - description: The size of the layer archive in bytes.
-        SigningProfileVersionArn:
-          allOf:
-          - $ref: '#/components/schemas/Arn'
-          - description: The Amazon Resource Name (ARN) for a signing profile version.
-        SigningJobArn:
-          allOf:
-          - $ref: '#/components/schemas/Arn'
-          - description: The Amazon Resource Name (ARN) of a signing job.
-      description: An <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda layer</a>.
-    Timestamp:
+          - $ref: '#/components/schemas/String'
+          - description: The pagination token that's included if more results are available.
+    TracingMode:
       type: string
-    VpcId:
-      type: string
-    TracingConfigResponse:
+      enum:
+      - Active
+      - PassThrough
+    Tags:
       type: object
-      properties:
-        Mode:
-          allOf:
-          - $ref: '#/components/schemas/TracingMode'
-          - description: The tracing mode.
-      description: The function's X-Ray tracing configuration.
-    PolicyLengthExceededException: {}
+      additionalProperties:
+        $ref: '#/components/schemas/TagValue'
+    Arn:
+      type: string
+      pattern: arn:(aws[a-zA-Z0-9-]*):([a-zA-Z0-9\-])+:([a-z]{2}(-gov)?-[a-z]+-\d{1})?:(\d{12})?:(.*)
+    EnvironmentVariables:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/EnvironmentVariableValue'
     UpdateFunctionUrlConfigResponse:
       type: object
       required:
@@ -5409,122 +5472,59 @@ components:
           allOf:
           - $ref: '#/components/schemas/InvokeMode'
           - description: <p>Use one of the following options:</p> <ul> <li> <p> <code>BUFFERED</code> â€“ This is the default option. Lambda invokes your function using the <code>Invoke</code> API operation. Invocation results are available when the payload is complete. The maximum payload size is 6 MB.</p> </li> <li> <p> <code>RESPONSE_STREAM</code> â€“ Your function streams payload results as they become available. Lambda invokes your function using the <code>InvokeWithResponseStream</code> API operation. The maximum response payload size is 20 MB, however, you can <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html">request a quota increase</a>.</p> </li> </ul>
-    AllowMethodsList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Method'
-      maxItems: 6
-    MaxAge:
-      type: integer
-      minimum: 0
-      maximum: 86400
-    SensitiveString:
+    RuntimeVersionArn:
       type: string
-      format: password
-    RequestTooLargeException: {}
-    FunctionArn:
-      type: string
-      pattern: arn:(aws[a-zA-Z-]*)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d{1}:\d{12}:function:[a-zA-Z0-9-_]+(:(\$LATEST|[a-zA-Z0-9-_]+))?
-    TagValue:
-      type: string
-    ListFunctionEventInvokeConfigsResponse:
-      type: object
-      properties:
-        FunctionEventInvokeConfigs:
-          allOf:
-          - $ref: '#/components/schemas/FunctionEventInvokeConfigList'
-          - description: A list of configurations.
-        NextMarker:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The pagination token that's included if more results are available.
-    EC2UnexpectedException: {}
-    InvokeMode:
+      pattern: ^arn:(aws[a-zA-Z-]*):lambda:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\d{1}::runtime:.+$
+      minLength: 26
+      maxLength: 2048
+    FunctionUrlAuthType:
       type: string
       enum:
-      - BUFFERED
-      - RESPONSE_STREAM
-    SubnetId:
+      - NONE
+      - AWS_IAM
+    TracingConfigResponse:
+      type: object
+      properties:
+        Mode:
+          allOf:
+          - $ref: '#/components/schemas/TracingMode'
+          - description: The tracing mode.
+      description: The function's X-Ray tracing configuration.
+    Date:
       type: string
+      format: date-time
+    EFSIOException: {}
+    Weight:
+      type: number
+      format: double
+      minimum: 0
+      maximum: 1
+    EphemeralStorage:
+      type: object
+      required:
+      - Size
+      properties:
+        Size:
+          allOf:
+          - $ref: '#/components/schemas/EphemeralStorageSize'
+          - description: The size of the function's <code>/tmp</code> directory.
+      description: The size of the function's <code>/tmp</code> directory in MB. The default value is 512, but it can be any whole number between 512 and 10,240 MB.
+    EFSMountFailureException: {}
+    ReservedConcurrentExecutions:
+      type: integer
+      minimum: 0
+    NonNegativeInteger:
+      type: integer
+      minimum: 0
     LastUpdateStatus:
       type: string
       enum:
       - Successful
       - Failed
       - InProgress
-    TooManyRequestsException: {}
-    S3Key:
-      type: string
-      minLength: 1
-      maxLength: 1024
-    GetFunctionResponse:
-      type: object
-      properties:
-        Configuration:
-          allOf:
-          - $ref: '#/components/schemas/FunctionConfiguration'
-          - description: The configuration of the function or version.
-        Code:
-          allOf:
-          - $ref: '#/components/schemas/FunctionCodeLocation'
-          - description: The deployment package of the function or version.
-        Tags:
-          allOf:
-          - $ref: '#/components/schemas/Tags'
-          - description: The function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/tagging.html">tags</a>.
-        Concurrency:
-          allOf:
-          - $ref: '#/components/schemas/Concurrency'
-          - description: The function's <a href="https://docs.aws.amazon.com/lambda/latest/dg/concurrent-executions.html">reserved concurrency</a>.
-    PackageType:
-      type: string
-      enum:
-      - Zip
-      - Image
-    RuntimeVersionArn:
-      type: string
-      pattern: ^arn:(aws[a-zA-Z-]*):lambda:[a-z]{2}((-gov)|(-iso(b?)))?-[a-z]+-\d{1}::runtime:.+$
-      minLength: 26
-      maxLength: 2048
-    GetProvisionedConcurrencyConfigResponse:
-      type: object
-      properties:
-        RequestedProvisionedConcurrentExecutions:
-          allOf:
-          - $ref: '#/components/schemas/PositiveInteger'
-          - description: The amount of provisioned concurrency requested.
-        AvailableProvisionedConcurrentExecutions:
-          allOf:
-          - $ref: '#/components/schemas/NonNegativeInteger'
-          - description: The amount of provisioned concurrency available.
-        AllocatedProvisionedConcurrentExecutions:
-          allOf:
-          - $ref: '#/components/schemas/NonNegativeInteger'
-          - description: The amount of provisioned concurrency allocated. When a weighted alias is used during linear and canary deployments, this value fluctuates depending on the amount of concurrency that is provisioned for the function versions.
-        Status:
-          allOf:
-          - $ref: '#/components/schemas/ProvisionedConcurrencyStatusEnum'
-          - description: The status of the allocation process.
-        StatusReason:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: For failed allocations, the reason that provisioned concurrency could not be allocated.
-        LastModified:
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
-          - description: The date and time that a user last updated the configuration, in <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601 format</a>.
-    CodeStorageExceededException: {}
-    Method:
-      type: string
-      pattern: .*
-      maxLength: 6
-    FunctionEventInvokeConfigList:
-      type: array
-      items:
-        $ref: '#/components/schemas/FunctionEventInvokeConfig'
   parameters:
-    X-Amz-Signature:
-      name: X-Amz-Signature
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
       in: header
       schema:
         type: string
@@ -5535,8 +5535,8 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
+    X-Amz-Signature:
+      name: X-Amz-Signature
       in: header
       schema:
         type: string
@@ -5547,14 +5547,14 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
       in: header
       schema:
         type: string
       required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
       in: header
       schema:
         type: string

@@ -80,6 +80,15 @@ paths:
         - '#organization:read'
 components:
   schemas:
+    iam_collection_role_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/iam_schemas-role'
+            type: array
+        type: object
     iam_components-schemas-name:
       description: Role Name.
       example: Organization Admin
@@ -103,19 +112,23 @@ components:
       - errors
       - messages
       type: object
-    iam_collection_role_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/iam_schemas-role'
-            type: array
-        type: object
+    iam_schemas-permissions:
+      description: Access permissions for this User.
+      items:
+        example: '#zones:read'
+        maxLength: 160
+        type: string
+      readOnly: true
+      type: array
     iam_api-response-single:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-common'
       type: object
+    iam_description:
+      description: Description of role's permissions.
+      example: Administrative access to the entire Organization
+      readOnly: true
+      type: string
     iam_account_identifier:
       description: Account identifier tag.
       example: eb78d65290b24279ba6f44721b3ea3c4
@@ -127,6 +140,68 @@ components:
       example: 3536bcfad5faccb999b47003c79917fb
       maxLength: 32
       type: string
+    iam_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/iam_result_info'
+      type: object
+    iam_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    iam_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    iam_schemas-role:
+      properties:
+        description:
+          $ref: '#/components/schemas/iam_description'
+        id:
+          $ref: '#/components/schemas/iam_role_components-schemas-identifier'
+        name:
+          $ref: '#/components/schemas/iam_components-schemas-name'
+        permissions:
+          $ref: '#/components/schemas/iam_schemas-permissions'
+      required:
+      - id
+      - name
+      - description
+      - permissions
+      type: object
     iam_api-response-common-failure:
       properties:
         errors:
@@ -158,45 +233,6 @@ components:
       - messages
       - result
       type: object
-    iam_schemas-permissions:
-      description: Access permissions for this User.
-      items:
-        example: '#zones:read'
-        maxLength: 160
-        type: string
-      readOnly: true
-      type: array
-    iam_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    iam_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/iam_result_info'
-      type: object
     iam_single_role_response:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-single'
@@ -204,42 +240,6 @@ components:
           result:
             type: object
         type: object
-    iam_schemas-role:
-      properties:
-        description:
-          $ref: '#/components/schemas/iam_description'
-        id:
-          $ref: '#/components/schemas/iam_role_components-schemas-identifier'
-        name:
-          $ref: '#/components/schemas/iam_components-schemas-name'
-        permissions:
-          $ref: '#/components/schemas/iam_schemas-permissions'
-      required:
-      - id
-      - name
-      - description
-      - permissions
-      type: object
-    iam_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    iam_description:
-      description: Description of role's permissions.
-      example: Administrative access to the entire Organization
-      readOnly: true
-      type: string
   securitySchemes:
     api_email:
       in: header

@@ -149,65 +149,6 @@ paths:
           $ref: '#/components/responses/common500Error'
 components:
   responses:
-    v9Unsupported:
-      description: v9 Unsupported
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The error type.
-                example: unsupportedEntityError
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unsupported API
-              detail:
-                type: string
-                description: Details about the error.
-                example: This endpoint does not support v9 APIs.
-          example:
-            type: unsupportedEntityError
-            title: Unsupported API
-            detail: This endpoint does not support v9 APIs.
-    apiVersion422ErrorStateInconsistent:
-      description: API State Inconsistent
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The error type.
-                example: APIStateInconsistent
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: API state seems to be inconsistent.
-              detail:
-                type: string
-                description: Details about the error.
-                example: Please perform a Git push from the Postman app to sync state between app and repository.
-          example:
-            type: APIStateInconsistent
-            title: API state seems to be inconsistent.
-            detail: Please perform a Git push from the Postman app to sync state between app and repository.
-    api403ErrorAndFeatureUnavailable:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            anyOf:
-            - $ref: '#/components/schemas/api403ErrorForbidden'
-            - $ref: '#/components/schemas/featureUnavailable403Error'
-          examples:
-            Forbidden:
-              $ref: '#/components/examples/api403ErrorForbidden'
-            Feature Unavailable:
-              $ref: '#/components/examples/featureUnavailable403Error'
     getApiVersions:
       description: Successful Response
       content:
@@ -278,8 +219,8 @@ components:
               nextCursor: VGh1IE1hciAxNiAyMDIzIDE3OjIxOjUzIEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
               limit: 2
               total: 1000
-    api401ErrorUnauthorized:
-      description: Unauthorized
+    apiVersion422ErrorStateInconsistent:
+      description: API State Inconsistent
       content:
         application/problem+json:
           schema:
@@ -287,32 +228,42 @@ components:
             properties:
               type:
                 type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
+                description: The error type.
+                example: APIStateInconsistent
               title:
                 type: string
                 description: A short summary of the problem.
-                example: Unauthorized
+                example: API state seems to be inconsistent.
               detail:
                 type: string
-                description: Information about the error.
-                example: An API key must be provided in the request header or query string
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-              instance:
-                type: string
-                description: The URI reference that identifies the specific occurrence of the problem.
-                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+                description: Details about the error.
+                example: Please perform a Git push from the Postman app to sync state between app and repository.
           example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: An API key must be provided in the request header or query string
-            status: 401
-            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+            type: APIStateInconsistent
+            title: API state seems to be inconsistent.
+            detail: Please perform a Git push from the Postman app to sync state between app and repository.
+    apiVersions404Response:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/api404ErrorNotFound'
+          examples:
+            API Not Found:
+              $ref: '#/components/examples/api404ErrorNotFound'
+    api403ErrorAndFeatureUnavailable:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            anyOf:
+            - $ref: '#/components/schemas/api403ErrorForbidden'
+            - $ref: '#/components/schemas/featureUnavailable403Error'
+          examples:
+            Forbidden:
+              $ref: '#/components/examples/api403ErrorForbidden'
+            Feature Unavailable:
+              $ref: '#/components/examples/featureUnavailable403Error'
     featureUnavailable403Error:
       description: Feature Unavailable
       content:
@@ -325,48 +276,6 @@ components:
               title: Forbidden
               detail: This feature isn't available in your region.
               status: 403
-    common500Error:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-    apiVersion404ErrorNotFound:
-      description: API Version Not Found
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/apiVersion404ErrorNotFound'
-          examples:
-            API Version Not Found:
-              $ref: '#/components/examples/apiVersion404ErrorNotFound'
-    apiVersions404Response:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/api404ErrorNotFound'
-          examples:
-            API Not Found:
-              $ref: '#/components/examples/api404ErrorNotFound'
     createApiVersion:
       description: Accepted
       content:
@@ -405,15 +314,53 @@ components:
       headers:
         Location:
           $ref: '#/components/headers/Location'
-    v10HeaderMissing:
-      description: Missing v10 Accept Header
+    v9Unsupported:
+      description: v9 Unsupported
       content:
         application/problem+json:
           schema:
-            $ref: '#/components/schemas/v10HeaderMissing'
-          examples:
-            Missing v10 Accept Header:
-              $ref: '#/components/examples/v10HeaderMissing'
+            type: object
+            properties:
+              type:
+                type: string
+                description: The error type.
+                example: unsupportedEntityError
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unsupported API
+              detail:
+                type: string
+                description: Details about the error.
+                example: This endpoint does not support v9 APIs.
+          example:
+            type: unsupportedEntityError
+            title: Unsupported API
+            detail: This endpoint does not support v9 APIs.
+    common500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
     updateApiVersion:
       description: Successful Response
       content:
@@ -449,42 +396,59 @@ components:
             id: 8d7ba74e-2c36-4e36-a263-f3c0c9ae21d2
             name: Release 1.5
             releaseNotes: This is the first public release update.
-  examples:
-    apiSchema403ErrorForbidden:
-      value:
-        title: You are not permitted to perform the action.
-        detail: You do not have access to perform this operation.
-        type: ForbiddenError
-    apiVersion400ErrorInstanceNotFound:
-      value:
-        error:
-          name: instanceNotFoundError
-          message: We could not find the API version you are looking for
-    api404ErrorNotFound:
-      value:
-        type: instanceNotFoundError
-        title: We could not find the API you are looking for
-        detail: We could not find the API you are looking for.
-    featureUnavailable403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Forbidden
-        detail: This feature isn't available in your region.
-        status: 403
     apiVersion404ErrorNotFound:
-      value:
-        type: VersionNotFound
-        title: API Version not found.
-        details: We could not find the API Version you are looking for.
+      description: API Version Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/apiVersion404ErrorNotFound'
+          examples:
+            API Version Not Found:
+              $ref: '#/components/examples/apiVersion404ErrorNotFound'
     v10HeaderMissing:
-      value:
-        name: instanceNotFoundError
-        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
-    api403ErrorForbidden:
-      value:
-        title: You are not permitted to perform the action.
-        detail: Please ensure that you have required permissions
-        type: ForbiddenError
+      description: Missing v10 Accept Header
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/v10HeaderMissing'
+          examples:
+            Missing v10 Accept Header:
+              $ref: '#/components/examples/v10HeaderMissing'
+    api401ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: An API key must be provided in the request header or query string
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+              instance:
+                type: string
+                description: The URI reference that identifies the specific occurrence of the problem.
+                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: An API key must be provided in the request header or query string
+            status: 401
+            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
   schemas:
     v10HeaderMissing:
       title: Missing v10 Accept Header
@@ -498,95 +462,6 @@ components:
           type: string
           description: The error message.
           example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
-    apiVersion404ErrorNotFound:
-      title: API Version Not Found
-      type: object
-      properties:
-        type:
-          type: string
-          description: The type of error.
-          example: VersionNotFound
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: API Version not found.
-        detail:
-          type: string
-          description: Information about the error.
-          example: We could not find the API Version you are looking for.
-    apiVersionId:
-      type: string
-      example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-    apiSchema403ErrorForbidden:
-      title: Forbidden
-      type: object
-      properties:
-        type:
-          type: string
-          description: The type of error.
-          example: ForbiddenError
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: You are not permitted to perform the action.
-        detail:
-          type: string
-          description: Information about the error.
-          example: You do not have access to perform this operation.
-    api403ErrorForbidden:
-      title: Forbidden
-      type: object
-      properties:
-        type:
-          type: string
-          description: The type of error.
-          example: ForbiddenError
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: You are not permitted to perform the action.
-        detail:
-          type: string
-          description: Information about the error.
-          example: Please ensure that you have required permissions
-    cursor:
-      type: string
-      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
-    apiVersion400ErrorInstanceNotFound:
-      title: API Version Not Found
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            name:
-              type: string
-              description: The type of error.
-              example: instanceNotFoundError
-            message:
-              type: string
-              description: The error message.
-              example: We could not find the API version you are looking for
-    api404ErrorNotFound:
-      title: API Not Found
-      type: object
-      properties:
-        type:
-          type: string
-          description: The type of error.
-          example: instanceNotFoundError
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: We could not find the API you are looking for
-        detail:
-          type: string
-          description: Information about the error.
-          example: We could not find the API you are looking for
-    limit:
-      type: integer
-      default: 10
-      example: 10
     featureUnavailable403Error:
       title: Feature Unavailable
       type: object
@@ -609,27 +484,102 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 403
-  headers:
-    Location:
-      description: The URL to get or poll the status of an API version task created.
-      schema:
-        type: string
-        example: /apis/6138195-0262634b-cdcb-4a03-a4b9-2b221eccfbaa/tasks/66ae9950-0869-4e65-96b0-1e0e47e771af
-  parameters:
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
+    api404ErrorNotFound:
+      title: API Not Found
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: instanceNotFoundError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: We could not find the API you are looking for
+        detail:
+          type: string
+          description: Information about the error.
+          example: We could not find the API you are looking for
+    apiVersion404ErrorNotFound:
+      title: API Version Not Found
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: VersionNotFound
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: API Version not found.
+        detail:
+          type: string
+          description: Information about the error.
+          example: We could not find the API Version you are looking for.
+    apiVersion400ErrorInstanceNotFound:
+      title: API Version Not Found
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The type of error.
+              example: instanceNotFoundError
+            message:
+              type: string
+              description: The error message.
+              example: We could not find the API version you are looking for
     limit:
-      name: limit
+      type: integer
+      default: 10
+      example: 10
+    apiVersionId:
+      type: string
+      example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+    api403ErrorForbidden:
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: ForbiddenError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: You are not permitted to perform the action.
+        detail:
+          type: string
+          description: Information about the error.
+          example: Please ensure that you have required permissions
+    apiSchema403ErrorForbidden:
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: ForbiddenError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: You are not permitted to perform the action.
+        detail:
+          type: string
+          description: Information about the error.
+          example: You do not have access to perform this operation.
+  parameters:
+    cursor:
+      name: cursor
       in: query
-      description: The maximum number of rows to return in the response.
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
       schema:
-        $ref: '#/components/schemas/limit'
-    apiId:
-      name: apiId
-      in: path
-      required: true
-      description: The API's ID.
-      schema:
-        type: string
-        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
+        $ref: '#/components/schemas/cursor'
     v10Accept:
       name: Accept
       in: header
@@ -640,12 +590,20 @@ components:
         enum:
         - application/vnd.api.v10+json
         example: application/vnd.api.v10+json
-    cursor:
-      name: cursor
-      in: query
-      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+    apiId:
+      name: apiId
+      in: path
+      required: true
+      description: The API's ID.
       schema:
-        $ref: '#/components/schemas/cursor'
+        type: string
+        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of rows to return in the response.
+      schema:
+        $ref: '#/components/schemas/limit'
     apiVersionId:
       name: versionId
       in: path
@@ -653,27 +611,43 @@ components:
       description: The API's version ID.
       schema:
         $ref: '#/components/schemas/apiVersionId'
+  examples:
+    v10HeaderMissing:
+      value:
+        name: instanceNotFoundError
+        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    apiSchema403ErrorForbidden:
+      value:
+        title: You are not permitted to perform the action.
+        detail: You do not have access to perform this operation.
+        type: ForbiddenError
+    api403ErrorForbidden:
+      value:
+        title: You are not permitted to perform the action.
+        detail: Please ensure that you have required permissions
+        type: ForbiddenError
+    apiVersion400ErrorInstanceNotFound:
+      value:
+        error:
+          name: instanceNotFoundError
+          message: We could not find the API version you are looking for
+    apiVersion404ErrorNotFound:
+      value:
+        type: VersionNotFound
+        title: API Version not found.
+        details: We could not find the API Version you are looking for.
+    featureUnavailable403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: This feature isn't available in your region.
+        status: 403
+    api404ErrorNotFound:
+      value:
+        type: instanceNotFoundError
+        title: We could not find the API you are looking for
+        detail: We could not find the API you are looking for.
   requestBodies:
-    updateApiVersion:
-      content:
-        application/json:
-          schema:
-            type: object
-            description: Information about the API version.
-            required:
-            - name
-            properties:
-              name:
-                type: string
-                description: The version's name.
-                example: Release 1.5
-              releaseNotes:
-                type: string
-                description: The version's Markdown-supported release notes.
-                example: This is the first public release update.
-          example:
-            name: Release 1.5
-            releaseNotes: This is the first public release update.
     createApiVersion:
       content:
         application/json:
@@ -830,6 +804,32 @@ components:
                 - directoryPath: /dir/index.yml
                 collections:
                 - filePath: postman/collections/c1.json
+    updateApiVersion:
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Information about the API version.
+            required:
+            - name
+            properties:
+              name:
+                type: string
+                description: The version's name.
+                example: Release 1.5
+              releaseNotes:
+                type: string
+                description: The version's Markdown-supported release notes.
+                example: This is the first public release update.
+          example:
+            name: Release 1.5
+            releaseNotes: This is the first public release update.
+  headers:
+    Location:
+      description: The URL to get or poll the status of an API version task created.
+      schema:
+        type: string
+        example: /apis/6138195-0262634b-cdcb-4a03-a4b9-2b221eccfbaa/tasks/66ae9950-0869-4e65-96b0-1e0e47e771af
   securitySchemes:
     PostmanApiKey:
       type: apiKey

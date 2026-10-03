@@ -234,6 +234,62 @@ paths:
           $ref: '#/components/responses/common500Error'
 components:
   schemas:
+    workspaceId:
+      type: string
+      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+    v10HeaderMissing:
+      title: Missing v10 Accept Header
+      type: object
+      properties:
+        name:
+          type: string
+          description: The error name.
+          example: instanceNotFoundError
+        message:
+          type: string
+          description: The error message.
+          example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    featureUnavailable403Error:
+      title: Feature Unavailable
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Forbidden
+        detail:
+          type: string
+          description: Information about the error.
+          example: This feature isn't available in your region.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
+    api404ErrorNotFound:
+      title: API Not Found
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: instanceNotFoundError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: We could not find the API you are looking for
+        detail:
+          type: string
+          description: Information about the error.
+          example: We could not find the API you are looking for
     apiVersion400ErrorInvalidParam:
       title: Invalid Parameter
       type: object
@@ -250,18 +306,6 @@ components:
           type: string
           description: Information about the error.
           example: Parameter, taskId is in an invalid format.
-    v10HeaderMissing:
-      title: Missing v10 Accept Header
-      type: object
-      properties:
-        name:
-          type: string
-          description: The error name.
-          example: instanceNotFoundError
-        message:
-          type: string
-          description: The error message.
-          example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
     apiVersion404ErrorNotFound:
       title: API Version Not Found
       type: object
@@ -278,6 +322,29 @@ components:
           type: string
           description: Information about the error.
           example: We could not find the API Version you are looking for.
+    taskNotFound:
+      title: Task Not Found
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+          example: invalidParamsError
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: The specified parameter is in an invalid format
+        detail:
+          type: string
+          description: Information about the error.
+          example: Parameter, taskId is in an invalid format.
+    limit:
+      type: integer
+      default: 10
+      example: 10
+    apiVersionId:
+      type: string
+      example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
     api403ErrorLimitReached:
       title: API Limit Reached
       type: object
@@ -314,12 +381,6 @@ components:
               type: string
               description: The error message.
               example: You can create up to 3 APIs on your current plan.
-    workspaceId:
-      type: string
-      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-    apiVersionId:
-      type: string
-      example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
     api403ErrorForbidden:
       title: Forbidden
       type: object
@@ -336,208 +397,80 @@ components:
           type: string
           description: Information about the error.
           example: Please ensure that you have required permissions
-    taskNotFound:
-      title: Task Not Found
-      type: object
-      properties:
-        type:
-          type: string
-          description: The type of error.
-          example: invalidParamsError
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: The specified parameter is in an invalid format
-        detail:
-          type: string
-          description: Information about the error.
-          example: Parameter, taskId is in an invalid format.
-    cursor:
-      type: string
-      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
-    api404ErrorNotFound:
-      title: API Not Found
-      type: object
-      properties:
-        type:
-          type: string
-          description: The type of error.
-          example: instanceNotFoundError
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: We could not find the API you are looking for
-        detail:
-          type: string
-          description: Information about the error.
-          example: We could not find the API you are looking for
-    limit:
-      type: integer
-      default: 10
-      example: 10
-    featureUnavailable403Error:
-      title: Feature Unavailable
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/forbidden
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Forbidden
-        detail:
-          type: string
-          description: Information about the error.
-          example: This feature isn't available in your region.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
   responses:
-    v9Unsupported:
-      description: v9 Unsupported
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The error type.
-                example: unsupportedEntityError
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unsupported API
-              detail:
-                type: string
-                description: Details about the error.
-                example: This endpoint does not support v9 APIs.
-          example:
-            type: unsupportedEntityError
-            title: Unsupported API
-            detail: This endpoint does not support v9 APIs.
-    getStatusOfAnAsyncTask:
+    getApiVersion:
       description: Successful Response
       content:
         application/json:
           schema:
             type: object
+            title: API Version Data Schema
             properties:
-              id:
-                type: string
-                description: The task's ID.
-                example: 10ca9f5a-c4c4-11ed-afa1-0242ac120002
-              meta:
+              version:
                 type: object
-                description: The response's non-standard meta information.
+                description: Information about the API version.
                 properties:
-                  url:
+                  id:
                     type: string
-                    format: url
-                    description: The endpoint URL that created the task.
-                    example: https://api.getpostman.com/apis/5360b75f-447e-467c-9299-12fd6c92450d/collections/e726de58-f1b3-4edd-a8a7-2579dc799d39/sync
-                  model:
+                    description: The version's ID.
+                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+                  name:
                     type: string
-                    description: The model for which the task is performing the operation.
-                    enum:
-                    - collection
-                    - api-version
-                    example: collection
-                  action:
+                    description: The version's name.
+                    example: Release 1.0
+                  createdAt:
                     type: string
-                    description: The task's action.
-                    enum:
-                    - update
-                    - create
-                    example: update
-              status:
-                description: The task's current status.
-                enum:
-                - pending
-                - failed
-                - completed
-                type: string
-                example: completed
-              details:
-                anyOf:
-                - type: object
-                  title: Task Resources
-                  description: Information about the task's resources.
-                  properties:
-                    resources:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            description: The ID of the assigned resource.
-                            example: collectionID
-                          url:
-                            type: string
-                            description: The task's assigned resource URL.
-                            example: https://api.getpostman.com/apis/5360b75f-447e-467c-9299-12fd6c92450d/collections/e726de58-f1b3-4edd-a8a7-2579dc799d39
-                - type: object
-                  title: Task Error Information
-                  description: Information about the error that occurred during the task's processing.
-                  properties:
-                    error:
+                    format: date-time
+                    description: The date and time at which the version was created.
+                    example: '2023-06-09T14:48:45.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the version was last updated.
+                    example: '2023-06-09T14:48:45.000Z'
+                  releaseNotes:
+                    type: string
+                    description: The version's release notes.
+                    example: This is the first release.
+                  schemas:
+                    type: array
+                    items:
                       type: object
                       properties:
-                        message:
+                        id:
                           type: string
-                          description: The task's error message.
-                          example: The API contains invalid schema
-              createdAt:
-                type: string
-                format: date-time
-                description: The date and time at which the task was created.
-                example: '2023-08-22T14:21:57.000Z'
-              updatedAt:
-                type: string
-                format: date-time
-                description: The date and time at which the task was last updated.
-                example: '2023-08-22T14:21:57.000Z'
+                          description: The schema's ID.
+                          example: 13a441a3-6109-4f78-86eb-e0144d0ff275
+                        type:
+                          type: string
+                          description: The schema type.
+                          example: openapi:3
+                  collections:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: The collection's ID.
+                          example: aeedb353-494b-4424-82cf-358aece2bd1c
+                        type:
+                          type: string
+                          description: The collection's name.
+                          example: collection1
           example:
-            id: 66ae9950-0869-4e65-96b0-1e0e47e771af
-            meta:
-              url: https://api.getpostman.com/apis/5360b75f-447e-467c-9299-12fd6c92450d/collections/e726de58-f1b3-4edd-a8a7-2579dc799d39/sync
-              model: collection
-              action: update
-            status: failed
-            details:
-              error:
-                message: The API contains invalid schema
-            createdAt: '2019-02-12 19:34:49'
-            updatedAt: '2023-02-12 19:34:49'
-    workspace400ErrorParamMissing:
-      description: Missing Workspace ID
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The type of error.
-                example: paramMissingError
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Parameter is missing in the request.
-              detail:
-                type: string
-                description: Information about the error.
-                example: Parameter, workspaceId is missing in the request.
-          example:
-            type: paramMissingError
-            title: Parameter is missing in the request.
-            detail: Parameter, workspaceId is missing in the request.
+            version:
+              createdAt: '2022-06-09T14:48:45.000Z'
+              updatedAt: '2022-06-09T19:50:49.000Z'
+              id: 3563baaa-07a2-46ed-9fd2-0e8a3c5f7ec2
+              name: Release 1.0
+              releaseNotes: This is the first release.
+              schemas:
+              - id: 13a441a3-6109-4f78-86eb-e0144d0ff275
+                type: openapi:3
+              collections:
+              - id: aeedb353-494b-4424-82cf-358aece2bd1c
+                name: collection1
     taskNotFound:
       description: Task Not Found
       content:
@@ -547,6 +480,80 @@ components:
           examples:
             Task Not Found:
               $ref: '#/components/examples/taskNotFound'
+    createApi:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            description: The API's base data schema.
+            title: API Base Data Schema
+            properties:
+              id:
+                type: string
+                description: The API's ID.
+                example: 5360b75f-447e-467c-9299-12fd6c92450d
+              name:
+                type: string
+                description: The API's name.
+                example: User Management API
+              summary:
+                type: string
+                description: The API's short summary.
+                example: An API to manager users.
+              createdAt:
+                type: string
+                format: date-time
+                description: The date and time at which the API was created.
+                example: '2023-08-22T14:21:57.000Z'
+              createdBy:
+                type: integer
+                description: The Postman ID of the user that created the API.
+                example: 12345678
+              updatedAt:
+                type: string
+                format: date-time
+                description: The date and time at which the API was updated.
+                example: '2023-08-22T14:21:57.000Z'
+              updatedBy:
+                type: integer
+                description: The Postman ID of the user that updated the API.
+                example: 12345678
+              description:
+                type: string
+                description: The API's description.
+                example: This API includes operations to add/remove/update users.
+          example:
+            id: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
+            name: Test API
+            summary: Testing API
+            createdAt: '2023-02-17T04:09:01.000Z'
+            createdBy: 12345678
+            updatedAt: '2023-02-17T04:09:13.000Z'
+            updatedBy: 12345678
+            description: This is a test API.
+    api403ErrorAndFeatureUnavailable:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            anyOf:
+            - $ref: '#/components/schemas/api403ErrorForbidden'
+            - $ref: '#/components/schemas/featureUnavailable403Error'
+          examples:
+            Forbidden:
+              $ref: '#/components/examples/api403ErrorForbidden'
+            Feature Unavailable:
+              $ref: '#/components/examples/featureUnavailable403Error'
+    api404ErrorNotFound:
+      description: API Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/api404ErrorNotFound'
+          examples:
+            API Not Found:
+              $ref: '#/components/examples/api404ErrorNotFound'
     getApis:
       description: Successful Response
       content:
@@ -651,122 +658,6 @@ components:
               createdAt: '2023-02-16T07:07:16.000Z'
               id: d535a8ba-ed4b-4c6a-bf1c-13fac95485b8
               updatedAt: '2023-02-16T07:07:16.000Z'
-    api403ErrorAndFeatureUnavailable:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            anyOf:
-            - $ref: '#/components/schemas/api403ErrorForbidden'
-            - $ref: '#/components/schemas/featureUnavailable403Error'
-          examples:
-            Forbidden:
-              $ref: '#/components/examples/api403ErrorForbidden'
-            Feature Unavailable:
-              $ref: '#/components/examples/featureUnavailable403Error'
-    api401ErrorUnauthorized:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: An API key must be provided in the request header or query string
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-              instance:
-                type: string
-                description: The URI reference that identifies the specific occurrence of the problem.
-                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: An API key must be provided in the request header or query string
-            status: 401
-            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
-    api404ErrorNotFound:
-      description: API Not Found
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/api404ErrorNotFound'
-          examples:
-            API Not Found:
-              $ref: '#/components/examples/api404ErrorNotFound'
-    featureUnavailable403Error:
-      description: Feature Unavailable
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/featureUnavailable403Error'
-          example:
-            value:
-              type: https://api.postman.com/problems/forbidden
-              title: Forbidden
-              detail: This feature isn't available in your region.
-              status: 403
-    common500Error:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-    workspace404Error:
-      description: Workspace Not Found
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The type of error.
-                example: instanceNotFoundError
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: We could not find the workspace you are looking for
-              detail:
-                type: string
-                description: Information about the error.
-                example: We could not find the workspace you are looking for.
-          example:
-            title: We could not find the workspace you are looking for
-            detail: We could not find the workspace you are looking for.
-            type: instanceNotFoundError
     updateApi:
       description: Successful Response
       content:
@@ -820,6 +711,112 @@ components:
             description: This is Test API A.
             createdBy: '12345678'
             updatedBy: '12345678'
+    featureUnavailable403Error:
+      description: Feature Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/featureUnavailable403Error'
+          example:
+            value:
+              type: https://api.postman.com/problems/forbidden
+              title: Forbidden
+              detail: This feature isn't available in your region.
+              status: 403
+    getStatusOfAnAsyncTask:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The task's ID.
+                example: 10ca9f5a-c4c4-11ed-afa1-0242ac120002
+              meta:
+                type: object
+                description: The response's non-standard meta information.
+                properties:
+                  url:
+                    type: string
+                    format: url
+                    description: The endpoint URL that created the task.
+                    example: https://api.getpostman.com/apis/5360b75f-447e-467c-9299-12fd6c92450d/collections/e726de58-f1b3-4edd-a8a7-2579dc799d39/sync
+                  model:
+                    type: string
+                    description: The model for which the task is performing the operation.
+                    enum:
+                    - collection
+                    - api-version
+                    example: collection
+                  action:
+                    type: string
+                    description: The task's action.
+                    enum:
+                    - update
+                    - create
+                    example: update
+              status:
+                description: The task's current status.
+                enum:
+                - pending
+                - failed
+                - completed
+                type: string
+                example: completed
+              details:
+                anyOf:
+                - type: object
+                  title: Task Resources
+                  description: Information about the task's resources.
+                  properties:
+                    resources:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The ID of the assigned resource.
+                            example: collectionID
+                          url:
+                            type: string
+                            description: The task's assigned resource URL.
+                            example: https://api.getpostman.com/apis/5360b75f-447e-467c-9299-12fd6c92450d/collections/e726de58-f1b3-4edd-a8a7-2579dc799d39
+                - type: object
+                  title: Task Error Information
+                  description: Information about the error that occurred during the task's processing.
+                  properties:
+                    error:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                          description: The task's error message.
+                          example: The API contains invalid schema
+              createdAt:
+                type: string
+                format: date-time
+                description: The date and time at which the task was created.
+                example: '2023-08-22T14:21:57.000Z'
+              updatedAt:
+                type: string
+                format: date-time
+                description: The date and time at which the task was last updated.
+                example: '2023-08-22T14:21:57.000Z'
+          example:
+            id: 66ae9950-0869-4e65-96b0-1e0e47e771af
+            meta:
+              url: https://api.getpostman.com/apis/5360b75f-447e-467c-9299-12fd6c92450d/collections/e726de58-f1b3-4edd-a8a7-2579dc799d39/sync
+              model: collection
+              action: update
+            status: failed
+            details:
+              error:
+                message: The API contains invalid schema
+            createdAt: '2019-02-12 19:34:49'
+            updatedAt: '2023-02-12 19:34:49'
     common401Error:
       description: Unauthorized
       content:
@@ -850,6 +847,134 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
+    workspace404Error:
+      description: Workspace Not Found
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The type of error.
+                example: instanceNotFoundError
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: We could not find the workspace you are looking for
+              detail:
+                type: string
+                description: Information about the error.
+                example: We could not find the workspace you are looking for.
+          example:
+            title: We could not find the workspace you are looking for
+            detail: We could not find the workspace you are looking for.
+            type: instanceNotFoundError
+    workspace400ErrorParamMissing:
+      description: Missing Workspace ID
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The type of error.
+                example: paramMissingError
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Parameter is missing in the request.
+              detail:
+                type: string
+                description: Information about the error.
+                example: Parameter, workspaceId is missing in the request.
+          example:
+            type: paramMissingError
+            title: Parameter is missing in the request.
+            detail: Parameter, workspaceId is missing in the request.
+    api401ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: An API key must be provided in the request header or query string
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+              instance:
+                type: string
+                description: The URI reference that identifies the specific occurrence of the problem.
+                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: An API key must be provided in the request header or query string
+            status: 401
+            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+    v9Unsupported:
+      description: v9 Unsupported
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The error type.
+                example: unsupportedEntityError
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unsupported API
+              detail:
+                type: string
+                description: Details about the error.
+                example: This endpoint does not support v9 APIs.
+          example:
+            type: unsupportedEntityError
+            title: Unsupported API
+            detail: This endpoint does not support v9 APIs.
+    common500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
     apiVersion404ErrorNotFound:
       description: API Version Not Found
       content:
@@ -859,140 +984,6 @@ components:
           examples:
             API Version Not Found:
               $ref: '#/components/examples/apiVersion404ErrorNotFound'
-    getApiVersion:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            title: API Version Data Schema
-            properties:
-              version:
-                type: object
-                description: Information about the API version.
-                properties:
-                  id:
-                    type: string
-                    description: The version's ID.
-                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-                  name:
-                    type: string
-                    description: The version's name.
-                    example: Release 1.0
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the version was created.
-                    example: '2023-06-09T14:48:45.000Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the version was last updated.
-                    example: '2023-06-09T14:48:45.000Z'
-                  releaseNotes:
-                    type: string
-                    description: The version's release notes.
-                    example: This is the first release.
-                  schemas:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: The schema's ID.
-                          example: 13a441a3-6109-4f78-86eb-e0144d0ff275
-                        type:
-                          type: string
-                          description: The schema type.
-                          example: openapi:3
-                  collections:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: The collection's ID.
-                          example: aeedb353-494b-4424-82cf-358aece2bd1c
-                        type:
-                          type: string
-                          description: The collection's name.
-                          example: collection1
-          example:
-            version:
-              createdAt: '2022-06-09T14:48:45.000Z'
-              updatedAt: '2022-06-09T19:50:49.000Z'
-              id: 3563baaa-07a2-46ed-9fd2-0e8a3c5f7ec2
-              name: Release 1.0
-              releaseNotes: This is the first release.
-              schemas:
-              - id: 13a441a3-6109-4f78-86eb-e0144d0ff275
-                type: openapi:3
-              collections:
-              - id: aeedb353-494b-4424-82cf-358aece2bd1c
-                name: collection1
-    v10HeaderMissing:
-      description: Missing v10 Accept Header
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/v10HeaderMissing'
-          examples:
-            Missing v10 Accept Header:
-              $ref: '#/components/examples/v10HeaderMissing'
-    createApi:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            description: The API's base data schema.
-            title: API Base Data Schema
-            properties:
-              id:
-                type: string
-                description: The API's ID.
-                example: 5360b75f-447e-467c-9299-12fd6c92450d
-              name:
-                type: string
-                description: The API's name.
-                example: User Management API
-              summary:
-                type: string
-                description: The API's short summary.
-                example: An API to manager users.
-              createdAt:
-                type: string
-                format: date-time
-                description: The date and time at which the API was created.
-                example: '2023-08-22T14:21:57.000Z'
-              createdBy:
-                type: integer
-                description: The Postman ID of the user that created the API.
-                example: 12345678
-              updatedAt:
-                type: string
-                format: date-time
-                description: The date and time at which the API was updated.
-                example: '2023-08-22T14:21:57.000Z'
-              updatedBy:
-                type: integer
-                description: The Postman ID of the user that updated the API.
-                example: 12345678
-              description:
-                type: string
-                description: The API's description.
-                example: This API includes operations to add/remove/update users.
-          example:
-            id: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
-            name: Test API
-            summary: Testing API
-            createdAt: '2023-02-17T04:09:01.000Z'
-            createdBy: 12345678
-            updatedAt: '2023-02-17T04:09:13.000Z'
-            updatedBy: 12345678
-            description: This is a test API.
     getApi:
       description: Successful Response
       content:
@@ -1176,111 +1167,39 @@ components:
               name: v1.0.0
             createdAt: '2022-06-09T14:48:45.000Z'
             summary: Test API.
-  examples:
-    apiVersion400ErrorInvalidParam:
-      value:
-        type: invalidParamsError
-        title: The specified parameter is in an invalid format
-        detail: Parameter, taskId is in an invalid format.
-    api404ErrorNotFound:
-      value:
-        type: instanceNotFoundError
-        title: We could not find the API you are looking for
-        detail: We could not find the API you are looking for.
-    featureUnavailable403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Forbidden
-        detail: This feature isn't available in your region.
-        status: 403
-    apiVersion404ErrorNotFound:
-      value:
-        type: VersionNotFound
-        title: API Version not found.
-        details: We could not find the API Version you are looking for.
     v10HeaderMissing:
-      value:
-        name: instanceNotFoundError
-        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
-    api403ErrorLimitReached:
-      value:
-        type: limitReachedError
-        title: You've reached the API limit
-        message: You can create up to 3 APIs on your current plan.
-        detail:
-          model: api
-          action: create
-          message: You can create up to 3 APIs on your current plan.
-    taskNotFound:
-      value:
-        detail: Parameter, taskId is in an invalid format.
-        title: The specified parameter is in an invalid format
-        type: invalidParamsError
-    api403ErrorForbidden:
-      value:
-        title: You are not permitted to perform the action.
-        detail: Please ensure that you have required permissions
-        type: ForbiddenError
-  headers:
-    Location:
-      description: The URL to get or poll the status of an API version task created.
+      description: Missing v10 Accept Header
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/v10HeaderMissing'
+          examples:
+            Missing v10 Accept Header:
+              $ref: '#/components/examples/v10HeaderMissing'
+  parameters:
+    cursor:
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
+    v10Accept:
+      name: Accept
+      in: header
+      required: true
+      description: The `application/vnd.api.v10+json` request header required to use the endpoint.
       schema:
         type: string
-        example: /apis/6138195-0262634b-cdcb-4a03-a4b9-2b221eccfbaa/tasks/66ae9950-0869-4e65-96b0-1e0e47e771af
-  requestBodies:
-    updateApi:
-      content:
-        application/json:
-          schema:
-            type: object
-            title: Create/Update API
-            description: Information about the API.
-            required:
-            - name
-            properties:
-              name:
-                type: string
-                description: The API's name.
-                example: Test API
-              summary:
-                type: string
-                description: The API's short summary.
-                example: Testing API
-              description:
-                type: string
-                description: The API's description. This supports Markdown formatting.
-                example: This is a test API.
-          example:
-            name: Test API
-            summary: Testing API
-            description: This is a test API.
-    createApi:
-      content:
-        application/json:
-          schema:
-            title: Create/Update API
-            description: Information about the API.
-            type: object
-            required:
-            - name
-            properties:
-              name:
-                type: string
-                description: The API's name.
-                example: Test API
-              summary:
-                type: string
-                description: The API's short summary.
-                example: Testing API
-              description:
-                type: string
-                description: The API's description. This supports Markdown formatting.
-                example: This is a test API.
-          example:
-            name: Test API
-            summary: Testing API
-            description: This is a test API.
-  parameters:
+        enum:
+        - application/vnd.api.v10+json
+        example: application/vnd.api.v10+json
+    workspaceIdQueryTrue:
+      name: workspaceId
+      in: query
+      required: true
+      description: The workspace's ID.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
     apiInclude:
       name: include
       in: query
@@ -1312,6 +1231,13 @@ components:
           - gitInfo
         example:
         - schemas
+    createdBy:
+      name: createdBy
+      in: query
+      description: Return only results created by the given user ID.
+      schema:
+        type: integer
+        example: 12345678
     apiId:
       name: apiId
       in: path
@@ -1320,12 +1246,6 @@ components:
       schema:
         type: string
         example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
-    limit:
-      name: limit
-      in: query
-      description: The maximum number of rows to return in the response.
-      schema:
-        $ref: '#/components/schemas/limit'
     apiDescription:
       name: description
       in: query
@@ -1333,30 +1253,12 @@ components:
       schema:
         type: string
         example: This is an API for testing purposes
-    v10Accept:
-      name: Accept
-      in: header
-      required: true
-      description: The `application/vnd.api.v10+json` request header required to use the endpoint.
-      schema:
-        type: string
-        enum:
-        - application/vnd.api.v10+json
-        example: application/vnd.api.v10+json
-    workspaceIdQueryTrue:
-      name: workspaceId
+    limit:
+      name: limit
       in: query
-      required: true
-      description: The workspace's ID.
+      description: The maximum number of rows to return in the response.
       schema:
-        $ref: '#/components/schemas/workspaceId'
-    createdBy:
-      name: createdBy
-      in: query
-      description: Return only results created by the given user ID.
-      schema:
-        type: integer
-        example: 12345678
+        $ref: '#/components/schemas/limit'
     apiTaskId:
       name: taskId
       in: path
@@ -1365,12 +1267,6 @@ components:
       schema:
         type: string
         example: 90ca9f5a-c4c4-21ed-afa1-0242ac120002
-    cursor:
-      name: cursor
-      in: query
-      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
-      schema:
-        $ref: '#/components/schemas/cursor'
     apiVersionId:
       name: versionId
       in: path
@@ -1378,6 +1274,110 @@ components:
       description: The API's version ID.
       schema:
         $ref: '#/components/schemas/apiVersionId'
+  examples:
+    v10HeaderMissing:
+      value:
+        name: instanceNotFoundError
+        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    api403ErrorLimitReached:
+      value:
+        type: limitReachedError
+        title: You've reached the API limit
+        message: You can create up to 3 APIs on your current plan.
+        detail:
+          model: api
+          action: create
+          message: You can create up to 3 APIs on your current plan.
+    taskNotFound:
+      value:
+        detail: Parameter, taskId is in an invalid format.
+        title: The specified parameter is in an invalid format
+        type: invalidParamsError
+    apiVersion400ErrorInvalidParam:
+      value:
+        type: invalidParamsError
+        title: The specified parameter is in an invalid format
+        detail: Parameter, taskId is in an invalid format.
+    api403ErrorForbidden:
+      value:
+        title: You are not permitted to perform the action.
+        detail: Please ensure that you have required permissions
+        type: ForbiddenError
+    apiVersion404ErrorNotFound:
+      value:
+        type: VersionNotFound
+        title: API Version not found.
+        details: We could not find the API Version you are looking for.
+    api404ErrorNotFound:
+      value:
+        type: instanceNotFoundError
+        title: We could not find the API you are looking for
+        detail: We could not find the API you are looking for.
+    featureUnavailable403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: This feature isn't available in your region.
+        status: 403
+  requestBodies:
+    createApi:
+      content:
+        application/json:
+          schema:
+            title: Create/Update API
+            description: Information about the API.
+            type: object
+            required:
+            - name
+            properties:
+              name:
+                type: string
+                description: The API's name.
+                example: Test API
+              summary:
+                type: string
+                description: The API's short summary.
+                example: Testing API
+              description:
+                type: string
+                description: The API's description. This supports Markdown formatting.
+                example: This is a test API.
+          example:
+            name: Test API
+            summary: Testing API
+            description: This is a test API.
+    updateApi:
+      content:
+        application/json:
+          schema:
+            type: object
+            title: Create/Update API
+            description: Information about the API.
+            required:
+            - name
+            properties:
+              name:
+                type: string
+                description: The API's name.
+                example: Test API
+              summary:
+                type: string
+                description: The API's short summary.
+                example: Testing API
+              description:
+                type: string
+                description: The API's description. This supports Markdown formatting.
+                example: This is a test API.
+          example:
+            name: Test API
+            summary: Testing API
+            description: This is a test API.
+  headers:
+    Location:
+      description: The URL to get or poll the status of an API version task created.
+      schema:
+        type: string
+        example: /apis/6138195-0262634b-cdcb-4a03-a4b9-2b221eccfbaa/tasks/66ae9950-0869-4e65-96b0-1e0e47e771af
   securitySchemes:
     PostmanApiKey:
       type: apiKey

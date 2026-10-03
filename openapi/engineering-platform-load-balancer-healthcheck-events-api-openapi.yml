@@ -76,6 +76,69 @@ paths:
       - 'Load Balancing: Monitors and Pools Read'
 components:
   schemas:
+    load-balancing_origin_healthy:
+      default: true
+      description: If true, filter events where the origin status is healthy. If false, filter events where the origin status is unhealthy.
+      example: true
+      type: boolean
+    load-balancing_schemas-identifier:
+      example: 17b5962d775c646f3f9725cbc7a53df4
+      type: string
+    load-balancing_origin-failure-reason:
+      description: Failure reason for un-healthy origin health check.
+      example: No failures
+      type: string
+    load-balancing_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    load-balancing_origin-ip:
+      description: The IP address (IPv4 or IPv6) of the origin.
+      example: 198.51.100.4
+      type: string
+    load-balancing_origin-healthy:
+      description: Whether the origin is reported as healthy.
+      example: true
+      type: boolean
+    load-balancing_origin-changed:
+      description: Whether the origin has changed health status.
+      example: true
+      type: boolean
+    load-balancing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    load-balancing_schemas-enabled:
+      default: true
+      description: Whether to enable (the default) this origin within the pool. Disabled origins will not receive traffic and are excluded from health checks. The origin will only be disabled for the current pool.
+      example: true
+      type: boolean
     load-balancing_analytics:
       properties:
         id:
@@ -106,22 +169,6 @@ components:
           format: date-time
           type: string
       type: object
-    load-balancing_schemas-identifier:
-      example: 17b5962d775c646f3f9725cbc7a53df4
-      type: string
-    load-balancing_origin-changed:
-      description: Whether the origin has changed health status.
-      example: true
-      type: boolean
-    load-balancing_origin-healthy:
-      description: Whether the origin is reported as healthy.
-      example: true
-      type: boolean
-    load-balancing_schemas-enabled:
-      default: true
-      description: Whether to enable (the default) this origin within the pool. Disabled origins will not receive traffic and are excluded from health checks. The origin will only be disabled for the current pool.
-      example: true
-      type: boolean
     load-balancing_api-response-common:
       properties:
         errors:
@@ -140,35 +187,22 @@ components:
       - messages
       - result
       type: object
-    load-balancing_pool_name:
-      description: The name for the pool to filter.
-      example: primary-dc
+    load-balancing_until:
+      description: End date and time of requesting data period in the ISO8601 format.
+      example: '2016-11-11T13:00:00Z'
+      format: date-time
       type: string
-    load-balancing_origin-failure-reason:
-      description: Failure reason for un-healthy origin health check.
-      example: No failures
+    load-balancing_address:
+      description: The IP address (IPv4 or IPv6) of the origin, or its publicly addressable hostname. Hostnames entered here should resolve directly to the origin, and not be a hostname proxied by Cloudflare. To set an internal/reserved address, virtual_network_id must also be set.
+      example: 0.0.0.0
       type: string
-    load-balancing_origin-analytics:
-      properties:
-        address:
-          $ref: '#/components/schemas/load-balancing_address'
-        changed:
-          $ref: '#/components/schemas/load-balancing_origin-changed'
-        enabled:
-          $ref: '#/components/schemas/load-balancing_schemas-enabled'
-        failure_reason:
-          $ref: '#/components/schemas/load-balancing_origin-failure-reason'
-        healthy:
-          $ref: '#/components/schemas/load-balancing_origin-healthy'
-        ip:
-          $ref: '#/components/schemas/load-balancing_origin-ip'
-        name:
-          $ref: '#/components/schemas/load-balancing_schemas-name'
+    load-balancing_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/load-balancing_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/load-balancing_result_info'
       type: object
-    load-balancing_schemas-name:
-      description: A human-identifiable name for the origin.
-      example: app-server-1
-      type: string
     load-balancing_api-response-common-failure:
       properties:
         errors:
@@ -200,61 +234,31 @@ components:
       - messages
       - result
       type: object
-    load-balancing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    load-balancing_address:
-      description: The IP address (IPv4 or IPv6) of the origin, or its publicly addressable hostname. Hostnames entered here should resolve directly to the origin, and not be a hostname proxied by Cloudflare. To set an internal/reserved address, virtual_network_id must also be set.
-      example: 0.0.0.0
+    load-balancing_pool_name:
+      description: The name for the pool to filter.
+      example: primary-dc
       type: string
-    load-balancing_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/load-balancing_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/load-balancing_result_info'
-      type: object
-    load-balancing_result_info:
+    load-balancing_schemas-name:
+      description: A human-identifiable name for the origin.
+      example: app-server-1
+      type: string
+    load-balancing_origin-analytics:
       properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
+        address:
+          $ref: '#/components/schemas/load-balancing_address'
+        changed:
+          $ref: '#/components/schemas/load-balancing_origin-changed'
+        enabled:
+          $ref: '#/components/schemas/load-balancing_schemas-enabled'
+        failure_reason:
+          $ref: '#/components/schemas/load-balancing_origin-failure-reason'
+        healthy:
+          $ref: '#/components/schemas/load-balancing_origin-healthy'
+        ip:
+          $ref: '#/components/schemas/load-balancing_origin-ip'
+        name:
+          $ref: '#/components/schemas/load-balancing_schemas-name'
       type: object
-    load-balancing_origin_healthy:
-      default: true
-      description: If true, filter events where the origin status is healthy. If false, filter events where the origin status is unhealthy.
-      example: true
-      type: boolean
-    load-balancing_until:
-      description: End date and time of requesting data period in the ISO8601 format.
-      example: '2016-11-11T13:00:00Z'
-      format: date-time
-      type: string
     load-balancing_components-schemas-response_collection:
       allOf:
       - $ref: '#/components/schemas/load-balancing_api-response-collection'
@@ -263,10 +267,6 @@ components:
             items:
               $ref: '#/components/schemas/load-balancing_analytics'
             type: array
-    load-balancing_origin-ip:
-      description: The IP address (IPv4 or IPv6) of the origin.
-      example: 198.51.100.4
-      type: string
   securitySchemes:
     api_email:
       in: header

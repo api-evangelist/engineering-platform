@@ -1033,6 +1033,31 @@ paths:
               headers: {}
 components:
   schemas:
+    CreativeWork:
+      properties:
+        provider:
+          type: array
+          description: The source of the creative work.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Thing'
+        text:
+          type: string
+          readOnly: true
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Thing'
+    VideosModule:
+      type: object
+      properties:
+        value:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/VideoObject'
     Error:
       required:
       - code
@@ -1088,15 +1113,22 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    ResponseBase:
-      required:
-      - _type
-      type: object
+    Response:
       properties:
-        _type:
+        webSearchUrl:
           type: string
-      discriminator:
-        propertyName: _type
+          description: The URL To Bing's search result for this item.
+          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
     ErrorResponse:
       required:
       - errors
@@ -1109,23 +1141,40 @@ components:
       description: The top-level response that represents a failed request.
       allOf:
       - $ref: '#/components/schemas/Response'
-    Identifiable:
+    Thing:
       properties:
-        id:
+        alternateName:
           type: string
-          description: A String identifier.
           readOnly: true
-      description: Defines the identity of a resource.
-      allOf:
-      - $ref: '#/components/schemas/ResponseBase'
-    VideoDetails:
-      properties:
-        relatedVideos:
-          $ref: '#/components/schemas/VideosModule'
-        videoResult:
-          $ref: '#/components/schemas/VideoObject'
+        bingId:
+          type: string
+          description: An ID that uniquely identifies this item.
+          readOnly: true
+        description:
+          type: string
+          description: A short description of the item.
+          readOnly: true
+        image:
+          $ref: '#/components/schemas/ImageObject'
+        name:
+          type: string
+          description: The name of the thing represented by this object.
+          readOnly: true
+        url:
+          type: string
+          description: The URL to get more information about the thing represented by this object.
+          readOnly: true
       allOf:
       - $ref: '#/components/schemas/Response'
+    ResponseBase:
+      required:
+      - _type
+      type: object
+      properties:
+        _type:
+          type: string
+      discriminator:
+        propertyName: _type
     VideoObject:
       properties:
         allowHttpsEmbed:
@@ -1158,55 +1207,23 @@ components:
       description: Defines a video object that is relevant to the query.
       allOf:
       - $ref: '#/components/schemas/MediaObject'
-    Thing:
+    Identifiable:
       properties:
-        alternateName:
+        id:
           type: string
+          description: A String identifier.
           readOnly: true
-        bingId:
-          type: string
-          description: An ID that uniquely identifies this item.
-          readOnly: true
-        description:
-          type: string
-          description: A short description of the item.
-          readOnly: true
-        image:
-          $ref: '#/components/schemas/ImageObject'
-        name:
-          type: string
-          description: The name of the thing represented by this object.
-          readOnly: true
-        url:
-          type: string
-          description: The URL to get more information about the thing represented by this object.
-          readOnly: true
+      description: Defines the identity of a resource.
+      allOf:
+      - $ref: '#/components/schemas/ResponseBase'
+    VideoDetails:
+      properties:
+        relatedVideos:
+          $ref: '#/components/schemas/VideosModule'
+        videoResult:
+          $ref: '#/components/schemas/VideoObject'
       allOf:
       - $ref: '#/components/schemas/Response'
-    VideosModule:
-      type: object
-      properties:
-        value:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/VideoObject'
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
-    ImageObject:
-      properties:
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
     MediaObject:
       properties:
         contentUrl:
@@ -1229,23 +1246,6 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/CreativeWork'
-    CreativeWork:
-      properties:
-        provider:
-          type: array
-          description: The source of the creative work.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Thing'
-        text:
-          type: string
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Thing'
   securitySchemes:
     apiKeyHeader:
       type: apiKey

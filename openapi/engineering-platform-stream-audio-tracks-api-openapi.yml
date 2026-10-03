@@ -172,55 +172,6 @@ paths:
       - Stream Audio Tracks
 components:
   schemas:
-    stream_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-single'
-      - properties:
-          result:
-            example: ok
-            type: string
-    stream_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      type: object
-    stream_addAudioTrackResponse:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/stream_additionalAudio'
-    stream_identifier:
-      description: A Cloudflare-generated unique identifier for a media item.
-      example: ea95132c15732412d22c1476fa83f27a
-      maxLength: 32
-      type: string
-    stream_audio_identifier:
-      description: The unique identifier for an additional audio track.
-      example: ea95132c15732412d22c1476fa83f27a
-      maxLength: 32
-      type: string
-    stream_account_identifier:
-      description: The account identifier tag.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    stream_audio_state:
-      description: Specifies the processing status of the video.
-      enum:
-      - queued
-      - ready
-      - error
-      type: string
-    stream_additionalAudio:
-      properties:
-        default:
-          $ref: '#/components/schemas/stream_audio_default'
-        label:
-          $ref: '#/components/schemas/stream_audio_label'
-        status:
-          $ref: '#/components/schemas/stream_audio_state'
-        uid:
-          $ref: '#/components/schemas/stream_identifier'
     stream_messages:
       example: []
       items:
@@ -236,18 +187,60 @@ components:
         type: object
         uniqueItems: true
       type: array
-    stream_copyAudioTrack:
+    stream_additionalAudio:
       properties:
+        default:
+          $ref: '#/components/schemas/stream_audio_default'
         label:
           $ref: '#/components/schemas/stream_audio_label'
-        url:
-          description: An audio track URL. The server must be publicly routable and support `HTTP HEAD` requests and `HTTP GET` range requests. The server should respond to `HTTP HEAD` requests with a `content-range` header that includes the size of the file.
-          example: https://www.examplestorage.com/audio_file.mp3
-          format: uri
-          type: string
+        status:
+          $ref: '#/components/schemas/stream_audio_state'
+        uid:
+          $ref: '#/components/schemas/stream_identifier'
+    stream_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-single'
+      - properties:
+          result:
+            example: ok
+            type: string
+    stream_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
       required:
-      - label
+      - success
+      - errors
+      - messages
       type: object
+    stream_audio_identifier:
+      description: The unique identifier for an additional audio track.
+      example: ea95132c15732412d22c1476fa83f27a
+      maxLength: 32
+      type: string
+    stream_account_identifier:
+      description: The account identifier tag.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    stream_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      type: object
+    stream_addAudioTrackResponse:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/stream_additionalAudio'
     stream_api-response-common-failure:
       properties:
         errors:
@@ -279,31 +272,6 @@ components:
       - messages
       - result
       type: object
-    stream_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    stream_listAudioTrackResponse:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-common'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/stream_additionalAudio'
-            type: array
     stream_editAudioTrack:
       properties:
         default:
@@ -315,10 +283,42 @@ components:
       description: A string to uniquely identify the track amongst other audio track labels for the specified video.
       example: director commentary
       type: string
+    stream_copyAudioTrack:
+      properties:
+        label:
+          $ref: '#/components/schemas/stream_audio_label'
+        url:
+          description: An audio track URL. The server must be publicly routable and support `HTTP HEAD` requests and `HTTP GET` range requests. The server should respond to `HTTP HEAD` requests with a `content-range` header that includes the size of the file.
+          example: https://www.examplestorage.com/audio_file.mp3
+          format: uri
+          type: string
+      required:
+      - label
+      type: object
+    stream_identifier:
+      description: A Cloudflare-generated unique identifier for a media item.
+      example: ea95132c15732412d22c1476fa83f27a
+      maxLength: 32
+      type: string
     stream_audio_default:
       default: false
       description: Denotes whether the audio track will be played by default in a player.
       type: boolean
+    stream_audio_state:
+      description: Specifies the processing status of the video.
+      enum:
+      - queued
+      - ready
+      - error
+      type: string
+    stream_listAudioTrackResponse:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-common'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/stream_additionalAudio'
+            type: array
   securitySchemes:
     api_email:
       in: header

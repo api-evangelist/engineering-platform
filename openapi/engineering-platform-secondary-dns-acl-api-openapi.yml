@@ -245,47 +245,35 @@ paths:
         pro: false
 components:
   schemas:
-    secondary-dns_api-response-common:
+    secondary-dns_acl:
       properties:
-        errors:
-          $ref: '#/components/schemas/secondary-dns_messages'
-        messages:
-          $ref: '#/components/schemas/secondary-dns_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
+        id:
+          $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
+        ip_range:
+          $ref: '#/components/schemas/secondary-dns_ip_range'
+        name:
+          $ref: '#/components/schemas/secondary-dns_acl_components-schemas-name'
       required:
-      - success
-      - errors
-      - messages
+      - id
+      - name
+      - ip_range
       type: object
-    secondary-dns_components-schemas-id_response:
+    secondary-dns_api-response-single:
       allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-single'
+      - $ref: '#/components/schemas/secondary-dns_api-response-common'
+      type: object
+    secondary-dns_components-schemas-identifier:
+      example: 23ff594956f20c2a721606e94745a8aa
+      readOnly: true
+      type: string
+    secondary-dns_components-schemas-response_collection:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-collection'
       - properties:
           result:
-            properties:
-              id:
-                $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
-            type: object
-    secondary-dns_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+            items:
+              $ref: '#/components/schemas/secondary-dns_acl'
+            type: array
     secondary-dns_api-response-common-failure:
       properties:
         errors:
@@ -317,48 +305,30 @@ components:
       - messages
       - result
       type: object
-    secondary-dns_components-schemas-single_response:
+    secondary-dns_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    secondary-dns_components-schemas-id_response:
       allOf:
       - $ref: '#/components/schemas/secondary-dns_api-response-single'
       - properties:
           result:
-            $ref: '#/components/schemas/secondary-dns_acl'
-    secondary-dns_components-schemas-identifier:
-      example: 23ff594956f20c2a721606e94745a8aa
-      readOnly: true
-      type: string
-    secondary-dns_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-common'
-      type: object
-    secondary-dns_acl_components-schemas-name:
-      description: The name of the acl.
-      example: my-acl-1
-      type: string
-    secondary-dns_account_identifier:
-      example: 01a7362d577a6c3019a474fd6f485823
-      readOnly: true
-      type: string
-    secondary-dns_acl:
-      properties:
-        id:
-          $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
-        ip_range:
-          $ref: '#/components/schemas/secondary-dns_ip_range'
-        name:
-          $ref: '#/components/schemas/secondary-dns_acl_components-schemas-name'
-      required:
-      - id
-      - name
-      - ip_range
-      type: object
-    secondary-dns_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/secondary-dns_result_info'
-      type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/secondary-dns_components-schemas-identifier'
+            type: object
     secondary-dns_result_info:
       properties:
         count:
@@ -378,18 +348,48 @@ components:
           example: 2000
           type: number
       type: object
-    secondary-dns_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/secondary-dns_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/secondary-dns_acl'
-            type: array
     secondary-dns_ip_range:
       description: Allowed IPv4/IPv6 address range of primary or secondary nameservers. This will be applied for the entire account. The IP range is used to allow additional NOTIFY IPs for secondary zones and IPs Cloudflare allows AXFR/IXFR requests from for primary zones. CIDRs are limited to a maximum of /24 for IPv4 and /64 for IPv6 respectively.
       example: 192.0.2.53/28
       type: string
+    secondary-dns_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/secondary-dns_messages'
+        messages:
+          $ref: '#/components/schemas/secondary-dns_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    secondary-dns_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/secondary-dns_result_info'
+      type: object
+    secondary-dns_acl_components-schemas-name:
+      description: The name of the acl.
+      example: my-acl-1
+      type: string
+    secondary-dns_account_identifier:
+      example: 01a7362d577a6c3019a474fd6f485823
+      readOnly: true
+      type: string
+    secondary-dns_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/secondary-dns_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/secondary-dns_acl'
   securitySchemes:
     api_email:
       in: header

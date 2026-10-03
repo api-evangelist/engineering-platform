@@ -772,95 +772,56 @@ paths:
       - Email Security
 components:
   schemas:
-    email-security_TraceLine:
+    email-security_ApiResponseCommon:
       properties:
-        lineno:
-          format: int64
+        errors:
+          example: []
+          items:
+            $ref: '#/components/schemas/email-security_Message'
+          type: array
+        messages:
+          example: []
+          items:
+            $ref: '#/components/schemas/email-security_Message'
+          type: array
+        success:
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    email-security_Link:
+      properties:
+        href:
+          type: string
+        text:
+          type:
+          - string
+          - 'null'
+      required:
+      - href
+      type: object
+    email-security_AccountId:
+      description: Account Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      minLength: 32
+      readOnly: true
+      title: account_id
+      type: string
+    email-security_Message:
+      properties:
+        code:
+          format: int32
+          minimum: 1000
           type: integer
         message:
           type: string
-        ts:
-          format: date-time
-          type: string
       required:
-      - ts
-      - lineno
+      - code
       - message
-      type: object
-    email-security_ValidationStatus:
-      enum:
-      - pass
-      - neutral
-      - fail
-      - error
-      - none
-      type: string
-    email-security_DispositionLabel:
-      enum:
-      - MALICIOUS
-      - MALICIOUS-BEC
-      - SUSPICIOUS
-      - SPOOF
-      - SPAM
-      - BULK
-      - ENCRYPTED
-      - EXTERNAL
-      - UNKNOWN
-      - NONE
-      type: string
-    email-security_Attachment:
-      properties:
-        content_type:
-          type:
-          - string
-          - 'null'
-        detection:
-          allOf:
-          - $ref: '#/components/schemas/email-security_DispositionLabel'
-          - type:
-            - string
-            - 'null'
-        encrypted:
-          type:
-          - boolean
-          - 'null'
-        name:
-          type:
-          - string
-          - 'null'
-        size:
-          minimum: 0
-          type: integer
-      required:
-      - size
-      type: object
-    email-security_ResultInfo:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          format: int32
-          type: integer
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          format: int32
-          type: integer
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          format: int32
-          type: integer
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          format: int32
-          type: integer
-      required:
-      - count
-      - page
-      - per_page
-      - total_count
       type: object
     email-security_MailsearchMessage:
       allOf:
@@ -1015,50 +976,32 @@ components:
           dkim: pass
           dmarc: none
           spf: fail
-    email-security_Link:
-      properties:
-        href:
-          type: string
-        text:
-          type:
-          - string
-          - 'null'
-      required:
-      - href
-      type: object
-    email-security_AccountId:
-      description: Account Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      minLength: 32
-      readOnly: true
-      title: account_id
+    email-security_DispositionLabel:
+      enum:
+      - MALICIOUS
+      - MALICIOUS-BEC
+      - SUSPICIOUS
+      - SPOOF
+      - SPAM
+      - BULK
+      - ENCRYPTED
+      - EXTERNAL
+      - UNKNOWN
+      - NONE
       type: string
-    email-security_PostfixId:
-      description: Message identifier
-      example: 4Njp3P0STMz2c02Q
-      title: postfix_id
-      type: string
-    email-security_PhishGuardReportTag:
+    email-security_TraceLine:
       properties:
-        category:
-          type: string
-        value:
-          type: string
-      required:
-      - category
-      - value
-      type: object
-    email-security_Message:
-      properties:
-        code:
-          format: int32
-          minimum: 1000
+        lineno:
+          format: int64
           type: integer
         message:
           type: string
+        ts:
+          format: date-time
+          type: string
       required:
-      - code
+      - ts
+      - lineno
       - message
       type: object
     email-security_ThreatCategory:
@@ -1076,40 +1019,6 @@ components:
           - 'null'
       required:
       - id
-      type: object
-    email-security_MessageDeliveryMode:
-      enum:
-      - DIRECT
-      - BCC
-      - JOURNAL
-      - REVIEW_SUBMISSION
-      - DMARC_UNVERIFIED
-      - DMARC_FAILURE_REPORT
-      - DMARC_AGGREGATE_REPORT
-      - THREAT_INTEL_SUBMISSION
-      - SIMULATION_SUBMISSION
-      - API
-      - RETRO_SCAN
-      type: string
-    email-security_ApiResponseCommon:
-      properties:
-        errors:
-          example: []
-          items:
-            $ref: '#/components/schemas/email-security_Message'
-          type: array
-        messages:
-          example: []
-          items:
-            $ref: '#/components/schemas/email-security_Message'
-          type: array
-        success:
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
       type: object
     email-security_MessageHeader:
       properties:
@@ -1171,6 +1080,97 @@ components:
       - fields
       - priority
       - disposition
+      type: object
+    email-security_MessageDeliveryMode:
+      enum:
+      - DIRECT
+      - BCC
+      - JOURNAL
+      - REVIEW_SUBMISSION
+      - DMARC_UNVERIFIED
+      - DMARC_FAILURE_REPORT
+      - DMARC_AGGREGATE_REPORT
+      - THREAT_INTEL_SUBMISSION
+      - SIMULATION_SUBMISSION
+      - API
+      - RETRO_SCAN
+      type: string
+    email-security_PostfixId:
+      description: Message identifier
+      example: 4Njp3P0STMz2c02Q
+      title: postfix_id
+      type: string
+    email-security_ResultInfo:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          format: int32
+          type: integer
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          format: int32
+          type: integer
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          format: int32
+          type: integer
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          format: int32
+          type: integer
+      required:
+      - count
+      - page
+      - per_page
+      - total_count
+      type: object
+    email-security_ValidationStatus:
+      enum:
+      - pass
+      - neutral
+      - fail
+      - error
+      - none
+      type: string
+    email-security_Attachment:
+      properties:
+        content_type:
+          type:
+          - string
+          - 'null'
+        detection:
+          allOf:
+          - $ref: '#/components/schemas/email-security_DispositionLabel'
+          - type:
+            - string
+            - 'null'
+        encrypted:
+          type:
+          - boolean
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        size:
+          minimum: 0
+          type: integer
+      required:
+      - size
+      type: object
+    email-security_PhishGuardReportTag:
+      properties:
+        category:
+          type: string
+        value:
+          type: string
+      required:
+      - category
+      - value
       type: object
   responses:
     email-security_ClientError:
