@@ -2116,26 +2116,14 @@ paths:
       - Email Security Settings
 components:
   schemas:
-    email-security_ApiResponseCommon:
-      properties:
-        errors:
-          example: []
-          items:
-            $ref: '#/components/schemas/email-security_Message'
-          type: array
-        messages:
-          example: []
-          items:
-            $ref: '#/components/schemas/email-security_Message'
-          type: array
-        success:
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
+    email-security_DeliveryMode:
+      enum:
+      - DIRECT
+      - BCC
+      - JOURNAL
+      - API
+      - RETRO_SCAN
+      type: string
     email-security_CreateDisplayName:
       properties:
         email:
@@ -2161,61 +2149,81 @@ components:
       - code
       - message
       type: object
-    email-security_TrustedDomain:
-      allOf:
-      - additionalProperties: false
-        example:
-          comments: null
-          is_recent: true
-          is_regex: false
-          is_similarity: false
-          pattern: example.com
-        properties:
-          comments:
-            type:
-            - string
-            - 'null'
-          is_recent:
-            type: boolean
-          is_regex:
-            type: boolean
-          is_similarity:
-            type: boolean
-          pattern:
-            minLength: 1
-            type: string
-        required:
-        - is_recent
-        - is_similarity
-        - is_regex
-        - pattern
-        type: object
-      - properties:
-          created_at:
-            format: date-time
-            type: string
-          id:
-            example: 2401
-            format: int32
-            title: identifier
+    email-security_DisplayName:
+      properties:
+        comments:
+          type:
+          - string
+          - 'null'
+        created_at:
+          format: date-time
+          type: string
+        directory_id:
+          allOf:
+          - format: int64
             type: integer
-          last_modified:
-            format: date-time
-            type: string
-        required:
-        - id
-        - created_at
-        - last_modified
-        type: object
+          - type:
+            - integer
+            - 'null'
+        directory_node_id:
+          type:
+          - string
+          - 'null'
+        email:
+          type:
+          - string
+          - 'null'
+        id:
+          example: 2403
+          format: int32
+          title: identifier
+          type: integer
+        is_email_regex:
+          type: boolean
+        last_modified:
+          format: date-time
+          type: string
+        name:
+          type: string
+        provenance:
+          type:
+          - string
+          - 'null'
+      required:
+      - id
+      - created_at
+      - last_modified
+      - name
+      - is_email_regex
+      type: object
+    email-security_CreateTrustedDomain:
+      additionalProperties: false
       example:
         comments: null
-        created_at: '2023-11-14T22:13:20Z'
-        id: 2401
         is_recent: true
         is_regex: false
         is_similarity: false
-        last_modified: '2023-11-14T22:13:20Z'
         pattern: example.com
+      properties:
+        comments:
+          type:
+          - string
+          - 'null'
+        is_recent:
+          type: boolean
+        is_regex:
+          type: boolean
+        is_similarity:
+          type: boolean
+        pattern:
+          minLength: 1
+          type: string
+      required:
+      - is_recent
+      - is_similarity
+      - is_regex
+      - pattern
+      type: object
     email-security_BlockedSender:
       allOf:
       - additionalProperties: false
@@ -2315,53 +2323,6 @@ components:
       - allowed_delivery_modes
       - lookback_hops
       type: object
-    email-security_DisplayName:
-      properties:
-        comments:
-          type:
-          - string
-          - 'null'
-        created_at:
-          format: date-time
-          type: string
-        directory_id:
-          allOf:
-          - format: int64
-            type: integer
-          - type:
-            - integer
-            - 'null'
-        directory_node_id:
-          type:
-          - string
-          - 'null'
-        email:
-          type:
-          - string
-          - 'null'
-        id:
-          example: 2403
-          format: int32
-          title: identifier
-          type: integer
-        is_email_regex:
-          type: boolean
-        last_modified:
-          format: date-time
-          type: string
-        name:
-          type: string
-        provenance:
-          type:
-          - string
-          - 'null'
-      required:
-      - id
-      - created_at
-      - last_modified
-      - name
-      - is_email_regex
-      type: object
     email-security_CreateAllowPattern:
       additionalProperties: false
       example:
@@ -2402,6 +2363,153 @@ components:
       - verify_sender
       - pattern_type
       type: object
+    email-security_ApiResponseCommon:
+      properties:
+        errors:
+          example: []
+          items:
+            $ref: '#/components/schemas/email-security_Message'
+          type: array
+        messages:
+          example: []
+          items:
+            $ref: '#/components/schemas/email-security_Message'
+          type: array
+        success:
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    email-security_AccountId:
+      description: Account Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      minLength: 32
+      readOnly: true
+      title: account_id
+      type: string
+    email-security_PatternType:
+      enum:
+      - EMAIL
+      - DOMAIN
+      - IP
+      - UNKNOWN
+      type: string
+    email-security_SortingDirection:
+      enum:
+      - asc
+      - desc
+      type: string
+    email-security_CreateBlockedSender:
+      additionalProperties: false
+      example:
+        comments: block sender with email test@example.com
+        is_regex: false
+        pattern: test@example.com
+        pattern_type: EMAIL
+      properties:
+        comments:
+          type:
+          - string
+          - 'null'
+        is_regex:
+          type: boolean
+        pattern:
+          minLength: 1
+          type: string
+        pattern_type:
+          $ref: '#/components/schemas/email-security_PatternType'
+      required:
+      - pattern
+      - is_regex
+      - pattern_type
+      type: object
+    email-security_ResultInfo:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          format: int32
+          type: integer
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          format: int32
+          type: integer
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          format: int32
+          type: integer
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          format: int32
+          type: integer
+      required:
+      - count
+      - page
+      - per_page
+      - total_count
+      type: object
+    email-security_TrustedDomain:
+      allOf:
+      - additionalProperties: false
+        example:
+          comments: null
+          is_recent: true
+          is_regex: false
+          is_similarity: false
+          pattern: example.com
+        properties:
+          comments:
+            type:
+            - string
+            - 'null'
+          is_recent:
+            type: boolean
+          is_regex:
+            type: boolean
+          is_similarity:
+            type: boolean
+          pattern:
+            minLength: 1
+            type: string
+        required:
+        - is_recent
+        - is_similarity
+        - is_regex
+        - pattern
+        type: object
+      - properties:
+          created_at:
+            format: date-time
+            type: string
+          id:
+            example: 2401
+            format: int32
+            title: identifier
+            type: integer
+          last_modified:
+            format: date-time
+            type: string
+        required:
+        - id
+        - created_at
+        - last_modified
+        type: object
+      example:
+        comments: null
+        created_at: '2023-11-14T22:13:20Z'
+        id: 2401
+        is_recent: true
+        is_regex: false
+        is_similarity: false
+        last_modified: '2023-11-14T22:13:20Z'
+        pattern: example.com
     email-security_AllowPattern:
       allOf:
       - additionalProperties: false
@@ -2472,114 +2580,6 @@ components:
         pattern: test@example.com
         pattern_type: EMAIL
         verify_sender: true
-    email-security_DeliveryMode:
-      enum:
-      - DIRECT
-      - BCC
-      - JOURNAL
-      - API
-      - RETRO_SCAN
-      type: string
-    email-security_CreateTrustedDomain:
-      additionalProperties: false
-      example:
-        comments: null
-        is_recent: true
-        is_regex: false
-        is_similarity: false
-        pattern: example.com
-      properties:
-        comments:
-          type:
-          - string
-          - 'null'
-        is_recent:
-          type: boolean
-        is_regex:
-          type: boolean
-        is_similarity:
-          type: boolean
-        pattern:
-          minLength: 1
-          type: string
-      required:
-      - is_recent
-      - is_similarity
-      - is_regex
-      - pattern
-      type: object
-    email-security_SortingDirection:
-      enum:
-      - asc
-      - desc
-      type: string
-    email-security_ResultInfo:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          format: int32
-          type: integer
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          format: int32
-          type: integer
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          format: int32
-          type: integer
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          format: int32
-          type: integer
-      required:
-      - count
-      - page
-      - per_page
-      - total_count
-      type: object
-    email-security_CreateBlockedSender:
-      additionalProperties: false
-      example:
-        comments: block sender with email test@example.com
-        is_regex: false
-        pattern: test@example.com
-        pattern_type: EMAIL
-      properties:
-        comments:
-          type:
-          - string
-          - 'null'
-        is_regex:
-          type: boolean
-        pattern:
-          minLength: 1
-          type: string
-        pattern_type:
-          $ref: '#/components/schemas/email-security_PatternType'
-      required:
-      - pattern
-      - is_regex
-      - pattern_type
-      type: object
-    email-security_PatternType:
-      enum:
-      - EMAIL
-      - DOMAIN
-      - IP
-      - UNKNOWN
-      type: string
-    email-security_AccountId:
-      description: Account Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      minLength: 32
-      readOnly: true
-      title: account_id
-      type: string
   responses:
     email-security_ClientError:
       content:

@@ -257,21 +257,15 @@ paths:
         pro: true
 components:
   schemas:
-    firewall_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    firewall_configuration:
+      description: The rule configuration.
+      oneOf:
+      - $ref: '#/components/schemas/firewall_ip_configuration'
+      - $ref: '#/components/schemas/firewall_ipv6_configuration'
+      - $ref: '#/components/schemas/firewall_cidr_configuration'
+      - $ref: '#/components/schemas/firewall_asn_configuration'
+      - $ref: '#/components/schemas/firewall_country_configuration'
+      type: object
     firewall_cidr_configuration:
       properties:
         target:
@@ -296,157 +290,6 @@ components:
           example: AS12345
           type: string
       title: An ASN configuration.
-    firewall_rule_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/firewall_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/firewall_rule'
-            type: array
-    firewall_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    firewall_country_configuration:
-      properties:
-        target:
-          description: The configuration target. You must set the target to `country` when specifying a country code in the rule.
-          enum:
-          - country
-          example: country
-        value:
-          description: 'The two-letter ISO-3166-1 alpha-2 code to match. For more information, refer to [IP Access rules: Parameters](https://developers.cloudflare.com/waf/tools/ip-access-rules/parameters/#country).'
-          example: US
-          type: string
-      title: A country configuration.
-    firewall_rule_single_response:
-      allOf:
-      - $ref: '#/components/schemas/firewall_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/firewall_rule'
-    firewall_ip_configuration:
-      properties:
-        target:
-          description: The configuration target. You must set the target to `ip` when specifying an IP address in the rule.
-          enum:
-          - ip
-          example: ip
-        value:
-          description: The IP address to match. This address will be compared to the IP address of incoming requests.
-          example: 198.51.100.4
-          type: string
-      title: An IP address configuration.
-    firewall_schemas-identifier:
-      description: The unique identifier of the IP Access rule.
-      example: 92f17202ed8bd63d69a66b86a49a8f6b
-      maxLength: 32
-      readOnly: true
-      type: string
-    firewall_notes:
-      description: An informative summary of the rule, typically used as a reminder or explanation.
-      example: This rule is enabled because of an event that occurred on date X.
-      type: string
-    firewall_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/firewall_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/firewall_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    firewall_rule_single_id_response:
-      allOf:
-      - $ref: '#/components/schemas/firewall_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/firewall_schemas-identifier'
-            type: object
-    firewall_schemas-mode:
-      description: The action to apply to a matched request.
-      enum:
-      - block
-      - challenge
-      - whitelist
-      - js_challenge
-      - managed_challenge
-      example: challenge
-      type: string
-    firewall_configuration:
-      description: The rule configuration.
-      oneOf:
-      - $ref: '#/components/schemas/firewall_ip_configuration'
-      - $ref: '#/components/schemas/firewall_ipv6_configuration'
-      - $ref: '#/components/schemas/firewall_cidr_configuration'
-      - $ref: '#/components/schemas/firewall_asn_configuration'
-      - $ref: '#/components/schemas/firewall_country_configuration'
-      type: object
-    firewall_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/firewall_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/firewall_result_info'
-      type: object
-    firewall_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/firewall_api-response-common'
-      - properties:
-          result:
-            anyOf:
-            - type:
-              - object
-              - 'null'
-            - type:
-              - string
-              - 'null'
-      type: object
     firewall_api-response-common:
       properties:
         errors:
@@ -471,6 +314,83 @@ components:
       - messages
       - result
       type: object
+    firewall_notes:
+      description: An informative summary of the rule, typically used as a reminder or explanation.
+      example: This rule is enabled because of an event that occurred on date X.
+      type: string
+    firewall_rule_single_id_response:
+      allOf:
+      - $ref: '#/components/schemas/firewall_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/firewall_schemas-identifier'
+            type: object
+    firewall_rule_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/firewall_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/firewall_rule'
+            type: array
+    firewall_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/firewall_api-response-common'
+      - properties:
+          result:
+            anyOf:
+            - type:
+              - object
+              - 'null'
+            - type:
+              - string
+              - 'null'
+      type: object
+    firewall_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    firewall_schemas-mode:
+      description: The action to apply to a matched request.
+      enum:
+      - block
+      - challenge
+      - whitelist
+      - js_challenge
+      - managed_challenge
+      example: challenge
+      type: string
+    firewall_schemas-identifier:
+      description: The unique identifier of the IP Access rule.
+      example: 92f17202ed8bd63d69a66b86a49a8f6b
+      maxLength: 32
+      readOnly: true
+      type: string
+    firewall_ipv6_configuration:
+      properties:
+        target:
+          description: The configuration target. You must set the target to `ip6` when specifying an IPv6 address in the rule.
+          enum:
+          - ip6
+          example: ip6
+        value:
+          description: The IPv6 address to match.
+          example: 2001:DB8:100::CF
+          type: string
+      title: An IPv6 address configuration.
     firewall_rule:
       properties:
         allowed_modes:
@@ -511,18 +431,98 @@ components:
       - allowed_modes
       - configuration
       type: object
-    firewall_ipv6_configuration:
+    firewall_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    firewall_ip_configuration:
       properties:
         target:
-          description: The configuration target. You must set the target to `ip6` when specifying an IPv6 address in the rule.
+          description: The configuration target. You must set the target to `ip` when specifying an IP address in the rule.
           enum:
-          - ip6
-          example: ip6
+          - ip
+          example: ip
         value:
-          description: The IPv6 address to match.
-          example: 2001:DB8:100::CF
+          description: The IP address to match. This address will be compared to the IP address of incoming requests.
+          example: 198.51.100.4
           type: string
-      title: An IPv6 address configuration.
+      title: An IP address configuration.
+    firewall_rule_single_response:
+      allOf:
+      - $ref: '#/components/schemas/firewall_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/firewall_rule'
+    firewall_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/firewall_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/firewall_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    firewall_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/firewall_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/firewall_result_info'
+      type: object
+    firewall_country_configuration:
+      properties:
+        target:
+          description: The configuration target. You must set the target to `country` when specifying a country code in the rule.
+          enum:
+          - country
+          example: country
+        value:
+          description: 'The two-letter ISO-3166-1 alpha-2 code to match. For more information, refer to [IP Access rules: Parameters](https://developers.cloudflare.com/waf/tools/ip-access-rules/parameters/#country).'
+          example: US
+          type: string
+      title: A country configuration.
   securitySchemes:
     api_email:
       in: header

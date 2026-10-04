@@ -188,27 +188,6 @@ paths:
         pro: true
 components:
   schemas:
-    email_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/email_api-response-common'
-      type: object
-    email_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    email_modified:
-      description: The date and time the destination address was last modified.
-      example: '2014-01-02T02:20:00Z'
-      format: date-time
-      readOnly: true
-      type: string
-    email_created:
-      description: The date and time the destination address has been created.
-      example: '2014-01-02T02:20:00Z'
-      format: date-time
-      readOnly: true
-      type: string
     email_result_info:
       properties:
         count:
@@ -228,9 +207,110 @@ components:
           example: 2000
           type: number
       type: object
+    email_addresses:
+      allOf:
+      - $ref: '#/components/schemas/email_destination_address_properties'
+      type: object
+    email_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    email_destination_address_properties:
+      properties:
+        created:
+          $ref: '#/components/schemas/email_created'
+        email:
+          $ref: '#/components/schemas/email_email'
+        id:
+          $ref: '#/components/schemas/email_destination_address_identifier'
+        modified:
+          $ref: '#/components/schemas/email_modified'
+        tag:
+          $ref: '#/components/schemas/email_destination_address_tag'
+        verified:
+          $ref: '#/components/schemas/email_verified'
+      type: object
+    email_verified:
+      description: The date and time the destination address has been verified. Null means not verified yet.
+      example: '2014-01-02T02:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
     email_destination_address_tag:
       deprecated: true
       description: Destination address tag. (Deprecated, replaced by destination address identifier)
+      example: ea95132c15732412d22c1476fa83f27a
+      maxLength: 32
+      readOnly: true
+      type: string
+    email_create_destination_address_properties:
+      properties:
+        email:
+          $ref: '#/components/schemas/email_email'
+      required:
+      - email
+      type: object
+    email_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/email_api-response-common'
+      type: object
+    email_destination_addresses_response_collection:
+      allOf:
+      - $ref: '#/components/schemas/email_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/email_addresses'
+            type: array
+          result_info:
+            properties:
+              count:
+                example: 1
+              page:
+                example: 1
+              per_page:
+                example: 20
+              total_count:
+                example: 1
+            type: object
+    email_created:
+      description: The date and time the destination address has been created.
+      example: '2014-01-02T02:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    email_email:
+      description: The contact email address of the user.
+      example: user@example.com
+      maxLength: 90
+      type: string
+    email_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/email_messages'
+        messages:
+          $ref: '#/components/schemas/email_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    email_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/email_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/email_result_info'
+      type: object
+    email_destination_address_identifier:
+      description: Destination address identifier.
       example: ea95132c15732412d22c1476fa83f27a
       maxLength: 32
       readOnly: true
@@ -256,92 +336,12 @@ components:
       - properties:
           result:
             $ref: '#/components/schemas/email_addresses'
-    email_email:
-      description: The contact email address of the user.
-      example: user@example.com
-      maxLength: 90
-      type: string
-    email_verified:
-      description: The date and time the destination address has been verified. Null means not verified yet.
+    email_modified:
+      description: The date and time the destination address was last modified.
       example: '2014-01-02T02:20:00Z'
       format: date-time
       readOnly: true
       type: string
-    email_destination_address_properties:
-      properties:
-        created:
-          $ref: '#/components/schemas/email_created'
-        email:
-          $ref: '#/components/schemas/email_email'
-        id:
-          $ref: '#/components/schemas/email_destination_address_identifier'
-        modified:
-          $ref: '#/components/schemas/email_modified'
-        tag:
-          $ref: '#/components/schemas/email_destination_address_tag'
-        verified:
-          $ref: '#/components/schemas/email_verified'
-      type: object
-    email_addresses:
-      allOf:
-      - $ref: '#/components/schemas/email_destination_address_properties'
-      type: object
-    email_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/email_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/email_result_info'
-      type: object
-    email_create_destination_address_properties:
-      properties:
-        email:
-          $ref: '#/components/schemas/email_email'
-      required:
-      - email
-      type: object
-    email_destination_addresses_response_collection:
-      allOf:
-      - $ref: '#/components/schemas/email_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/email_addresses'
-            type: array
-          result_info:
-            properties:
-              count:
-                example: 1
-              page:
-                example: 1
-              per_page:
-                example: 20
-              total_count:
-                example: 1
-            type: object
-    email_destination_address_identifier:
-      description: Destination address identifier.
-      example: ea95132c15732412d22c1476fa83f27a
-      maxLength: 32
-      readOnly: true
-      type: string
-    email_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/email_messages'
-        messages:
-          $ref: '#/components/schemas/email_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
   securitySchemes:
     api_email:
       in: header

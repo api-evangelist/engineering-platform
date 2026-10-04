@@ -242,20 +242,27 @@ paths:
           $ref: '#/components/responses/common500Error'
 components:
   requestBodies:
-    createCollectionFork:
+    mergeEnvironmentFork:
       content:
         application/json:
           schema:
-            type: object
             required:
-            - label
+            - source
+            type: object
             properties:
-              label:
+              source:
                 type: string
-                description: The fork's label.
-                example: Test Fork
+                format: uid
+                description: The source environment's unique ID to merge data from.
+                example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+              deleteSource:
+                type: boolean
+                default: false
+                description: If true, the forked environment will be deleted.
+                example: false
           example:
-            label: Test Fork
+            source: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+            deleteSource: false
     mergeCollectionFork:
       content:
         application/json:
@@ -293,6 +300,33 @@ components:
             strategy: deleteSource
             source: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
             destination: 12345678-09547fef-a9a5-4e00-998b-aa563e8db69a
+    pullEnvironment:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              source:
+                type: string
+                format: uid
+                description: The source environment's unique ID to pull data from.
+                example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+          example:
+            source: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+    createCollectionFork:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - label
+            properties:
+              label:
+                type: string
+                description: The fork's label.
+                example: Test Fork
+          example:
+            label: Test Fork
     forkEnvironment:
       content:
         application/json:
@@ -309,123 +343,73 @@ components:
             fork:
               value:
                 forkName: My fork
-    mergeEnvironmentFork:
-      content:
-        application/json:
-          schema:
-            required:
-            - source
-            type: object
-            properties:
-              source:
-                type: string
-                format: uid
-                description: The source environment's unique ID to merge data from.
-                example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-              deleteSource:
-                type: boolean
-                default: false
-                description: If true, the forked environment will be deleted.
-                example: false
-          example:
-            source: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-            deleteSource: false
-    pullEnvironment:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              source:
-                type: string
-                format: uid
-                description: The source environment's unique ID to pull data from.
-                example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-          example:
-            source: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-  schemas:
-    workspaceId:
-      type: string
-      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+  parameters:
+    workspaceIdQueryTrue:
+      name: workspaceId
+      in: query
+      required: true
+      description: The workspace's ID.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
+    forkWorkspaceQuery:
+      name: workspace
+      in: query
+      required: true
+      description: The workspace ID in which to create the fork.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
     cursor:
-      type: string
-      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
+    environmentUid:
+      name: environmentId
+      in: path
+      required: true
+      description: The environment's unique ID.
+      schema:
+        type: string
+        format: uid
+        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+    sortByCreatedAt:
+      name: sort
+      in: query
+      description: Sort the results by the date and time of creation.
+      schema:
+        type: string
+        enum:
+        - createdAt
+        example: createdAt
+    collectionId:
+      name: collectionId
+      in: path
+      required: true
+      description: The collection's ID.
+      schema:
+        type: string
+        example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+    createdAtSort:
+      name: direction
+      in: query
+      description: Sort the results by creation date in ascending (`asc`) or descending (`desc`) order.
+      schema:
+        $ref: '#/components/schemas/ascDesc'
+    directionQuery:
+      name: direction
+      in: query
+      description: Sort results in ascending (`asc`) or descending (`desc`) order.
+      schema:
+        $ref: '#/components/schemas/ascDesc'
     limit:
-      type: integer
-      default: 10
-      example: 10
-    ascDesc:
-      type: string
-      enum:
-      - asc
-      - desc
-      example: asc
+      name: limit
+      in: query
+      description: The maximum number of rows to return in the response.
+      schema:
+        $ref: '#/components/schemas/limit'
   responses:
-    mergeCollectionFork:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              collection:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The source collection's ID.
-                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-                  uid:
-                    type: string
-                    format: uid
-                    description: The source collection's unique ID.
-                    example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-          example:
-            collection:
-              id: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-              uid: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-    mergeEnvironmentFork:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              environment:
-                type: object
-                description: Information about the merged environment.
-                properties:
-                  uid:
-                    type: string
-                    format: uid
-                    description: The merged environment's ID.
-                    example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-          example:
-            environment:
-              uid: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-    common403ErrorForbiddenError:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: forbiddenError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: You do not have enough permissions to perform this action.
-          example:
-            error:
-              name: forbiddenError
-              message: You do not have enough permissions to perform this action.
-    forkCollection400ErrorNotForked:
+    forkCollection400ErrorBadId:
       description: Bad Request
       content:
         application/json:
@@ -442,11 +426,85 @@ components:
                   message:
                     type: string
                     description: The error message.
-                    example: The collection is not a forked collection.
+                    example: The collection Id is not a forked collection.
           example:
             collection:
               name: badRequest
-              message: The collection is not a forked collection.
+              message: The collection Id is not a forked collection.
+    forkCollection400ErrorNoForks:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: badRequest
+                  message:
+                    type: string
+                    description: The error message.
+                    example: This collection id has no forks.
+          example:
+            collection:
+              name: badRequest
+              message: This collection id has no forks.
+    common401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
     getCollectionsForkedByUser:
       description: Successful Response
       content:
@@ -512,276 +570,6 @@ components:
               total: 2
               nextCursor: null
               inaccessibleFork: 0
-    common401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
-    fork404Error:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: notFoundError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: Fork not found.
-          example:
-            collection:
-              name: notFoundError
-              message: Fork not found.
-    getCollectionForks:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: array
-                description: A list of the collection's forks.
-                items:
-                  type: object
-                  description: Information about the forked collection.
-                  properties:
-                    createdAt:
-                      type: string
-                      format: date-time
-                      description: The date and time at which the fork was created.
-                      example: '2023-11-16T09:18:17.000Z'
-                    createdBy:
-                      type: string
-                      description: The user who created the collection fork.
-                      example: Taylor Lee
-                    forkId:
-                      type: string
-                      format: uid
-                      description: The forked collection's ID.
-                      example: 12345678-667df1ad-2ee3-7890-b678-7742d82e2e1f
-                    forkName:
-                      type: string
-                      description: The forked collection's label.
-                      example: Collection Fork
-              meta:
-                type: object
-                description: The response's meta information for paginated results.
-                properties:
-                  nextCursor:
-                    type:
-                    - string
-                    - 'null'
-                    format: base64
-                    description: The pagination cursor that points to the next record in the results set.
-                    example: eyJpZCI6MzMyNzksImZvcmtzQWZ0ZXIiOjIwfQ==
-                  total:
-                    type: number
-                    description: The total number of forked collections.
-                    example: 2
-          example:
-            data:
-            - forkName: Collection Fork
-              forkId: 12345678-667df1ad-2ee3-7890-b678-7742d82e2e1f
-              createdBy: Taylor Lee
-              createdAt: '2023-11-16T09:18:17.000Z'
-            - forkName: Test Fork
-              forkId: 87654321-38j9f1ad-2ee3-7890-dv5h-7742d82e2e1f
-              createdBy: Alex Cruz
-              createdAt: '2023-11-16T09:16:15.000Z'
-            meta:
-              total: 2
-              nextCursor: null
-    instanceNotFoundCollection:
-      description: Instance Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: instanceNotFoundError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: The specified item does not exist.
-                  details:
-                    type: object
-                    description: Information about the error.
-                    properties:
-                      item:
-                        type: string
-                        description: The instance item.
-                        example: collection
-                      id:
-                        type: string
-                        description: The collection ID.
-                        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-          example:
-            error:
-              name: instanceNotFoundError
-              message: The specified item does not exist.
-              details:
-                item: collection
-                id: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-    forkCollection400ErrorNoForks:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: badRequest
-                  message:
-                    type: string
-                    description: The error message.
-                    example: This collection id has no forks.
-          example:
-            collection:
-              name: badRequest
-              message: This collection id has no forks.
-    environmentForks404Error:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              title:
-                type: string
-                description: A short summary of the error.
-                example: Not Found
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 404
-              detail:
-                type: string
-                description: Details about the occurrence of the error.
-                example: We could not find the environment you are looking for
-              type:
-                type: string
-                format: uri
-                description: The error type.
-                example: https://api.postman.com/problems/notFound
-          example:
-            title: We could not find the environment you are looking for
-            status: 404
-            detail: We could not find the environment you are looking for
-            type: https://api.postman.com/problems/notFound
-    pullCollectionChanges:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              collection:
-                type: object
-                description: Information about the updated collection fork.
-                properties:
-                  destinationId:
-                    type: string
-                    format: uid
-                    description: The ID of the forked collection the changes were pulled into.
-                    example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-                  sourceId:
-                    type: string
-                    format: uid
-                    description: The ID of the source collection the changes were pulled from.
-                    example: 12345678-45499451-e894-41b8-8c66-8191ab64932a
-          example:
-            collection:
-              destinationId: 112345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-              sourceId: 12345678-45499451-e894-41b8-8c66-8191ab64932a
-    environmentForks400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The type of error.
-                example: https://api.postman.com/problems/bad-request
-              title:
-                type: string
-                description: The title of the error message.
-                example: The environment Id is not a forked environment.
-              detail:
-                type: object
-                description: Details about the error message.
-                example: {}
-          examples:
-            environmentNotForked:
-              value:
-                type: https://api.postman.com/problems/bad-request
-                title: The environment Id is not a forked environment.
-                detail: {}
-    pullEnvironment:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              environment:
-                type: object
-                description: Information about the merged environment.
-                properties:
-                  uid:
-                    type: string
-                    format: uid
-                    description: The merged environment's unique ID.
-                    example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-          example:
-            environment:
-              uid: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
     forkEnvironment:
       description: Successful Response
       content:
@@ -811,52 +599,6 @@ components:
               uid: 12345678-0fcea3ba-abcf-49c3-9f48-669c208fef25
               name: Testing Environment
               forkName: Test Fork
-    forkCollection400ErrorBadId:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: badRequest
-                  message:
-                    type: string
-                    description: The error message.
-                    example: The collection Id is not a forked collection.
-          example:
-            collection:
-              name: badRequest
-              message: The collection Id is not a forked collection.
-    common500Error:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
     createCollectionFork:
       description: Successful Response
       content:
@@ -908,72 +650,6 @@ components:
                 createdAt: '2022-06-16T19:51:44.069Z'
                 from: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
               uid: 12345678-09547fef-a9a5-4e00-998b-aa563e8db69a
-    getSourceCollectionStatus:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              collection:
-                type: object
-                properties:
-                  collectionUid:
-                    type: object
-                    description: Information about the forked collection. The object's name is the forked collection's UID (`userId`-`collectionId`).
-                    properties:
-                      isSourceAhead:
-                        type: boolean
-                        description: If true, there is a difference between the forked collection and its source collection.
-                        example: false
-          example:
-            collection:
-              12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2:
-                isSourceAhead: false
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    fork400ErrorNoUserFound:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: badRequest
-                  message:
-                    type: string
-                    description: The error message.
-                    example: No Postman User found for given filters
-          example:
-            collection:
-              name: badRequest
-              message: No Postman User found for given filters
     getEnvironmentForks:
       description: Successful Response
       content:
@@ -1040,71 +716,395 @@ components:
             meta:
               total: 6
               nextCursor: null
-  parameters:
-    forkWorkspaceQuery:
-      name: workspace
-      in: query
-      required: true
-      description: The workspace ID in which to create the fork.
-      schema:
-        $ref: '#/components/schemas/workspaceId'
-    directionQuery:
-      name: direction
-      in: query
-      description: Sort results in ascending (`asc`) or descending (`desc`) order.
-      schema:
-        $ref: '#/components/schemas/ascDesc'
-    cursor:
-      name: cursor
-      in: query
-      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
-      schema:
-        $ref: '#/components/schemas/cursor'
-    sortByCreatedAt:
-      name: sort
-      in: query
-      description: Sort the results by the date and time of creation.
-      schema:
-        type: string
-        enum:
-        - createdAt
-        example: createdAt
-    collectionId:
-      name: collectionId
-      in: path
-      required: true
-      description: The collection's ID.
-      schema:
-        type: string
-        example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-    workspaceIdQueryTrue:
-      name: workspaceId
-      in: query
-      required: true
-      description: The workspace's ID.
-      schema:
-        $ref: '#/components/schemas/workspaceId'
-    environmentUid:
-      name: environmentId
-      in: path
-      required: true
-      description: The environment's unique ID.
-      schema:
-        type: string
-        format: uid
-        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+    common500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
+    mergeEnvironmentFork:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              environment:
+                type: object
+                description: Information about the merged environment.
+                properties:
+                  uid:
+                    type: string
+                    format: uid
+                    description: The merged environment's ID.
+                    example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+          example:
+            environment:
+              uid: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+    environmentForks404Error:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: A short summary of the error.
+                example: Not Found
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 404
+              detail:
+                type: string
+                description: Details about the occurrence of the error.
+                example: We could not find the environment you are looking for
+              type:
+                type: string
+                format: uri
+                description: The error type.
+                example: https://api.postman.com/problems/notFound
+          example:
+            title: We could not find the environment you are looking for
+            status: 404
+            detail: We could not find the environment you are looking for
+            type: https://api.postman.com/problems/notFound
+    pullCollectionChanges:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              collection:
+                type: object
+                description: Information about the updated collection fork.
+                properties:
+                  destinationId:
+                    type: string
+                    format: uid
+                    description: The ID of the forked collection the changes were pulled into.
+                    example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+                  sourceId:
+                    type: string
+                    format: uid
+                    description: The ID of the source collection the changes were pulled from.
+                    example: 12345678-45499451-e894-41b8-8c66-8191ab64932a
+          example:
+            collection:
+              destinationId: 112345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+              sourceId: 12345678-45499451-e894-41b8-8c66-8191ab64932a
+    getCollectionForks:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                description: A list of the collection's forks.
+                items:
+                  type: object
+                  description: Information about the forked collection.
+                  properties:
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the fork was created.
+                      example: '2023-11-16T09:18:17.000Z'
+                    createdBy:
+                      type: string
+                      description: The user who created the collection fork.
+                      example: Taylor Lee
+                    forkId:
+                      type: string
+                      format: uid
+                      description: The forked collection's ID.
+                      example: 12345678-667df1ad-2ee3-7890-b678-7742d82e2e1f
+                    forkName:
+                      type: string
+                      description: The forked collection's label.
+                      example: Collection Fork
+              meta:
+                type: object
+                description: The response's meta information for paginated results.
+                properties:
+                  nextCursor:
+                    type:
+                    - string
+                    - 'null'
+                    format: base64
+                    description: The pagination cursor that points to the next record in the results set.
+                    example: eyJpZCI6MzMyNzksImZvcmtzQWZ0ZXIiOjIwfQ==
+                  total:
+                    type: number
+                    description: The total number of forked collections.
+                    example: 2
+          example:
+            data:
+            - forkName: Collection Fork
+              forkId: 12345678-667df1ad-2ee3-7890-b678-7742d82e2e1f
+              createdBy: Taylor Lee
+              createdAt: '2023-11-16T09:18:17.000Z'
+            - forkName: Test Fork
+              forkId: 87654321-38j9f1ad-2ee3-7890-dv5h-7742d82e2e1f
+              createdBy: Alex Cruz
+              createdAt: '2023-11-16T09:16:15.000Z'
+            meta:
+              total: 2
+              nextCursor: null
+    pullEnvironment:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              environment:
+                type: object
+                description: Information about the merged environment.
+                properties:
+                  uid:
+                    type: string
+                    format: uid
+                    description: The merged environment's unique ID.
+                    example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+          example:
+            environment:
+              uid: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+    getSourceCollectionStatus:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              collection:
+                type: object
+                properties:
+                  collectionUid:
+                    type: object
+                    description: Information about the forked collection. The object's name is the forked collection's UID (`userId`-`collectionId`).
+                    properties:
+                      isSourceAhead:
+                        type: boolean
+                        description: If true, there is a difference between the forked collection and its source collection.
+                        example: false
+          example:
+            collection:
+              12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2:
+                isSourceAhead: false
+    fork400ErrorNoUserFound:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: badRequest
+                  message:
+                    type: string
+                    description: The error message.
+                    example: No Postman User found for given filters
+          example:
+            collection:
+              name: badRequest
+              message: No Postman User found for given filters
+    forkCollection400ErrorNotForked:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: badRequest
+                  message:
+                    type: string
+                    description: The error message.
+                    example: The collection is not a forked collection.
+          example:
+            collection:
+              name: badRequest
+              message: The collection is not a forked collection.
+    mergeCollectionFork:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              collection:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The source collection's ID.
+                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+                  uid:
+                    type: string
+                    format: uid
+                    description: The source collection's unique ID.
+                    example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+          example:
+            collection:
+              id: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+              uid: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+    instanceNotFoundCollection:
+      description: Instance Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: instanceNotFoundError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: The specified item does not exist.
+                  details:
+                    type: object
+                    description: Information about the error.
+                    properties:
+                      item:
+                        type: string
+                        description: The instance item.
+                        example: collection
+                      id:
+                        type: string
+                        description: The collection ID.
+                        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+          example:
+            error:
+              name: instanceNotFoundError
+              message: The specified item does not exist.
+              details:
+                item: collection
+                id: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+    common403ErrorForbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: forbiddenError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: You do not have enough permissions to perform this action.
+          example:
+            error:
+              name: forbiddenError
+              message: You do not have enough permissions to perform this action.
+    environmentForks400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The type of error.
+                example: https://api.postman.com/problems/bad-request
+              title:
+                type: string
+                description: The title of the error message.
+                example: The environment Id is not a forked environment.
+              detail:
+                type: object
+                description: Details about the error message.
+                example: {}
+          examples:
+            environmentNotForked:
+              value:
+                type: https://api.postman.com/problems/bad-request
+                title: The environment Id is not a forked environment.
+                detail: {}
+    fork404Error:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: notFoundError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: Fork not found.
+          example:
+            collection:
+              name: notFoundError
+              message: Fork not found.
+  schemas:
     limit:
-      name: limit
-      in: query
-      description: The maximum number of rows to return in the response.
-      schema:
-        $ref: '#/components/schemas/limit'
-    createdAtSort:
-      name: direction
-      in: query
-      description: Sort the results by creation date in ascending (`asc`) or descending (`desc`) order.
-      schema:
-        $ref: '#/components/schemas/ascDesc'
+      type: integer
+      default: 10
+      example: 10
+    workspaceId:
+      type: string
+      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
+    ascDesc:
+      type: string
+      enum:
+      - asc
+      - desc
+      example: asc
   securitySchemes:
     PostmanApiKey:
       type: apiKey

@@ -157,6 +157,7 @@ paths:
       x-summary-source: derived
 components:
   schemas:
+    ServiceException: {}
     AccountLimit:
       type: object
       properties:
@@ -181,24 +182,6 @@ components:
           - $ref: '#/components/schemas/UnreservedConcurrentExecutions'
           - description: The maximum number of simultaneous function executions, minus the capacity that's reserved for individual functions with <a>PutFunctionConcurrency</a>.
       description: Limits that are related to concurrency and storage. All file and storage sizes are in bytes.
-    UnreservedConcurrentExecutions:
-      type: integer
-      minimum: 0
-    ServiceException: {}
-    GetAccountSettingsResponse:
-      type: object
-      properties:
-        AccountLimit:
-          allOf:
-          - $ref: '#/components/schemas/AccountLimit'
-          - description: Limits that are related to concurrency and code storage.
-        AccountUsage:
-          allOf:
-          - $ref: '#/components/schemas/AccountUsage'
-          - description: The number of functions and amount of storage in use.
-    TooManyRequestsException: {}
-    Integer:
-      type: integer
     AccountUsage:
       type: object
       properties:
@@ -211,11 +194,28 @@ components:
           - $ref: '#/components/schemas/Long'
           - description: The number of Lambda functions.
       description: The number of functions and amount of storage in use.
+    TooManyRequestsException: {}
+    GetAccountSettingsResponse:
+      type: object
+      properties:
+        AccountLimit:
+          allOf:
+          - $ref: '#/components/schemas/AccountLimit'
+          - description: Limits that are related to concurrency and code storage.
+        AccountUsage:
+          allOf:
+          - $ref: '#/components/schemas/AccountUsage'
+          - description: The number of functions and amount of storage in use.
     Long:
       type: integer
+    UnreservedConcurrentExecutions:
+      type: integer
+      minimum: 0
+    Integer:
+      type: integer
   parameters:
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
+    X-Amz-Credential:
+      name: X-Amz-Credential
       in: header
       schema:
         type: string
@@ -226,20 +226,20 @@ components:
       schema:
         type: string
       required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
     X-Amz-Algorithm:
       name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Credential:
-      name: X-Amz-Credential
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
       in: header
       schema:
         type: string
@@ -250,8 +250,8 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
       in: header
       schema:
         type: string

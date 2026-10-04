@@ -1022,6 +1022,18 @@ paths:
               headers: {}
 components:
   schemas:
+    ErrorResponse:
+      required:
+      - errors
+      properties:
+        errors:
+          type: array
+          description: A list of errors that describe the reasons why the request failed.
+          items:
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
+      allOf:
+      - $ref: '#/components/schemas/Response'
     CreativeWork:
       properties:
         provider:
@@ -1039,6 +1051,70 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/Thing'
+    MediaObject:
+      properties:
+        contentUrl:
+          type: string
+          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
+          readOnly: true
+        height:
+          type: integer
+          description: The height of the source media object, in pixels.
+          format: int32
+          readOnly: true
+        hostPageUrl:
+          type: string
+          description: URL of the page that hosts the media object.
+          readOnly: true
+        width:
+          type: integer
+          description: The width of the source media object, in pixels.
+          format: int32
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
+    Query:
+      required:
+      - text
+      type: object
+      properties:
+        displayText:
+          type: string
+          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
+          readOnly: true
+        searchLink:
+          type: string
+          readOnly: true
+        text:
+          type: string
+          description: The query string. Use this string as the query term in a new search request.
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+        webSearchUrl:
+          type: string
+          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
+          readOnly: true
+      description: Defines a search query.
+    TrendingVideosSubcategory:
+      required:
+      - tiles
+      - title
+      type: object
+      properties:
+        tiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendingVideosTile'
+        title:
+          type: string
+      x-ms-discriminator-value: TrendingVideos/Subcategory
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
     Error:
       required:
       - code
@@ -1094,47 +1170,17 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
-    ImageObject:
-      properties:
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
-    TrendingVideosCategory:
+    TrendingVideosTile:
       required:
-      - subcategories
-      - title
+      - image
+      - query
       type: object
       properties:
-        subcategories:
-          type: array
-          items:
-            $ref: '#/components/schemas/TrendingVideosSubcategory'
-        title:
-          type: string
-      x-ms-discriminator-value: TrendingVideos/Category
-    ErrorResponse:
-      required:
-      - errors
-      properties:
-        errors:
-          type: array
-          description: A list of errors that describe the reasons why the request failed.
-          items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
-      allOf:
-      - $ref: '#/components/schemas/Response'
+        image:
+          $ref: '#/components/schemas/ImageObject'
+        query:
+          $ref: '#/components/schemas/Query'
+      x-ms-discriminator-value: TrendingVideos/Tile
     Thing:
       properties:
         alternateName:
@@ -1160,35 +1206,19 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/Response'
-    ResponseBase:
+    TrendingVideosCategory:
       required:
-      - _type
+      - subcategories
+      - title
       type: object
       properties:
-        _type:
+        subcategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrendingVideosSubcategory'
+        title:
           type: string
-      discriminator:
-        propertyName: _type
-    Identifiable:
-      properties:
-        id:
-          type: string
-          description: A String identifier.
-          readOnly: true
-      description: Defines the identity of a resource.
-      allOf:
-      - $ref: '#/components/schemas/ResponseBase'
-    TrendingVideosTile:
-      required:
-      - image
-      - query
-      type: object
-      properties:
-        image:
-          $ref: '#/components/schemas/ImageObject'
-        query:
-          $ref: '#/components/schemas/Query'
-      x-ms-discriminator-value: TrendingVideos/Tile
+      x-ms-discriminator-value: TrendingVideos/Category
     TrendingVideos:
       required:
       - bannerTiles
@@ -1204,63 +1234,33 @@ components:
             $ref: '#/components/schemas/TrendingVideosCategory'
       allOf:
       - $ref: '#/components/schemas/Response'
-    Query:
+    Identifiable:
+      properties:
+        id:
+          type: string
+          description: A String identifier.
+          readOnly: true
+      description: Defines the identity of a resource.
+      allOf:
+      - $ref: '#/components/schemas/ResponseBase'
+    ResponseBase:
       required:
-      - text
+      - _type
       type: object
       properties:
-        displayText:
+        _type:
           type: string
-          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
-          readOnly: true
-        searchLink:
-          type: string
-          readOnly: true
-        text:
-          type: string
-          description: The query string. Use this string as the query term in a new search request.
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
+      discriminator:
+        propertyName: _type
+    Response:
+      properties:
         webSearchUrl:
           type: string
-          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
+          description: The URL To Bing's search result for this item.
           readOnly: true
-      description: Defines a search query.
-    MediaObject:
-      properties:
-        contentUrl:
-          type: string
-          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
-          readOnly: true
-        height:
-          type: integer
-          description: The height of the source media object, in pixels.
-          format: int32
-          readOnly: true
-        hostPageUrl:
-          type: string
-          description: URL of the page that hosts the media object.
-          readOnly: true
-        width:
-          type: integer
-          description: The width of the source media object, in pixels.
-          format: int32
-          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
       allOf:
-      - $ref: '#/components/schemas/CreativeWork'
-    TrendingVideosSubcategory:
-      required:
-      - tiles
-      - title
-      type: object
-      properties:
-        tiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/TrendingVideosTile'
-        title:
-          type: string
-      x-ms-discriminator-value: TrendingVideos/Subcategory
+      - $ref: '#/components/schemas/Identifiable'
   securitySchemes:
     apiKeyHeader:
       type: apiKey

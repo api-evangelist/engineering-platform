@@ -120,115 +120,34 @@ components:
                   type: string
                   description: The error message.
                   example: Provided schema type is not supported.
-  responses:
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    schemaSecurityValidation400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/schemaSecurityValidation400Error'
-          examples:
-            Invalid Schema:
-              $ref: '#/components/examples/schemaSecurityValidation400Error'
-    common401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
-    featureUnavailable403Error:
-      description: Feature Unavailable
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/featureUnavailable403Error'
-          example:
-            value:
-              type: https://api.postman.com/problems/forbidden
-              title: Forbidden
-              detail: This feature isn't available in your region.
-              status: 403
-    schemaSecurityValidation:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              warnings:
-                type: array
-                description: 'Information about each issue discovered in the analysis. Each object includes the violation''s severity and category, the location of the issue, data paths, and other information. This returns an empty object if there are no issues present in the schema.
-
-
-                  If there are issues, this returns the `possibleFixUrl` response in each warning object. This provides a link to documentation you can use to resolve the warning.
-
-                  '
-                items:
-                  type: object
-                  additionalProperties: true
-          examples:
-            No Warnings Found:
-              $ref: '#/components/examples/schemaSecurityValidationNoWarnings'
-            Successful Response with Governance Warnings:
-              $ref: '#/components/examples/schemaSecurityValidationGovernanceWarnings'
-            Successful Response with Security Warnings:
-              $ref: '#/components/examples/schemaSecurityValidationSecurityWarnings'
-  requestBodies:
-    schemaSecurityValidation:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/schemaSecurityValidationRequest'
-          examples:
-            Request Body:
-              $ref: '#/components/examples/schemaSecurityValidationRequest'
   examples:
+    schemaSecurityValidationGovernanceWarnings:
+      value:
+        warnings:
+        - slug: OPENAPI_SPECTRAL_6_RULE_1027
+          severity: WARN
+          message: A schema property should have a $ref property referencing a reusable schema
+          location:
+            start:
+              line: 55
+              column: 26
+            end:
+              line: 58
+              column: 17
+          dataPath:
+          - components
+          - parameters
+          - userId
+          - schema
+          possibleFixUrl: https://go.pstmn.io/openapi3-security-warnings#a-schema-property-should-reference-a-reusable-schema
+          category:
+            name: governance
+            slug: governance
+          vulnerability:
+            name: A schema property should have a $ref property.
+            slug: OPENAPI_SPECTRAL_6_schema_reference_reusable
+          type: governance
+          checksum: 2fc9df0e8ccbcdb610ab1694651bb68731fc5add4ebb44da0e5f15faf634b035
     schemaSecurityValidationSecurityWarnings:
       value:
         warnings:
@@ -275,33 +194,6 @@ components:
             slug: POSTMAN_OWASP_GOVERNANCE_VULNERABILITY_0017
           type: governance
           checksum: 7760d7354c85b925141d708e14ecaef6512ef20a5b89ba8c722d1fc16c1e5b02
-    schemaSecurityValidationGovernanceWarnings:
-      value:
-        warnings:
-        - slug: OPENAPI_SPECTRAL_6_RULE_1027
-          severity: WARN
-          message: A schema property should have a $ref property referencing a reusable schema
-          location:
-            start:
-              line: 55
-              column: 26
-            end:
-              line: 58
-              column: 17
-          dataPath:
-          - components
-          - parameters
-          - userId
-          - schema
-          possibleFixUrl: https://go.pstmn.io/openapi3-security-warnings#a-schema-property-should-reference-a-reusable-schema
-          category:
-            name: governance
-            slug: governance
-          vulnerability:
-            name: A schema property should have a $ref property.
-            slug: OPENAPI_SPECTRAL_6_schema_reference_reusable
-          type: governance
-          checksum: 2fc9df0e8ccbcdb610ab1694651bb68731fc5add4ebb44da0e5f15faf634b035
     schemaSecurityValidation400Error:
       value:
         error:
@@ -317,6 +209,114 @@ components:
     schemaSecurityValidationNoWarnings:
       value:
         warnings: []
+  requestBodies:
+    schemaSecurityValidation:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/schemaSecurityValidationRequest'
+          examples:
+            Request Body:
+              $ref: '#/components/examples/schemaSecurityValidationRequest'
+  responses:
+    schemaSecurityValidation400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/schemaSecurityValidation400Error'
+          examples:
+            Invalid Schema:
+              $ref: '#/components/examples/schemaSecurityValidation400Error'
+    featureUnavailable403Error:
+      description: Feature Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/featureUnavailable403Error'
+          example:
+            value:
+              type: https://api.postman.com/problems/forbidden
+              title: Forbidden
+              detail: This feature isn't available in your region.
+              status: 403
+    schemaSecurityValidation:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              warnings:
+                type: array
+                description: 'Information about each issue discovered in the analysis. Each object includes the violation''s severity and category, the location of the issue, data paths, and other information. This returns an empty object if there are no issues present in the schema.
+
+
+                  If there are issues, this returns the `possibleFixUrl` response in each warning object. This provides a link to documentation you can use to resolve the warning.
+
+                  '
+                items:
+                  type: object
+                  additionalProperties: true
+          examples:
+            No Warnings Found:
+              $ref: '#/components/examples/schemaSecurityValidationNoWarnings'
+            Successful Response with Governance Warnings:
+              $ref: '#/components/examples/schemaSecurityValidationGovernanceWarnings'
+            Successful Response with Security Warnings:
+              $ref: '#/components/examples/schemaSecurityValidationSecurityWarnings'
+    common401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
   securitySchemes:
     PostmanApiKey:
       type: apiKey

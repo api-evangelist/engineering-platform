@@ -138,51 +138,163 @@ paths:
         category: licenses
         subcategory: licenses
 components:
-  responses:
-    forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/basic-error'
-    not_found:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/basic-error'
-    not_modified:
-      description: Not modified
-  parameters:
-    repo:
-      name: repo
-      description: The name of the repository without the `.git` extension. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
-    per-page:
-      name: per_page
-      description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
-      in: query
-      schema:
-        type: integer
-        default: 30
-    page:
-      name: page
-      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
-      in: query
-      schema:
-        type: integer
-        default: 1
-    owner:
-      name: owner
-      description: The account owner of the repository. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
   schemas:
+    license-content:
+      title: License Content
+      description: License Content
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        sha:
+          type: string
+        size:
+          type: integer
+        url:
+          type: string
+          format: uri
+        html_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+        git_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+        download_url:
+          type:
+          - string
+          - 'null'
+          format: uri
+        type:
+          type: string
+        content:
+          type: string
+        encoding:
+          type: string
+        _links:
+          type: object
+          properties:
+            git:
+              type:
+              - string
+              - 'null'
+              format: uri
+            html:
+              type:
+              - string
+              - 'null'
+              format: uri
+            self:
+              type: string
+              format: uri
+          required:
+          - git
+          - html
+          - self
+        license:
+          $ref: '#/components/schemas/nullable-license-simple'
+      required:
+      - _links
+      - git_url
+      - html_url
+      - download_url
+      - name
+      - path
+      - sha
+      - size
+      - type
+      - url
+      - content
+      - encoding
+      - license
+    nullable-license-simple:
+      title: License Simple
+      description: License Simple
+      type:
+      - object
+      - 'null'
+      properties:
+        key:
+          type: string
+          example: mit
+        name:
+          type: string
+          example: MIT License
+        url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          example: https://api.github.com/licenses/mit
+        spdx_id:
+          type:
+          - string
+          - 'null'
+          example: MIT
+        node_id:
+          type: string
+          example: MDc6TGljZW5zZW1pdA==
+        html_url:
+          type: string
+          format: uri
+      required:
+      - key
+      - name
+      - url
+      - spdx_id
+      - node_id
+    license-simple:
+      title: License Simple
+      description: License Simple
+      type: object
+      properties:
+        key:
+          type: string
+          example: mit
+        name:
+          type: string
+          example: MIT License
+        url:
+          type:
+          - string
+          - 'null'
+          format: uri
+          example: https://api.github.com/licenses/mit
+        spdx_id:
+          type:
+          - string
+          - 'null'
+          example: MIT
+        node_id:
+          type: string
+          example: MDc6TGljZW5zZW1pdA==
+        html_url:
+          type: string
+          format: uri
+      required:
+      - key
+      - name
+      - url
+      - spdx_id
+      - node_id
+    basic-error:
+      title: Basic Error
+      description: Basic Error
+      type: object
+      properties:
+        message:
+          type: string
+        documentation_url:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
     license:
       title: License
       description: License
@@ -301,162 +413,21 @@ components:
       - limitations
       - body
       - featured
-    license-simple:
-      title: License Simple
-      description: License Simple
-      type: object
-      properties:
-        key:
-          type: string
-          example: mit
-        name:
-          type: string
-          example: MIT License
-        url:
-          type:
-          - string
-          - 'null'
-          format: uri
-          example: https://api.github.com/licenses/mit
-        spdx_id:
-          type:
-          - string
-          - 'null'
-          example: MIT
-        node_id:
-          type: string
-          example: MDc6TGljZW5zZW1pdA==
-        html_url:
-          type: string
-          format: uri
-      required:
-      - key
-      - name
-      - url
-      - spdx_id
-      - node_id
-    license-content:
-      title: License Content
-      description: License Content
-      type: object
-      properties:
-        name:
-          type: string
-        path:
-          type: string
-        sha:
-          type: string
-        size:
-          type: integer
-        url:
-          type: string
-          format: uri
-        html_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-        git_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-        download_url:
-          type:
-          - string
-          - 'null'
-          format: uri
-        type:
-          type: string
-        content:
-          type: string
-        encoding:
-          type: string
-        _links:
-          type: object
-          properties:
-            git:
-              type:
-              - string
-              - 'null'
-              format: uri
-            html:
-              type:
-              - string
-              - 'null'
-              format: uri
-            self:
-              type: string
-              format: uri
-          required:
-          - git
-          - html
-          - self
-        license:
-          $ref: '#/components/schemas/nullable-license-simple'
-      required:
-      - _links
-      - git_url
-      - html_url
-      - download_url
-      - name
-      - path
-      - sha
-      - size
-      - type
-      - url
-      - content
-      - encoding
-      - license
-    nullable-license-simple:
-      title: License Simple
-      description: License Simple
-      type:
-      - object
-      - 'null'
-      properties:
-        key:
-          type: string
-          example: mit
-        name:
-          type: string
-          example: MIT License
-        url:
-          type:
-          - string
-          - 'null'
-          format: uri
-          example: https://api.github.com/licenses/mit
-        spdx_id:
-          type:
-          - string
-          - 'null'
-          example: MIT
-        node_id:
-          type: string
-          example: MDc6TGljZW5zZW1pdA==
-        html_url:
-          type: string
-          format: uri
-      required:
-      - key
-      - name
-      - url
-      - spdx_id
-      - node_id
-    basic-error:
-      title: Basic Error
-      description: Basic Error
-      type: object
-      properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        url:
-          type: string
-        status:
-          type: string
+  responses:
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
+    not_found:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
+    not_modified:
+      description: Not modified
   examples:
     license:
       value:
@@ -629,6 +600,35 @@ components:
         spdx_id: GPL-3.0
         url: https://api.github.com/licenses/gpl-3.0
         node_id: MDc6TGljZW5zZW1pdA==
+  parameters:
+    per-page:
+      name: per_page
+      description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
+      in: query
+      schema:
+        type: integer
+        default: 30
+    repo:
+      name: repo
+      description: The name of the repository without the `.git` extension. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    owner:
+      name: owner
+      description: The account owner of the repository. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
+      in: query
+      schema:
+        type: integer
+        default: 1
 externalDocs:
   description: GitHub Enterprise Developer Docs
   url: https://docs.github.com/enterprise-server@3.9/rest/

@@ -227,24 +227,128 @@ paths:
         pro: true
 components:
   schemas:
-    iam_response_single_account:
+    iam_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    iam_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/iam_messages'
+        messages:
+          $ref: '#/components/schemas/iam_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    iam_api-response-single:
       allOf:
-      - $ref: '#/components/schemas/iam_api-response-single'
+      - $ref: '#/components/schemas/iam_api-response-common'
+      type: object
+    iam_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    iam_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/iam_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/iam_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    iam_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-common'
       - properties:
           result:
-            $ref: '#/components/schemas/iam_account'
-        type: object
-      title: Response with a single account
-    iam_response_collection_accounts:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/iam_account'
-            type: array
-        type: object
-      title: Response with a list of accounts
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/iam_result_info'
+      type: object
+    iam_create-account:
+      properties:
+        name:
+          description: Account name
+          type: string
+        type:
+          description: the type of account being created. For self-serve customers, use standard. for enterprise customers, use enterprise.
+          enum:
+          - standard
+          - enterprise
+          example: standard
+        unit:
+          description: information related to the tenant unit, and optionally, an id of the unit to create the account on. see https://developers.cloudflare.com/tenant/how-to/manage-accounts/
+          properties:
+            id:
+              description: Tenant unit ID
+              example: f267e341f3dd4697bd3b9f71dd96247f
+              type: string
+          type: object
+      required:
+      - name
+      - type
+      title: Create account
+      type: object
     iam_api-response-single-id:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-common'
@@ -259,6 +363,22 @@ components:
             - object
             - 'null'
       type: object
+    iam_account_identifier:
+      description: Account identifier tag.
+      example: eb78d65290b24279ba6f44721b3ea3c4
+      maxLength: 32
+      readOnly: true
+      type: string
+    iam_response_collection_accounts:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-collection'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/iam_account'
+            type: array
+        type: object
+      title: Response with a list of accounts
     iam_account:
       properties:
         created_on:
@@ -321,143 +441,23 @@ components:
       - id
       - name
       type: object
-    iam_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/iam_messages'
-        messages:
-          $ref: '#/components/schemas/iam_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    iam_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-common'
-      type: object
-    iam_account_identifier:
-      description: Account identifier tag.
-      example: eb78d65290b24279ba6f44721b3ea3c4
-      maxLength: 32
-      readOnly: true
-      type: string
-    iam_components-schemas-account:
-      allOf:
-      - $ref: '#/components/schemas/iam_account'
-    iam_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/iam_result_info'
-      type: object
-    iam_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    iam_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    iam_create-account:
-      properties:
-        name:
-          description: Account name
-          type: string
-        type:
-          description: the type of account being created. For self-serve customers, use standard. for enterprise customers, use enterprise.
-          enum:
-          - standard
-          - enterprise
-          example: standard
-        unit:
-          description: information related to the tenant unit, and optionally, an id of the unit to create the account on. see https://developers.cloudflare.com/tenant/how-to/manage-accounts/
-          properties:
-            id:
-              description: Tenant unit ID
-              example: f267e341f3dd4697bd3b9f71dd96247f
-              type: string
-          type: object
-      required:
-      - name
-      - type
-      title: Create account
-      type: object
-    iam_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/iam_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/iam_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     iam_common_components-schemas-identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       readOnly: true
       type: string
+    iam_response_single_account:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/iam_account'
+        type: object
+      title: Response with a single account
+    iam_components-schemas-account:
+      allOf:
+      - $ref: '#/components/schemas/iam_account'
   securitySchemes:
     api_email:
       in: header

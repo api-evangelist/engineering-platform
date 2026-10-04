@@ -137,24 +137,23 @@ paths:
         - '#logs:edit'
 components:
   schemas:
-    logcontrol_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
     logcontrol_cmb_config_response_single:
       allOf:
       - $ref: '#/components/schemas/logcontrol_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/logcontrol_cmb_config'
-    logcontrol_cmb_config:
-      properties:
-        regions:
-          $ref: '#/components/schemas/logcontrol_regions'
-      type:
-      - object
-      - 'null'
+    logcontrol_regions:
+      description: Comma-separated list of regions.
+      example: eu
+      maxLength: 256
+      pattern: ^[a-z,]*$
+      type: string
+    logcontrol_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     logcontrol_api-response-common-failure:
       properties:
         errors:
@@ -186,6 +185,10 @@ components:
       - messages
       - result
       type: object
+    logcontrol_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/logcontrol_api-response-common'
+      type: object
     logcontrol_api-response-common:
       properties:
         errors:
@@ -203,12 +206,6 @@ components:
       - errors
       - messages
       type: object
-    logcontrol_regions:
-      description: Comma-separated list of regions.
-      example: eu
-      maxLength: 256
-      pattern: ^[a-z,]*$
-      type: string
     logcontrol_messages:
       example: []
       items:
@@ -224,10 +221,13 @@ components:
         type: object
         uniqueItems: true
       type: array
-    logcontrol_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/logcontrol_api-response-common'
-      type: object
+    logcontrol_cmb_config:
+      properties:
+        regions:
+          $ref: '#/components/schemas/logcontrol_regions'
+      type:
+      - object
+      - 'null'
   securitySchemes:
     api_email:
       in: header

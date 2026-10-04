@@ -278,6 +278,29 @@ paths:
               headers: {}
 components:
   schemas:
+    ErrorResponse:
+      required:
+      - errors
+      properties:
+        errors:
+          type: array
+          description: A list of errors that describe the reasons why the request failed.
+          items:
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    TrendingTopics:
+      required:
+      - value
+      properties:
+        value:
+          type: array
+          description: A list of trending news topics on Bing
+          items:
+            $ref: '#/components/schemas/NewsTopic'
+      allOf:
+      - $ref: '#/components/schemas/Answer'
     CreativeWork:
       properties:
         datePublished:
@@ -299,6 +322,112 @@ components:
       description: The most generic kind of creative work, including books, movies, photographs, software programs, etc.
       allOf:
       - $ref: '#/components/schemas/Thing'
+    VideoObject:
+      properties:
+        allowHttpsEmbed:
+          type: boolean
+          readOnly: true
+        allowMobileEmbed:
+          type: boolean
+          readOnly: true
+        embedHtml:
+          type: string
+          readOnly: true
+        isSuperfresh:
+          type: boolean
+          readOnly: true
+        motionThumbnailId:
+          type: string
+          readOnly: true
+        motionThumbnailUrl:
+          type: string
+          readOnly: true
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+        videoId:
+          type: string
+          readOnly: true
+        viewCount:
+          type: integer
+          format: int32
+          readOnly: true
+      description: Defines a video object that is relevant to the query.
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
+    MediaObject:
+      properties:
+        contentUrl:
+          type: string
+          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
+          readOnly: true
+        height:
+          type: integer
+          description: The height of the source media object, in pixels.
+          format: int32
+          readOnly: true
+        width:
+          type: integer
+          description: The width of the source media object, in pixels.
+          format: int32
+          readOnly: true
+      description: Defines a media object.
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
+    Query:
+      required:
+      - text
+      type: object
+      properties:
+        displayText:
+          type: string
+          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
+          readOnly: true
+        searchLink:
+          type: string
+          description: The URL that you use to get the results of the related search. Before using the URL, you must append query parameters as appropriate and include the Ocp-Apim-Subscription-Key header. Use this URL if you're displaying the results in your own user interface. Otherwise, use the webSearchUrl URL.
+          readOnly: true
+        text:
+          type: string
+          description: The query string. Use this string as the query term in a new search request.
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+        webSearchUrl:
+          type: string
+          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
+          readOnly: true
+      description: Defines a search query.
+    NewsTopic:
+      properties:
+        isBreakingNews:
+          type: boolean
+          description: A Boolean value that indicates whether the topic is considered breaking news. If the topic is considered breaking news, the value is true.
+          readOnly: true
+        newsSearchUrl:
+          type: string
+          description: The URL to the Bing News search results for the search query term
+          readOnly: true
+        query:
+          $ref: '#/components/schemas/Query'
+      allOf:
+      - $ref: '#/components/schemas/Thing'
+      x-ms-discriminator-value: News/Topic
+    Answer:
+      properties:
+        followUpQueries:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Query'
+      description: Defines an answer.
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
     Error:
       required:
       - code
@@ -354,34 +483,6 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
-    ImageObject:
-      properties:
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
-    ErrorResponse:
-      required:
-      - errors
-      properties:
-        errors:
-          type: array
-          description: A list of errors that describe the reasons why the request failed.
-          items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
-      allOf:
-      - $ref: '#/components/schemas/Response'
     Thing:
       properties:
         alternateName:
@@ -409,38 +510,15 @@ components:
       description: Defines a thing.
       allOf:
       - $ref: '#/components/schemas/Response'
-    VideoObject:
+    Identifiable:
       properties:
-        allowHttpsEmbed:
-          type: boolean
-          readOnly: true
-        allowMobileEmbed:
-          type: boolean
-          readOnly: true
-        embedHtml:
+        id:
           type: string
+          description: A String identifier.
           readOnly: true
-        isSuperfresh:
-          type: boolean
-          readOnly: true
-        motionThumbnailId:
-          type: string
-          readOnly: true
-        motionThumbnailUrl:
-          type: string
-          readOnly: true
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-        videoId:
-          type: string
-          readOnly: true
-        viewCount:
-          type: integer
-          format: int32
-          readOnly: true
-      description: Defines a video object that is relevant to the query.
+      description: Defines the identity of a resource.
       allOf:
-      - $ref: '#/components/schemas/MediaObject'
+      - $ref: '#/components/schemas/ResponseBase'
     ResponseBase:
       required:
       - _type
@@ -451,93 +529,15 @@ components:
       description: Response base
       discriminator:
         propertyName: _type
-    Identifiable:
+    Response:
       properties:
-        id:
-          type: string
-          description: A String identifier.
-          readOnly: true
-      description: Defines the identity of a resource.
-      allOf:
-      - $ref: '#/components/schemas/ResponseBase'
-    TrendingTopics:
-      required:
-      - value
-      properties:
-        value:
-          type: array
-          description: A list of trending news topics on Bing
-          items:
-            $ref: '#/components/schemas/NewsTopic'
-      allOf:
-      - $ref: '#/components/schemas/Answer'
-    NewsTopic:
-      properties:
-        isBreakingNews:
-          type: boolean
-          description: A Boolean value that indicates whether the topic is considered breaking news. If the topic is considered breaking news, the value is true.
-          readOnly: true
-        newsSearchUrl:
-          type: string
-          description: The URL to the Bing News search results for the search query term
-          readOnly: true
-        query:
-          $ref: '#/components/schemas/Query'
-      allOf:
-      - $ref: '#/components/schemas/Thing'
-      x-ms-discriminator-value: News/Topic
-    Answer:
-      properties:
-        followUpQueries:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-      description: Defines an answer.
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    MediaObject:
-      properties:
-        contentUrl:
-          type: string
-          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
-          readOnly: true
-        height:
-          type: integer
-          description: The height of the source media object, in pixels.
-          format: int32
-          readOnly: true
-        width:
-          type: integer
-          description: The width of the source media object, in pixels.
-          format: int32
-          readOnly: true
-      description: Defines a media object.
-      allOf:
-      - $ref: '#/components/schemas/CreativeWork'
-    Query:
-      required:
-      - text
-      type: object
-      properties:
-        displayText:
-          type: string
-          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
-          readOnly: true
-        searchLink:
-          type: string
-          description: The URL that you use to get the results of the related search. Before using the URL, you must append query parameters as appropriate and include the Ocp-Apim-Subscription-Key header. Use this URL if you're displaying the results in your own user interface. Otherwise, use the webSearchUrl URL.
-          readOnly: true
-        text:
-          type: string
-          description: The query string. Use this string as the query term in a new search request.
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
         webSearchUrl:
           type: string
-          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
+          description: The URL To Bing's search result for this item.
           readOnly: true
-      description: Defines a search query.
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
   securitySchemes:
     apiKeyHeader:
       type: apiKey

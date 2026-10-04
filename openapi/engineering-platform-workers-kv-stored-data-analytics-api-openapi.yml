@@ -83,23 +83,27 @@ paths:
       - Workers KV Storage Read
 components:
   schemas:
-    workers-kv_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/workers-kv_messages'
-        messages:
-          $ref: '#/components/schemas/workers-kv_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
+    workers-kv_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    workers-kv_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     workers-kv_query:
       description: For specifying result metrics.
       properties:
@@ -160,12 +164,31 @@ components:
           format: date-time
           type: string
       type: object
-    workers-kv_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
+    workers-kv_components-schemas-result:
+      allOf:
+      - $ref: '#/components/schemas/workers-kv_result'
+      - properties:
+          data:
+            example:
+            - metrics:
+              - - 2
+                - 4
+              - - 16
+                - 32
+          max:
+            example:
+              storedBytes: 32
+              storedKeys: 4
+          min:
+            example:
+              storedBytes: 16
+              storedKeys: 2
+          query:
+            $ref: '#/components/schemas/workers-kv_query'
+          totals:
+            example:
+              storedBytes: 48
+              storedKeys: 6
     workers-kv_api-response-common-failure:
       properties:
         errors:
@@ -195,46 +218,23 @@ components:
       - messages
       - result
       type: object
-    workers-kv_components-schemas-result:
-      allOf:
-      - $ref: '#/components/schemas/workers-kv_result'
-      - properties:
-          data:
-            example:
-            - metrics:
-              - - 2
-                - 4
-              - - 16
-                - 32
-          max:
-            example:
-              storedBytes: 32
-              storedKeys: 4
-          min:
-            example:
-              storedBytes: 16
-              storedKeys: 2
-          query:
-            $ref: '#/components/schemas/workers-kv_query'
-          totals:
-            example:
-              storedBytes: 48
-              storedKeys: 6
-    workers-kv_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    workers-kv_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers-kv_messages'
+        messages:
+          $ref: '#/components/schemas/workers-kv_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     workers-kv_result:
       description: Metrics on Workers KV requests.
       properties:

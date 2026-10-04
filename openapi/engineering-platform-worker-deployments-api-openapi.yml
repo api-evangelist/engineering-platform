@@ -107,62 +107,9 @@ paths:
         - com.cloudflare.edge.worker.deployment.edit
 components:
   schemas:
-    workers_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/workers_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/workers_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     workers_schemas-version_identifier:
       example: bcf48806-b317-4351-9ee7-36e7d557d4de
       maxLength: 36
-      type: string
-    workers_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/workers_messages'
-        messages:
-          $ref: '#/components/schemas/workers_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
       type: string
     workers_deployments-strategy-percentage:
       properties:
@@ -204,6 +151,16 @@ components:
         type: object
         uniqueItems: true
       type: array
+    workers_schemas-deployments-single-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            allOf:
+            - $ref: '#/components/schemas/workers_deployments-base'
+            - oneOf:
+              - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
+        type: object
     workers_schemas-script_name:
       description: Name of the script.
       example: this-is_my_script-01
@@ -224,11 +181,6 @@ components:
                 type: array
             type: object
         type: object
-    workers_deployments-create-body:
-      allOf:
-      - $ref: '#/components/schemas/workers_deployments-base'
-      - oneOf:
-        - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
     workers_deployments-base:
       properties:
         annotations:
@@ -258,20 +210,68 @@ components:
         strategy:
           type: string
       type: object
+    workers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers_messages'
+        messages:
+          $ref: '#/components/schemas/workers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers_deployments-create-body:
+      allOf:
+      - $ref: '#/components/schemas/workers_deployments-base'
+      - oneOf:
+        - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     workers_schemas-deployment_identifier:
       example: dc78f0bc-05c5-46b7-bb4e-137f55930378
       maxLength: 36
       type: string
-    workers_schemas-deployments-single-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            allOf:
-            - $ref: '#/components/schemas/workers_deployments-base'
-            - oneOf:
-              - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
-        type: object
+    workers_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/workers_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/workers_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
   securitySchemes:
     api_email:
       in: header

@@ -348,6 +348,46 @@ paths:
         pro: true
 components:
   schemas:
+    zones_name:
+      description: The domain name
+      example: example.com
+      maxLength: 253
+      pattern: ^([a-zA-Z0-9][\-a-zA-Z0-9]*\.)+[\-a-zA-Z0-9]{2,20}$
+      type: string
+    zones_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    zones_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
     zones_api-response-common-failure:
       properties:
         errors:
@@ -375,60 +415,6 @@ components:
       - messages
       - result
       type: object
-    zones_api-response-single-id:
-      allOf:
-      - $ref: '#/components/schemas/zones_api-response-common'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/zones_identifier'
-            required:
-            - id
-            type:
-            - object
-            - 'null'
-      type: object
-    zones_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/zones_messages'
-        messages:
-          $ref: '#/components/schemas/zones_messages'
-        success:
-          description: Whether the API call was successful
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    zones_name:
-      description: The domain name
-      example: example.com
-      maxLength: 253
-      pattern: ^([a-zA-Z0-9][\-a-zA-Z0-9]*\.)+[\-a-zA-Z0-9]{2,20}$
-      type: string
-    zones_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
     zones_type:
       default: full
       description: 'A full zone implies that DNS is hosted with Cloudflare. A partial zone is
@@ -442,33 +428,6 @@ components:
       - secondary
       example: full
       type: string
-    zones_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    zones_vanity_name_servers:
-      description: 'An array of domains used for custom name servers. This is only
-
-        available for Business and Enterprise plans.'
-      example:
-      - ns1.example.com
-      - ns2.example.com
-      items:
-        format: hostname
-        maxLength: 253
-        type: string
-      type: array
     zones_paused:
       default: false
       description: 'Indicates whether the zone is only using Cloudflare DNS services. A
@@ -485,6 +444,33 @@ components:
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       type: string
+    zones_vanity_name_servers:
+      description: 'An array of domains used for custom name servers. This is only
+
+        available for Business and Enterprise plans.'
+      example:
+      - ns1.example.com
+      - ns2.example.com
+      items:
+        format: hostname
+        maxLength: 253
+        type: string
+      type: array
+    zones_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/zones_messages'
+        messages:
+          $ref: '#/components/schemas/zones_messages'
+        success:
+          description: Whether the API call was successful
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     zones_zone:
       properties:
         account:
@@ -656,6 +642,20 @@ components:
       - created_on
       - modified_on
       - activated_on
+      type: object
+    zones_api-response-single-id:
+      allOf:
+      - $ref: '#/components/schemas/zones_api-response-common'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/zones_identifier'
+            required:
+            - id
+            type:
+            - object
+            - 'null'
       type: object
   securitySchemes:
     api_email:

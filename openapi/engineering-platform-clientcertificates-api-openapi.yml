@@ -408,10 +408,26 @@ paths:
       x-summary-source: derived
 components:
   schemas:
+    ClientCertificates:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfClientCertificate'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of ClientCertificate resources.
     ListOfClientCertificate:
       type: array
       items:
         $ref: '#/components/schemas/ClientCertificate'
+    MapOfStringToString:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
     ClientCertificate:
       type: object
       properties:
@@ -440,19 +456,17 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: Represents a client certificate used to configure client-side SSL authentication while sending requests to the integration endpoint.
-    ClientCertificates:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfClientCertificate'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of ClientCertificate resources.
-    BadRequestException: {}
+    LimitExceededException: {}
+    Op:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      - move
+      - copy
+      - test
+    TooManyRequestsException: {}
     PatchOperation:
       type: object
       properties:
@@ -473,29 +487,15 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
       description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
-    String:
-      type: string
-    LimitExceededException: {}
     NotFoundException: {}
     ConflictException: {}
-    Op:
-      type: string
-      enum:
-      - add
-      - remove
-      - replace
-      - move
-      - copy
-      - test
+    BadRequestException: {}
     Timestamp:
       type: string
       format: date-time
     UnauthorizedException: {}
-    TooManyRequestsException: {}
-    MapOfStringToString:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/String'
+    String:
+      type: string
   parameters:
     X-Amz-Algorithm:
       name: X-Amz-Algorithm
@@ -503,8 +503,8 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
+    X-Amz-Date:
+      name: X-Amz-Date
       in: header
       schema:
         type: string
@@ -515,8 +515,8 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Date:
-      name: X-Amz-Date
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
       in: header
       schema:
         type: string

@@ -171,6 +171,68 @@ paths:
         pro: true
 components:
   schemas:
+    iam_permission_groups:
+      description: A set of permission groups that are specified to the policy.
+      example:
+      - id: c8fed203ed3043cba015a93ad1616f1f
+        meta:
+          label: load_balancer_admin
+          scopes: com.cloudflare.api.account
+        name: Zone Read
+      - id: 82e64a83756745bbbb1c9c2701bf816b
+        meta:
+          label: fbm_user
+          scopes: com.cloudflare.api.account
+        name: Magic Network Monitoring
+      items:
+        $ref: '#/components/schemas/iam_permission_group'
+      type: array
+    iam_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    iam_permission_group:
+      description: A named group of permissions that map to a group of operations against resources.
+      properties:
+        id:
+          description: Identifier of the group.
+          example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
+          readOnly: true
+          type: string
+        meta:
+          description: Attributes associated to the permission group.
+          example:
+            label: load_balancer_admin
+            scopes: com.cloudflare.api.account
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+          type: object
+        name:
+          description: Name of the group.
+          example: Load Balancer
+          readOnly: true
+          type: string
+      required:
+      - id
+      type: object
     iam_api-response-common:
       properties:
         errors:
@@ -188,6 +250,21 @@ components:
       - errors
       - messages
       type: object
+    iam_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     iam_api-response-common-failure:
       properties:
         errors:
@@ -219,55 +296,6 @@ components:
       - messages
       - result
       type: object
-    iam_permission_groups:
-      description: A set of permission groups that are specified to the policy.
-      example:
-      - id: c8fed203ed3043cba015a93ad1616f1f
-        meta:
-          label: load_balancer_admin
-          scopes: com.cloudflare.api.account
-        name: Zone Read
-      - id: 82e64a83756745bbbb1c9c2701bf816b
-        meta:
-          label: fbm_user
-          scopes: com.cloudflare.api.account
-        name: Magic Network Monitoring
-      items:
-        $ref: '#/components/schemas/iam_permission_group'
-      type: array
-    iam_account_identifier:
-      description: Account identifier tag.
-      example: eb78d65290b24279ba6f44721b3ea3c4
-      maxLength: 32
-      readOnly: true
-      type: string
-    iam_permission_group:
-      description: A named group of permissions that map to a group of operations against resources.
-      properties:
-        id:
-          description: Identifier of the group.
-          example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
-          readOnly: true
-          type: string
-        meta:
-          description: Attributes associated to the permission group.
-          example:
-            label: load_balancer_admin
-            scopes: com.cloudflare.api.account
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-          type: object
-        name:
-          description: Name of the group.
-          example: Load Balancer
-          readOnly: true
-          type: string
-      required:
-      - id
-      type: object
     iam_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-common'
@@ -280,40 +308,18 @@ components:
           result_info:
             $ref: '#/components/schemas/iam_result_info'
       type: object
-    iam_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    iam_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
+    iam_permission_group_components-schemas-identifier:
+      description: Permission Group identifier tag.
+      example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
+      maxLength: 32
+      readOnly: true
+      type: string
+    iam_account_identifier:
+      description: Account identifier tag.
+      example: eb78d65290b24279ba6f44721b3ea3c4
+      maxLength: 32
+      readOnly: true
+      type: string
     iam_collection_permission_groups_response:
       allOf:
       - $ref: '#/components/schemas/iam_api-response-collection'
@@ -322,12 +328,6 @@ components:
             $ref: '#/components/schemas/iam_permission_groups'
         type: object
       title: List of Resource groups
-    iam_permission_group_components-schemas-identifier:
-      description: Permission Group identifier tag.
-      example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
-      maxLength: 32
-      readOnly: true
-      type: string
   securitySchemes:
     api_email:
       in: header

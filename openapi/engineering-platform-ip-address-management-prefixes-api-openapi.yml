@@ -313,33 +313,20 @@ paths:
       - 'IP Prefixes: Write'
 components:
   schemas:
-    addressing_single_response:
+    addressing_asn:
+      description: Autonomous System Number (ASN) the prefix will be advertised under.
+      example: 209242
+      type:
+      - integer
+      - 'null'
+    addressing_response_collection:
       allOf:
-      - $ref: '#/components/schemas/addressing_api-response-single'
+      - $ref: '#/components/schemas/addressing_api-response-collection'
       - properties:
           result:
-            $ref: '#/components/schemas/addressing_ipam-prefixes'
-    addressing_advertised:
-      description: Prefix advertisement status to the Internet. This field is only not 'null' if on demand is enabled.
-      example: true
-      type:
-      - boolean
-      - 'null'
-    addressing_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/addressing_result_info'
-      type: object
-    addressing_on_demand_enabled:
-      description: Whether advertisement of the prefix to the Internet may be dynamically enabled or disabled.
-      example: true
-      type: boolean
-    addressing_approved:
-      description: Approval state of the prefix (P = pending, V = active).
-      example: P
-      type: string
+            items:
+              $ref: '#/components/schemas/addressing_ipam-prefixes'
+            type: array
     addressing_ipam-prefixes:
       properties:
         account_id:
@@ -369,39 +356,10 @@ components:
         on_demand_locked:
           $ref: '#/components/schemas/addressing_on_demand_locked'
       type: object
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    addressing_loa_upload_response:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-single'
-      - properties:
-          result:
-            properties:
-              filename:
-                description: Name of LOA document.
-                example: document.pdf
-                type: string
-            type: object
-    addressing_loa_document_identifier:
-      description: Identifier for the uploaded LOA document.
-      example: d933b1530bc56c9953cf8ce166da8004
-      maxLength: 32
-      type:
-      - string
-      - 'null'
+    addressing_on_demand_enabled:
+      description: Whether advertisement of the prefix to the Internet may be dynamically enabled or disabled.
+      example: true
+      type: boolean
     addressing_result_info:
       properties:
         count:
@@ -420,40 +378,6 @@ components:
           description: Total results available without any search parameters
           example: 2000
           type: number
-      type: object
-    addressing_on_demand_locked:
-      description: Whether advertisement status of the prefix is locked, meaning it cannot be changed.
-      example: false
-      type: boolean
-    addressing_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    addressing_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/addressing_messages'
-        messages:
-          $ref: '#/components/schemas/addressing_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    addressing_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    addressing_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-common'
       type: object
     addressing_api-response-common-failure:
       properties:
@@ -486,11 +410,67 @@ components:
       - messages
       - result
       type: object
+    addressing_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/addressing_result_info'
+      type: object
+    addressing_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-common'
+      type: object
+    addressing_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    addressing_cidr:
+      description: IP Prefix in Classless Inter-Domain Routing format.
+      example: 192.0.2.0/24
+      type: string
     addressing_description:
       description: Description of the prefix.
       example: Internal test prefix
       maxLength: 1000
       type: string
+    addressing_approved:
+      description: Approval state of the prefix (P = pending, V = active).
+      example: P
+      type: string
+    addressing_single_response:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/addressing_ipam-prefixes'
+    addressing_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/addressing_messages'
+        messages:
+          $ref: '#/components/schemas/addressing_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    addressing_on_demand_locked:
+      description: Whether advertisement status of the prefix is locked, meaning it cannot be changed.
+      example: false
+      type: boolean
+    addressing_advertised:
+      description: Prefix advertisement status to the Internet. This field is only not 'null' if on demand is enabled.
+      example: true
+      type:
+      - boolean
+      - 'null'
     addressing_modified_at_nullable:
       description: Last time the advertisement status was changed. This field is only not 'null' if on demand is enabled.
       example: '2014-01-01T05:20:00.12345Z'
@@ -498,24 +478,44 @@ components:
       type:
       - string
       - 'null'
-    addressing_cidr:
-      description: IP Prefix in Classless Inter-Domain Routing format.
-      example: 192.0.2.0/24
-      type: string
-    addressing_asn:
-      description: Autonomous System Number (ASN) the prefix will be advertised under.
-      example: 209242
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_loa_document_identifier:
+      description: Identifier for the uploaded LOA document.
+      example: d933b1530bc56c9953cf8ce166da8004
+      maxLength: 32
       type:
-      - integer
+      - string
       - 'null'
-    addressing_response_collection:
+    addressing_loa_upload_response:
       allOf:
-      - $ref: '#/components/schemas/addressing_api-response-collection'
+      - $ref: '#/components/schemas/addressing_api-response-single'
       - properties:
           result:
-            items:
-              $ref: '#/components/schemas/addressing_ipam-prefixes'
-            type: array
+            properties:
+              filename:
+                description: Name of LOA document.
+                example: document.pdf
+                type: string
+            type: object
+    addressing_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
   securitySchemes:
     api_email:
       in: header

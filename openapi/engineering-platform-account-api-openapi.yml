@@ -232,6 +232,8 @@ components:
     Double:
       type: number
       format: double
+    Integer:
+      type: integer
     Account:
       type: object
       properties:
@@ -252,7 +254,29 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The version of the API keys used for the account.
       description: Represents an AWS account that is associated with API Gateway.
-    BadRequestException: {}
+    LimitExceededException: {}
+    Op:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      - move
+      - copy
+      - test
+    ThrottleSettings:
+      type: object
+      properties:
+        burstLimit:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          - description: The API target request burst rate limit. This allows more requests through for a period of time than the target rate limit.
+        rateLimit:
+          allOf:
+          - $ref: '#/components/schemas/Double'
+          - description: The API target request rate limit.
+      description: ' The API request rate limits.'
+    TooManyRequestsException: {}
     PatchOperation:
       type: object
       properties:
@@ -273,40 +297,16 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
       description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
-    String:
-      type: string
-    LimitExceededException: {}
     NotFoundException: {}
-    ConflictException: {}
-    Op:
-      type: string
-      enum:
-      - add
-      - remove
-      - replace
-      - move
-      - copy
-      - test
-    UnauthorizedException: {}
     ListOfString:
       type: array
       items:
         $ref: '#/components/schemas/String'
-    TooManyRequestsException: {}
-    ThrottleSettings:
-      type: object
-      properties:
-        burstLimit:
-          allOf:
-          - $ref: '#/components/schemas/Integer'
-          - description: The API target request burst rate limit. This allows more requests through for a period of time than the target rate limit.
-        rateLimit:
-          allOf:
-          - $ref: '#/components/schemas/Double'
-          - description: The API target request rate limit.
-      description: ' The API request rate limits.'
-    Integer:
-      type: integer
+    ConflictException: {}
+    BadRequestException: {}
+    UnauthorizedException: {}
+    String:
+      type: string
   parameters:
     X-Amz-Algorithm:
       name: X-Amz-Algorithm
@@ -314,8 +314,8 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
+    X-Amz-Date:
+      name: X-Amz-Date
       in: header
       schema:
         type: string
@@ -326,8 +326,8 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Date:
-      name: X-Amz-Date
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
       in: header
       schema:
         type: string

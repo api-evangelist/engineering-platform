@@ -163,6 +163,43 @@ components:
             items:
               $ref: '#/components/schemas/addressing_ipam-delegations'
             type: array
+    addressing_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/addressing_messages'
+        messages:
+          $ref: '#/components/schemas/addressing_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    addressing_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/addressing_result_info'
+      type: object
+    addressing_id_response:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/addressing_delegation_identifier'
+            type: object
+    addressing_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-common'
+      type: object
     addressing_result_info:
       properties:
         count:
@@ -182,9 +219,45 @@ components:
           example: 2000
           type: number
       type: object
-    addressing_api-response-single:
+    addressing_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type: string
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_schemas-single_response:
       allOf:
-      - $ref: '#/components/schemas/addressing_api-response-common'
+      - $ref: '#/components/schemas/addressing_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/addressing_ipam-delegations'
+    addressing_ipam-delegations:
+      properties:
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        created_at:
+          $ref: '#/components/schemas/addressing_timestamp'
+        delegated_account_id:
+          $ref: '#/components/schemas/addressing_delegated_account_identifier'
+        id:
+          $ref: '#/components/schemas/addressing_delegation_identifier'
+        modified_at:
+          $ref: '#/components/schemas/addressing_timestamp'
+        parent_prefix_id:
+          $ref: '#/components/schemas/addressing_identifier'
       type: object
     addressing_api-response-common-failure:
       properties:
@@ -217,88 +290,15 @@ components:
       - messages
       - result
       type: object
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    addressing_schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/addressing_ipam-delegations'
+    addressing_cidr:
+      description: IP Prefix in Classless Inter-Domain Routing format.
+      example: 192.0.2.0/24
+      type: string
     addressing_identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       type: string
-    addressing_cidr:
-      description: IP Prefix in Classless Inter-Domain Routing format.
-      example: 192.0.2.0/24
-      type: string
-    addressing_ipam-delegations:
-      properties:
-        cidr:
-          $ref: '#/components/schemas/addressing_cidr'
-        created_at:
-          $ref: '#/components/schemas/addressing_timestamp'
-        delegated_account_id:
-          $ref: '#/components/schemas/addressing_delegated_account_identifier'
-        id:
-          $ref: '#/components/schemas/addressing_delegation_identifier'
-        modified_at:
-          $ref: '#/components/schemas/addressing_timestamp'
-        parent_prefix_id:
-          $ref: '#/components/schemas/addressing_identifier'
-      type: object
-    addressing_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/addressing_messages'
-        messages:
-          $ref: '#/components/schemas/addressing_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    addressing_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type: string
-    addressing_id_response:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/addressing_delegation_identifier'
-            type: object
-    addressing_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/addressing_result_info'
-      type: object
   securitySchemes:
     api_email:
       in: header

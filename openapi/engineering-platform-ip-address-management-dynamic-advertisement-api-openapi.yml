@@ -103,6 +103,53 @@ paths:
       - 'IP Prefixes: BGP On Demand Write'
 components:
   schemas:
+    addressing_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/addressing_messages'
+        messages:
+          $ref: '#/components/schemas/addressing_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    addressing_schemas-advertised:
+      description: Enablement of prefix advertisement to the Internet.
+      example: true
+      type: boolean
+    addressing_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/addressing_api-response-common'
+      type: object
+    addressing_modified_at_nullable:
+      description: Last time the advertisement status was changed. This field is only not 'null' if on demand is enabled.
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
+      type:
+      - string
+      - 'null'
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     addressing_advertised_response:
       allOf:
       - $ref: '#/components/schemas/addressing_api-response-single'
@@ -114,14 +161,6 @@ components:
               advertised_modified_at:
                 $ref: '#/components/schemas/addressing_modified_at_nullable'
             type: object
-    addressing_schemas-advertised:
-      description: Enablement of prefix advertisement to the Internet.
-      example: true
-      type: boolean
-    addressing_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/addressing_api-response-common'
-      type: object
     addressing_api-response-common-failure:
       properties:
         errors:
@@ -153,50 +192,11 @@ components:
       - messages
       - result
       type: object
-    addressing_modified_at_nullable:
-      description: Last time the advertisement status was changed. This field is only not 'null' if on demand is enabled.
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
-      type:
-      - string
-      - 'null'
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     addressing_identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       type: string
-    addressing_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/addressing_messages'
-        messages:
-          $ref: '#/components/schemas/addressing_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
   securitySchemes:
     api_email:
       in: header

@@ -310,7 +310,260 @@ paths:
       parameters:
       - $ref: '#/components/parameters/workspaceIncludeScimQuery'
 components:
+  examples:
+    userRoleUpdatedSCIMId:
+      value:
+        roles:
+        - id: '1'
+          displayName: Viewer
+          user:
+          - 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+    userRoleGroupUpdatedSCIMId:
+      value:
+        roles:
+        - id: '3'
+          displayName: Admin
+          user:
+          - e982929dadd02cf627e8c111925fc37a93dbc86f510840db
+          group:
+          - 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+    workspaceRoles:
+      value:
+        roles:
+        - id: '3'
+          displayName: Admin
+          user:
+          - '12345678'
+          group:
+          - '123'
+    updateRoleSCIMId:
+      value:
+        roles:
+        - op: add
+          path: /user
+          value:
+          - id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+            role: '1'
+    workspaceRolesScimIds:
+      value:
+        roles:
+        - id: '3'
+          displayName: Admin
+          user:
+          - 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+          group:
+          - 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+    updateRoleGroupSCIMId:
+      value:
+        roles:
+        - op: add
+          path: /user
+          value:
+          - id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
+            role: '3'
+        - op: add
+          path: /usergroup
+          value:
+          - id: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+            role: '3'
+    userRoleUpdated:
+      value:
+        roles:
+        - id: '1'
+          displayName: Viewer
+          user:
+          - '12345678'
+          group:
+          - '123'
+        - id: '2'
+          displayName: Editor
+          user:
+          - '87654321'
+          group:
+          - '123'
+        - id: '3'
+          displayName: Admin
+          user:
+          - '13428756'
+          group:
+          - '132'
+    updateUserRole:
+      value:
+        roles:
+        - op: add
+          path: /user
+          value:
+          - id: '12345678'
+            role: '1'
+          - id: '87654321'
+            role: '2'
+        - op: remove
+          path: /user
+          value:
+          - id: '87612345'
+            role: '1'
+        - op: add
+          path: /usergroup
+          value:
+          - id: '123'
+            role: '2'
+        - op: remove
+          path: /usergroup
+          value:
+          - id: '312'
+            role: '3'
   responses:
+    instanceNotFoundWorkspace:
+      description: Instance Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: instanceNotFoundError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: The specified workspace does not exist.
+          example:
+            error:
+              name: instanceNotFoundError
+              message: The specified workspace does not exist.
+    common401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
+    deleteWorkspace:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              workspace:
+                type: object
+                description: Information about the deleted workspace.
+                properties:
+                  id:
+                    type: string
+                    description: The workspace's ID.
+                    example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+          example:
+            workspace:
+              id: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+    common403ErrorPermissions:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/forbidden
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Resource cannot be accessed
+              detail:
+                type: string
+                description: Information about the error.
+                example: Inadequate permissions. Resource access forbidden.
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 403
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Resource cannot be accessed
+            detail: Inadequate permissions. Resource access forbidden.
+            status: 403
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
+    workspaceRoles400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The error type.
+                example: invalidParamError
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: body.roles[0] should have required property 'op'
+              detail:
+                type: string
+                description: Information about the error.
+                example: ''
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 400
+          example:
+            type: invalidParamError
+            title: body.roles[0] should have required property 'op'
+            detail: ''
+            status: 400
     getWorkspace:
       description: Successful Response
       content:
@@ -580,28 +833,6 @@ components:
                   scim:
                     createdBy: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
                     updatedBy: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-    workspace400Error:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: instanceNotFoundError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: The specified workspace does not exist.
-          example:
-            error:
-              name: instanceNotFoundError
-              message: The specified workspace does not exist.
     workspace400ErrorMalformedRequest:
       description: Workspace Not Found
       content:
@@ -620,199 +851,106 @@ components:
           example:
             name: malformedRequestError
             message: '''workspace'' object missing in the request'
-    createWorkspace:
-      description: Successful Response
+    workspaceRoles422UnsupportRoleError:
+      description: Partner and Personal Workspace Roles Unsupported
       content:
         application/json:
           schema:
             type: object
             properties:
-              workspace:
-                type: object
-                description: Information about the created workspace.
-                properties:
-                  id:
-                    type: string
-                    description: The workspace's ID.
-                    example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-                  name:
-                    type: string
-                    description: The workspace's name.
-                    example: Test Workspace
-          example:
-            workspace:
-              id: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-              name: Team Workspace
-    getWorkspaceRoles:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/getWorkspaceRoles'
-          examples:
-            Successful Response:
-              $ref: '#/components/examples/workspaceRoles'
-            Return SCIM IDs:
-              $ref: '#/components/examples/workspaceRolesScimIds'
-    resourceNotFound404Error:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/not-found
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Resource not found
               detail:
                 type: string
                 description: Information about the error.
-                example: ''
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 404
-          example:
-            type: https://api.postman.com/problems/not-found
-            title: Resource not found
-            detail: ''
-            status: 404
-    workspaceRoles400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              type:
+                example: Roles are not supported for personal and partner workspaces.
+              link:
                 type: string
                 description: The error type.
-                example: invalidParamError
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: body.roles[0] should have required property 'op'
-              detail:
-                type: string
-                description: Information about the error.
-                example: ''
+                example: https://api.postman.com/problems/unprocessable-entity
               status:
                 type: number
                 format: http-status-code
                 description: The error's HTTP status code.
-                example: 400
-          example:
-            type: invalidParamError
-            title: body.roles[0] should have required property 'op'
-            detail: ''
-            status: 400
-    globalVariables500Error:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/servererror
+                example: 422
               title:
                 type: string
                 description: A short summary of the problem.
-                example: Internal server error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Details about the error
+                example: Cannot process the request.
           example:
-            type: https://api.postman.com/problems/servererror
-            title: Internal server error
-            detail: Details about the error
-    updateWorkspaceGlobalVariables:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            description: Information about the workspace's updated global variables.
-            properties:
-              values:
-                type: array
-                description: A list of the workspace's global variables.
-                items:
-                  $ref: '#/components/schemas/globalVariable'
-          example:
-            values:
-            - key: api-key
-              type: secret
-              value: PMAK-XXXX
-              enabled: true
-            - key: collection_uid
-              type: default
-              value: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-              enabled: true
-    common401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
-    updateWorkspace:
+            detail: Roles are not supported for personal and partner workspaces.
+            link: https://api.postman.com/problems/unprocessable-entity
+            status: 422
+            title: Cannot process the request.
+    getAllWorkspaceRoles:
       description: Successful Response
       content:
         application/json:
           schema:
             type: object
             properties:
-              workspace:
+              roles:
                 type: object
-                description: Information about the updated workspace.
+                description: Information about the workspace's [user roles](https://learning.postman.com/docs/collaborating-in-postman/roles-and-permissions/#team-roles).
                 properties:
-                  id:
-                    type: string
-                    description: The workspace's ID.
-                    example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-                  name:
-                    type: string
-                    description: The workspace's name.
-                    example: Test Workspace
+                  user:
+                    type: array
+                    description: The list of user roles in the workspace.
+                    items:
+                      type: object
+                      description: Information about the user role.
+                      properties:
+                        id:
+                          type: string
+                          description: The role's ID.
+                          example: '1'
+                        description:
+                          type: string
+                          description: The role's description.
+                          example: Can manage people and all resources
+                        displayName:
+                          type: string
+                          description: The role's display name.
+                          example: Admin
+                  usergroup:
+                    type: array
+                    description: Information about the workspace's [user group roles](https://learning.postman.com/docs/collaborating-in-postman/user-groups/).
+                    items:
+                      type: object
+                      description: Information about the user group in the workspace.
+                      properties:
+                        id:
+                          type: string
+                          description: The role's ID.
+                          example: '1'
+                        description:
+                          type: string
+                          description: The role's description.
+                          example: Can manage people and all resources
+                        displayName:
+                          type: string
+                          description: The role's display name.
+                          example: Admin
           example:
-            workspace:
-              id: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-              name: Test Workspace
+            roles:
+              user:
+              - id: '3'
+                displayName: Admin
+                description: Can manage workspace details and members.
+              - id: '1'
+                displayName: Viewer
+                description: Can view, fork, and export workspace resources.
+              - id: '2'
+                displayName: Editor
+                description: Can create and edit workspace resources.
+              usergroup:
+              - id: '3'
+                displayName: Admin
+                description: Can manage workspace details and members.
+              - id: '1'
+                displayName: Viewer
+                description: Can view, fork, and export workspace resources.
+              - id: '2'
+                displayName: Editor
+                description: Can create and edit workspace resources.
     workspace403ErrorUnauthorized:
       description: Forbidden
       content:
@@ -851,29 +989,7 @@ components:
               message: You are not authorized to perform this action
               detail: You do not have permission to create team workspaces.
               instance: ''
-    instanceNotFoundWorkspace:
-      description: Instance Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: instanceNotFoundError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: The specified workspace does not exist.
-          example:
-            error:
-              name: instanceNotFoundError
-              message: The specified workspace does not exist.
-    deleteWorkspace:
+    updateWorkspace:
       description: Successful Response
       content:
         application/json:
@@ -882,15 +998,127 @@ components:
             properties:
               workspace:
                 type: object
-                description: Information about the deleted workspace.
+                description: Information about the updated workspace.
                 properties:
                   id:
                     type: string
                     description: The workspace's ID.
                     example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+                  name:
+                    type: string
+                    description: The workspace's name.
+                    example: Test Workspace
           example:
             workspace:
               id: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+              name: Test Workspace
+    resourceNotFound404Error:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/not-found
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Resource not found
+              detail:
+                type: string
+                description: Information about the error.
+                example: ''
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 404
+          example:
+            type: https://api.postman.com/problems/not-found
+            title: Resource not found
+            detail: ''
+            status: 404
+    unauthorizedError:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: An API key must be provided in the request header or query string
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: An API key must be provided in the request header or query string
+            status: 401
+    updateWorkspaceGlobalVariables:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Information about the workspace's updated global variables.
+            properties:
+              values:
+                type: array
+                description: A list of the workspace's global variables.
+                items:
+                  $ref: '#/components/schemas/globalVariable'
+          example:
+            values:
+            - key: api-key
+              type: secret
+              value: PMAK-XXXX
+              enabled: true
+            - key: collection_uid
+              type: default
+              value: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+              enabled: true
+    globalVariables500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/servererror
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal server error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Details about the error
+          example:
+            type: https://api.postman.com/problems/servererror
+            title: Internal server error
+            detail: Details about the error
     workspace403Error:
       description: Forbidden
       content:
@@ -925,6 +1153,167 @@ components:
                 error:
                   name: cannotConvertFromPublicWorkspace
                   message: Can not convert workspaces from public workspaces for team user. First convert to team.
+    workspace404ErrorNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: workspaceNotFoundError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: Workspace not found
+                  statusCode:
+                    type: number
+                    format: http-status-code
+                    description: The error's HTTP status code.
+                    example: 404
+          example:
+            error:
+              name: workspaceNotFoundError
+              message: Workspace not found
+              statusCode: 404
+    common500ErrorInternalServer:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Sever Error
+              detail:
+                type: string
+                description: An explanation about the problem.
+                example: Internal Sever Error
+              status:
+                type: integer
+                format: http-status-code
+                description: The HTTP status code generated by the origin server.
+                example: 500
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
+            status: 500
+    api401ErrorUnauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: An API key must be provided in the request header or query string
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+              instance:
+                type: string
+                description: The URI reference that identifies the specific occurrence of the problem.
+                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: An API key must be provided in the request header or query string
+            status: 401
+            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+    updateWorkspaceRoles:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              roles:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The role's ID.
+                      example: '1'
+                    user:
+                      type: array
+                      description: A list of user IDs assigned to the role.
+                      items:
+                        type: string
+                        description: The user's ID or SCIM ID.
+                        example: '12345678'
+                    group:
+                      type: array
+                      description: A list of user group IDs assigned to the role.
+                      items:
+                        type: string
+                        description: The user group's ID or SCIM ID.
+                        example: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+                    displayName:
+                      type: string
+                      description: The role's display name.
+                      enum:
+                      - Admin
+                      - Viewer
+                      - Editor
+                      example: Viewer
+          examples:
+            Update User Role:
+              $ref: '#/components/examples/userRoleUpdated'
+            Update Role with SCIM ID:
+              $ref: '#/components/examples/userRoleUpdatedSCIMId'
+            Update Role and Group with SCIM IDs:
+              $ref: '#/components/examples/userRoleGroupUpdatedSCIMId'
+    getWorkspaceGlobalVariables:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Information about the workspace's global variables.
+            properties:
+              values:
+                type: array
+                description: A list of the workspace's global variables.
+                items:
+                  $ref: '#/components/schemas/globalVariable'
+          example:
+            values:
+            - key: api-key
+              type: secret
+              value: PMAK-XXXX
+              enabled: true
+            - key: collection_uid
+              type: default
+              value: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+              enabled: true
     getWorkspaces:
       description: Successful Response
       content:
@@ -1029,182 +1418,18 @@ components:
                   createdBy: 12345678
                   scim:
                     createdBy: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-    workspaceRoles422UnsupportRoleError:
-      description: Partner and Personal Workspace Roles Unsupported
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              detail:
-                type: string
-                description: Information about the error.
-                example: Roles are not supported for personal and partner workspaces.
-              link:
-                type: string
-                description: The error type.
-                example: https://api.postman.com/problems/unprocessable-entity
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 422
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Cannot process the request.
-          example:
-            detail: Roles are not supported for personal and partner workspaces.
-            link: https://api.postman.com/problems/unprocessable-entity
-            status: 422
-            title: Cannot process the request.
-    getAllWorkspaceRoles:
+    getWorkspaceRoles:
       description: Successful Response
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              roles:
-                type: object
-                description: Information about the workspace's [user roles](https://learning.postman.com/docs/collaborating-in-postman/roles-and-permissions/#team-roles).
-                properties:
-                  user:
-                    type: array
-                    description: The list of user roles in the workspace.
-                    items:
-                      type: object
-                      description: Information about the user role.
-                      properties:
-                        id:
-                          type: string
-                          description: The role's ID.
-                          example: '1'
-                        description:
-                          type: string
-                          description: The role's description.
-                          example: Can manage people and all resources
-                        displayName:
-                          type: string
-                          description: The role's display name.
-                          example: Admin
-                  usergroup:
-                    type: array
-                    description: Information about the workspace's [user group roles](https://learning.postman.com/docs/collaborating-in-postman/user-groups/).
-                    items:
-                      type: object
-                      description: Information about the user group in the workspace.
-                      properties:
-                        id:
-                          type: string
-                          description: The role's ID.
-                          example: '1'
-                        description:
-                          type: string
-                          description: The role's description.
-                          example: Can manage people and all resources
-                        displayName:
-                          type: string
-                          description: The role's display name.
-                          example: Admin
-          example:
-            roles:
-              user:
-              - id: '3'
-                displayName: Admin
-                description: Can manage workspace details and members.
-              - id: '1'
-                displayName: Viewer
-                description: Can view, fork, and export workspace resources.
-              - id: '2'
-                displayName: Editor
-                description: Can create and edit workspace resources.
-              usergroup:
-              - id: '3'
-                displayName: Admin
-                description: Can manage workspace details and members.
-              - id: '1'
-                displayName: Viewer
-                description: Can view, fork, and export workspace resources.
-              - id: '2'
-                displayName: Editor
-                description: Can create and edit workspace resources.
-    updateWorkspaceRoles:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              roles:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: The role's ID.
-                      example: '1'
-                    user:
-                      type: array
-                      description: A list of user IDs assigned to the role.
-                      items:
-                        type: string
-                        description: The user's ID or SCIM ID.
-                        example: '12345678'
-                    group:
-                      type: array
-                      description: A list of user group IDs assigned to the role.
-                      items:
-                        type: string
-                        description: The user group's ID or SCIM ID.
-                        example: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-                    displayName:
-                      type: string
-                      description: The role's display name.
-                      enum:
-                      - Admin
-                      - Viewer
-                      - Editor
-                      example: Viewer
+            $ref: '#/components/schemas/getWorkspaceRoles'
           examples:
-            Update User Role:
-              $ref: '#/components/examples/userRoleUpdated'
-            Update Role with SCIM ID:
-              $ref: '#/components/examples/userRoleUpdatedSCIMId'
-            Update Role and Group with SCIM IDs:
-              $ref: '#/components/examples/userRoleGroupUpdatedSCIMId'
-    unauthorizedError:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: An API key must be provided in the request header or query string
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: An API key must be provided in the request header or query string
-            status: 401
-    workspace404ErrorNotFound:
+            Successful Response:
+              $ref: '#/components/examples/workspaceRoles'
+            Return SCIM IDs:
+              $ref: '#/components/examples/workspaceRolesScimIds'
+    workspace400Error:
       description: Not Found
       content:
         application/json:
@@ -1217,284 +1442,39 @@ components:
                   name:
                     type: string
                     description: The error name.
-                    example: workspaceNotFoundError
+                    example: instanceNotFoundError
                   message:
                     type: string
                     description: The error message.
-                    example: Workspace not found
-                  statusCode:
-                    type: number
-                    format: http-status-code
-                    description: The error's HTTP status code.
-                    example: 404
+                    example: The specified workspace does not exist.
           example:
             error:
-              name: workspaceNotFoundError
-              message: Workspace not found
-              statusCode: 404
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    getWorkspaceGlobalVariables:
+              name: instanceNotFoundError
+              message: The specified workspace does not exist.
+    createWorkspace:
       description: Successful Response
       content:
         application/json:
           schema:
             type: object
-            description: Information about the workspace's global variables.
             properties:
-              values:
-                type: array
-                description: A list of the workspace's global variables.
-                items:
-                  $ref: '#/components/schemas/globalVariable'
+              workspace:
+                type: object
+                description: Information about the created workspace.
+                properties:
+                  id:
+                    type: string
+                    description: The workspace's ID.
+                    example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+                  name:
+                    type: string
+                    description: The workspace's name.
+                    example: Test Workspace
           example:
-            values:
-            - key: api-key
-              type: secret
-              value: PMAK-XXXX
-              enabled: true
-            - key: collection_uid
-              type: default
-              value: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-              enabled: true
-    common500ErrorInternalServer:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Sever Error
-              detail:
-                type: string
-                description: An explanation about the problem.
-                example: Internal Sever Error
-              status:
-                type: integer
-                format: http-status-code
-                description: The HTTP status code generated by the origin server.
-                example: 500
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-            status: 500
-    api401ErrorUnauthorized:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: An API key must be provided in the request header or query string
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-              instance:
-                type: string
-                description: The URI reference that identifies the specific occurrence of the problem.
-                example: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: An API key must be provided in the request header or query string
-            status: 401
-            instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
-    common403ErrorPermissions:
-      description: Forbidden
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/forbidden
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Resource cannot be accessed
-              detail:
-                type: string
-                description: Information about the error.
-                example: Inadequate permissions. Resource access forbidden.
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 403
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Resource cannot be accessed
-            detail: Inadequate permissions. Resource access forbidden.
-            status: 403
-  examples:
-    updateRoleGroupSCIMId:
-      value:
-        roles:
-        - op: add
-          path: /user
-          value:
-          - id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-            role: '3'
-        - op: add
-          path: /usergroup
-          value:
-          - id: 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-            role: '3'
-    userRoleGroupUpdatedSCIMId:
-      value:
-        roles:
-        - id: '3'
-          displayName: Admin
-          user:
-          - e982929dadd02cf627e8c111925fc37a93dbc86f510840db
-          group:
-          - 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
-    updateRoleSCIMId:
-      value:
-        roles:
-        - op: add
-          path: /user
-          value:
-          - id: 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-            role: '1'
-    updateUserRole:
-      value:
-        roles:
-        - op: add
-          path: /user
-          value:
-          - id: '12345678'
-            role: '1'
-          - id: '87654321'
-            role: '2'
-        - op: remove
-          path: /user
-          value:
-          - id: '87612345'
-            role: '1'
-        - op: add
-          path: /usergroup
-          value:
-          - id: '123'
-            role: '2'
-        - op: remove
-          path: /usergroup
-          value:
-          - id: '312'
-            role: '3'
-    userRoleUpdatedSCIMId:
-      value:
-        roles:
-        - id: '1'
-          displayName: Viewer
-          user:
-          - 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-    workspaceRoles:
-      value:
-        roles:
-        - id: '3'
-          displayName: Admin
-          user:
-          - '12345678'
-          group:
-          - '123'
-    userRoleUpdated:
-      value:
-        roles:
-        - id: '1'
-          displayName: Viewer
-          user:
-          - '12345678'
-          group:
-          - '123'
-        - id: '2'
-          displayName: Editor
-          user:
-          - '87654321'
-          group:
-          - '123'
-        - id: '3'
-          displayName: Admin
-          user:
-          - '13428756'
-          group:
-          - '132'
-    workspaceRolesScimIds:
-      value:
-        roles:
-        - id: '3'
-          displayName: Admin
-          user:
-          - 405775fe15ed41872a8eea4c8aa2b38cda9749812cc55c99
-          group:
-          - 561631fq14ed41872a8eea4c8aa2b38cda9749812cc55c00
+            workspace:
+              id: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+              name: Team Workspace
   parameters:
-    workspaceIncludeScimQuery:
-      name: include
-      in: query
-      description: 'Include the following information in the endpoint''s response:
-
-        - `scim` — Return IDs as SCIM user and group IDs.
-
-        '
-      schema:
-        type: string
-        example: scim
-        enum:
-        - scim
-    identifierType:
-      name: identifierType
-      in: header
-      description: Use SCIM user IDs instead of Postman user IDs.
-      schema:
-        type: string
-        example: scim
     workspaceTypeQuery:
       name: type
       in: query
@@ -1508,13 +1488,26 @@ components:
         - private
         - public
         - partner
-    workspaceCreatedBy:
-      name: createdBy
-      in: query
-      description: Return only workspaces created by a specific user ID. For multiple users, pass this value as a comma-separated list of user IDs. The response only returns workspaces that you have access to.
+    workspaceId:
+      name: workspaceId
+      in: path
+      required: true
+      description: The workspace's ID.
       schema:
-        type: integer
-        example: 12345678
+        $ref: '#/components/schemas/workspaceId'
+    workspaceIncludeScimQuery:
+      name: include
+      in: query
+      description: 'Include the following information in the endpoint''s response:
+
+        - `scim` — Return IDs as SCIM user and group IDs.
+
+        '
+      schema:
+        type: string
+        example: scim
+        enum:
+        - scim
     workspaceIncludeQuery:
       name: include
       in: query
@@ -1531,78 +1524,20 @@ components:
         enum:
         - mocks:deactivated
         - scim
-    workspaceId:
-      name: workspaceId
-      in: path
-      required: true
-      description: The workspace's ID.
+    workspaceCreatedBy:
+      name: createdBy
+      in: query
+      description: Return only workspaces created by a specific user ID. For multiple users, pass this value as a comma-separated list of user IDs. The response only returns workspaces that you have access to.
       schema:
-        $ref: '#/components/schemas/workspaceId'
-  schemas:
-    workspaceId:
-      type: string
-      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-    globalVariable:
-      title: Global Variable
-      type: object
-      description: Information about the global variable.
-      properties:
-        key:
-          type: string
-          description: The variable's name.
-          example: variableName
-        type:
-          type: string
-          description: The [type](https://learning.postman.com/docs/sending-requests/variables/#variable-types) of variable.
-          enum:
-          - default
-          - secret
-          example: default
-        value:
-          type: string
-          description: The variable's value.
-          example: variableValue
-        enabled:
-          type: boolean
-          description: If true, the variable is enabled.
-          example: true
-    getWorkspaceRoles:
-      title: Workspace Roles
-      type: object
-      description: Information about the workspace's roles.
-      properties:
-        roles:
-          type: array
-          description: A list of workspace roles and the users and groups assigned to them.
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: The role's ID.
-                example: '3'
-              user:
-                type: array
-                description: A list of user IDs assigned to the role.
-                items:
-                  type: string
-                  description: The user's ID or SCIM ID.
-                  example: '12345678'
-              group:
-                type: array
-                description: A list of user group IDs assigned to the role.
-                items:
-                  type: string
-                  description: The group's ID.
-                  example: '123'
-              displayName:
-                type: string
-                description: The role's display name.
-                enum:
-                - Admin
-                - Viewer
-                - Editor
-                example: Viewer
+        type: integer
+        example: 12345678
+    identifierType:
+      name: identifierType
+      in: header
+      description: Use SCIM user IDs instead of Postman user IDs.
+      schema:
+        type: string
+        example: scim
   requestBodies:
     updateWorkspaceRoles:
       content:
@@ -1666,43 +1601,27 @@ components:
               $ref: '#/components/examples/updateRoleSCIMId'
             Update Role and Group with SCIM IDs:
               $ref: '#/components/examples/updateRoleGroupSCIMId'
-    updateWorkspace:
+    updateWorkspaceGlobalVariables:
       content:
         application/json:
           schema:
             type: object
             properties:
-              workspace:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The workspace's new name.
-                    example: Test Workspace
-                  type:
-                    type: string
-                    description: 'The new workspace visibility [type](https://learning.postman.com/docs/collaborating-in-postman/using-workspaces/managing-workspaces/#changing-workspace-visibility). This property does not support the following workspace visibility changes:
-
-                      - `private` to `public`, `public` to `private`, and `private` to `personal` for Free and Basic [plans](https://www.postman.com/pricing/).
-
-                      - `public` to `personal` for team users.
-
-                      '
-                    enum:
-                    - private
-                    - personal
-                    - team
-                    - public
-                    example: team
-                  description:
-                    type: string
-                    description: The new workspace description.
-                    example: This is a test team workspace.
+              values:
+                type: array
+                description: A list of the workspace's global variables.
+                items:
+                  $ref: '#/components/schemas/globalVariable'
           example:
-            workspace:
-              name: Test Workspace
-              description: This is a test team workspace.
-              type: team
+            values:
+            - key: api-key
+              type: secret
+              value: PMAK-XXXX
+              enabled: true
+            - key: collection_uid
+              type: default
+              value: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+              enabled: true
     createWorkspace:
       content:
         application/json:
@@ -1751,27 +1670,108 @@ components:
               name: Team Workspace
               type: team
               description: This is a team workspace.
-    updateWorkspaceGlobalVariables:
+    updateWorkspace:
       content:
         application/json:
           schema:
             type: object
             properties:
-              values:
-                type: array
-                description: A list of the workspace's global variables.
-                items:
-                  $ref: '#/components/schemas/globalVariable'
+              workspace:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The workspace's new name.
+                    example: Test Workspace
+                  type:
+                    type: string
+                    description: 'The new workspace visibility [type](https://learning.postman.com/docs/collaborating-in-postman/using-workspaces/managing-workspaces/#changing-workspace-visibility). This property does not support the following workspace visibility changes:
+
+                      - `private` to `public`, `public` to `private`, and `private` to `personal` for Free and Basic [plans](https://www.postman.com/pricing/).
+
+                      - `public` to `personal` for team users.
+
+                      '
+                    enum:
+                    - private
+                    - personal
+                    - team
+                    - public
+                    example: team
+                  description:
+                    type: string
+                    description: The new workspace description.
+                    example: This is a test team workspace.
           example:
-            values:
-            - key: api-key
-              type: secret
-              value: PMAK-XXXX
-              enabled: true
-            - key: collection_uid
-              type: default
-              value: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-              enabled: true
+            workspace:
+              name: Test Workspace
+              description: This is a test team workspace.
+              type: team
+  schemas:
+    workspaceId:
+      type: string
+      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+    getWorkspaceRoles:
+      title: Workspace Roles
+      type: object
+      description: Information about the workspace's roles.
+      properties:
+        roles:
+          type: array
+          description: A list of workspace roles and the users and groups assigned to them.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The role's ID.
+                example: '3'
+              user:
+                type: array
+                description: A list of user IDs assigned to the role.
+                items:
+                  type: string
+                  description: The user's ID or SCIM ID.
+                  example: '12345678'
+              group:
+                type: array
+                description: A list of user group IDs assigned to the role.
+                items:
+                  type: string
+                  description: The group's ID.
+                  example: '123'
+              displayName:
+                type: string
+                description: The role's display name.
+                enum:
+                - Admin
+                - Viewer
+                - Editor
+                example: Viewer
+    globalVariable:
+      title: Global Variable
+      type: object
+      description: Information about the global variable.
+      properties:
+        key:
+          type: string
+          description: The variable's name.
+          example: variableName
+        type:
+          type: string
+          description: The [type](https://learning.postman.com/docs/sending-requests/variables/#variable-types) of variable.
+          enum:
+          - default
+          - secret
+          example: default
+        value:
+          type: string
+          description: The variable's value.
+          example: variableValue
+        enabled:
+          type: boolean
+          description: If true, the variable is enabled.
+          example: true
   securitySchemes:
     PostmanApiKey:
       type: apiKey

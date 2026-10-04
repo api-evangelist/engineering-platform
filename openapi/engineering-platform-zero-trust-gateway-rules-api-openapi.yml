@@ -244,29 +244,29 @@ paths:
       - Zero Trust Gateway Rules
 components:
   schemas:
-    zero-trust-gateway_precedence:
-      description: Precedence sets the order of your rules. Lower values indicate higher precedence. At each processing phase, applicable rules are evaluated in ascending order of this value.
-      type: integer
-    zero-trust-gateway_rules_components-schemas-uuid:
-      description: The API resource UUID.
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    zero-trust-gateway_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    zero-trust-gateway_empty_response:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
+      - properties:
+          result:
+            type: object
+    zero-trust-gateway_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/zero-trust-gateway_messages'
+        messages:
+          $ref: '#/components/schemas/zero-trust-gateway_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     zero-trust-gateway_result_info:
       properties:
         count:
@@ -286,29 +286,21 @@ components:
           example: 2000
           type: number
       type: object
-    zero-trust-gateway_rules_components-schemas-response_collection:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-collection'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/zero-trust-gateway_rules'
-            type: array
-    zero-trust-gateway_traffic:
-      description: The wirefilter expression used for traffic matching.
-      example: http.request.uri matches ".*a/partial/uri.*" and http.request.host in $01302951-49f9-47c9-a400-0297e60b6a10
-      type: string
-    zero-trust-gateway_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/zero-trust-gateway_result_info'
-      type: object
-    zero-trust-gateway_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
-      type: object
+    zero-trust-gateway_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     zero-trust-gateway_action:
       description: The action to preform when the associated traffic, identity, and device posture expressions are either absent or evaluate to `true`.
       enum:
@@ -329,42 +321,25 @@ components:
       - resolve
       example: allow
       type: string
-    zero-trust-gateway_schedule:
-      description: The schedule for activating DNS policies. This does not apply to HTTP or network policies.
-      properties:
-        fri:
-          description: The time intervals when the rule will be active on Fridays, in increasing order from 00:00-24:00.  If this parameter is omitted, the rule will be deactivated on Fridays.
-          example: 08:00-12:30,13:30-17:00
-          type: string
-        mon:
-          description: The time intervals when the rule will be active on Mondays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Mondays.
-          example: 08:00-12:30,13:30-17:00
-          type: string
-        sat:
-          description: The time intervals when the rule will be active on Saturdays, in increasing order from 00:00-24:00.  If this parameter is omitted, the rule will be deactivated on Saturdays.
-          example: 08:00-12:30,13:30-17:00
-          type: string
-        sun:
-          description: The time intervals when the rule will be active on Sundays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Sundays.
-          example: 08:00-12:30,13:30-17:00
-          type: string
-        thu:
-          description: The time intervals when the rule will be active on Thursdays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Thursdays.
-          example: 08:00-12:30,13:30-17:00
-          type: string
-        time_zone:
-          description: The time zone the rule will be evaluated against. If a [valid time zone city name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) is provided, Gateway will always use the current time at that time zone. If this parameter is omitted, then Gateway will use the time zone inferred from the user's source IP to evaluate the rule. If Gateway cannot determine the time zone from the IP, we will fall back to the time zone of the user's connected data center.
-          example: America/New York
-          type: string
-        tue:
-          description: The time intervals when the rule will be active on Tuesdays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Tuesdays.
-          example: 08:00-12:30,13:30-17:00
-          type: string
-        wed:
-          description: The time intervals when the rule will be active on Wednesdays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Wednesdays.
-          example: 08:00-12:30,13:30-17:00
-          type: string
-      type: object
+    zero-trust-gateway_schemas-description:
+      description: The description of the rule.
+      example: Block bad websites based on their host name.
+      type: string
+    zero-trust-gateway_identity:
+      description: The wirefilter expression used for identity matching.
+      example: any(identity.groups.name[*] in {"finance"})
+      type: string
+    zero-trust-gateway_rules_components-schemas-uuid:
+      description: The API resource UUID.
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
+    zero-trust-gateway_rules_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/zero-trust-gateway_rules'
     zero-trust-gateway_filters:
       description: The protocol or layer to evaluate the traffic, identity, and device posture expressions.
       example:
@@ -379,6 +354,10 @@ components:
         example: http
         type: string
       type: array
+    zero-trust-gateway_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
+      type: object
     zero-trust-gateway_rule-settings:
       description: Additional settings that modify the rule's action.
       properties:
@@ -560,61 +539,18 @@ components:
               type: string
           type: object
       type: object
-    zero-trust-gateway_timestamp:
-      example: '2014-01-01T05:20:00.12345Z'
-      format: date-time
+    zero-trust-gateway_identifier:
+      example: 699d98642c564d2e855e9661899b7252
       type: string
-    zero-trust-gateway_dns_resolver_settings_v6:
-      properties:
-        ip:
-          description: IPv6 address of upstream resolver.
-          example: '2001:DB8::'
-          type: string
-        port:
-          description: A port number to use for upstream resolver. Defaults to 53 if unspecified.
-          example: 5053
-          type: integer
-        route_through_private_network:
-          description: Whether to connect to this resolver over a private network. Must be set when vnet_id is set.
-          example: true
-          type: boolean
-        vnet_id:
-          description: Optionally specify a virtual network for this resolver. Uses default virtual network id if omitted.
-          example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-          type: string
-      required:
-      - ip
-      type: object
-    zero-trust-gateway_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/zero-trust-gateway_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/zero-trust-gateway_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
+    zero-trust-gateway_precedence:
+      description: Precedence sets the order of your rules. Lower values indicate higher precedence. At each processing phase, applicable rules are evaluated in ascending order of this value.
+      type: integer
+    zero-trust-gateway_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/zero-trust-gateway_result_info'
       type: object
     zero-trust-gateway_rules:
       properties:
@@ -649,19 +585,93 @@ components:
         updated_at:
           $ref: '#/components/schemas/zero-trust-gateway_timestamp'
       type: object
-    zero-trust-gateway_identity:
-      description: The wirefilter expression used for identity matching.
-      example: any(identity.groups.name[*] in {"finance"})
+    zero-trust-gateway_schedule:
+      description: The schedule for activating DNS policies. This does not apply to HTTP or network policies.
+      properties:
+        fri:
+          description: The time intervals when the rule will be active on Fridays, in increasing order from 00:00-24:00.  If this parameter is omitted, the rule will be deactivated on Fridays.
+          example: 08:00-12:30,13:30-17:00
+          type: string
+        mon:
+          description: The time intervals when the rule will be active on Mondays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Mondays.
+          example: 08:00-12:30,13:30-17:00
+          type: string
+        sat:
+          description: The time intervals when the rule will be active on Saturdays, in increasing order from 00:00-24:00.  If this parameter is omitted, the rule will be deactivated on Saturdays.
+          example: 08:00-12:30,13:30-17:00
+          type: string
+        sun:
+          description: The time intervals when the rule will be active on Sundays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Sundays.
+          example: 08:00-12:30,13:30-17:00
+          type: string
+        thu:
+          description: The time intervals when the rule will be active on Thursdays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Thursdays.
+          example: 08:00-12:30,13:30-17:00
+          type: string
+        time_zone:
+          description: The time zone the rule will be evaluated against. If a [valid time zone city name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) is provided, Gateway will always use the current time at that time zone. If this parameter is omitted, then Gateway will use the time zone inferred from the user's source IP to evaluate the rule. If Gateway cannot determine the time zone from the IP, we will fall back to the time zone of the user's connected data center.
+          example: America/New York
+          type: string
+        tue:
+          description: The time intervals when the rule will be active on Tuesdays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Tuesdays.
+          example: 08:00-12:30,13:30-17:00
+          type: string
+        wed:
+          description: The time intervals when the rule will be active on Wednesdays, in increasing order from 00:00-24:00. If this parameter is omitted, the rule will be deactivated on Wednesdays.
+          example: 08:00-12:30,13:30-17:00
+          type: string
+      type: object
+    zero-trust-gateway_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/zero-trust-gateway_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/zero-trust-gateway_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    zero-trust-gateway_components-schemas-name:
+      description: The name of the rule.
+      example: block bad websites
       type: string
-    zero-trust-gateway_identifier:
-      example: 699d98642c564d2e855e9661899b7252
-      type: string
-    zero-trust-gateway_rules_components-schemas-single_response:
+    zero-trust-gateway_rules_components-schemas-response_collection:
       allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
+      - $ref: '#/components/schemas/zero-trust-gateway_api-response-collection'
       - properties:
           result:
-            $ref: '#/components/schemas/zero-trust-gateway_rules'
+            items:
+              $ref: '#/components/schemas/zero-trust-gateway_rules'
+            type: array
+    zero-trust-gateway_device_posture:
+      description: The wirefilter expression used for device posture check matching.
+      example: any(device_posture.checks.passed[*] in {"1308749e-fcfb-4ebc-b051-fe022b632644"})
+      type: string
+    zero-trust-gateway_traffic:
+      description: The wirefilter expression used for traffic matching.
+      example: http.request.uri matches ".*a/partial/uri.*" and http.request.host in $01302951-49f9-47c9-a400-0297e60b6a10
+      type: string
     zero-trust-gateway_deleted_at:
       description: Date of deletion, if any.
       format: date-time
@@ -669,35 +679,10 @@ components:
       type:
       - string
       - 'null'
-    zero-trust-gateway_device_posture:
-      description: The wirefilter expression used for device posture check matching.
-      example: any(device_posture.checks.passed[*] in {"1308749e-fcfb-4ebc-b051-fe022b632644"})
-      type: string
     zero-trust-gateway_enabled:
       description: True if the rule is enabled.
       example: true
       type: boolean
-    zero-trust-gateway_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/zero-trust-gateway_messages'
-        messages:
-          $ref: '#/components/schemas/zero-trust-gateway_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    zero-trust-gateway_schemas-description:
-      description: The description of the rule.
-      example: Block bad websites based on their host name.
-      type: string
     zero-trust-gateway_dns_resolver_settings_v4:
       properties:
         ip:
@@ -719,16 +704,31 @@ components:
       required:
       - ip
       type: object
-    zero-trust-gateway_empty_response:
-      allOf:
-      - $ref: '#/components/schemas/zero-trust-gateway_api-response-single'
-      - properties:
-          result:
-            type: object
-    zero-trust-gateway_components-schemas-name:
-      description: The name of the rule.
-      example: block bad websites
+    zero-trust-gateway_timestamp:
+      example: '2014-01-01T05:20:00.12345Z'
+      format: date-time
       type: string
+    zero-trust-gateway_dns_resolver_settings_v6:
+      properties:
+        ip:
+          description: IPv6 address of upstream resolver.
+          example: '2001:DB8::'
+          type: string
+        port:
+          description: A port number to use for upstream resolver. Defaults to 53 if unspecified.
+          example: 5053
+          type: integer
+        route_through_private_network:
+          description: Whether to connect to this resolver over a private network. Must be set when vnet_id is set.
+          example: true
+          type: boolean
+        vnet_id:
+          description: Optionally specify a virtual network for this resolver. Uses default virtual network id if omitted.
+          example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+          type: string
+      required:
+      - ip
+      type: object
   securitySchemes:
     api_email:
       in: header

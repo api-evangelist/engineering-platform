@@ -163,56 +163,26 @@ paths:
       - Account Settings Write
 components:
   schemas:
-    aaa_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    aaa_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/aaa_result_info'
-      type: object
-    aaa_sensitive_id_response:
-      allOf:
-      - $ref: '#/components/schemas/aaa_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/aaa_token'
-            type: object
-    aaa_result_info:
+    aaa_pagerduty:
       properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
+        id:
+          $ref: '#/components/schemas/aaa_uuid'
+        name:
+          $ref: '#/components/schemas/aaa_name'
       type: object
+    aaa_account-id:
+      description: The account id
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    aaa_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      readOnly: true
+      type: string
+      x-auditable: true
     aaa_api-response-common:
       properties:
         errors:
@@ -230,29 +200,35 @@ components:
       - errors
       - messages
       type: object
-    aaa_pagerduty:
-      properties:
-        id:
-          $ref: '#/components/schemas/aaa_uuid'
-        name:
-          $ref: '#/components/schemas/aaa_name'
-      type: object
+    aaa_name:
+      description: The name of the pagerduty service.
+      example: My PagerDuty Service
+      type: string
+    aaa_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    aaa_integration-token:
+      description: The token integration key
+      example: 8c71e667571b4f61b94d9e4b12158038
+      maxLength: 32
+      readOnly: true
+      type: string
     aaa_api-response-single:
       allOf:
       - $ref: '#/components/schemas/aaa_api-response-common'
       type: object
-    aaa_token:
-      description: token in form of UUID
-      example: a313ba7d-3e46-4c0e-a408-08fafbc3816a
-      maxLength: 36
-      readOnly: true
-      type: string
-    aaa_account-id:
-      description: The account id
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
     aaa_components-schemas-response_collection:
       allOf:
       - $ref: '#/components/schemas/aaa_api-response-collection'
@@ -261,6 +237,13 @@ components:
             items:
               $ref: '#/components/schemas/aaa_pagerduty'
             type: array
+    aaa_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/aaa_result_info'
+      type: object
     aaa_schemas-api-response-common-failure:
       properties:
         errors:
@@ -285,17 +268,25 @@ components:
       - errors
       - messages
       type: object
-    aaa_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      readOnly: true
-      type: string
-      x-auditable: true
-    aaa_name:
-      description: The name of the pagerduty service.
-      example: My PagerDuty Service
-      type: string
+    aaa_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
     aaa_id_response:
       allOf:
       - $ref: '#/components/schemas/aaa_api-response-single'
@@ -305,10 +296,19 @@ components:
               id:
                 $ref: '#/components/schemas/aaa_uuid'
             type: object
-    aaa_integration-token:
-      description: The token integration key
-      example: 8c71e667571b4f61b94d9e4b12158038
-      maxLength: 32
+    aaa_sensitive_id_response:
+      allOf:
+      - $ref: '#/components/schemas/aaa_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/aaa_token'
+            type: object
+    aaa_token:
+      description: token in form of UUID
+      example: a313ba7d-3e46-4c0e-a408-08fafbc3816a
+      maxLength: 36
       readOnly: true
       type: string
   securitySchemes:

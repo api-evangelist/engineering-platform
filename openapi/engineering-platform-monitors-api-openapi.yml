@@ -145,125 +145,7 @@ paths:
         '500':
           $ref: '#/components/responses/common500ErrorServerError'
 components:
-  examples:
-    monitors400ErrorInvalidCollectionUid:
-      value:
-        error:
-          name: invalidUidError
-          message: The specified uid is invalid.
-          details:
-            param: collection
-            uid: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-    monitors400ErrorInvalidTimezone:
-      value:
-        error:
-          name: invalidParamsError
-          message: The request had invalid parameters
-          details:
-            param: schedule.timezone
-    monitors400ErrorMissingParameter:
-      value:
-        error:
-          name: paramMissingError
-          message: Parameter is missing in the request.
-          details:
-            param:
-            - name
-    monitors400ErrorInvalidCronPattern:
-      value:
-        error:
-          name: cronPatternNotAllowedError
-          message: Invalid cron pattern. Enter a valid cron pattern, such as "0 17 * * *"
-          details:
-            pattern: '* * * * *'
-    monitors400ErrorInvalidEnvironmentUid:
-      value:
-        error:
-          name: invalidUidError
-          message: The specified uid is invalid.
-          details:
-            param: environment
-            uid: 5daabc50-8451-43f6-922d-96b403b4f28e
-  parameters:
-    workspaceQuery:
-      name: workspace
-      in: query
-      description: The workspace's ID.
-      schema:
-        $ref: '#/components/schemas/workspaceId'
-    async:
-      name: async
-      in: query
-      description: If true, runs the monitor asynchronously from the created monitor run task. By default, the server will not respond until the task finishes (`false`).
-      schema:
-        type: boolean
-        default: false
-        example: false
-    monitorId:
-      name: monitorId
-      in: path
-      required: true
-      description: The monitor's ID.
-      schema:
-        type: string
-        example: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-    workspaceResultsQuery:
-      name: workspace
-      in: query
-      description: Return only results found in the given workspace.
-      schema:
-        $ref: '#/components/schemas/workspaceId'
   responses:
-    createMonitor:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              monitor:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The monitor's ID.
-                    example: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-                  name:
-                    type: string
-                    description: The monitor's name.
-                    example: Test Monitor
-                  uid:
-                    type: string
-                    format: uid
-                    description: The monitor's unique ID.
-                    example: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-          example:
-            monitor:
-              id: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-              name: Test Monitor
-              uid: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-    instanceNotFoundMonitor:
-      description: Instance Not Found
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: instanceNotFoundError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: The specified monitor does not exist.
-          example:
-            error:
-              name: instanceNotFoundError
-              message: The specified monitor does not exist.
     getMonitor:
       description: Successful Response
       content:
@@ -443,31 +325,27 @@ components:
                     failed: 1
                   requests:
                     total: 4
-    monitors400ErrorInvalidCronPattern:
-      description: Invalid Cron Pattern
+    monitors400CreateErrors:
+      description: Bad Request
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/monitors400ErrorInvalidCronPattern'
-          example:
-            value:
-              error:
-                name: cronPatternNotAllowedError
-                message: Invalid cron pattern. Enter a valid cron pattern, such as "0 17 * * *"
-                details:
-                  pattern: '* * * * *'
-    featureUnavailable403Error:
-      description: Feature Unavailable
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/featureUnavailable403Error'
-          example:
-            value:
-              type: https://api.postman.com/problems/forbidden
-              title: Forbidden
-              detail: This feature isn't available in your region.
-              status: 403
+            anyOf:
+            - $ref: '#/components/schemas/monitors400ErrorInvalidCronPattern'
+            - $ref: '#/components/schemas/monitors400ErrorInvalidTimezone'
+            - $ref: '#/components/schemas/monitors400ErrorInvalidUid'
+            - $ref: '#/components/schemas/monitors400ParamMissing'
+          examples:
+            Invalid Cron Pattern:
+              $ref: '#/components/examples/monitors400ErrorInvalidCronPattern'
+            Invalid Timezone:
+              $ref: '#/components/examples/monitors400ErrorInvalidTimezone'
+            Invalid Collection UID:
+              $ref: '#/components/examples/monitors400ErrorInvalidCollectionUid'
+            Invalid Environment UID:
+              $ref: '#/components/examples/monitors400ErrorInvalidEnvironmentUid'
+            Missing Parameter:
+              $ref: '#/components/examples/monitors400ErrorMissingParameter'
     common401Error:
       description: Unauthorized
       content:
@@ -498,6 +376,123 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
+    monitors400ErrorInvalidCronPattern:
+      description: Invalid Cron Pattern
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/monitors400ErrorInvalidCronPattern'
+          example:
+            value:
+              error:
+                name: cronPatternNotAllowedError
+                message: Invalid cron pattern. Enter a valid cron pattern, such as "0 17 * * *"
+                details:
+                  pattern: '* * * * *'
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
+    getMonitors:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              monitors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The monitor's ID.
+                      example: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+                    name:
+                      type: string
+                      description: The monitor's name.
+                      example: Test Monitor
+                    owner:
+                      type: string
+                      description: The ID of the monitor's owner.
+                      example: '12345678'
+                    uid:
+                      type: string
+                      format: uid
+                      description: The monitor's unique ID.
+                      example: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+          example:
+            monitors:
+            - id: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+              name: Test Monitor
+              uid: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+              owner: '12345678'
+            - id: 1e6b6cb7-f13d-4000-acb7-0695757174a8
+              name: Postman Echo Monitor
+              uid: 87654321-1e6b6cb7-f13d-4000-acb7-0695757174a8
+              owner: '87654321'
+    common403ErrorAndFeatureUnavailable:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            anyOf:
+            - $ref: '#/components/schemas/common403Error'
+            - $ref: '#/components/schemas/featureUnavailable403Error'
+          examples:
+            Forbidden:
+              value:
+                type: https://api.postman.com/problems/forbidden
+                title: Forbidden
+                detail: Forbidden
+                status: 403
+            Feature Unavailable:
+              value:
+                type: https://api.postman.com/problems/forbidden
+                title: Forbidden
+                detail: This feature isn't available in your region.
+                status: 403
+    instanceNotFoundMonitor:
+      description: Instance Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: instanceNotFoundError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: The specified monitor does not exist.
+          example:
+            error:
+              name: instanceNotFoundError
+              message: The specified monitor does not exist.
     updateMonitor:
       description: Successful Response
       content:
@@ -526,27 +521,69 @@ components:
               id: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
               name: Test Monitor
               uid: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-    common403ErrorAndFeatureUnavailable:
-      description: Forbidden
+    featureUnavailable403Error:
+      description: Feature Unavailable
       content:
         application/json:
           schema:
-            anyOf:
-            - $ref: '#/components/schemas/common403Error'
-            - $ref: '#/components/schemas/featureUnavailable403Error'
-          examples:
-            Forbidden:
-              value:
-                type: https://api.postman.com/problems/forbidden
-                title: Forbidden
-                detail: Forbidden
-                status: 403
-            Feature Unavailable:
-              value:
-                type: https://api.postman.com/problems/forbidden
-                title: Forbidden
-                detail: This feature isn't available in your region.
-                status: 403
+            $ref: '#/components/schemas/featureUnavailable403Error'
+          example:
+            value:
+              type: https://api.postman.com/problems/forbidden
+              title: Forbidden
+              detail: This feature isn't available in your region.
+              status: 403
+    createMonitor:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              monitor:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The monitor's ID.
+                    example: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+                  name:
+                    type: string
+                    description: The monitor's name.
+                    example: Test Monitor
+                  uid:
+                    type: string
+                    format: uid
+                    description: The monitor's unique ID.
+                    example: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+          example:
+            monitor:
+              id: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+              name: Test Monitor
+              uid: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+    deleteMonitor:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              monitor:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The monitor's ID.
+                    example: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+                  uid:
+                    type: string
+                    format: uid
+                    description: The monitor's unique ID.
+                    example: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+          example:
+            monitor:
+              id: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+              uid: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
     runMonitor:
       description: Successful Response
       content:
@@ -764,112 +801,106 @@ components:
                     status: success
                     startedAt: '2022-06-17T19:50:04.019Z'
                     finishedAt: '2022-06-17T19:50:06.439Z'
-    monitors400CreateErrors:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            anyOf:
-            - $ref: '#/components/schemas/monitors400ErrorInvalidCronPattern'
-            - $ref: '#/components/schemas/monitors400ErrorInvalidTimezone'
-            - $ref: '#/components/schemas/monitors400ErrorInvalidUid'
-            - $ref: '#/components/schemas/monitors400ParamMissing'
-          examples:
-            Invalid Cron Pattern:
-              $ref: '#/components/examples/monitors400ErrorInvalidCronPattern'
-            Invalid Timezone:
-              $ref: '#/components/examples/monitors400ErrorInvalidTimezone'
-            Invalid Collection UID:
-              $ref: '#/components/examples/monitors400ErrorInvalidCollectionUid'
-            Invalid Environment UID:
-              $ref: '#/components/examples/monitors400ErrorInvalidEnvironmentUid'
-            Missing Parameter:
-              $ref: '#/components/examples/monitors400ErrorMissingParameter'
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    getMonitors:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              monitors:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      description: The monitor's ID.
-                      example: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-                    name:
-                      type: string
-                      description: The monitor's name.
-                      example: Test Monitor
-                    owner:
-                      type: string
-                      description: The ID of the monitor's owner.
-                      example: '12345678'
-                    uid:
-                      type: string
-                      format: uid
-                      description: The monitor's unique ID.
-                      example: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-          example:
-            monitors:
-            - id: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-              name: Test Monitor
-              uid: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-              owner: '12345678'
-            - id: 1e6b6cb7-f13d-4000-acb7-0695757174a8
-              name: Postman Echo Monitor
-              uid: 87654321-1e6b6cb7-f13d-4000-acb7-0695757174a8
-              owner: '87654321'
-    deleteMonitor:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              monitor:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The monitor's ID.
-                    example: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-                  uid:
-                    type: string
-                    format: uid
-                    description: The monitor's unique ID.
-                    example: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-          example:
-            monitor:
-              id: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
-              uid: 12345678-1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+  parameters:
+    monitorId:
+      name: monitorId
+      in: path
+      required: true
+      description: The monitor's ID.
+      schema:
+        type: string
+        example: 1e6b6cc1-c760-48e0-968f-4bfaeeae9af1
+    async:
+      name: async
+      in: query
+      description: If true, runs the monitor asynchronously from the created monitor run task. By default, the server will not respond until the task finishes (`false`).
+      schema:
+        type: boolean
+        default: false
+        example: false
+    workspaceResultsQuery:
+      name: workspace
+      in: query
+      description: Return only results found in the given workspace.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
+    workspaceQuery:
+      name: workspace
+      in: query
+      description: The workspace's ID.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
   schemas:
+    featureUnavailable403Error:
+      title: Feature Unavailable
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Forbidden
+        detail:
+          type: string
+          description: Information about the error.
+          example: This feature isn't available in your region.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+    monitors400ParamMissing:
+      title: Missing Parameter
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The error name.
+              example: paramMissingError
+            message:
+              type: string
+              description: The error message.
+              example: Parameter is missing in the request.
+            details:
+              type: object
+              description: Information about the error.
+              properties:
+                param:
+                  type: array
+                  description: A list of the missing parameters.
+                  items:
+                    type: string
+                    example: name
+    monitors400ErrorInvalidCronPattern:
+      title: Invalid Cron Pattern
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The error name.
+              example: cronPatternNotAllowedError
+            message:
+              type: string
+              description: The error message.
+              example: Invalid cron pattern. Enter a valid cron pattern, such as "0 17 * * *"
+            details:
+              type: object
+              description: Information about the error.
+              properties:
+                pattern:
+                  type: string
+                  description: The invalid cron pattern.
+                  example: '* * * * *'
     workspaceId:
       type: string
       example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
@@ -918,51 +949,6 @@ components:
                   type: string
                   description: The invalid parameter.
                   example: schedule.timezone
-    featureUnavailable403Error:
-      title: Feature Unavailable
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/forbidden
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Forbidden
-        detail:
-          type: string
-          description: Information about the error.
-          example: This feature isn't available in your region.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
-    monitors400ErrorInvalidCronPattern:
-      title: Invalid Cron Pattern
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            name:
-              type: string
-              description: The error name.
-              example: cronPatternNotAllowedError
-            message:
-              type: string
-              description: The error message.
-              example: Invalid cron pattern. Enter a valid cron pattern, such as "0 17 * * *"
-            details:
-              type: object
-              description: Information about the error.
-              properties:
-                pattern:
-                  type: string
-                  description: The invalid cron pattern.
-                  example: '* * * * *'
     monitors400ErrorInvalidUid:
       title: Invalid UID
       type: object
@@ -991,84 +977,46 @@ components:
                   format: uid
                   description: The invalid UID.
                   example: 5daabc50-8451-43f6-922d-96b403b4f28e
-    monitors400ParamMissing:
-      title: Missing Parameter
-      type: object
-      properties:
+  examples:
+    monitors400ErrorInvalidTimezone:
+      value:
         error:
-          type: object
-          properties:
-            name:
-              type: string
-              description: The error name.
-              example: paramMissingError
-            message:
-              type: string
-              description: The error message.
-              example: Parameter is missing in the request.
-            details:
-              type: object
-              description: Information about the error.
-              properties:
-                param:
-                  type: array
-                  description: A list of the missing parameters.
-                  items:
-                    type: string
-                    example: name
+          name: invalidParamsError
+          message: The request had invalid parameters
+          details:
+            param: schedule.timezone
+    monitors400ErrorInvalidCronPattern:
+      value:
+        error:
+          name: cronPatternNotAllowedError
+          message: Invalid cron pattern. Enter a valid cron pattern, such as "0 17 * * *"
+          details:
+            pattern: '* * * * *'
+    monitors400ErrorMissingParameter:
+      value:
+        error:
+          name: paramMissingError
+          message: Parameter is missing in the request.
+          details:
+            param:
+            - name
+    monitors400ErrorInvalidEnvironmentUid:
+      value:
+        error:
+          name: invalidUidError
+          message: The specified uid is invalid.
+          details:
+            param: environment
+            uid: 5daabc50-8451-43f6-922d-96b403b4f28e
+    monitors400ErrorInvalidCollectionUid:
+      value:
+        error:
+          name: invalidUidError
+          message: The specified uid is invalid.
+          details:
+            param: collection
+            uid: 12ece9e1-2abf-4edc-8e34-de66e74114d2
   requestBodies:
-    updateMonitor:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              monitor:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The monitor's name.
-                    example: Test Monitor
-                  schedule:
-                    type: object
-                    description: Information about the monitor's schedule.
-                    properties:
-                      cron:
-                        type: string
-                        description: 'The monitor''s run frequency, based on the given cron pattern. For example:
-
-
-                          | Frequency | Cron pattern |
-
-                          | --------- | ------------ |
-
-                          | Every 5 minutes | `*/5 * * * *` |
-
-                          | Every 30 minutes | `*/30 * * * *` |
-
-                          | Every hour | `0 */1 * * *` |
-
-                          | Every 6 hours | `0 */6 * * *` |
-
-                          | Every day at 5 pm | `0 17 * * *` |
-
-                          | Every Monday at 12 pm | `0 12 * * MON` |
-
-                          | Every weekday (Mon — Fri) at 6 am | `0 6 * * MON-FRI` |
-
-                          '
-                        example: '*/5 * * * *'
-                      timezone:
-                        type: string
-                        description: The monitor's [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
-                        example: America/Chicago
-          example:
-            monitor:
-              name: Test Monitor
-              schedule:
-                cron: '*/5 * * * *'
-                timezone: America/Chicago
     createMonitor:
       content:
         application/json:
@@ -1131,6 +1079,58 @@ components:
                 timezone: America/Chicago
               collection: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
               environment: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
+    updateMonitor:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              monitor:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The monitor's name.
+                    example: Test Monitor
+                  schedule:
+                    type: object
+                    description: Information about the monitor's schedule.
+                    properties:
+                      cron:
+                        type: string
+                        description: 'The monitor''s run frequency, based on the given cron pattern. For example:
+
+
+                          | Frequency | Cron pattern |
+
+                          | --------- | ------------ |
+
+                          | Every 5 minutes | `*/5 * * * *` |
+
+                          | Every 30 minutes | `*/30 * * * *` |
+
+                          | Every hour | `0 */1 * * *` |
+
+                          | Every 6 hours | `0 */6 * * *` |
+
+                          | Every day at 5 pm | `0 17 * * *` |
+
+                          | Every Monday at 12 pm | `0 12 * * MON` |
+
+                          | Every weekday (Mon — Fri) at 6 am | `0 6 * * MON-FRI` |
+
+                          '
+                        example: '*/5 * * * *'
+                      timezone:
+                        type: string
+                        description: The monitor's [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+                        example: America/Chicago
+          example:
+            monitor:
+              name: Test Monitor
+              schedule:
+                cron: '*/5 * * * *'
+                timezone: America/Chicago
   securitySchemes:
     PostmanApiKey:
       type: apiKey

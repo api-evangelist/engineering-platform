@@ -94,120 +94,14 @@ components:
     tunnel_schemas-config_version:
       description: The version of the Tunnel Configuration.
       type: integer
-    tunnel_config:
-      description: The tunnel configuration and ingress rules.
-      properties:
-        ingress:
-          description: List of public hostname definitions. At least one ingress rule needs to be defined for the tunnel.
-          items:
-            $ref: '#/components/schemas/tunnel_ingressRule'
-          minItems: 1
-          type: array
-        originRequest:
-          $ref: '#/components/schemas/tunnel_originRequest'
-        warp-routing:
-          description: Enable private network access from WARP users to private network routes. This is enabled if the tunnel has an assigned route.
-          properties:
-            enabled:
-              default: false
-              type: boolean
-          readOnly: true
-          type: object
-      type: object
     tunnel_timestamp:
       example: '2014-01-01T05:20:00.12345Z'
       format: date-time
       type: string
-    tunnel_ingressRule:
-      description: Public hostname
-      properties:
-        hostname:
-          description: Public hostname for this service.
-          example: tunnel.example.com
-          type: string
-        originRequest:
-          $ref: '#/components/schemas/tunnel_originRequest'
-        path:
-          default: ''
-          description: Requests with this path route to this public hostname.
-          example: subpath
-          type: string
-        service:
-          description: 'Protocol and address of destination server. Supported protocols: http://, https://, unix://, tcp://, ssh://, rdp://, unix+tls://, smb://. Alternatively can return a HTTP status code http_status:[code] e.g. ''http_status:404''.
-
-            '
-          example: https://localhost:8001
-          type: string
-      required:
-      - hostname
-      - service
-      type: object
-    tunnel_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/tunnel_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/tunnel_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    tunnel_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    tunnel_schemas-config_src:
-      default: local
-      description: Indicates if this is a locally or remotely configured tunnel. If `local`, manage the tunnel using a YAML file on the origin machine. If `cloudflare`, manage the tunnel's configuration on the Zero Trust dashboard.
-      enum:
-      - local
-      - cloudflare
-      example: cloudflare
-      type: string
-    tunnel_configuration_response:
-      allOf:
-      - $ref: '#/components/schemas/tunnel_schemas-api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/tunnel_configuration'
-    tunnel_tunnel_id:
-      description: UUID of the tunnel.
-      example: f70ff985-a4ef-4643-bbbc-4a0ed4fc8415
-      format: uuid
-      maxLength: 36
-      readOnly: true
+    tunnel_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
     tunnel_configuration:
       description: Cloudflare Tunnel configuration
@@ -225,10 +119,37 @@ components:
         version:
           $ref: '#/components/schemas/tunnel_schemas-config_version'
       type: object
-    tunnel_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
+    tunnel_schemas-config_src:
+      default: local
+      description: Indicates if this is a locally or remotely configured tunnel. If `local`, manage the tunnel using a YAML file on the origin machine. If `cloudflare`, manage the tunnel's configuration on the Zero Trust dashboard.
+      enum:
+      - local
+      - cloudflare
+      example: cloudflare
+      type: string
+    tunnel_schemas-api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/tunnel_messages'
+        messages:
+          $ref: '#/components/schemas/tunnel_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    tunnel_tunnel_id:
+      description: UUID of the tunnel.
+      example: f70ff985-a4ef-4643-bbbc-4a0ed4fc8415
+      format: uuid
+      maxLength: 36
+      readOnly: true
       type: string
     tunnel_originRequest:
       description: Configuration parameters for the public hostname specific connection settings between cloudflared and origin server.
@@ -308,23 +229,102 @@ components:
       allOf:
       - $ref: '#/components/schemas/tunnel_schemas-api-response-common'
       type: object
-    tunnel_schemas-api-response-common:
+    tunnel_config:
+      description: The tunnel configuration and ingress rules.
+      properties:
+        ingress:
+          description: List of public hostname definitions. At least one ingress rule needs to be defined for the tunnel.
+          items:
+            $ref: '#/components/schemas/tunnel_ingressRule'
+          minItems: 1
+          type: array
+        originRequest:
+          $ref: '#/components/schemas/tunnel_originRequest'
+        warp-routing:
+          description: Enable private network access from WARP users to private network routes. This is enabled if the tunnel has an assigned route.
+          properties:
+            enabled:
+              default: false
+              type: boolean
+          readOnly: true
+          type: object
+      type: object
+    tunnel_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    tunnel_ingressRule:
+      description: Public hostname
+      properties:
+        hostname:
+          description: Public hostname for this service.
+          example: tunnel.example.com
+          type: string
+        originRequest:
+          $ref: '#/components/schemas/tunnel_originRequest'
+        path:
+          default: ''
+          description: Requests with this path route to this public hostname.
+          example: subpath
+          type: string
+        service:
+          description: 'Protocol and address of destination server. Supported protocols: http://, https://, unix://, tcp://, ssh://, rdp://, unix+tls://, smb://. Alternatively can return a HTTP status code http_status:[code] e.g. ''http_status:404''.
+
+            '
+          example: https://localhost:8001
+          type: string
+      required:
+      - hostname
+      - service
+      type: object
+    tunnel_api-response-common-failure:
       properties:
         errors:
-          $ref: '#/components/schemas/tunnel_messages'
+          allOf:
+          - $ref: '#/components/schemas/tunnel_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
         messages:
-          $ref: '#/components/schemas/tunnel_messages'
+          allOf:
+          - $ref: '#/components/schemas/tunnel_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
         success:
           description: Whether the API call was successful
           enum:
-          - true
-          example: true
+          - false
+          example: false
           type: boolean
       required:
       - success
       - errors
       - messages
+      - result
       type: object
+    tunnel_configuration_response:
+      allOf:
+      - $ref: '#/components/schemas/tunnel_schemas-api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/tunnel_configuration'
   securitySchemes:
     api_email:
       in: header

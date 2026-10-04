@@ -539,7 +539,105 @@ paths:
       parameters:
       - $ref: '#/components/parameters/threadId'
 components:
+  examples:
+    v10HeaderMissing:
+      value:
+        name: instanceNotFoundError
+        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    featureUnavailable403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: This feature isn't available in your region.
+        status: 403
+    comment403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: Forbidden
+        status: 403
   responses:
+    commentGet:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentResponse'
+          example:
+            data:
+            - id: 46818
+              threadId: 12345
+              createdBy: 12345678
+              createdAt: '2024-01-18T12:00:54.000Z'
+              updatedAt: '2024-01-18T12:00:54.000Z'
+              body: This is also an example.
+            - id: 46817
+              threadId: 67890
+              createdBy: 87654321
+              createdAt: '2024-01-18T11:48:01.000Z'
+              updatedAt: '2024-01-18T11:48:01.000Z'
+              body: Another example.
+            - id: 46814
+              threadId: 23456
+              createdBy: 12345678
+              createdAt: '2024-01-18T11:30:40.000Z'
+              updatedAt: '2024-01-18T11:30:40.000Z'
+              body: This is an example.
+    comment403Error:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/comment403Error'
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Forbidden
+            detail: Forbidden
+            status: 403
+    commentUpdated:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentCreatedUpdated'
+          example:
+            data:
+              id: 46814
+              threadId: 12345
+              createdBy: 12345678
+              createdAt: '2024-01-18T11:30:40.000Z'
+              updatedAt: '2024-01-18T11:30:40.000Z'
+              body: This is an updated example.
+    comment500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 500
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
+            status: 500
     comment401Error:
       description: Unauthorized
       content:
@@ -570,28 +668,37 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
-    commentGet:
-      description: Successful Response
+    v10HeaderMissing:
+      description: Missing v10 Accept Header
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/v10HeaderMissing'
+          examples:
+            Missing v10 Accept Header:
+              $ref: '#/components/examples/v10HeaderMissing'
+    comment403ErrorAndFeatureUnavailable:
+      description: Forbidden
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/commentResponse'
+            anyOf:
+            - $ref: '#/components/schemas/comment403Error'
+            - $ref: '#/components/schemas/featureUnavailable403Error'
+          examples:
+            Forbidden:
+              $ref: '#/components/examples/comment403Error'
+            Feature Unavailable:
+              $ref: '#/components/examples/featureUnavailable403Error'
+    commentCreated:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/commentCreatedUpdated'
           example:
             data:
-            - id: 46818
-              threadId: 12345
-              createdBy: 12345678
-              createdAt: '2024-01-18T12:00:54.000Z'
-              updatedAt: '2024-01-18T12:00:54.000Z'
-              body: This is also an example.
-            - id: 46817
-              threadId: 67890
-              createdBy: 87654321
-              createdAt: '2024-01-18T11:48:01.000Z'
-              updatedAt: '2024-01-18T11:48:01.000Z'
-              body: Another example.
-            - id: 46814
-              threadId: 23456
+              id: 46814
               createdBy: 12345678
               createdAt: '2024-01-18T11:30:40.000Z'
               updatedAt: '2024-01-18T11:30:40.000Z'
@@ -626,170 +733,7 @@ components:
             title: Not Found
             detail: Not Found
             status: 404
-    comment403ErrorAndFeatureUnavailable:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            anyOf:
-            - $ref: '#/components/schemas/comment403Error'
-            - $ref: '#/components/schemas/featureUnavailable403Error'
-          examples:
-            Forbidden:
-              $ref: '#/components/examples/comment403Error'
-            Feature Unavailable:
-              $ref: '#/components/examples/featureUnavailable403Error'
-    comment403Error:
-      description: Forbidden
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/comment403Error'
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Forbidden
-            detail: Forbidden
-            status: 403
-    commentCreated:
-      description: Created
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentCreatedUpdated'
-          example:
-            data:
-              id: 46814
-              createdBy: 12345678
-              createdAt: '2024-01-18T11:30:40.000Z'
-              updatedAt: '2024-01-18T11:30:40.000Z'
-              body: This is an example.
-    comment500Error:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 500
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-            status: 500
-    commentUpdated:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/commentCreatedUpdated'
-          example:
-            data:
-              id: 46814
-              threadId: 12345
-              createdBy: 12345678
-              createdAt: '2024-01-18T11:30:40.000Z'
-              updatedAt: '2024-01-18T11:30:40.000Z'
-              body: This is an updated example.
-    v10HeaderMissing:
-      description: Missing v10 Accept Header
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/v10HeaderMissing'
-          examples:
-            Missing v10 Accept Header:
-              $ref: '#/components/examples/v10HeaderMissing'
-  parameters:
-    collectionUid:
-      name: collectionId
-      in: path
-      required: true
-      description: The collection's unique ID.
-      schema:
-        type: string
-        format: uid
-        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-    threadId:
-      name: threadId
-      in: path
-      required: true
-      description: The comment's thread ID.
-      schema:
-        type: integer
-        example: 34567
-    commentId:
-      name: commentId
-      in: path
-      required: true
-      description: The comment's ID.
-      schema:
-        type: integer
-        example: 46814
-    apiId:
-      name: apiId
-      in: path
-      required: true
-      description: The API's ID.
-      schema:
-        type: string
-        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
-    collectionResponseUid:
-      name: responseId
-      in: path
-      required: true
-      description: The response's unique ID.
-      schema:
-        type: string
-        format: uid
-        example: 12345678-cc364734-7dfd-4bfc-897d-be763dcdbb07
-    collectionRequestUid:
-      name: requestId
-      in: path
-      required: true
-      description: The request's unique ID.
-      schema:
-        type: string
-        format: uid
-        example: 12345678-c82dd02c-4870-4907-8fcb-593a876cf05b
-    collectionFolderUid:
-      name: folderId
-      in: path
-      required: true
-      description: The folder's unique ID.
-      schema:
-        type: string
-        format: uid
-        example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
   schemas:
-    v10HeaderMissing:
-      title: Missing v10 Accept Header
-      type: object
-      properties:
-        name:
-          type: string
-          description: The error name.
-          example: instanceNotFoundError
-        message:
-          type: string
-          description: The error message.
-          example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
     featureUnavailable403Error:
       title: Feature Unavailable
       type: object
@@ -812,6 +756,38 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 403
+    commentCreateUpdate:
+      title: Comment Payload Object
+      type: object
+      description: Information about the comment.
+      required:
+      - body
+      properties:
+        body:
+          type: string
+          description: The contents of the comment.
+          example: This is an example.
+        tags:
+          type: object
+          description: Information about users tagged in the `body` comment.
+          properties:
+            userName:
+              type: object
+              required:
+              - type
+              - id
+              description: An object that contains information about the tagged user. The object's name is the user's Postman username. For example, `@user-postman`.
+              properties:
+                type:
+                  type: string
+                  description: The `user` value.
+                  enum:
+                  - user
+                  example: user
+                id:
+                  type: integer
+                  description: The user's ID.
+                  example: 87654321
     commentResponse:
       title: Comment Response Object
       type: object
@@ -877,6 +853,18 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 403
+    v10HeaderMissing:
+      title: Missing v10 Accept Header
+      type: object
+      properties:
+        name:
+          type: string
+          description: The error name.
+          example: instanceNotFoundError
+        message:
+          type: string
+          description: The error message.
+          example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
     commentCreatedUpdated:
       title: Comment Updated/Created Object
       type: object
@@ -910,55 +898,67 @@ components:
               type: string
               description: The contents of the comment.
               example: This is an example.
-    commentCreateUpdate:
-      title: Comment Payload Object
-      type: object
-      description: Information about the comment.
-      required:
-      - body
-      properties:
-        body:
-          type: string
-          description: The contents of the comment.
-          example: This is an example.
-        tags:
-          type: object
-          description: Information about users tagged in the `body` comment.
-          properties:
-            userName:
-              type: object
-              required:
-              - type
-              - id
-              description: An object that contains information about the tagged user. The object's name is the user's Postman username. For example, `@user-postman`.
-              properties:
-                type:
-                  type: string
-                  description: The `user` value.
-                  enum:
-                  - user
-                  example: user
-                id:
-                  type: integer
-                  description: The user's ID.
-                  example: 87654321
-  examples:
-    v10HeaderMissing:
-      value:
-        name: instanceNotFoundError
-        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
-    comment403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Forbidden
-        detail: Forbidden
-        status: 403
-    featureUnavailable403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Forbidden
-        detail: This feature isn't available in your region.
-        status: 403
+  parameters:
+    commentId:
+      name: commentId
+      in: path
+      required: true
+      description: The comment's ID.
+      schema:
+        type: integer
+        example: 46814
+    threadId:
+      name: threadId
+      in: path
+      required: true
+      description: The comment's thread ID.
+      schema:
+        type: integer
+        example: 34567
+    collectionResponseUid:
+      name: responseId
+      in: path
+      required: true
+      description: The response's unique ID.
+      schema:
+        type: string
+        format: uid
+        example: 12345678-cc364734-7dfd-4bfc-897d-be763dcdbb07
+    collectionUid:
+      name: collectionId
+      in: path
+      required: true
+      description: The collection's unique ID.
+      schema:
+        type: string
+        format: uid
+        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+    collectionRequestUid:
+      name: requestId
+      in: path
+      required: true
+      description: The request's unique ID.
+      schema:
+        type: string
+        format: uid
+        example: 12345678-c82dd02c-4870-4907-8fcb-593a876cf05b
+    apiId:
+      name: apiId
+      in: path
+      required: true
+      description: The API's ID.
+      schema:
+        type: string
+        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
+    collectionFolderUid:
+      name: folderId
+      in: path
+      required: true
+      description: The folder's unique ID.
+      schema:
+        type: string
+        format: uid
+        example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
   requestBodies:
     commentCreateUpdate:
       required: true

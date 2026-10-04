@@ -1033,6 +1033,58 @@ paths:
               headers: {}
 components:
   schemas:
+    ErrorResponse:
+      required:
+      - errors
+      properties:
+        errors:
+          type: array
+          description: A list of errors that describe the reasons why the request failed.
+          items:
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    VideoDetails:
+      properties:
+        relatedVideos:
+          $ref: '#/components/schemas/VideosModule'
+        videoResult:
+          $ref: '#/components/schemas/VideoObject'
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    VideoObject:
+      properties:
+        allowHttpsEmbed:
+          type: boolean
+          readOnly: true
+        allowMobileEmbed:
+          type: boolean
+          readOnly: true
+        embedHtml:
+          type: string
+          readOnly: true
+        isSuperfresh:
+          type: boolean
+          readOnly: true
+        motionThumbnailId:
+          type: string
+          readOnly: true
+        motionThumbnailUrl:
+          type: string
+          readOnly: true
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+        videoId:
+          type: string
+          readOnly: true
+        viewCount:
+          type: integer
+          format: int32
+          readOnly: true
+      description: Defines a video object that is relevant to the query.
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
     CreativeWork:
       properties:
         provider:
@@ -1050,14 +1102,35 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/Thing'
-    VideosModule:
-      type: object
+    MediaObject:
       properties:
-        value:
-          type: array
+        contentUrl:
+          type: string
+          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
           readOnly: true
-          items:
-            $ref: '#/components/schemas/VideoObject'
+        height:
+          type: integer
+          description: The height of the source media object, in pixels.
+          format: int32
+          readOnly: true
+        hostPageUrl:
+          type: string
+          description: URL of the page that hosts the media object.
+          readOnly: true
+        width:
+          type: integer
+          description: The width of the source media object, in pixels.
+          format: int32
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/CreativeWork'
+    ImageObject:
+      properties:
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+      description: Defines an image
+      allOf:
+      - $ref: '#/components/schemas/MediaObject'
     Error:
       required:
       - code
@@ -1113,34 +1186,14 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    Response:
+    VideosModule:
+      type: object
       properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
-    ImageObject:
-      properties:
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-      description: Defines an image
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
-    ErrorResponse:
-      required:
-      - errors
-      properties:
-        errors:
+        value:
           type: array
-          description: A list of errors that describe the reasons why the request failed.
+          readOnly: true
           items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
-      allOf:
-      - $ref: '#/components/schemas/Response'
+            $ref: '#/components/schemas/VideoObject'
     Thing:
       properties:
         alternateName:
@@ -1166,47 +1219,6 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/Response'
-    ResponseBase:
-      required:
-      - _type
-      type: object
-      properties:
-        _type:
-          type: string
-      discriminator:
-        propertyName: _type
-    VideoObject:
-      properties:
-        allowHttpsEmbed:
-          type: boolean
-          readOnly: true
-        allowMobileEmbed:
-          type: boolean
-          readOnly: true
-        embedHtml:
-          type: string
-          readOnly: true
-        isSuperfresh:
-          type: boolean
-          readOnly: true
-        motionThumbnailId:
-          type: string
-          readOnly: true
-        motionThumbnailUrl:
-          type: string
-          readOnly: true
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-        videoId:
-          type: string
-          readOnly: true
-        viewCount:
-          type: integer
-          format: int32
-          readOnly: true
-      description: Defines a video object that is relevant to the query.
-      allOf:
-      - $ref: '#/components/schemas/MediaObject'
     Identifiable:
       properties:
         id:
@@ -1216,36 +1228,24 @@ components:
       description: Defines the identity of a resource.
       allOf:
       - $ref: '#/components/schemas/ResponseBase'
-    VideoDetails:
+    ResponseBase:
+      required:
+      - _type
+      type: object
       properties:
-        relatedVideos:
-          $ref: '#/components/schemas/VideosModule'
-        videoResult:
-          $ref: '#/components/schemas/VideoObject'
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    MediaObject:
+        _type:
+          type: string
+      discriminator:
+        propertyName: _type
+    Response:
       properties:
-        contentUrl:
+        webSearchUrl:
           type: string
-          description: Original URL to retrieve the source (file) for the media object (e.g the source URL for the image).
+          description: The URL To Bing's search result for this item.
           readOnly: true
-        height:
-          type: integer
-          description: The height of the source media object, in pixels.
-          format: int32
-          readOnly: true
-        hostPageUrl:
-          type: string
-          description: URL of the page that hosts the media object.
-          readOnly: true
-        width:
-          type: integer
-          description: The width of the source media object, in pixels.
-          format: int32
-          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
       allOf:
-      - $ref: '#/components/schemas/CreativeWork'
+      - $ref: '#/components/schemas/Identifiable'
   securitySchemes:
     apiKeyHeader:
       type: apiKey
