@@ -1304,61 +1304,7 @@ paths:
         subcategory: reactions
       deprecated: true
 components:
-  headers:
-    link:
-      example: <https://api.github.com/resource?page=2>; rel="next", <https://api.github.com/resource?page=5>; rel="last"
-      schema:
-        type: string
   parameters:
-    release-id:
-      name: release_id
-      description: The unique identifier of the release.
-      in: path
-      required: true
-      schema:
-        type: integer
-    issue-number:
-      name: issue_number
-      description: The number that identifies the issue.
-      in: path
-      required: true
-      schema:
-        type: integer
-    org:
-      name: org
-      description: The organization name. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
-    discussion-number:
-      name: discussion_number
-      description: The number that identifies the discussion.
-      in: path
-      required: true
-      schema:
-        type: integer
-    team-id:
-      name: team_id
-      description: The unique identifier of the team.
-      in: path
-      required: true
-      schema:
-        type: integer
-    comment-number:
-      name: comment_number
-      description: The number that identifies the comment.
-      in: path
-      required: true
-      schema:
-        type: integer
-    team-slug:
-      name: team_slug
-      description: The slug of the team name.
-      in: path
-      required: true
-      schema:
-        type: string
     owner:
       name: owner
       description: The account owner of the repository. The name is not case sensitive.
@@ -1366,9 +1312,9 @@ components:
       required: true
       schema:
         type: string
-    comment-id:
-      name: comment_id
-      description: The unique identifier of the comment.
+    issue-number:
+      name: issue_number
+      description: The number that identifies the issue.
       in: path
       required: true
       schema:
@@ -1380,6 +1326,13 @@ components:
       required: true
       schema:
         type: integer
+    comment-id:
+      name: comment_id
+      description: The unique identifier of the comment.
+      in: path
+      required: true
+      schema:
+        type: integer
     per-page:
       name: per_page
       description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
@@ -1387,13 +1340,20 @@ components:
       schema:
         type: integer
         default: 30
-    repo:
-      name: repo
-      description: The name of the repository without the `.git` extension. The name is not case sensitive.
+    team-id:
+      name: team_id
+      description: The unique identifier of the team.
       in: path
       required: true
       schema:
-        type: string
+        type: integer
+    release-id:
+      name: release_id
+      description: The unique identifier of the release.
+      in: path
+      required: true
+      schema:
+        type: integer
     page:
       name: page
       description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
@@ -1401,6 +1361,41 @@ components:
       schema:
         type: integer
         default: 1
+    repo:
+      name: repo
+      description: The name of the repository without the `.git` extension. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    discussion-number:
+      name: discussion_number
+      description: The number that identifies the discussion.
+      in: path
+      required: true
+      schema:
+        type: integer
+    comment-number:
+      name: comment_number
+      description: The number that identifies the comment.
+      in: path
+      required: true
+      schema:
+        type: integer
+    org:
+      name: org
+      description: The organization name. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    team-slug:
+      name: team_slug
+      description: The slug of the team name.
+      in: path
+      required: true
+      schema:
+        type: string
   examples:
     reaction:
       value:
@@ -1453,6 +1448,42 @@ components:
         content: heart
         created_at: '2016-05-20T20:09:31Z'
   schemas:
+    reaction:
+      title: Reaction
+      description: Reactions to conversations provide a way to help people express their feelings more simply and effectively.
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        node_id:
+          type: string
+          example: MDg6UmVhY3Rpb24x
+        user:
+          $ref: '#/components/schemas/nullable-simple-user'
+        content:
+          description: The reaction to use
+          example: heart
+          type: string
+          enum:
+          - '+1'
+          - '-1'
+          - laugh
+          - confused
+          - heart
+          - hooray
+          - rocket
+          - eyes
+        created_at:
+          type: string
+          format: date-time
+          example: '2016-05-20T20:09:31Z'
+      required:
+      - id
+      - node_id
+      - user
+      - content
+      - created_at
     nullable-simple-user:
       title: Simple User
       description: A GitHub user.
@@ -1554,42 +1585,19 @@ components:
       - subscriptions_url
       - type
       - url
-    reaction:
-      title: Reaction
-      description: Reactions to conversations provide a way to help people express their feelings more simply and effectively.
+    basic-error:
+      title: Basic Error
+      description: Basic Error
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
-        node_id:
+        message:
           type: string
-          example: MDg6UmVhY3Rpb24x
-        user:
-          $ref: '#/components/schemas/nullable-simple-user'
-        content:
-          description: The reaction to use
-          example: heart
+        documentation_url:
           type: string
-          enum:
-          - '+1'
-          - '-1'
-          - laugh
-          - confused
-          - heart
-          - hooray
-          - rocket
-          - eyes
-        created_at:
+        url:
           type: string
-          format: date-time
-          example: '2016-05-20T20:09:31Z'
-      required:
-      - id
-      - node_id
-      - user
-      - content
-      - created_at
+        status:
+          type: string
     validation-error:
       title: Validation Error
       description: Validation Error
@@ -1632,38 +1640,30 @@ components:
                   - 'null'
                   items:
                     type: string
-    basic-error:
-      title: Basic Error
-      description: Basic Error
-      type: object
-      properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        url:
-          type: string
-        status:
-          type: string
   responses:
-    validation_failed:
-      description: Validation failed, or the endpoint has been spammed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/validation-error'
     gone:
       description: Gone
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
+    validation_failed:
+      description: Validation failed, or the endpoint has been spammed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/validation-error'
     not_found:
       description: Resource not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
+  headers:
+    link:
+      example: <https://api.github.com/resource?page=2>; rel="next", <https://api.github.com/resource?page=5>; rel="last"
+      schema:
+        type: string
 externalDocs:
   description: GitHub Enterprise Developer Docs
   url: https://docs.github.com/enterprise-server@3.9/rest/

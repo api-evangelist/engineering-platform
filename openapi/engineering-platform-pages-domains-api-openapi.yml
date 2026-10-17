@@ -228,20 +228,6 @@ paths:
       - Pages Domains
 components:
   schemas:
-    pages_project_name:
-      description: Name of the project.
-      example: this-is-my-project-01
-      pattern: ^[a-z0-9][a-z0-9-]*$
-      type: string
-    pages_domain-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/pages_api-response-common'
-      - $ref: '#/components/schemas/pages_api-response-pagination'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/pages_domain-object'
-            type: array
     pages_api-response-common-failure:
       properties:
         errors:
@@ -271,39 +257,71 @@ components:
       - messages
       - result
       type: object
-    pages_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    pages_api-response-common:
+    pages_project_name:
+      description: Name of the project.
+      example: this-is-my-project-01
+      pattern: ^[a-z0-9][a-z0-9-]*$
+      type: string
+    pages_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/pages_api-response-common'
+      - properties:
+          result:
+            type:
+            - object
+            - 'null'
+      type: object
+    pages_domains-post:
       properties:
-        errors:
-          $ref: '#/components/schemas/pages_messages'
-        messages:
-          $ref: '#/components/schemas/pages_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
+        name:
+          example: example.com
+          type: string
+      type: object
+    pages_domain-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/pages_api-response-common'
+      - $ref: '#/components/schemas/pages_api-response-pagination'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/pages_domain-object'
+            type: array
+    pages_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    pages_api-response-pagination:
+      properties:
+        result_info:
+          properties:
+            count:
+              description: The number of items on the current page.
+              example: 1
+              type: integer
+            page:
+              description: The page currently being requested.
+              example: 1
+              type: integer
+            per_page:
+              description: The number of items per page being returned.
+              example: 100
+              type: integer
+            total_count:
+              description: The total count of items.
+              example: 1
+              type: integer
+            total_pages:
+              description: The total count of pages.
+              example: 1
+              type: integer
+          required:
+          - page
+          - per_page
+          - count
+          - total_count
+          type: object
       type: object
     pages_domain-object:
       properties:
@@ -377,69 +395,51 @@ components:
           readOnly: true
           type: string
       type: object
-    pages_api-response-pagination:
-      properties:
-        result_info:
-          properties:
-            count:
-              description: The number of items on the current page.
-              example: 1
-              type: integer
-            page:
-              description: The page currently being requested.
-              example: 1
-              type: integer
-            per_page:
-              description: The number of items per page being returned.
-              example: 100
-              type: integer
-            total_count:
-              description: The total count of items.
-              example: 1
-              type: integer
-            total_pages:
-              description: The total count of pages.
-              example: 1
-              type: integer
-          required:
-          - page
-          - per_page
-          - count
-          - total_count
-          type: object
-      type: object
-    pages_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/pages_api-response-common'
-      - properties:
-          result:
-            type:
-            - object
-            - 'null'
-      type: object
     pages_domain_name:
       description: Name of the domain.
       example: this-is-my-domain-01.com
       pattern: ^[a-z0-9][a-z0-9-]*$
       type: string
-    pages_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
+    pages_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/pages_messages'
+        messages:
+          $ref: '#/components/schemas/pages_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
     pages_domain-response-single:
       allOf:
       - $ref: '#/components/schemas/pages_api-response-single'
       - properties:
           result:
             $ref: '#/components/schemas/pages_domain-object'
-    pages_domains-post:
-      properties:
-        name:
-          example: example.com
-          type: string
-      type: object
+    pages_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
   securitySchemes:
     api_email:
       in: header

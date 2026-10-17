@@ -88,10 +88,6 @@ paths:
         subcategory: rate-limit
 components:
   headers:
-    x-rate-limit-remaining:
-      example: 4999
-      schema:
-        type: integer
     x-rate-limit-limit:
       example: 5000
       schema:
@@ -101,7 +97,50 @@ components:
       schema:
         type: integer
         format: timestamp
+    x-rate-limit-remaining:
+      example: 4999
+      schema:
+        type: integer
+  responses:
+    not_modified:
+      description: Not modified
+    not_found:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/basic-error'
   schemas:
+    rate-limit:
+      title: Rate Limit
+      type: object
+      properties:
+        limit:
+          type: integer
+        remaining:
+          type: integer
+        reset:
+          type: integer
+        used:
+          type: integer
+      required:
+      - limit
+      - remaining
+      - reset
+      - used
+    basic-error:
+      title: Basic Error
+      description: Basic Error
+      type: object
+      properties:
+        message:
+          type: string
+        documentation_url:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
     rate-limit-overview:
       title: Rate Limit Overview
       description: Rate Limit Overview
@@ -136,45 +175,6 @@ components:
       required:
       - rate
       - resources
-    basic-error:
-      title: Basic Error
-      description: Basic Error
-      type: object
-      properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        url:
-          type: string
-        status:
-          type: string
-    rate-limit:
-      title: Rate Limit
-      type: object
-      properties:
-        limit:
-          type: integer
-        remaining:
-          type: integer
-        reset:
-          type: integer
-        used:
-          type: integer
-      required:
-      - limit
-      - remaining
-      - reset
-      - used
-  responses:
-    not_found:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/basic-error'
-    not_modified:
-      description: Not modified
   examples:
     rate-limit-overview:
       value:

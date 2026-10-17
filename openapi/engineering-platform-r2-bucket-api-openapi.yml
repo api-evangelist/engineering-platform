@@ -665,55 +665,27 @@ paths:
       - R2 Bucket
 components:
   schemas:
-    r2_storage_class:
-      default: Standard
-      description: Storage class for newly uploaded objects, unless specified otherwise.
-      enum:
-      - Standard
-      - InfrequentAccess
-      type: string
-    r2_domain_name:
-      description: Name of the custom domain
-      example: example-domain/custom-domain.com
-      type: string
-    r2_v4_response_list:
-      allOf:
-      - $ref: '#/components/schemas/r2_v4_response'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/r2_result_info'
-        type: object
-    r2_edit_custom_domain_request:
+    r2_remove_custom_domain_response:
       example:
-        enabled: true
-        minTLS: '1.2'
+        domain: example-domain/custom-domain.com
       properties:
-        enabled:
-          description: Whether to enable public bucket access at the specified custom domain
-          type: boolean
-        minTLS:
-          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to previous value.
-          enum:
-          - '1.0'
-          - '1.1'
-          - '1.2'
-          - '1.3'
+        domain:
+          description: Name of the removed custom domain
           type: string
+      required:
+      - domain
       type: object
-    r2_errors:
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    r2_result_info:
+      properties:
+        cursor:
+          description: A continuation token that should be used to fetch the next page of results
+          example: 1-JTdCJTIydiUyMiUzQTElMkMlMjJzdGFydEFmdGVyJTIyJTNBJTIyZGF2aWRwdWJsaWMlMjIlN0Q=
+          type: string
+        per_page:
+          description: Maximum number of results on this page
+          example: 20
+          type: number
+      type: object
     r2_list_custom_domains_response:
       example:
         domains:
@@ -789,52 +761,30 @@ components:
       required:
       - domains
       type: object
-    r2_temp_access_creds_request:
+    r2_edit_custom_domain_request:
       example:
-        bucket: example-bucket
-        objects:
-        - example-object
-        parentAccessKeyId: example-access-key-id
-        permission: object-read-write
-        prefixes:
-        - example-prefix/
-        ttlSeconds: 3600
+        enabled: true
+        minTLS: '1.2'
       properties:
-        bucket:
-          description: Name of the R2 bucket
-          type: string
-        objects:
-          description: Optional object paths to scope the credentials to
-          items:
-            type: string
-          type: array
-        parentAccessKeyId:
-          description: The parent access key id to use for signing
-          type: string
-        permission:
-          description: Permissions allowed on the credentials
+        enabled:
+          description: Whether to enable public bucket access at the specified custom domain
+          type: boolean
+        minTLS:
+          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to previous value.
           enum:
-          - admin-read-write
-          - admin-read-only
-          - object-read-write
-          - object-read-only
+          - '1.0'
+          - '1.1'
+          - '1.2'
+          - '1.3'
           type: string
-        prefixes:
-          description: Optional prefix paths to scope the credentials to
-          items:
-            type: string
-          type: array
-        ttlSeconds:
-          default: 900
-          description: How long the credentials will live for in seconds
-          maximum: 604800
-          type: number
-      required:
-      - bucket
-      - permission
-      - ttlSeconds
-      - parentAccessKeyId
       type: object
+    r2_v4_response_list:
+      allOf:
+      - $ref: '#/components/schemas/r2_v4_response'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/r2_result_info'
+        type: object
     r2_managed_domain_response:
       example:
         bucketId: 0113a9e4549cf9b1ff1bf56e04da0cef
@@ -856,10 +806,23 @@ components:
       - domain
       - enabled
       type: object
-    r2_messages:
-      items:
-        type: string
-      type: array
+    r2_domain_name:
+      description: Name of the custom domain
+      example: example-domain/custom-domain.com
+      type: string
+    r2_bucket:
+      description: A single R2 bucket
+      properties:
+        creation_date:
+          description: Creation timestamp
+          type: string
+        location:
+          $ref: '#/components/schemas/r2_bucket_location'
+        name:
+          $ref: '#/components/schemas/r2_bucket_name'
+        storage_class:
+          $ref: '#/components/schemas/r2_storage_class'
+      type: object
     r2_add_custom_domain_request:
       example:
         domain: prefix.example-domain.com
@@ -886,18 +849,43 @@ components:
       - domain
       - zoneId
       type: object
-    r2_bucket:
-      description: A single R2 bucket
+    r2_errors:
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    r2_v4_response_failure:
       properties:
-        creation_date:
-          description: Creation timestamp
-          type: string
-        location:
-          $ref: '#/components/schemas/r2_bucket_location'
-        name:
-          $ref: '#/components/schemas/r2_bucket_name'
-        storage_class:
-          $ref: '#/components/schemas/r2_storage_class'
+        errors:
+          $ref: '#/components/schemas/r2_errors'
+        messages:
+          $ref: '#/components/schemas/r2_messages'
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
       type: object
     r2_bucket_location:
       description: Location of the bucket
@@ -908,6 +896,10 @@ components:
       - weur
       - wnam
       type: string
+    r2_messages:
+      items:
+        type: string
+      type: array
     r2_v4_response:
       properties:
         errors:
@@ -926,88 +918,6 @@ components:
       - errors
       - messages
       - result
-      type: object
-    r2_sippy:
-      properties:
-        destination:
-          description: Details about the configured destination bucket
-          properties:
-            accessKeyId:
-              description: 'ID of the Cloudflare API token used when writing objects to this
-
-                bucket
-
-                '
-              type: string
-            account:
-              type: string
-            bucket:
-              description: Name of the bucket on the provider
-              type: string
-            provider:
-              enum:
-              - r2
-              type: string
-          type: object
-        enabled:
-          description: State of Sippy for this bucket
-          type: boolean
-        source:
-          description: Details about the configured source bucket
-          properties:
-            bucket:
-              description: Name of the bucket on the provider
-              type: string
-            provider:
-              enum:
-              - aws
-              - gcs
-              type: string
-            region:
-              description: Region where the bucket resides (AWS only)
-              type:
-              - string
-              - 'null'
-          type: object
-      type: object
-    r2_add_custom_domain_response:
-      example:
-        domain: example-domain.com
-        enabled: true
-      properties:
-        domain:
-          description: Domain name of the affected custom domain
-          type: string
-        enabled:
-          description: Whether this bucket is publicly accessible at the specified custom domain
-          type: boolean
-        minTLS:
-          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to 1.0.
-          enum:
-          - '1.0'
-          - '1.1'
-          - '1.2'
-          - '1.3'
-          type: string
-      required:
-      - domain
-      - enabled
-      type: object
-    r2_temp_access_creds_response:
-      example:
-        accessKeyId: example-access-key-id
-        secretAccessKey: example-secret-key
-        sessionToken: example-session-token
-      properties:
-        accessKeyId:
-          description: ID for new access key
-          type: string
-        secretAccessKey:
-          description: Secret access key
-          type: string
-        sessionToken:
-          description: Security token
-          type: string
       type: object
     r2_enable_sippy_aws:
       properties:
@@ -1067,95 +977,111 @@ components:
               description: Secret Access Key of an IAM credential (ideally scoped to a single S3 bucket)
               type: string
           type: object
-    r2_v4_response_failure:
-      properties:
-        errors:
-          $ref: '#/components/schemas/r2_errors'
-        messages:
-          $ref: '#/components/schemas/r2_messages'
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    r2_remove_custom_domain_response:
+    r2_temp_access_creds_response:
       example:
-        domain: example-domain/custom-domain.com
+        accessKeyId: example-access-key-id
+        secretAccessKey: example-secret-key
+        sessionToken: example-session-token
       properties:
-        domain:
-          description: Name of the removed custom domain
+        accessKeyId:
+          description: ID for new access key
           type: string
-      required:
-      - domain
+        secretAccessKey:
+          description: Secret access key
+          type: string
+        sessionToken:
+          description: Security token
+          type: string
       type: object
-    r2_edit_managed_domain_request:
-      example:
-        enabled: true
+    r2_sippy:
       properties:
+        destination:
+          description: Details about the configured destination bucket
+          properties:
+            accessKeyId:
+              description: 'ID of the Cloudflare API token used when writing objects to this
+
+                bucket
+
+                '
+              type: string
+            account:
+              type: string
+            bucket:
+              description: Name of the bucket on the provider
+              type: string
+            provider:
+              enum:
+              - r2
+              type: string
+          type: object
         enabled:
-          description: Whether to enable public bucket access at the r2.dev domain
+          description: State of Sippy for this bucket
           type: boolean
-      required:
-      - enabled
+        source:
+          description: Details about the configured source bucket
+          properties:
+            bucket:
+              description: Name of the bucket on the provider
+              type: string
+            provider:
+              enum:
+              - aws
+              - gcs
+              type: string
+            region:
+              description: Region where the bucket resides (AWS only)
+              type:
+              - string
+              - 'null'
+          type: object
       type: object
-    r2_result_info:
+    r2_temp_access_creds_request:
+      example:
+        bucket: example-bucket
+        objects:
+        - example-object
+        parentAccessKeyId: example-access-key-id
+        permission: object-read-write
+        prefixes:
+        - example-prefix/
+        ttlSeconds: 3600
       properties:
-        cursor:
-          description: A continuation token that should be used to fetch the next page of results
-          example: 1-JTdCJTIydiUyMiUzQTElMkMlMjJzdGFydEFmdGVyJTIyJTNBJTIyZGF2aWRwdWJsaWMlMjIlN0Q=
+        bucket:
+          description: Name of the R2 bucket
           type: string
-        per_page:
-          description: Maximum number of results on this page
-          example: 20
+        objects:
+          description: Optional object paths to scope the credentials to
+          items:
+            type: string
+          type: array
+        parentAccessKeyId:
+          description: The parent access key id to use for signing
+          type: string
+        permission:
+          description: Permissions allowed on the credentials
+          enum:
+          - admin-read-write
+          - admin-read-only
+          - object-read-write
+          - object-read-only
+          type: string
+        prefixes:
+          description: Optional prefix paths to scope the credentials to
+          items:
+            type: string
+          type: array
+        ttlSeconds:
+          default: 900
+          description: How long the credentials will live for in seconds
+          maximum: 604800
           type: number
-      type: object
-    r2_account_identifier:
-      description: Account ID
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    r2_edit_custom_domain_response:
-      example:
-        domain: example-domain.com
-        enabled: true
-      properties:
-        domain:
-          description: Domain name of the affected custom domain
-          type: string
-        enabled:
-          description: Whether this bucket is publicly accessible at the specified custom domain
-          type: boolean
-        minTLS:
-          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to 1.0.
-          enum:
-          - '1.0'
-          - '1.1'
-          - '1.2'
-          - '1.3'
-          type: string
       required:
-      - domain
+      - bucket
+      - permission
+      - ttlSeconds
+      - parentAccessKeyId
       type: object
-    r2_bucket_name:
-      description: Name of the bucket
-      example: example-bucket
-      maxLength: 64
-      minLength: 3
-      pattern: ^[a-z0-9][a-z0-9-]*[a-z0-9]
-      type: string
     r2_enable_sippy_gcs:
       properties:
         destination:
@@ -1211,6 +1137,80 @@ components:
               - gcs
               type: string
           type: object
+    r2_edit_managed_domain_request:
+      example:
+        enabled: true
+      properties:
+        enabled:
+          description: Whether to enable public bucket access at the r2.dev domain
+          type: boolean
+      required:
+      - enabled
+      type: object
+    r2_storage_class:
+      default: Standard
+      description: Storage class for newly uploaded objects, unless specified otherwise.
+      enum:
+      - Standard
+      - InfrequentAccess
+      type: string
+    r2_bucket_name:
+      description: Name of the bucket
+      example: example-bucket
+      maxLength: 64
+      minLength: 3
+      pattern: ^[a-z0-9][a-z0-9-]*[a-z0-9]
+      type: string
+    r2_account_identifier:
+      description: Account ID
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    r2_edit_custom_domain_response:
+      example:
+        domain: example-domain.com
+        enabled: true
+      properties:
+        domain:
+          description: Domain name of the affected custom domain
+          type: string
+        enabled:
+          description: Whether this bucket is publicly accessible at the specified custom domain
+          type: boolean
+        minTLS:
+          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to 1.0.
+          enum:
+          - '1.0'
+          - '1.1'
+          - '1.2'
+          - '1.3'
+          type: string
+      required:
+      - domain
+      type: object
+    r2_add_custom_domain_response:
+      example:
+        domain: example-domain.com
+        enabled: true
+      properties:
+        domain:
+          description: Domain name of the affected custom domain
+          type: string
+        enabled:
+          description: Whether this bucket is publicly accessible at the specified custom domain
+          type: boolean
+        minTLS:
+          description: Minimum TLS Version the custom domain will accept for incoming connections. If not set, defaults to 1.0.
+          enum:
+          - '1.0'
+          - '1.1'
+          - '1.2'
+          - '1.3'
+          type: string
+      required:
+      - domain
+      - enabled
+      type: object
   securitySchemes:
     api_email:
       in: header

@@ -175,151 +175,6 @@ paths:
         - '#analytics:read'
 components:
   schemas:
-    dns-analytics_dimensions:
-      description: A comma-separated list of dimensions to group results by.
-      example: queryType
-      type: string
-    dns-analytics_until:
-      description: End date and time of requesting data period in ISO 8601 format.
-      example: '2023-11-11T13:00:00Z'
-      format: date-time
-      type: string
-    dns-analytics_since:
-      description: Start date and time of requesting data period in ISO 8601 format.
-      example: '2023-11-11T12:00:00Z'
-      format: date-time
-      type: string
-    dns-analytics_data:
-      description: Array with one row per combination of dimension values.
-      items:
-        properties:
-          dimensions:
-            description: Array of dimension values, representing the combination of dimension values corresponding to this row.
-            items:
-              description: Dimension value.
-              example: NODATA
-              type: string
-            type: array
-        required:
-        - dimensions
-        type: object
-      type: array
-    dns-analytics_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    dns-analytics_time_delta:
-      description: Unit of time to group data by.
-      enum:
-      - all
-      - auto
-      - year
-      - quarter
-      - month
-      - week
-      - day
-      - hour
-      - dekaminute
-      - minute
-      example: hour
-      type: string
-    dns-analytics_query:
-      properties:
-        dimensions:
-          description: Array of dimension names.
-          example:
-          - responseCode
-          - queryName
-          items:
-            description: Dimension name.
-            example: responseCode
-            type: string
-          type: array
-        filters:
-          $ref: '#/components/schemas/dns-analytics_filters'
-        limit:
-          $ref: '#/components/schemas/dns-analytics_limit'
-        metrics:
-          description: Array of metric names.
-          example:
-          - queryCount
-          - responseTimeAvg
-          items:
-            description: Metric name.
-            example: queries
-            type: string
-          type: array
-        since:
-          $ref: '#/components/schemas/dns-analytics_since'
-        sort:
-          description: Array of dimensions to sort by, where each dimension may be prefixed by - (descending) or + (ascending).
-          example:
-          - +responseCode
-          - -queryName
-          items:
-            description: Dimension name (may be prefixed by - (descending) or + (ascending).
-            example: +responseCode
-            type: string
-          type: array
-        until:
-          $ref: '#/components/schemas/dns-analytics_until'
-      required:
-      - dimensions
-      - metrics
-      - since
-      - until
-      - limit
-      type: object
-    dns-analytics_metrics:
-      description: A comma-separated list of metrics to query.
-      example: queryCount,uncachedCount
-      type: string
-    dns-analytics_filters:
-      description: Segmentation filter in 'attribute operator value' format.
-      example: responseCode==NOERROR,queryType==A
-      type: string
-    dns-analytics_limit:
-      default: 100000
-      description: Limit number of returned metrics.
-      example: 100
-      type: integer
-    dns-analytics_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/dns-analytics_messages'
-        messages:
-          $ref: '#/components/schemas/dns-analytics_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    dns-analytics_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    dns-analytics_sort:
-      description: A comma-separated list of dimensions to sort by, where each dimension may be prefixed by - (descending) or + (ascending).
-      example: +responseCode,-queryName
-      type: string
     dns-analytics_report:
       allOf:
       - $ref: '#/components/schemas/dns-analytics_result'
@@ -381,41 +236,6 @@ components:
         - time_intervals
         - query
         - data
-    dns-analytics_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/dns-analytics_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/dns-analytics_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    dns-analytics_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dns-analytics_api-response-common'
-      type: object
     dns-analytics_result:
       properties:
         data:
@@ -450,6 +270,186 @@ components:
       - query
       - data
       type: object
+    dns-analytics_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    dns-analytics_metrics:
+      description: A comma-separated list of metrics to query.
+      example: queryCount,uncachedCount
+      type: string
+    dns-analytics_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dns-analytics_api-response-common'
+      type: object
+    dns-analytics_time_delta:
+      description: Unit of time to group data by.
+      enum:
+      - all
+      - auto
+      - year
+      - quarter
+      - month
+      - week
+      - day
+      - hour
+      - dekaminute
+      - minute
+      example: hour
+      type: string
+    dns-analytics_dimensions:
+      description: A comma-separated list of dimensions to group results by.
+      example: queryType
+      type: string
+    dns-analytics_sort:
+      description: A comma-separated list of dimensions to sort by, where each dimension may be prefixed by - (descending) or + (ascending).
+      example: +responseCode,-queryName
+      type: string
+    dns-analytics_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/dns-analytics_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/dns-analytics_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    dns-analytics_data:
+      description: Array with one row per combination of dimension values.
+      items:
+        properties:
+          dimensions:
+            description: Array of dimension values, representing the combination of dimension values corresponding to this row.
+            items:
+              description: Dimension value.
+              example: NODATA
+              type: string
+            type: array
+        required:
+        - dimensions
+        type: object
+      type: array
+    dns-analytics_until:
+      description: End date and time of requesting data period in ISO 8601 format.
+      example: '2023-11-11T13:00:00Z'
+      format: date-time
+      type: string
+    dns-analytics_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dns-analytics_query:
+      properties:
+        dimensions:
+          description: Array of dimension names.
+          example:
+          - responseCode
+          - queryName
+          items:
+            description: Dimension name.
+            example: responseCode
+            type: string
+          type: array
+        filters:
+          $ref: '#/components/schemas/dns-analytics_filters'
+        limit:
+          $ref: '#/components/schemas/dns-analytics_limit'
+        metrics:
+          description: Array of metric names.
+          example:
+          - queryCount
+          - responseTimeAvg
+          items:
+            description: Metric name.
+            example: queries
+            type: string
+          type: array
+        since:
+          $ref: '#/components/schemas/dns-analytics_since'
+        sort:
+          description: Array of dimensions to sort by, where each dimension may be prefixed by - (descending) or + (ascending).
+          example:
+          - +responseCode
+          - -queryName
+          items:
+            description: Dimension name (may be prefixed by - (descending) or + (ascending).
+            example: +responseCode
+            type: string
+          type: array
+        until:
+          $ref: '#/components/schemas/dns-analytics_until'
+      required:
+      - dimensions
+      - metrics
+      - since
+      - until
+      - limit
+      type: object
+    dns-analytics_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/dns-analytics_messages'
+        messages:
+          $ref: '#/components/schemas/dns-analytics_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    dns-analytics_since:
+      description: Start date and time of requesting data period in ISO 8601 format.
+      example: '2023-11-11T12:00:00Z'
+      format: date-time
+      type: string
+    dns-analytics_limit:
+      default: 100000
+      description: Limit number of returned metrics.
+      example: 100
+      type: integer
+    dns-analytics_filters:
+      description: Segmentation filter in 'attribute operator value' format.
+      example: responseCode==NOERROR,queryType==A
+      type: string
   securitySchemes:
     api_email:
       in: header

@@ -350,16 +350,10 @@ paths:
       - DLP Profiles
 components:
   schemas:
-    dlp_Pattern:
-      properties:
-        regex:
-          type: string
-        validation:
-          allOf:
-          - $ref: '#/components/schemas/dlp_Validation'
-      required:
-      - regex
-      type: object
+    dlp_Validation:
+      enum:
+      - luhn
+      type: string
     dlp_CustomProfileUpdate:
       properties:
         allowed_match_count:
@@ -392,45 +386,27 @@ components:
       - name
       - entries
       type: object
-    dlp_CustomEntry:
+    dlp_Pattern:
       properties:
-        created_at:
-          format: date-time
+        regex:
           type: string
+        validation:
+          allOf:
+          - $ref: '#/components/schemas/dlp_Validation'
+      required:
+      - regex
+      type: object
+    dlp_NewCustomEntry:
+      properties:
         enabled:
           type: boolean
-        id:
-          format: uuid
-          type: string
         name:
           type: string
         pattern:
           $ref: '#/components/schemas/dlp_Pattern'
-        profile_id:
-          format: uuid
-          type:
-          - string
-          - 'null'
-        updated_at:
-          format: date-time
-          type: string
       required:
-      - id
       - name
-      - created_at
-      - updated_at
       - pattern
-      - enabled
-      type: object
-    dlp_PredefinedEntryUpdate:
-      properties:
-        enabled:
-          type: boolean
-        id:
-          format: uuid
-          type: string
-      required:
-      - id
       - enabled
       type: object
     dlp_SharedEntryUpdate:
@@ -482,6 +458,139 @@ components:
         - enabled
         - entry_type
         type: object
+    dlp_PredefinedProfileUpdate:
+      properties:
+        allowed_match_count:
+          format: int32
+          type:
+          - integer
+          - 'null'
+        context_awareness:
+          $ref: '#/components/schemas/dlp_ContextAwareness'
+        entries:
+          items:
+            $ref: '#/components/schemas/dlp_PredefinedEntryUpdate'
+          type: array
+        ocr_enabled:
+          type: boolean
+      required:
+      - entries
+      type: object
+    dlp_SkipConfig:
+      description: Content types to exclude from context analysis and return all matches.
+      properties:
+        files:
+          description: If the content type is a file, skip context analysis and return all matches.
+          type: boolean
+      required:
+      - files
+      type: object
+    dlp_ProfileArray:
+      items:
+        $ref: '#/components/schemas/dlp_Profile'
+      type: array
+    dlp_WordListEntry:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        enabled:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        profile_id:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        updated_at:
+          format: date-time
+          type: string
+        word_list: {}
+      required:
+      - id
+      - name
+      - created_at
+      - updated_at
+      - word_list
+      - enabled
+      type: object
+    dlp_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/dlp_api-response-common'
+      type: object
+    dlp_NewCustomProfiles:
+      properties:
+        profiles:
+          items:
+            $ref: '#/components/schemas/dlp_NewCustomProfile'
+          type: array
+      required:
+      - profiles
+      type: object
+    dlp_PredefinedEntryUpdate:
+      properties:
+        enabled:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+      required:
+      - id
+      - enabled
+      type: object
+    dlp_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    dlp_NewCustomProfile:
+      properties:
+        allowed_match_count:
+          default: 0
+          description: Related DLP policies will trigger when the match count exceeds the number set.
+          example: 5
+          format: int32
+          maximum: 1000
+          minimum: 0
+          type: integer
+        context_awareness:
+          $ref: '#/components/schemas/dlp_ContextAwareness'
+        description:
+          description: The description of the profile
+          type:
+          - string
+          - 'null'
+        entries:
+          items:
+            $ref: '#/components/schemas/dlp_EntryOfNewProfile'
+          type: array
+        name:
+          type: string
+        ocr_enabled:
+          type: boolean
+        shared_entries:
+          description: Entries from other profiles (e.g. pre-defined Cloudflare profiles, or your Microsoft Information Protection profiles).
+          items:
+            $ref: '#/components/schemas/dlp_NewSharedEntry'
+          type: array
+      required:
+      - name
+      - entries
+      type: object
     dlp_IntegrationProfile:
       properties:
         created_at:
@@ -511,11 +620,8 @@ components:
       - created_at
       - updated_at
       type: object
-    dlp_IntegrationEntry:
+    dlp_PredefinedEntry:
       properties:
-        created_at:
-          format: date-time
-          type: string
         enabled:
           type: boolean
         id:
@@ -528,154 +634,11 @@ components:
           type:
           - string
           - 'null'
-        updated_at:
-          format: date-time
-          type: string
       required:
       - id
       - name
-      - created_at
-      - updated_at
       - enabled
       type: object
-    dlp_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/dlp_api-response-common'
-      type: object
-    dlp_Validation:
-      enum:
-      - luhn
-      type: string
-    dlp_PredefinedProfile:
-      properties:
-        allowed_match_count:
-          format: int32
-          type: integer
-        context_awareness:
-          $ref: '#/components/schemas/dlp_ContextAwareness'
-        entries:
-          items:
-            $ref: '#/components/schemas/dlp_Entry'
-          type: array
-        id:
-          description: The id of the predefined profile (uuid)
-          format: uuid
-          type: string
-        name:
-          description: The name of the predefined profile
-          type: string
-        ocr_enabled:
-          type: boolean
-        open_access:
-          description: Whether this profile can be accessed by anyone
-          type: boolean
-      required:
-      - id
-      - name
-      - entries
-      - allowed_match_count
-      type: object
-    dlp_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/dlp_messages'
-        messages:
-          $ref: '#/components/schemas/dlp_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    dlp_NewWordListEntry:
-      properties:
-        enabled:
-          type: boolean
-        name:
-          type: string
-        words:
-          items:
-            type: string
-          type: array
-      required:
-      - name
-      - words
-      - enabled
-      type: object
-    dlp_NewCustomProfiles:
-      properties:
-        profiles:
-          items:
-            $ref: '#/components/schemas/dlp_NewCustomProfile'
-          type: array
-      required:
-      - profiles
-      type: object
-    dlp_NewCustomEntry:
-      properties:
-        enabled:
-          type: boolean
-        name:
-          type: string
-        pattern:
-          $ref: '#/components/schemas/dlp_Pattern'
-      required:
-      - name
-      - pattern
-      - enabled
-      type: object
-    dlp_Profile:
-      discriminator:
-        propertyName: type
-      oneOf:
-      - allOf:
-        - $ref: '#/components/schemas/dlp_CustomProfile'
-        - properties:
-            type:
-              enum:
-              - custom
-              type: string
-          required:
-          - type
-          type: object
-        title: Custom Profile
-      - allOf:
-        - $ref: '#/components/schemas/dlp_PredefinedProfile'
-        - properties:
-            type:
-              enum:
-              - predefined
-              type: string
-          required:
-          - type
-          type: object
-        title: Predefined Profile
-      - allOf:
-        - $ref: '#/components/schemas/dlp_IntegrationProfile'
-        - properties:
-            type:
-              enum:
-              - integration
-              type: string
-          required:
-          - type
-          type: object
-        title: Integration Profile
-    dlp_NewCustomEntryWithId:
-      allOf:
-      - $ref: '#/components/schemas/dlp_NewCustomEntry'
-      - properties:
-          entry_id:
-            format: uuid
-            type: string
-        required:
-        - entry_id
-        type: object
     dlp_NewSharedEntry:
       discriminator:
         propertyName: entry_type
@@ -740,74 +703,55 @@ components:
         - enabled
         - entry_type
         type: object
-    dlp_ProfileArray:
-      items:
-        $ref: '#/components/schemas/dlp_Profile'
-      type: array
-    dlp_NewCustomProfile:
-      properties:
-        allowed_match_count:
-          default: 0
-          description: Related DLP policies will trigger when the match count exceeds the number set.
-          example: 5
-          format: int32
-          maximum: 1000
-          minimum: 0
-          type: integer
-        context_awareness:
-          $ref: '#/components/schemas/dlp_ContextAwareness'
-        description:
-          description: The description of the profile
-          type:
-          - string
-          - 'null'
-        entries:
-          items:
-            $ref: '#/components/schemas/dlp_EntryOfNewProfile'
-          type: array
-        name:
-          type: string
-        ocr_enabled:
-          type: boolean
-        shared_entries:
-          description: Entries from other profiles (e.g. pre-defined Cloudflare profiles, or your Microsoft Information Protection profiles).
-          items:
-            $ref: '#/components/schemas/dlp_NewSharedEntry'
-          type: array
-      required:
-      - name
-      - entries
-      type: object
-    dlp_PredefinedProfileUpdate:
-      properties:
-        allowed_match_count:
-          format: int32
-          type:
-          - integer
-          - 'null'
-        context_awareness:
-          $ref: '#/components/schemas/dlp_ContextAwareness'
-        entries:
-          items:
-            $ref: '#/components/schemas/dlp_PredefinedEntryUpdate'
-          type: array
-        ocr_enabled:
-          type: boolean
-      required:
-      - entries
-      type: object
     dlp_EntryUpdate:
       oneOf:
       - $ref: '#/components/schemas/dlp_NewCustomEntryWithId'
       - $ref: '#/components/schemas/dlp_NewCustomEntry'
-    dlp_SkipConfig:
-      description: Content types to exclude from context analysis and return all matches.
+    dlp_api-response-common-failure:
       properties:
-        files:
-          description: If the content type is a file, skip context analysis and return all matches.
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/dlp_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
           type: boolean
       required:
-      - files
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    dlp_NewWordListEntry:
+      properties:
+        enabled:
+          type: boolean
+        name:
+          type: string
+        words:
+          items:
+            type: string
+          type: array
+      required:
+      - name
+      - words
+      - enabled
       type: object
     dlp_Entry:
       discriminator:
@@ -868,10 +812,201 @@ components:
           - type
           type: object
         title: Word List Entry
+    dlp_PredefinedProfile:
+      properties:
+        allowed_match_count:
+          format: int32
+          type: integer
+        context_awareness:
+          $ref: '#/components/schemas/dlp_ContextAwareness'
+        entries:
+          items:
+            $ref: '#/components/schemas/dlp_Entry'
+          type: array
+        id:
+          description: The id of the predefined profile (uuid)
+          format: uuid
+          type: string
+        name:
+          description: The name of the predefined profile
+          type: string
+        ocr_enabled:
+          type: boolean
+        open_access:
+          description: Whether this profile can be accessed by anyone
+          type: boolean
+      required:
+      - id
+      - name
+      - entries
+      - allowed_match_count
+      type: object
+    dlp_ContextAwareness:
+      description: Scan the context of predefined entries to only return matches surrounded by keywords.
+      properties:
+        enabled:
+          description: If true, scan the context of predefined entries to only return matches surrounded by keywords.
+          type: boolean
+        skip:
+          $ref: '#/components/schemas/dlp_SkipConfig'
+      required:
+      - enabled
+      - skip
+      type: object
+    dlp_IntegrationEntry:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        enabled:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        profile_id:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - id
+      - name
+      - created_at
+      - updated_at
+      - enabled
+      type: object
     dlp_Empty:
       type:
       - object
       - 'null'
+    dlp_Profile:
+      discriminator:
+        propertyName: type
+      oneOf:
+      - allOf:
+        - $ref: '#/components/schemas/dlp_CustomProfile'
+        - properties:
+            type:
+              enum:
+              - custom
+              type: string
+          required:
+          - type
+          type: object
+        title: Custom Profile
+      - allOf:
+        - $ref: '#/components/schemas/dlp_PredefinedProfile'
+        - properties:
+            type:
+              enum:
+              - predefined
+              type: string
+          required:
+          - type
+          type: object
+        title: Predefined Profile
+      - allOf:
+        - $ref: '#/components/schemas/dlp_IntegrationProfile'
+        - properties:
+            type:
+              enum:
+              - integration
+              type: string
+          required:
+          - type
+          type: object
+        title: Integration Profile
+    dlp_EntryOfNewProfile:
+      oneOf:
+      - $ref: '#/components/schemas/dlp_NewCustomEntry'
+      - $ref: '#/components/schemas/dlp_NewWordListEntry'
+    dlp_NewCustomEntryWithId:
+      allOf:
+      - $ref: '#/components/schemas/dlp_NewCustomEntry'
+      - properties:
+          entry_id:
+            format: uuid
+            type: string
+        required:
+        - entry_id
+        type: object
+    dlp_ExactDataEntry:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        enabled:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        secret:
+          type: boolean
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - id
+      - name
+      - created_at
+      - updated_at
+      - enabled
+      - secret
+      type: object
+    dlp_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/dlp_messages'
+        messages:
+          $ref: '#/components/schemas/dlp_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    dlp_CustomEntry:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        enabled:
+          type: boolean
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        pattern:
+          $ref: '#/components/schemas/dlp_Pattern'
+        profile_id:
+          format: uuid
+          type:
+          - string
+          - 'null'
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - id
+      - name
+      - created_at
+      - updated_at
+      - pattern
+      - enabled
+      type: object
     dlp_CustomProfile:
       properties:
         allowed_match_count:
@@ -919,141 +1054,6 @@ components:
       - allowed_match_count
       - context_awareness
       - ocr_enabled
-      type: object
-    dlp_EntryOfNewProfile:
-      oneOf:
-      - $ref: '#/components/schemas/dlp_NewCustomEntry'
-      - $ref: '#/components/schemas/dlp_NewWordListEntry'
-    dlp_PredefinedEntry:
-      properties:
-        enabled:
-          type: boolean
-        id:
-          format: uuid
-          type: string
-        name:
-          type: string
-        profile_id:
-          format: uuid
-          type:
-          - string
-          - 'null'
-      required:
-      - id
-      - name
-      - enabled
-      type: object
-    dlp_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/dlp_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/dlp_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    dlp_ExactDataEntry:
-      properties:
-        created_at:
-          format: date-time
-          type: string
-        enabled:
-          type: boolean
-        id:
-          format: uuid
-          type: string
-        name:
-          type: string
-        secret:
-          type: boolean
-        updated_at:
-          format: date-time
-          type: string
-      required:
-      - id
-      - name
-      - created_at
-      - updated_at
-      - enabled
-      - secret
-      type: object
-    dlp_WordListEntry:
-      properties:
-        created_at:
-          format: date-time
-          type: string
-        enabled:
-          type: boolean
-        id:
-          format: uuid
-          type: string
-        name:
-          type: string
-        profile_id:
-          format: uuid
-          type:
-          - string
-          - 'null'
-        updated_at:
-          format: date-time
-          type: string
-        word_list: {}
-      required:
-      - id
-      - name
-      - created_at
-      - updated_at
-      - word_list
-      - enabled
-      type: object
-    dlp_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    dlp_ContextAwareness:
-      description: Scan the context of predefined entries to only return matches surrounded by keywords.
-      properties:
-        enabled:
-          description: If true, scan the context of predefined entries to only return matches surrounded by keywords.
-          type: boolean
-        skip:
-          $ref: '#/components/schemas/dlp_SkipConfig'
-      required:
-      - enabled
-      - skip
       type: object
   securitySchemes:
     api_email:

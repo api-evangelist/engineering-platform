@@ -148,66 +148,16 @@ paths:
         '500':
           $ref: '#/components/responses/common500Error'
 components:
-  examples:
-    v10HeaderMissing:
-      value:
-        name: instanceNotFoundError
-        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
-    apiSchema403ErrorForbidden:
-      value:
-        title: You are not permitted to perform the action.
-        detail: You do not have access to perform this operation.
-        type: ForbiddenError
-    apiVersion400ErrorInstanceNotFound:
-      value:
-        error:
-          name: instanceNotFoundError
-          message: We could not find the API version you are looking for
-    api403ErrorForbidden:
-      value:
-        title: You are not permitted to perform the action.
-        detail: Please ensure that you have required permissions
-        type: ForbiddenError
-    apiVersion404ErrorNotFound:
-      value:
-        type: VersionNotFound
-        title: API Version not found.
-        details: We could not find the API Version you are looking for.
-    featureUnavailable403Error:
-      value:
-        type: https://api.postman.com/problems/forbidden
-        title: Forbidden
-        detail: This feature isn't available in your region.
-        status: 403
-    api404ErrorNotFound:
-      value:
-        type: instanceNotFoundError
-        title: We could not find the API you are looking for
-        detail: We could not find the API you are looking for.
   responses:
-    v9Unsupported:
-      description: v9 Unsupported
+    v10HeaderMissing:
+      description: Missing v10 Accept Header
       content:
         application/problem+json:
           schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The error type.
-                example: unsupportedEntityError
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unsupported API
-              detail:
-                type: string
-                description: Details about the error.
-                example: This endpoint does not support v9 APIs.
-          example:
-            type: unsupportedEntityError
-            title: Unsupported API
-            detail: This endpoint does not support v9 APIs.
+            $ref: '#/components/schemas/v10HeaderMissing'
+          examples:
+            Missing v10 Accept Header:
+              $ref: '#/components/examples/v10HeaderMissing'
     common500Error:
       description: Internal Server Error
       content:
@@ -232,15 +182,29 @@ components:
             type: https://api.postman.com/problems/internal-server-error
             title: Internal Server Error
             detail: Internal Server Error
-    apiVersion404ErrorNotFound:
-      description: API Version Not Found
+    apiVersion422ErrorStateInconsistent:
+      description: API State Inconsistent
       content:
         application/problem+json:
           schema:
-            $ref: '#/components/schemas/apiVersion404ErrorNotFound'
-          examples:
-            API Version Not Found:
-              $ref: '#/components/examples/apiVersion404ErrorNotFound'
+            type: object
+            properties:
+              type:
+                type: string
+                description: The error type.
+                example: APIStateInconsistent
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: API state seems to be inconsistent.
+              detail:
+                type: string
+                description: Details about the error.
+                example: Please perform a Git push from the Postman app to sync state between app and repository.
+          example:
+            type: APIStateInconsistent
+            title: API state seems to be inconsistent.
+            detail: Please perform a Git push from the Postman app to sync state between app and repository.
     api403ErrorAndFeatureUnavailable:
       description: Forbidden
       content:
@@ -254,15 +218,18 @@ components:
               $ref: '#/components/examples/api403ErrorForbidden'
             Feature Unavailable:
               $ref: '#/components/examples/featureUnavailable403Error'
-    v10HeaderMissing:
-      description: Missing v10 Accept Header
+    featureUnavailable403Error:
+      description: Feature Unavailable
       content:
-        application/problem+json:
+        application/json:
           schema:
-            $ref: '#/components/schemas/v10HeaderMissing'
-          examples:
-            Missing v10 Accept Header:
-              $ref: '#/components/examples/v10HeaderMissing'
+            $ref: '#/components/schemas/featureUnavailable403Error'
+          example:
+            value:
+              type: https://api.postman.com/problems/forbidden
+              title: Forbidden
+              detail: This feature isn't available in your region.
+              status: 403
     createApiVersion:
       description: Accepted
       content:
@@ -301,76 +268,6 @@ components:
       headers:
         Location:
           $ref: '#/components/headers/Location'
-    apiVersion422ErrorStateInconsistent:
-      description: API State Inconsistent
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The error type.
-                example: APIStateInconsistent
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: API state seems to be inconsistent.
-              detail:
-                type: string
-                description: Details about the error.
-                example: Please perform a Git push from the Postman app to sync state between app and repository.
-          example:
-            type: APIStateInconsistent
-            title: API state seems to be inconsistent.
-            detail: Please perform a Git push from the Postman app to sync state between app and repository.
-    updateApiVersion:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              id:
-                type: string
-                description: The version's ID.
-                example: 8d7ba74e-2c36-4e36-a263-f3c0c9ae21d2
-              name:
-                type: string
-                description: The version's name.
-                example: Release 1.5
-              createdAt:
-                type: string
-                format: date-time
-                description: The date and time at which the version was created.
-                example: '2022-06-09T14:48:45.000Z'
-              updatedAt:
-                type: string
-                format: date-time
-                description: The date and time at which the version was last updated.
-                example: '2022-06-09T19:50:49.000Z'
-              releaseNotes:
-                type: string
-                description: The version's release notes.
-                example: This is the first public release update.
-          example:
-            createdAt: '2022-06-09T14:48:45.000Z'
-            updatedAt: '2022-06-09T19:50:49.000Z'
-            id: 8d7ba74e-2c36-4e36-a263-f3c0c9ae21d2
-            name: Release 1.5
-            releaseNotes: This is the first public release update.
-    featureUnavailable403Error:
-      description: Feature Unavailable
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/featureUnavailable403Error'
-          example:
-            value:
-              type: https://api.postman.com/problems/forbidden
-              title: Forbidden
-              detail: This feature isn't available in your region.
-              status: 403
     api401ErrorUnauthorized:
       description: Unauthorized
       content:
@@ -406,6 +303,50 @@ components:
             detail: An API key must be provided in the request header or query string
             status: 401
             instance: /collections/12ece9e1-2abf-4edc-8e34-de66e74114d2/requests/%7B%7BrequestId%7D%7D
+    updateApiVersion:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The version's ID.
+                example: 8d7ba74e-2c36-4e36-a263-f3c0c9ae21d2
+              name:
+                type: string
+                description: The version's name.
+                example: Release 1.5
+              createdAt:
+                type: string
+                format: date-time
+                description: The date and time at which the version was created.
+                example: '2022-06-09T14:48:45.000Z'
+              updatedAt:
+                type: string
+                format: date-time
+                description: The date and time at which the version was last updated.
+                example: '2022-06-09T19:50:49.000Z'
+              releaseNotes:
+                type: string
+                description: The version's release notes.
+                example: This is the first public release update.
+          example:
+            createdAt: '2022-06-09T14:48:45.000Z'
+            updatedAt: '2022-06-09T19:50:49.000Z'
+            id: 8d7ba74e-2c36-4e36-a263-f3c0c9ae21d2
+            name: Release 1.5
+            releaseNotes: This is the first public release update.
+    apiVersion404ErrorNotFound:
+      description: API Version Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/apiVersion404ErrorNotFound'
+          examples:
+            API Version Not Found:
+              $ref: '#/components/examples/apiVersion404ErrorNotFound'
     getApiVersions:
       description: Successful Response
       content:
@@ -485,45 +426,30 @@ components:
           examples:
             API Not Found:
               $ref: '#/components/examples/api404ErrorNotFound'
+    v9Unsupported:
+      description: v9 Unsupported
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The error type.
+                example: unsupportedEntityError
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unsupported API
+              detail:
+                type: string
+                description: Details about the error.
+                example: This endpoint does not support v9 APIs.
+          example:
+            type: unsupportedEntityError
+            title: Unsupported API
+            detail: This endpoint does not support v9 APIs.
   schemas:
-    apiVersion404ErrorNotFound:
-      title: API Version Not Found
-      type: object
-      properties:
-        type:
-          type: string
-          description: The type of error.
-          example: VersionNotFound
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: API Version not found.
-        detail:
-          type: string
-          description: Information about the error.
-          example: We could not find the API Version you are looking for.
-    featureUnavailable403Error:
-      title: Feature Unavailable
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/forbidden
-        title:
-          type: string
-          description: A short summary of the problem.
-          example: Forbidden
-        detail:
-          type: string
-          description: Information about the error.
-          example: This feature isn't available in your region.
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
     api404ErrorNotFound:
       title: API Not Found
       type: object
@@ -559,21 +485,22 @@ components:
               type: string
               description: The error message.
               example: We could not find the API version you are looking for
-    cursor:
-      type: string
-      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
-    v10HeaderMissing:
-      title: Missing v10 Accept Header
+    apiVersion404ErrorNotFound:
+      title: API Version Not Found
       type: object
       properties:
-        name:
+        type:
           type: string
-          description: The error name.
-          example: instanceNotFoundError
-        message:
+          description: The type of error.
+          example: VersionNotFound
+        title:
           type: string
-          description: The error message.
-          example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+          description: A short summary of the problem.
+          example: API Version not found.
+        detail:
+          type: string
+          description: Information about the error.
+          example: We could not find the API Version you are looking for.
     apiSchema403ErrorForbidden:
       title: Forbidden
       type: object
@@ -590,9 +517,46 @@ components:
           type: string
           description: Information about the error.
           example: You do not have access to perform this operation.
+    v10HeaderMissing:
+      title: Missing v10 Accept Header
+      type: object
+      properties:
+        name:
+          type: string
+          description: The error name.
+          example: instanceNotFoundError
+        message:
+          type: string
+          description: The error message.
+          example: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    featureUnavailable403Error:
+      title: Feature Unavailable
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Forbidden
+        detail:
+          type: string
+          description: Information about the error.
+          example: This feature isn't available in your region.
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
     apiVersionId:
       type: string
       example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
     api403ErrorForbidden:
       title: Forbidden
       type: object
@@ -609,50 +573,42 @@ components:
           type: string
           description: Information about the error.
           example: Please ensure that you have required permissions
-  headers:
-    Location:
-      description: The URL to get or poll the status of an API version task created.
-      schema:
-        type: string
-        example: /apis/6138195-0262634b-cdcb-4a03-a4b9-2b221eccfbaa/tasks/66ae9950-0869-4e65-96b0-1e0e47e771af
-  parameters:
-    cursor:
-      name: cursor
-      in: query
-      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
-      schema:
-        $ref: '#/components/schemas/cursor'
-    v10Accept:
-      name: Accept
-      in: header
-      required: true
-      description: The `application/vnd.api.v10+json` request header required to use the endpoint.
-      schema:
-        type: string
-        enum:
-        - application/vnd.api.v10+json
-        example: application/vnd.api.v10+json
-    apiId:
-      name: apiId
-      in: path
-      required: true
-      description: The API's ID.
-      schema:
-        type: string
-        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
-    apiVersionId:
-      name: versionId
-      in: path
-      required: true
-      description: The API's version ID.
-      schema:
-        $ref: '#/components/schemas/apiVersionId'
-    limit:
-      name: limit
-      in: query
-      description: The maximum number of rows to return in the response.
-      schema:
-        $ref: '#/components/schemas/limit'
+  examples:
+    apiVersion400ErrorInstanceNotFound:
+      value:
+        error:
+          name: instanceNotFoundError
+          message: We could not find the API version you are looking for
+    apiSchema403ErrorForbidden:
+      value:
+        title: You are not permitted to perform the action.
+        detail: You do not have access to perform this operation.
+        type: ForbiddenError
+    apiVersion404ErrorNotFound:
+      value:
+        type: VersionNotFound
+        title: API Version not found.
+        details: We could not find the API Version you are looking for.
+    api403ErrorForbidden:
+      value:
+        title: You are not permitted to perform the action.
+        detail: Please ensure that you have required permissions
+        type: ForbiddenError
+    api404ErrorNotFound:
+      value:
+        type: instanceNotFoundError
+        title: We could not find the API you are looking for
+        detail: We could not find the API you are looking for.
+    v10HeaderMissing:
+      value:
+        name: instanceNotFoundError
+        message: API not found. For v10 and later APIs, ensure that your request sends the "application/vnd.api.v10+json" Accept header.
+    featureUnavailable403Error:
+      value:
+        type: https://api.postman.com/problems/forbidden
+        title: Forbidden
+        detail: This feature isn't available in your region.
+        status: 403
   requestBodies:
     updateApiVersion:
       content:
@@ -830,6 +786,50 @@ components:
                 - directoryPath: /dir/index.yml
                 collections:
                 - filePath: postman/collections/c1.json
+  parameters:
+    apiId:
+      name: apiId
+      in: path
+      required: true
+      description: The API's ID.
+      schema:
+        type: string
+        example: 90ca9f5a-c4c4-11ed-afa1-0242ac120002
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of rows to return in the response.
+      schema:
+        $ref: '#/components/schemas/limit'
+    apiVersionId:
+      name: versionId
+      in: path
+      required: true
+      description: The API's version ID.
+      schema:
+        $ref: '#/components/schemas/apiVersionId'
+    cursor:
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
+    v10Accept:
+      name: Accept
+      in: header
+      required: true
+      description: The `application/vnd.api.v10+json` request header required to use the endpoint.
+      schema:
+        type: string
+        enum:
+        - application/vnd.api.v10+json
+        example: application/vnd.api.v10+json
+  headers:
+    Location:
+      description: The URL to get or poll the status of an API version task created.
+      schema:
+        type: string
+        example: /apis/6138195-0262634b-cdcb-4a03-a4b9-2b221eccfbaa/tasks/66ae9950-0869-4e65-96b0-1e0e47e771af
   securitySchemes:
     PostmanApiKey:
       type: apiKey

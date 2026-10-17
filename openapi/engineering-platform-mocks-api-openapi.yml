@@ -308,7 +308,7 @@ paths:
           $ref: '#/components/responses/common500ErrorServerError'
 components:
   responses:
-    mock400ErrorAlreadyPublished:
+    paramMissing400Error:
       description: Bad Request
       content:
         application/json:
@@ -321,54 +321,53 @@ components:
                   name:
                     type: string
                     description: The error name.
-                    example: mockAlreadyPublishedError
+                    example: paramMissingError
                   message:
                     type: string
                     description: The error message.
-                    example: This mock is already public.
-          example:
-            error:
-              name: mockAlreadyPublishedError
-              message: This mock is already public.
-    serverResponseNotFound400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverResponseNotFoundError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: We could not find the mock server response you are looking for.
-          example:
-            error:
-              name: serverResponseNotFoundError
-              message: We could not find the mock server response you are looking for.
-    publishMock:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              mock:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The mock server's ID.
-                    example: e3d951bf-873f-49ac-a658-b2dcb91d3289
-          example:
-            mock:
-              id: e3d951bf-873f-49ac-a658-b2dcb91d3289
+                    example: Parameter is missing in the request.
+                  details:
+                    type: object
+                    description: Information about the error.
+                    properties:
+                      param:
+                        type: array
+                        description: Information about the missing parameter.
+                        items:
+                          type: string
+          examples:
+            Missing name Parameter:
+              value:
+                error:
+                  name: paramMissingError
+                  message: Parameter is missing in the request.
+                  details:
+                    param:
+                    - name
+            Missing collection Parameter:
+              value:
+                error:
+                  name: paramMissingError
+                  message: Parameter is missing in the request.
+                  details:
+                    param:
+                    - collection
+            Missing Mock serverResponse parameter:
+              value:
+                error:
+                  name: paramMissingError
+                  message: Parameter is missing in the request.
+                  details:
+                    param:
+                    - serverResponse
+            Missing Server Response statusCode parameter:
+              value:
+                error:
+                  name: paramMissingError
+                  message: Parameter is missing in the request.
+                  details:
+                    param:
+                    - statusCode
     deleteMockServerResponse:
       description: Successful Response
       content:
@@ -442,99 +441,132 @@ components:
             createdBy: '20891195'
             updatedBy: '20891195'
             createdAt: '2022-09-21T20:20:09.000Z'
-    getMock:
+    getMocks:
       description: Successful Response
       content:
         application/json:
           schema:
             type: object
             properties:
-              mock:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The mock server's ID.
-                    example: e3d951bf-873f-49ac-a658-b2dcb91d3289
-                  owner:
-                    type: string
-                    description: The ID of mock server's owner.
-                    example: '12345678'
-                  uid:
-                    type: string
-                    format: uid
-                    description: The mock server's unique ID.
-                    example: 12345678-e782b64e-406b-4a6c-8fe9-9ebe84aeb706
-                  collection:
-                    type: string
-                    description: The unique ID of the mock's associated collection.
-                    example: 12345678-39fee52f-b806-3ffa-1173-00a6f5b183dc
-                  mockUrl:
-                    type: string
-                    format: url
-                    description: The mock server URL.
-                    example: https://e3d951bf-873f-49ac-a658-b2dcb91d3289.mock.pstmn.io
-                  name:
-                    type: string
-                    description: The mock server's name.
-                    example: Test Mock
-                  config:
-                    type: object
-                    description: Information about the mock server's configuration.
-                    properties:
-                      headers:
-                        type: array
-                        description: A list of the mock server's headers.
-                        items:
+              mocks:
+                type: array
+                items:
+                  type: object
+                  description: Information about the mock servers.
+                  properties:
+                    id:
+                      type: string
+                      description: The mock server's ID.
+                      example: e3d951bf-873f-49ac-a658-b2dcb91d3289
+                    owner:
+                      type: string
+                      description: The ID of mock server's owner.
+                      example: '12345678'
+                    uid:
+                      type: string
+                      format: uid
+                      description: The mock server's unique ID.
+                      example: 12345678-e782b64e-406b-4a6c-8fe9-9ebe84aeb706
+                    collection:
+                      type: string
+                      description: The unique ID of the mock's associated collection.
+                      example: 12345678-39fee52f-b806-3ffa-1173-00a6f5b183dc
+                    mockUrl:
+                      type: string
+                      format: url
+                      description: The mock server URL.
+                      example: https://e3d951bf-873f-49ac-a658-b2dcb91d3289.mock.pstmn.io
+                    config:
+                      type: object
+                      description: Information about the mock server's configuration.
+                      properties:
+                        delay:
+                          type:
+                          - object
+                          - 'null'
+                          description: Information about the mock server's simulated network delay settings. This returns a null value if there are no configured network delay settings.
+                          properties:
+                            type:
+                              type: string
+                              description: 'The type of simulated delay value:
+
+                                - `fixed` — The delay value is a fixed value.
+
+                                '
+                              example: fixed
+                              enum:
+                              - fixed
+                            preset:
+                              type: string
+                              description: 'The simulated fixed network delay value:
+
+                                - `1` — 2G (300 ms).
+
+                                - `2` — 3G (100 ms).
+
+                                The object does not return this value for custom delay values.
+
+                                '
+                              example: '2'
+                              enum:
+                              - '1'
+                              - '2'
+                            duration:
+                              type: integer
+                              description: The configured delay, in milliseconds.
+                              example: 100
+                        headers:
+                          type: array
+                          description: A list of the mock server's headers.
+                          items:
+                            type: string
+                          example: []
+                        matchBody:
+                          type: boolean
+                          description: If true, match the request body.
+                          example: false
+                        matchQueryParams:
+                          type: boolean
+                          description: If true, match query parameters.
+                          example: true
+                        matchWildcards:
+                          type: boolean
+                          description: If true, use wildcard variable matching.
+                          example: true
+                        serverResponseId:
                           type: string
-                      matchBody:
-                        type: boolean
-                        description: If true, match the request body.
-                        example: false
-                      matchQueryParams:
-                        type: boolean
-                        description: If true, match query parameters.
-                        example: true
-                      matchWildcards:
-                        type: boolean
-                        description: If true, use wildcard variable matching.
-                        example: true
-                      serverResponseId:
-                        type:
-                        - string
-                        - 'null'
-                        description: The ID of mock server's default response for requests. All calls to the mock server will return the defined response.
-                        example: 94d0f5d9-dbdf-4046-9a7d-a11f9b78ac65
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the mock server was created.
-                    example: '2022-06-09T19:00:39.000Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the mock server was last updated.
-                    example: '2022-06-09T19:00:39.000Z'
-                  isPublic:
-                    type: boolean
-                    description: If true, the mock server is public and visible to all users. This field does not indicate the mock server's access control status.
-                    example: false
-                  deactivated:
-                    type: boolean
-                    description: If true, the mock server is not active. Mock servers deactivate when a linked collection or environment is deleted.
-                    example: false
-                  environment:
-                    type: string
-                    description: The mock server's associated environment ID.
-                    example: 1679925-0b9e9f15-3208-a2b1-22e0-d58392f01524
+                          description: The ID of mock server's default response for requests. All calls to the mock server will return the defined response.
+                          example: 94d0f5d9-dbdf-4046-9a7d-a11f9b78ac65
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the mock server was created.
+                      example: '2022-06-09T19:00:39.000Z'
+                    environment:
+                      type: string
+                      description: The mock server's associated environment ID.
+                      example: 1679925-0b9e9f15-3208-a2b1-22e0-d58392f01524
+                    isPublic:
+                      type: boolean
+                      description: If true, the mock server is public and visible to all users. This field does not indicate the mock server's access control status.
+                      example: false
+                    name:
+                      type: string
+                      description: The mock server's name.
+                      example: Test Mock
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the mock server was last updated.
+                      example: '2022-06-09T19:00:39.000Z'
           example:
-            mock:
-              id: e3d951bf-873f-49ac-a658-b2dcb91d3289
+            mocks:
+            - id: e3d951bf-873f-49ac-a658-b2dcb91d3289
               owner: '12345678'
               uid: 12345678-e3d951bf-873f-49ac-a658-b2dcb91d3289
               collection: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
               mockUrl: https://e3d951bf-873f-49ac-a658-b2dcb91d3289.mock.pstmn.io
-              name: Test Mock
+              name: Test Mock A
               config:
                 headers: []
                 matchBody: false
@@ -543,42 +575,72 @@ components:
                 delay:
                   type: fixed
                   duration: 140000
-                serverResponseId: 94d0f5d9-dbdf-4046-9a7d-a11f9b78ac65
+                serverResponseId: ''
               createdAt: '2022-07-25T20:54:30.000Z'
               updatedAt: '2022-07-25T20:54:30.000Z'
               isPublic: false
-              deactivated: false
               environment: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
-    common401Error:
-      description: Unauthorized
+            - id: cf0f8f11-fe0e-455f-99f3-4177f10f0704
+              owner: '12345678'
+              uid: 12345678-cf0f8f11-fe0e-455f-99f3-4177f10f0704
+              collection: 12345678-2cd8f6b1-e85b-46a6-8111-bd62e73e8aa8
+              mockUrl: https://cf0f8f11-fe0e-455f-99f3-4177f10f0704.mock.pstmn.io
+              name: Test Mock B
+              config:
+                headers: []
+                matchBody: false
+                matchHeader: false
+                matchQueryParams: true
+                matchWildcards: true
+                delay: null
+                serverResponseId: 94d0f5d9-dbdf-4046-9a7d-a11f9b78ac65
+              createdAt: '2023-01-26T18:59:05.000Z'
+              updatedAt: '2023-01-26T18:59:05.000Z'
+              isPublic: false
+    mock400ErrorAlreadyUnpublished:
+      description: Bad Request
       content:
-        application/problem+json:
+        application/json:
           schema:
             type: object
             properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: mockAlreadyUnpublishedError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: This mock has already been deleted.
           example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
+            error:
+              name: mockAlreadyUnpublishedError
+              message: This mock has already been deleted.
+    serverResponseNotFound400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverResponseNotFoundError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: We could not find the mock server response you are looking for.
+          example:
+            error:
+              name: serverResponseNotFoundError
+              message: We could not find the mock server response you are looking for.
     common500ErrorServerError:
       description: Internal Server Error
       content:
@@ -601,137 +663,6 @@ components:
             error:
               name: serverError
               message: An error has occurred on the server.
-    paramMissing400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: paramMissingError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: Parameter is missing in the request.
-                  details:
-                    type: object
-                    description: Information about the error.
-                    properties:
-                      param:
-                        type: array
-                        description: Information about the missing parameter.
-                        items:
-                          type: string
-          examples:
-            Missing name Parameter:
-              value:
-                error:
-                  name: paramMissingError
-                  message: Parameter is missing in the request.
-                  details:
-                    param:
-                    - name
-            Missing collection Parameter:
-              value:
-                error:
-                  name: paramMissingError
-                  message: Parameter is missing in the request.
-                  details:
-                    param:
-                    - collection
-            Missing Mock serverResponse parameter:
-              value:
-                error:
-                  name: paramMissingError
-                  message: Parameter is missing in the request.
-                  details:
-                    param:
-                    - serverResponse
-            Missing Server Response statusCode parameter:
-              value:
-                error:
-                  name: paramMissingError
-                  message: Parameter is missing in the request.
-                  details:
-                    param:
-                    - statusCode
-    mock400ErrorLogRetentionPeriodExceeded:
-      description: Log Retention Period Exceeded
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: invalidParamsError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: 'Invalid value for parameter: since. Cannot view logs beyond the call log retention period based on your plan i.e. 30 days.'
-          example:
-            error:
-              name: invalidParamsError
-              message: 'Invalid value for parameter: since. Cannot view logs beyond the call log retention period based on your plan i.e. 30 days.'
-    getMockServerResponses:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: array
-            description: Information about the mock server's responses.
-            items:
-              type: object
-              description: Information about the server response.
-              properties:
-                id:
-                  type: string
-                  description: The server response's ID.
-                  example: 965cdd16-fe22-4d96-a161-3d05490ac421
-                name:
-                  type: string
-                  description: The server response's name.
-                  example: Internal Server Error
-                statusCode:
-                  type: number
-                  description: The server response's 5xx HTTP response code.
-                  example: 500
-                createdAt:
-                  type: string
-                  format: date-time
-                  description: The date and time at which the server response was created.
-                  example: '2022-08-02T14:57:44.000Z'
-                updatedAt:
-                  type: string
-                  format: date-time
-                  description: The date and time at which the server response was last updated.
-                  example: '2022-08-02T14:57:44.000Z'
-                createdBy:
-                  type: string
-                  description: The user ID of the user who created the server response.
-                  example: '12345678'
-                updatedBy:
-                  type: string
-                  description: The user ID of the user who last updated the server response.
-                  example: '12345678'
-          example:
-          - id: 965cdd16-fe22-4d96-a161-3d05490ac421
-            name: Internal Server Error
-            statusCode: 500
-            createdAt: '2022-08-02T14:57:44.000Z'
-            updatedAt: '2022-08-02T14:57:44.000Z'
-            createdBy: '12345678'
-            updatedBy: '12345678'
     mockCreateUpdate:
       description: Successful Response
       content:
@@ -864,25 +795,8 @@ components:
               createdAt: '2022-06-09T19:00:39.000Z'
               updatedAt: '2022-06-09T19:00:39.000Z'
               environment: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
-    unpublishMock:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              mock:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The mock server's ID.
-                    example: e3d951bf-873f-49ac-a658-b2dcb91d3289
-          example:
-            mock:
-              id: e3d951bf-873f-49ac-a658-b2dcb91d3289
-    mock400ErrorAlreadyUnpublished:
-      description: Bad Request
+    mock400ErrorLogRetentionPeriodExceeded:
+      description: Log Retention Period Exceeded
       content:
         application/json:
           schema:
@@ -894,15 +808,15 @@ components:
                   name:
                     type: string
                     description: The error name.
-                    example: mockAlreadyUnpublishedError
+                    example: invalidParamsError
                   message:
                     type: string
                     description: The error message.
-                    example: This mock has already been deleted.
+                    example: 'Invalid value for parameter: since. Cannot view logs beyond the call log retention period based on your plan i.e. 30 days.'
           example:
             error:
-              name: mockAlreadyUnpublishedError
-              message: This mock has already been deleted.
+              name: invalidParamsError
+              message: 'Invalid value for parameter: since. Cannot view logs beyond the call log retention period based on your plan i.e. 30 days.'
     mock400ErrorInstanceNotFound:
       description: Not Found
       content:
@@ -925,6 +839,225 @@ components:
             error:
               name: instanceNotFoundError
               message: The specified mock does not exist.
+    mock400ErrorAlreadyPublished:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: mockAlreadyPublishedError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: This mock is already public.
+          example:
+            error:
+              name: mockAlreadyPublishedError
+              message: This mock is already public.
+    unpublishMock:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mock:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The mock server's ID.
+                    example: e3d951bf-873f-49ac-a658-b2dcb91d3289
+          example:
+            mock:
+              id: e3d951bf-873f-49ac-a658-b2dcb91d3289
+    getMockServerResponses:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: array
+            description: Information about the mock server's responses.
+            items:
+              type: object
+              description: Information about the server response.
+              properties:
+                id:
+                  type: string
+                  description: The server response's ID.
+                  example: 965cdd16-fe22-4d96-a161-3d05490ac421
+                name:
+                  type: string
+                  description: The server response's name.
+                  example: Internal Server Error
+                statusCode:
+                  type: number
+                  description: The server response's 5xx HTTP response code.
+                  example: 500
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: The date and time at which the server response was created.
+                  example: '2022-08-02T14:57:44.000Z'
+                updatedAt:
+                  type: string
+                  format: date-time
+                  description: The date and time at which the server response was last updated.
+                  example: '2022-08-02T14:57:44.000Z'
+                createdBy:
+                  type: string
+                  description: The user ID of the user who created the server response.
+                  example: '12345678'
+                updatedBy:
+                  type: string
+                  description: The user ID of the user who last updated the server response.
+                  example: '12345678'
+          example:
+          - id: 965cdd16-fe22-4d96-a161-3d05490ac421
+            name: Internal Server Error
+            statusCode: 500
+            createdAt: '2022-08-02T14:57:44.000Z'
+            updatedAt: '2022-08-02T14:57:44.000Z'
+            createdBy: '12345678'
+            updatedBy: '12345678'
+    deleteMock:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mock:
+                type: object
+                description: Information about the mock server.
+                properties:
+                  id:
+                    type: string
+                    description: The mock server's ID.
+                    example: e3d951bf-873f-49ac-a658-b2dcb91d3289
+                  uid:
+                    type: string
+                    format: uid
+                    description: The mock server's unique ID.
+                    example: 12345678-e782b64e-406b-4a6c-8fe9-9ebe84aeb706
+          example:
+            mock:
+              id: e782b64e-406b-4a6c-8fe9-9ebe84aeb706
+              uid: 12345678-e782b64e-406b-4a6c-8fe9-9ebe84aeb706
+    getMock:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mock:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The mock server's ID.
+                    example: e3d951bf-873f-49ac-a658-b2dcb91d3289
+                  owner:
+                    type: string
+                    description: The ID of mock server's owner.
+                    example: '12345678'
+                  uid:
+                    type: string
+                    format: uid
+                    description: The mock server's unique ID.
+                    example: 12345678-e782b64e-406b-4a6c-8fe9-9ebe84aeb706
+                  collection:
+                    type: string
+                    description: The unique ID of the mock's associated collection.
+                    example: 12345678-39fee52f-b806-3ffa-1173-00a6f5b183dc
+                  mockUrl:
+                    type: string
+                    format: url
+                    description: The mock server URL.
+                    example: https://e3d951bf-873f-49ac-a658-b2dcb91d3289.mock.pstmn.io
+                  name:
+                    type: string
+                    description: The mock server's name.
+                    example: Test Mock
+                  config:
+                    type: object
+                    description: Information about the mock server's configuration.
+                    properties:
+                      headers:
+                        type: array
+                        description: A list of the mock server's headers.
+                        items:
+                          type: string
+                      matchBody:
+                        type: boolean
+                        description: If true, match the request body.
+                        example: false
+                      matchQueryParams:
+                        type: boolean
+                        description: If true, match query parameters.
+                        example: true
+                      matchWildcards:
+                        type: boolean
+                        description: If true, use wildcard variable matching.
+                        example: true
+                      serverResponseId:
+                        type:
+                        - string
+                        - 'null'
+                        description: The ID of mock server's default response for requests. All calls to the mock server will return the defined response.
+                        example: 94d0f5d9-dbdf-4046-9a7d-a11f9b78ac65
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the mock server was created.
+                    example: '2022-06-09T19:00:39.000Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the mock server was last updated.
+                    example: '2022-06-09T19:00:39.000Z'
+                  isPublic:
+                    type: boolean
+                    description: If true, the mock server is public and visible to all users. This field does not indicate the mock server's access control status.
+                    example: false
+                  deactivated:
+                    type: boolean
+                    description: If true, the mock server is not active. Mock servers deactivate when a linked collection or environment is deleted.
+                    example: false
+                  environment:
+                    type: string
+                    description: The mock server's associated environment ID.
+                    example: 1679925-0b9e9f15-3208-a2b1-22e0-d58392f01524
+          example:
+            mock:
+              id: e3d951bf-873f-49ac-a658-b2dcb91d3289
+              owner: '12345678'
+              uid: 12345678-e3d951bf-873f-49ac-a658-b2dcb91d3289
+              collection: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+              mockUrl: https://e3d951bf-873f-49ac-a658-b2dcb91d3289.mock.pstmn.io
+              name: Test Mock
+              config:
+                headers: []
+                matchBody: false
+                matchQueryParams: true
+                matchWildcards: true
+                delay:
+                  type: fixed
+                  duration: 140000
+                serverResponseId: 94d0f5d9-dbdf-4046-9a7d-a11f9b78ac65
+              createdAt: '2022-07-25T20:54:30.000Z'
+              updatedAt: '2022-07-25T20:54:30.000Z'
+              isPublic: false
+              deactivated: false
+              environment: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
     mockServerResponse:
       description: Successful Response
       content:
@@ -1005,6 +1138,23 @@ components:
             createdBy: '12345678'
             updatedBy: '12345678'
             mock: 32cd624d-9986-4f20-9048-89252f722269
+    publishMock:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mock:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The mock server's ID.
+                    example: e3d951bf-873f-49ac-a658-b2dcb91d3289
+          example:
+            mock:
+              id: e3d951bf-873f-49ac-a658-b2dcb91d3289
     getMockCallLogs:
       description: Successful Response
       content:
@@ -1170,227 +1320,37 @@ components:
                 statusCode: 200
             meta:
               nextCursor: null
-    deleteMock:
-      description: Successful Response
+    common401Error:
+      description: Unauthorized
       content:
-        application/json:
+        application/problem+json:
           schema:
             type: object
             properties:
-              mock:
-                type: object
-                description: Information about the mock server.
-                properties:
-                  id:
-                    type: string
-                    description: The mock server's ID.
-                    example: e3d951bf-873f-49ac-a658-b2dcb91d3289
-                  uid:
-                    type: string
-                    format: uid
-                    description: The mock server's unique ID.
-                    example: 12345678-e782b64e-406b-4a6c-8fe9-9ebe84aeb706
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
           example:
-            mock:
-              id: e782b64e-406b-4a6c-8fe9-9ebe84aeb706
-              uid: 12345678-e782b64e-406b-4a6c-8fe9-9ebe84aeb706
-    getMocks:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              mocks:
-                type: array
-                items:
-                  type: object
-                  description: Information about the mock servers.
-                  properties:
-                    id:
-                      type: string
-                      description: The mock server's ID.
-                      example: e3d951bf-873f-49ac-a658-b2dcb91d3289
-                    owner:
-                      type: string
-                      description: The ID of mock server's owner.
-                      example: '12345678'
-                    uid:
-                      type: string
-                      format: uid
-                      description: The mock server's unique ID.
-                      example: 12345678-e782b64e-406b-4a6c-8fe9-9ebe84aeb706
-                    collection:
-                      type: string
-                      description: The unique ID of the mock's associated collection.
-                      example: 12345678-39fee52f-b806-3ffa-1173-00a6f5b183dc
-                    mockUrl:
-                      type: string
-                      format: url
-                      description: The mock server URL.
-                      example: https://e3d951bf-873f-49ac-a658-b2dcb91d3289.mock.pstmn.io
-                    config:
-                      type: object
-                      description: Information about the mock server's configuration.
-                      properties:
-                        delay:
-                          type:
-                          - object
-                          - 'null'
-                          description: Information about the mock server's simulated network delay settings. This returns a null value if there are no configured network delay settings.
-                          properties:
-                            type:
-                              type: string
-                              description: 'The type of simulated delay value:
-
-                                - `fixed` — The delay value is a fixed value.
-
-                                '
-                              example: fixed
-                              enum:
-                              - fixed
-                            preset:
-                              type: string
-                              description: 'The simulated fixed network delay value:
-
-                                - `1` — 2G (300 ms).
-
-                                - `2` — 3G (100 ms).
-
-                                The object does not return this value for custom delay values.
-
-                                '
-                              example: '2'
-                              enum:
-                              - '1'
-                              - '2'
-                            duration:
-                              type: integer
-                              description: The configured delay, in milliseconds.
-                              example: 100
-                        headers:
-                          type: array
-                          description: A list of the mock server's headers.
-                          items:
-                            type: string
-                          example: []
-                        matchBody:
-                          type: boolean
-                          description: If true, match the request body.
-                          example: false
-                        matchQueryParams:
-                          type: boolean
-                          description: If true, match query parameters.
-                          example: true
-                        matchWildcards:
-                          type: boolean
-                          description: If true, use wildcard variable matching.
-                          example: true
-                        serverResponseId:
-                          type: string
-                          description: The ID of mock server's default response for requests. All calls to the mock server will return the defined response.
-                          example: 94d0f5d9-dbdf-4046-9a7d-a11f9b78ac65
-                    createdAt:
-                      type: string
-                      format: date-time
-                      description: The date and time at which the mock server was created.
-                      example: '2022-06-09T19:00:39.000Z'
-                    environment:
-                      type: string
-                      description: The mock server's associated environment ID.
-                      example: 1679925-0b9e9f15-3208-a2b1-22e0-d58392f01524
-                    isPublic:
-                      type: boolean
-                      description: If true, the mock server is public and visible to all users. This field does not indicate the mock server's access control status.
-                      example: false
-                    name:
-                      type: string
-                      description: The mock server's name.
-                      example: Test Mock
-                    updatedAt:
-                      type: string
-                      format: date-time
-                      description: The date and time at which the mock server was last updated.
-                      example: '2022-06-09T19:00:39.000Z'
-          example:
-            mocks:
-            - id: e3d951bf-873f-49ac-a658-b2dcb91d3289
-              owner: '12345678'
-              uid: 12345678-e3d951bf-873f-49ac-a658-b2dcb91d3289
-              collection: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-              mockUrl: https://e3d951bf-873f-49ac-a658-b2dcb91d3289.mock.pstmn.io
-              name: Test Mock A
-              config:
-                headers: []
-                matchBody: false
-                matchQueryParams: true
-                matchWildcards: true
-                delay:
-                  type: fixed
-                  duration: 140000
-                serverResponseId: ''
-              createdAt: '2022-07-25T20:54:30.000Z'
-              updatedAt: '2022-07-25T20:54:30.000Z'
-              isPublic: false
-              environment: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
-            - id: cf0f8f11-fe0e-455f-99f3-4177f10f0704
-              owner: '12345678'
-              uid: 12345678-cf0f8f11-fe0e-455f-99f3-4177f10f0704
-              collection: 12345678-2cd8f6b1-e85b-46a6-8111-bd62e73e8aa8
-              mockUrl: https://cf0f8f11-fe0e-455f-99f3-4177f10f0704.mock.pstmn.io
-              name: Test Mock B
-              config:
-                headers: []
-                matchBody: false
-                matchHeader: false
-                matchQueryParams: true
-                matchWildcards: true
-                delay: null
-                serverResponseId: 94d0f5d9-dbdf-4046-9a7d-a11f9b78ac65
-              createdAt: '2023-01-26T18:59:05.000Z'
-              updatedAt: '2023-01-26T18:59:05.000Z'
-              isPublic: false
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
   parameters:
-    mockInclude:
-      name: include
-      in: query
-      description: Include call log records with header and body data. This query parameter accepts the `request.headers`, `request.body`, `response.headers`, and `response.body` values. For multiple include types, comma-separate each value.
-      schema:
-        type: string
-        example: request.headers,request.body,response.headers,response.body
-    cursor:
-      name: cursor
-      in: query
-      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
-      schema:
-        $ref: '#/components/schemas/cursor'
-    mockResponseStatusCode:
-      name: responseStatusCode
-      in: query
-      description: Return only call logs that match the given HTTP response status code.
-      schema:
-        type: number
-        example: 500
-    teamIdResultsQuery:
-      name: teamId
-      in: query
-      description: Return only results that belong to the given team ID.
-      schema:
-        type: string
-        example: 1b96f65f-8d23-4e1d-b5e2-055992c3b8cbd2567dfa09a9
-    until:
-      name: until
-      in: query
-      description: Return only results created until this given time, in [ISO 8601](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) format. This value cannot be earlier than the `since` value.
-      schema:
-        $ref: '#/components/schemas/untilDateTime'
-    mockRequestPath:
-      name: requestPath
-      in: query
-      description: Return only call logs that match the given request path. Matching is not case-sensitive.
-      schema:
-        type: string
-        example: /animals?type=Dog
     serverResponseId:
       name: serverResponseId
       in: path
@@ -1399,50 +1359,18 @@ components:
       schema:
         type: string
         example: 965cdd16-fe22-4d96-a161-3d05490ac421
-    direction:
-      name: direction
+    workspaceIdQuery:
+      name: workspaceId
       in: query
-      description: Sort in ascending (`asc`) or descending (`desc`) order. Matching is not case-sensitive. If you use this query parameter, you must also use the `sort` parameter.
-      schema:
-        $ref: '#/components/schemas/ascDesc'
-    mockRequestMethod:
-      name: requestMethod
-      in: query
-      description: Return only call logs that match the given HTTP method. Matching is not case-sensitive.
-      schema:
-        type: string
-        example: post
-    workspaceResultsQuery:
-      name: workspace
-      in: query
-      description: Return only results found in the given workspace.
+      description: The workspace's ID.
       schema:
         $ref: '#/components/schemas/workspaceId'
-    mockId:
-      name: mockId
-      in: path
-      required: true
-      description: The mock's ID.
-      schema:
-        type: string
-        example: e3d951bf-873f-49ac-a658-b2dcb91d3289
-    mockSortServedAt:
-      name: sort
+    until:
+      name: until
       in: query
-      description: Sort the results by the given value. If you use this query parameter, you must also use the `direction` parameter.
+      description: Return only results created until this given time, in [ISO 8601](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) format. This value cannot be earlier than the `since` value.
       schema:
-        type: string
-        enum:
-        - servedAt
-        example: servedAt
-    limitDefault100:
-      name: limit
-      in: query
-      description: The maximum number of rows to return in the response.
-      schema:
-        type: number
-        default: 100
-        example: 3
+        $ref: '#/components/schemas/untilDateTime'
     mockResponseType:
       name: responseType
       in: query
@@ -1456,12 +1384,84 @@ components:
       description: Return only results created since the given time, in [ISO 8601](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) format. This value cannot be later than the `until` value.
       schema:
         $ref: '#/components/schemas/sinceDateTime'
-    workspaceIdQuery:
-      name: workspaceId
+    mockRequestPath:
+      name: requestPath
       in: query
-      description: The workspace's ID.
+      description: Return only call logs that match the given request path. Matching is not case-sensitive.
+      schema:
+        type: string
+        example: /animals?type=Dog
+    teamIdResultsQuery:
+      name: teamId
+      in: query
+      description: Return only results that belong to the given team ID.
+      schema:
+        type: string
+        example: 1b96f65f-8d23-4e1d-b5e2-055992c3b8cbd2567dfa09a9
+    mockResponseStatusCode:
+      name: responseStatusCode
+      in: query
+      description: Return only call logs that match the given HTTP response status code.
+      schema:
+        type: number
+        example: 500
+    mockSortServedAt:
+      name: sort
+      in: query
+      description: Sort the results by the given value. If you use this query parameter, you must also use the `direction` parameter.
+      schema:
+        type: string
+        enum:
+        - servedAt
+        example: servedAt
+    mockId:
+      name: mockId
+      in: path
+      required: true
+      description: The mock's ID.
+      schema:
+        type: string
+        example: e3d951bf-873f-49ac-a658-b2dcb91d3289
+    direction:
+      name: direction
+      in: query
+      description: Sort in ascending (`asc`) or descending (`desc`) order. Matching is not case-sensitive. If you use this query parameter, you must also use the `sort` parameter.
+      schema:
+        $ref: '#/components/schemas/ascDesc'
+    cursor:
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
+    limitDefault100:
+      name: limit
+      in: query
+      description: The maximum number of rows to return in the response.
+      schema:
+        type: number
+        default: 100
+        example: 3
+    workspaceResultsQuery:
+      name: workspace
+      in: query
+      description: Return only results found in the given workspace.
       schema:
         $ref: '#/components/schemas/workspaceId'
+    mockInclude:
+      name: include
+      in: query
+      description: Include call log records with header and body data. This query parameter accepts the `request.headers`, `request.body`, `response.headers`, and `response.body` values. For multiple include types, comma-separate each value.
+      schema:
+        type: string
+        example: request.headers,request.body,response.headers,response.body
+    mockRequestMethod:
+      name: requestMethod
+      in: query
+      description: Return only call logs that match the given HTTP method. Matching is not case-sensitive.
+      schema:
+        type: string
+        example: post
   requestBodies:
     createMock:
       required: true
@@ -1500,66 +1500,6 @@ components:
               collection: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
               environment: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
               private: true
-    createMockServerResponse:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              serverResponse:
-                type: object
-                required:
-                - name
-                - statusCode
-                properties:
-                  name:
-                    type: string
-                    description: The server response's name.
-                    example: Internal Server Error
-                  statusCode:
-                    type: integer
-                    description: The server response's 5xx HTTP response code. This property only accepts 5xx values.
-                    example: 500
-                  headers:
-                    type: array
-                    description: The server response's request headers, such as Content-Type, Accept, encoding, and other information.
-                    items:
-                      type: object
-                      properties:
-                        key:
-                          type: string
-                          description: The request header's key value.
-                          example: Content-Type
-                        value:
-                          type: string
-                          description: The request header's value.
-                          example: application/json
-                  language:
-                    type:
-                    - string
-                    - 'null'
-                    description: The server response's body language type.
-                    enum:
-                    - text
-                    - javascript
-                    - json
-                    - html
-                    - xml
-                    example: json
-                  body:
-                    type: string
-                    description: The server response's body that returns when calling the mock server.
-                    example: "{\n    \"message\": \"Something went wrong; try again later.\"\n}"
-          example:
-            serverResponse:
-              name: Internal Server Error
-              statusCode: 500
-              header:
-              - key: Content-Type
-                value: application/json
-              language: json
-              body: "{\n    \"message\": \"Something went wrong; try again later.\"\n}"
     updateMock:
       content:
         application/json:
@@ -1671,24 +1611,84 @@ components:
                 value: application/json
               language: json
               body: "{\n    \"message\": \"Something went wrong; try again later.\"\n}"
+    createMockServerResponse:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              serverResponse:
+                type: object
+                required:
+                - name
+                - statusCode
+                properties:
+                  name:
+                    type: string
+                    description: The server response's name.
+                    example: Internal Server Error
+                  statusCode:
+                    type: integer
+                    description: The server response's 5xx HTTP response code. This property only accepts 5xx values.
+                    example: 500
+                  headers:
+                    type: array
+                    description: The server response's request headers, such as Content-Type, Accept, encoding, and other information.
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                          description: The request header's key value.
+                          example: Content-Type
+                        value:
+                          type: string
+                          description: The request header's value.
+                          example: application/json
+                  language:
+                    type:
+                    - string
+                    - 'null'
+                    description: The server response's body language type.
+                    enum:
+                    - text
+                    - javascript
+                    - json
+                    - html
+                    - xml
+                    example: json
+                  body:
+                    type: string
+                    description: The server response's body that returns when calling the mock server.
+                    example: "{\n    \"message\": \"Something went wrong; try again later.\"\n}"
+          example:
+            serverResponse:
+              name: Internal Server Error
+              statusCode: 500
+              header:
+              - key: Content-Type
+                value: application/json
+              language: json
+              body: "{\n    \"message\": \"Something went wrong; try again later.\"\n}"
   schemas:
-    untilDateTime:
-      type: string
-      format: date-time
-      example: '2022-06-15T00:00:00.000Z'
     sinceDateTime:
       type: string
       format: date-time
       example: '2022-06-01T00:00:00.000Z'
+    workspaceId:
+      type: string
+      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
+    untilDateTime:
+      type: string
+      format: date-time
+      example: '2022-06-15T00:00:00.000Z'
     ascDesc:
       type: string
       enum:
       - asc
       - desc
       example: asc
-    workspaceId:
-      type: string
-      example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
     cursor:
       type: string
       example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=

@@ -329,6 +329,40 @@ paths:
       - Pages Deployment
 components:
   schemas:
+    pages_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/pages_messages'
+          example:
+          - code: 7003
+            message: No route for the URI.
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/pages_messages'
+          example: []
+        result:
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    pages_project_name:
+      description: Name of the project.
+      example: this-is-my-project-01
+      pattern: ^[a-z0-9][a-z0-9-]*$
+      type: string
     pages_deployments:
       properties:
         aliases:
@@ -476,12 +510,13 @@ components:
           readOnly: true
           type: string
       type: object
-    pages_project_name:
-      description: Name of the project.
-      example: this-is-my-project-01
-      pattern: ^[a-z0-9][a-z0-9-]*$
+    pages_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
       type: string
-    pages_deployment-response-details:
+    pages_deployment-new-deployment:
       allOf:
       - $ref: '#/components/schemas/pages_api-response-common'
       - properties:
@@ -576,158 +611,6 @@ components:
                 type: integer
             type: object
         type: object
-    pages_build_config:
-      description: Configs for the project build process.
-      properties:
-        build_caching:
-          description: Enable build caching for the project.
-          example: true
-          type:
-          - boolean
-          - 'null'
-        build_command:
-          description: Command used to build project.
-          example: npm run build
-          type:
-          - string
-          - 'null'
-        destination_dir:
-          description: Output directory of the build.
-          example: build
-          type:
-          - string
-          - 'null'
-        root_dir:
-          description: Directory to run the command.
-          example: /
-          type:
-          - string
-          - 'null'
-        web_analytics_tag:
-          description: The classifying tag for analytics.
-          example: cee1c73f6e4743d0b5e6bb1a0bcaabcc
-          type:
-          - string
-          - 'null'
-        web_analytics_token:
-          description: The auth token for analytics.
-          example: 021e1057c18547eca7b79f2516f06o7x
-          type:
-          - string
-          - 'null'
-      type: object
-    pages_deployment-new-deployment:
-      allOf:
-      - $ref: '#/components/schemas/pages_api-response-common'
-      - properties:
-          result:
-            $ref: '#/components/schemas/pages_deployments'
-    pages_source:
-      properties:
-        config:
-          properties:
-            deployments_enabled:
-              type: boolean
-            owner:
-              type: string
-            path_excludes:
-              items:
-                type: string
-              type: array
-            path_includes:
-              items:
-                type: string
-              type: array
-            pr_comments_enabled:
-              type: boolean
-            preview_branch_excludes:
-              items:
-                type: string
-              type: array
-            preview_branch_includes:
-              items:
-                type: string
-              type: array
-            preview_deployment_setting:
-              enum:
-              - all
-              - none
-              - custom
-              type: string
-            production_branch:
-              type: string
-            production_deployments_enabled:
-              type: boolean
-            repo_name:
-              type: string
-          type: object
-        type:
-          type: string
-      readOnly: true
-      type: object
-    pages_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/pages_messages'
-          example:
-          - code: 7003
-            message: No route for the URI.
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/pages_messages'
-          example: []
-        result:
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    pages_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    pages_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/pages_messages'
-        messages:
-          $ref: '#/components/schemas/pages_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     pages_api-response-pagination:
       properties:
         result_info:
@@ -791,6 +674,129 @@ components:
           type: string
       readOnly: true
       type: object
+    pages_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/pages_messages'
+        messages:
+          $ref: '#/components/schemas/pages_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    pages_source:
+      properties:
+        config:
+          properties:
+            deployments_enabled:
+              type: boolean
+            owner:
+              type: string
+            path_excludes:
+              items:
+                type: string
+              type: array
+            path_includes:
+              items:
+                type: string
+              type: array
+            pr_comments_enabled:
+              type: boolean
+            preview_branch_excludes:
+              items:
+                type: string
+              type: array
+            preview_branch_includes:
+              items:
+                type: string
+              type: array
+            preview_deployment_setting:
+              enum:
+              - all
+              - none
+              - custom
+              type: string
+            production_branch:
+              type: string
+            production_deployments_enabled:
+              type: boolean
+            repo_name:
+              type: string
+          type: object
+        type:
+          type: string
+      readOnly: true
+      type: object
+    pages_build_config:
+      description: Configs for the project build process.
+      properties:
+        build_caching:
+          description: Enable build caching for the project.
+          example: true
+          type:
+          - boolean
+          - 'null'
+        build_command:
+          description: Command used to build project.
+          example: npm run build
+          type:
+          - string
+          - 'null'
+        destination_dir:
+          description: Output directory of the build.
+          example: build
+          type:
+          - string
+          - 'null'
+        root_dir:
+          description: Directory to run the command.
+          example: /
+          type:
+          - string
+          - 'null'
+        web_analytics_tag:
+          description: The classifying tag for analytics.
+          example: cee1c73f6e4743d0b5e6bb1a0bcaabcc
+          type:
+          - string
+          - 'null'
+        web_analytics_token:
+          description: The auth token for analytics.
+          example: 021e1057c18547eca7b79f2516f06o7x
+          type:
+          - string
+          - 'null'
+      type: object
+    pages_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    pages_deployment-response-details:
+      allOf:
+      - $ref: '#/components/schemas/pages_api-response-common'
+      - properties:
+          result:
+            $ref: '#/components/schemas/pages_deployments'
     pages_deployment-list-response:
       allOf:
       - $ref: '#/components/schemas/pages_api-response-common'
@@ -800,12 +806,6 @@ components:
             items:
               $ref: '#/components/schemas/pages_deployments'
             type: array
-    pages_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
   securitySchemes:
     api_email:
       in: header

@@ -166,65 +166,22 @@ paths:
     - url: https://api.getpostman.com
     - url: https://api.eu.postman.com
 components:
-  parameters:
-    enterprise:
-      name: enterprise
-      description: The slug version of the enterprise name. You can also substitute this value with the enterprise id.
-      in: path
-      required: true
-      schema:
-        type: string
-    org:
-      name: org
-      description: The organization name. The name is not case sensitive.
-      in: path
-      required: true
-      schema:
-        type: string
-    per-page:
-      name: per_page
-      description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
-      in: query
-      schema:
-        type: integer
-        default: 30
-    page:
-      name: page
-      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
-      in: query
-      schema:
-        type: integer
-        default: 1
-    billingAccountStatus:
-      name: status
-      in: query
-      required: true
-      description: The account's status.
-      schema:
-        type: string
-        enum:
-        - PAID
-        example: PAID
-    billingAccountId:
-      name: accountId
-      in: path
-      required: true
-      description: The account's ID.
-      schema:
-        type: string
-        example: '123456'
   schemas:
-    advanced-security-active-committers-user:
+    advanced-security-active-committers:
       type: object
       properties:
-        user_login:
-          type: string
-        last_pushed_date:
-          type: string
-          example: '2021-11-03'
+        total_advanced_security_committers:
+          type: integer
+          example: 25
+        total_count:
+          type: integer
+          example: 2
+        repositories:
+          type: array
+          items:
+            $ref: '#/components/schemas/advanced-security-active-committers-repository'
       required:
-      - user_login
-      - last_pushed_date
+      - repositories
     advanced-security-active-committers-repository:
       type: object
       properties:
@@ -242,6 +199,17 @@ components:
       - name
       - advanced_security_committers
       - advanced_security_committers_breakdown
+    advanced-security-active-committers-user:
+      type: object
+      properties:
+        user_login:
+          type: string
+        last_pushed_date:
+          type: string
+          example: '2021-11-03'
+      required:
+      - user_login
+      - last_pushed_date
     basic-error:
       title: Basic Error
       description: Basic Error
@@ -255,21 +223,80 @@ components:
           type: string
         status:
           type: string
-    advanced-security-active-committers:
+    getAccountInvoices:
       type: object
+      required:
+      - data
       properties:
-        total_advanced_security_committers:
-          type: integer
-          example: 25
-        total_count:
-          type: integer
-          example: 2
-        repositories:
+        data:
           type: array
           items:
-            $ref: '#/components/schemas/advanced-security-active-committers-repository'
-      required:
-      - repositories
+            $ref: '#/components/schemas/invoiceData'
+    invoiceData:
+      title: Account Invoice
+      type: object
+      description: Information about the invoice.
+      properties:
+        id:
+          type: string
+          description: The invoice's ID.
+          example: inv_7UDSYBJPGQU93N7M
+        status:
+          type: string
+          description: The invoice's status.
+          example: PAID
+        issuedAt:
+          type: string
+          format: date
+          description: The date on which the invoice was issued.
+          example: '2023-10-12'
+        totalAmount:
+          type: object
+          description: Information about the invoice's total billed amount.
+          properties:
+            value:
+              type: integer
+              description: The amount billed.
+              example: 440
+            currency:
+              type: string
+              description: The currency of the billed amount. Currently only supports the `USD` value.
+              example: USD
+        links:
+          type: object
+          description: A [JSON API spec](https://jsonapi.org/format/#document-links) object containing hypermedia links.
+          properties:
+            web:
+              type: object
+              description: An object containing web-based account references.
+              properties:
+                href:
+                  type: string
+                  format: url
+                  description: A URL where you can download the invoice in PDF and view details.
+                  example: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
+    invoicesForbidden403Error:
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Forbidden
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: You are not authorized to perform this action
     invoicesNoTeam400Error:
       title: Bad Request
       type: object
@@ -292,28 +319,6 @@ components:
           type: string
           description: Details about the occurrence of the error.
           example: You must be part of a team
-    invoiceMissingStatus400Error:
-      title: Missing Status
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/bad-request
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Malformed request
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 400
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: Please provide a valid status to fetch invoices
     invoicesAccountInfo:
       title: Account Information
       type: object
@@ -385,80 +390,75 @@ components:
               type: integer
               description: The number of unbilled slots if [auto-flex billing](https://learning.postman.com/auto-flex-policy/) is available.
               example: 0
-    invoicesForbidden403Error:
-      title: Forbidden
+    invoiceMissingStatus400Error:
+      title: Missing Status
       type: object
       properties:
         type:
           type: string
           format: uri
           description: The error type.
-          example: https://api.postman.com/problems/forbidden
+          example: https://api.postman.com/problems/bad-request
         title:
           type: string
           description: A short summary of the error.
-          example: Forbidden
+          example: Malformed request
         status:
           type: number
           format: http-status-code
           description: The error's HTTP status code.
-          example: 403
+          example: 400
         detail:
           type: string
           description: Details about the occurrence of the error.
-          example: You are not authorized to perform this action
-    getAccountInvoices:
-      type: object
-      required:
-      - data
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/invoiceData'
-    invoiceData:
-      title: Account Invoice
-      type: object
-      description: Information about the invoice.
-      properties:
-        id:
-          type: string
-          description: The invoice's ID.
-          example: inv_7UDSYBJPGQU93N7M
-        status:
-          type: string
-          description: The invoice's status.
-          example: PAID
-        issuedAt:
-          type: string
-          format: date
-          description: The date on which the invoice was issued.
-          example: '2023-10-12'
-        totalAmount:
-          type: object
-          description: Information about the invoice's total billed amount.
-          properties:
-            value:
-              type: integer
-              description: The amount billed.
-              example: 440
-            currency:
-              type: string
-              description: The currency of the billed amount. Currently only supports the `USD` value.
-              example: USD
-        links:
-          type: object
-          description: A [JSON API spec](https://jsonapi.org/format/#document-links) object containing hypermedia links.
-          properties:
-            web:
-              type: object
-              description: An object containing web-based account references.
-              properties:
-                href:
-                  type: string
-                  format: url
-                  description: A URL where you can download the invoice in PDF and view details.
-                  example: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
+          example: Please provide a valid status to fetch invoices
+  parameters:
+    org:
+      name: org
+      description: The organization name. The name is not case sensitive.
+      in: path
+      required: true
+      schema:
+        type: string
+    page:
+      name: page
+      description: The page number of the results to fetch. For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
+      in: query
+      schema:
+        type: integer
+        default: 1
+    per-page:
+      name: per_page
+      description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
+      in: query
+      schema:
+        type: integer
+        default: 30
+    enterprise:
+      name: enterprise
+      description: The slug version of the enterprise name. You can also substitute this value with the enterprise id.
+      in: path
+      required: true
+      schema:
+        type: string
+    billingAccountId:
+      name: accountId
+      in: path
+      required: true
+      description: The account's ID.
+      schema:
+        type: string
+        example: '123456'
+    billingAccountStatus:
+      name: status
+      in: query
+      required: true
+      description: The account's status.
+      schema:
+        type: string
+        enum:
+        - PAID
+        example: PAID
   responses:
     code_scanning_forbidden_read:
       description: Response if GitHub Advanced Security is not enabled for this repository
@@ -466,23 +466,23 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
-    getAccounts:
+    getAccountInvoices:
       description: Successful Response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/invoicesAccountInfo'
+            $ref: '#/components/schemas/getAccountInvoices'
           example:
-            billingEmail: taylor.lee@example.com
-            id: 372691
-            salesChannel: SELF_SERVE
-            slots:
-              available: 8
-              consumed: 2
-              total: 10
-              unbilled: 0
-            state: PAID
-            teamId: 380691
+            data:
+            - id: inv_7UDSYBJPGQU93N7M
+              status: PAID
+              issuedAt: '2023-10-12'
+              totalAmount:
+                value: 440
+                currency: USD
+              links:
+                web:
+                  href: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
     invoiceMissingStatus400Error:
       description: Bad Request
       content:
@@ -505,34 +505,6 @@ components:
             title: Malformed request
             status: 400
             detail: You must be part of a team
-    invoicesForbidden403Error:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/invoicesForbidden403Error'
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Forbidden
-            status: 403
-            detail: You are not authorized to perform this action
-    getAccountInvoices:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/getAccountInvoices'
-          example:
-            data:
-            - id: inv_7UDSYBJPGQU93N7M
-              status: PAID
-              issuedAt: '2023-10-12'
-              totalAmount:
-                value: 440
-                currency: USD
-              links:
-                web:
-                  href: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
     unauthorizedError:
       description: Unauthorized
       content:
@@ -585,6 +557,34 @@ components:
             error:
               name: serverError
               message: An error has occurred on the server.
+    getAccounts:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoicesAccountInfo'
+          example:
+            billingEmail: taylor.lee@example.com
+            id: 372691
+            salesChannel: SELF_SERVE
+            slots:
+              available: 8
+              consumed: 2
+              total: 10
+              unbilled: 0
+            state: PAID
+            teamId: 380691
+    invoicesForbidden403Error:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoicesForbidden403Error'
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Forbidden
+            status: 403
+            detail: You are not authorized to perform this action
   examples:
     advanced-security-active-committers:
       value:

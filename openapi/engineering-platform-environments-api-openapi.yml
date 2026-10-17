@@ -202,159 +202,8 @@ paths:
         '500':
           $ref: '#/components/responses/common500Error'
 components:
-  requestBodies:
-    mergeEnvironmentFork:
-      content:
-        application/json:
-          schema:
-            required:
-            - source
-            type: object
-            properties:
-              source:
-                type: string
-                format: uid
-                description: The source environment's unique ID to merge data from.
-                example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-              deleteSource:
-                type: boolean
-                default: false
-                description: If true, the forked environment will be deleted.
-                example: false
-          example:
-            source: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-            deleteSource: false
-    updateEnvironment:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              environment:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The environment's name.
-                    example: Test Environment
-                  values:
-                    type: array
-                    description: Information about the environment's variables.
-                    items:
-                      type: object
-                      properties:
-                        enabled:
-                          type: boolean
-                          description: If true, the variable is enabled.
-                          example: true
-                        key:
-                          type: string
-                          description: The variable's name.
-                          example: apiKey
-                        value:
-                          type: string
-                          description: The variable's value.
-                          example: PMAK-XXX
-                        type:
-                          type: string
-                          description: The variable type.
-                          enum:
-                          - secret
-                          - default
-                          - any
-                          example: secret
-          example:
-            environment:
-              name: Test A Environment
-              values:
-              - key: variable_a
-                value: The variable_a value.
-                enabled: false
-                type: default
-    pullEnvironment:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              source:
-                type: string
-                format: uid
-                description: The source environment's unique ID to pull data from.
-                example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-          example:
-            source: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-    forkEnvironment:
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-            - forkName
-            properties:
-              forkName:
-                type: string
-                description: The forked environment's label.
-                example: My fork
-          examples:
-            fork:
-              value:
-                forkName: My fork
-    createEnvironment:
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              environment:
-                type: object
-                required:
-                - name
-                properties:
-                  name:
-                    type: string
-                    description: The environment's name.
-                    example: Test Environment
-                  values:
-                    type: array
-                    description: Information about the environment's variables.
-                    items:
-                      type: object
-                      properties:
-                        enabled:
-                          type: boolean
-                          description: If true, the variable is enabled.
-                          example: true
-                        key:
-                          type: string
-                          description: The variable's name.
-                          example: collectionId
-                        value:
-                          type: string
-                          description: The variable's value.
-                          example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-                        type:
-                          type: string
-                          description: The variable type.
-                          enum:
-                          - secret
-                          - default
-                          - any
-                          example: default
-          example:
-            environment:
-              name: Test Environment
-              values:
-              - key: collectionId
-                value: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-                enabled: true
-                type: default
-              - key: variable_1
-                value: The variable_1 value.
-                enabled: false
-                type: default
   responses:
-    createEnvironment:
+    updateEnvironment:
       description: Successful Response
       content:
         application/json:
@@ -371,7 +220,7 @@ components:
                   name:
                     type: string
                     description: The environment's name.
-                    example: Test Environment
+                    example: Test A Environment
                   uid:
                     type: string
                     format: uid
@@ -380,10 +229,54 @@ components:
           example:
             environment:
               id: 5daabc50-8451-43f6-922d-96b403b4f28e
-              name: Test Environment
+              name: Test A Environment
               uid: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
-    common401Error:
-      description: Unauthorized
+    mergeEnvironmentFork:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              environment:
+                type: object
+                description: Information about the merged environment.
+                properties:
+                  uid:
+                    type: string
+                    format: uid
+                    description: The merged environment's ID.
+                    example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+          example:
+            environment:
+              uid: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+    environmentForks400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The type of error.
+                example: https://api.postman.com/problems/bad-request
+              title:
+                type: string
+                description: The title of the error message.
+                example: The environment Id is not a forked environment.
+              detail:
+                type: object
+                description: Details about the error message.
+                example: {}
+          examples:
+            environmentNotForked:
+              value:
+                type: https://api.postman.com/problems/bad-request
+                title: The environment Id is not a forked environment.
+                detail: {}
+    common500Error:
+      description: Internal Server Error
       content:
         application/problem+json:
           schema:
@@ -393,47 +286,19 @@ components:
                 type: string
                 format: uri-reference
                 description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
+                example: https://api.postman.com/problems/internal-server-error
               title:
                 type: string
                 description: A short summary of the problem.
-                example: Unauthorized
+                example: Internal Server Error
               detail:
                 type: string
                 description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
+                example: Internal Server Error
           example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
     forkEnvironment:
       description: Successful Response
       content:
@@ -463,65 +328,33 @@ components:
               uid: 12345678-0fcea3ba-abcf-49c3-9f48-669c208fef25
               name: Testing Environment
               forkName: Test Fork
-    getEnvironments:
-      description: Successful Response
+    environments400ErrorMalformedRequest:
+      description: Bad Request
       content:
         application/json:
           schema:
             type: object
             properties:
-              environments:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: malformedRequestError
+                  message:
+                    type: string
+                    example: Found 1 errors with the supplied environment.
+                  details:
+                    type: array
+                    items:
                       type: string
-                      description: The environment's ID.
-                      example: 5daabc50-8451-43f6-922d-96b403b4f28e
-                    name:
-                      type: string
-                      description: The environment's name.
-                      example: Test Environment
-                    createdAt:
-                      type: string
-                      format: date-time
-                      description: The date and time at which the environment was created.
-                      example: '2020-09-23T14:31:18.000Z'
-                    updatedAt:
-                      type: string
-                      format: date-time
-                      description: The date and time at which the environment was last updated.
-                      example: '2020-12-04T14:13:40.000Z'
-                    owner:
-                      type: string
-                      description: The environment owner's ID.
-                      example: '12345678'
-                    uid:
-                      type: string
-                      format: uid
-                      description: The environment's unique ID.
-                      example: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
-                    isPublic:
-                      type: boolean
-                      description: If true, the environment is public and visible to all users.
-                      example: false
+                      example: ': must have required property ''environment'''
           example:
-            environments:
-            - id: 5daabc50-8451-43f6-922d-96b403b4f28e
-              name: Test Environment
-              createdAt: '2020-09-23T14:31:18.000Z'
-              updatedAt: '2020-12-04T14:13:40.000Z'
-              owner: '12345678'
-              uid: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
-              isPublic: false
-            - id: 7d786cc8-142b-4d62-b5a5-872afc37ad16
-              name: Environment Scanner
-              createdAt: '2020-02-04T19:34:23.000Z'
-              updatedAt: '2020-08-12T13:34:06.000Z'
-              owner: '12345678'
-              uid: 12345678-7d786cc8-142b-4d62-b5a5-872afc37ad16
-              isPublic: false
+            error:
+              name: malformedRequestError
+              message: Found 1 errors with the supplied environment.
+              details:
+              - ': must have required property ''environment'''
     getEnvironmentForks:
       description: Successful Response
       content:
@@ -588,31 +421,41 @@ components:
             meta:
               total: 6
               nextCursor: null
-    common500Error:
+    common500ErrorServerError:
       description: Internal Server Error
       content:
-        application/problem+json:
+        application/json:
           schema:
             type: object
             properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
           example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-    mergeEnvironmentFork:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
+    common403Error:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/common403Error'
+          example:
+            value:
+              type: https://api.postman.com/problems/forbidden
+              title: Forbidden
+              detail: Forbidden
+              status: 403
+    pullEnvironment:
       description: Successful Response
       content:
         application/json:
@@ -626,12 +469,35 @@ components:
                   uid:
                     type: string
                     format: uid
-                    description: The merged environment's ID.
+                    description: The merged environment's unique ID.
                     example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
           example:
             environment:
               uid: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-    updateEnvironment:
+    deleteEnvironment:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              environment:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The deleted environment's ID.
+                    example: 4dfb28a4-9a6c-4ce4-b31a-17c26a8b2cce
+                  uid:
+                    type: string
+                    format: uid
+                    description: The deleted environment's unique ID.
+                    example: 12345678-4dfb28a4-9a6c-4ce4-b31a-17c26a8b2cce
+          example:
+            environment:
+              id: 5daabc50-8451-43f6-922d-96b403b4f28e
+              uid: 1234567-5daabc50-8451-43f6-922d-96b403b4f28e
+    createEnvironment:
       description: Successful Response
       content:
         application/json:
@@ -648,7 +514,7 @@ components:
                   name:
                     type: string
                     description: The environment's name.
-                    example: Test A Environment
+                    example: Test Environment
                   uid:
                     type: string
                     format: uid
@@ -657,38 +523,67 @@ components:
           example:
             environment:
               id: 5daabc50-8451-43f6-922d-96b403b4f28e
-              name: Test A Environment
+              name: Test Environment
               uid: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
-    environmentForks404Error:
-      description: Not Found
+    getEnvironments:
+      description: Successful Response
       content:
         application/json:
           schema:
             type: object
             properties:
-              title:
-                type: string
-                description: A short summary of the error.
-                example: Not Found
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 404
-              detail:
-                type: string
-                description: Details about the occurrence of the error.
-                example: We could not find the environment you are looking for
-              type:
-                type: string
-                format: uri
-                description: The error type.
-                example: https://api.postman.com/problems/notFound
+              environments:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The environment's ID.
+                      example: 5daabc50-8451-43f6-922d-96b403b4f28e
+                    name:
+                      type: string
+                      description: The environment's name.
+                      example: Test Environment
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the environment was created.
+                      example: '2020-09-23T14:31:18.000Z'
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: The date and time at which the environment was last updated.
+                      example: '2020-12-04T14:13:40.000Z'
+                    owner:
+                      type: string
+                      description: The environment owner's ID.
+                      example: '12345678'
+                    uid:
+                      type: string
+                      format: uid
+                      description: The environment's unique ID.
+                      example: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
+                    isPublic:
+                      type: boolean
+                      description: If true, the environment is public and visible to all users.
+                      example: false
           example:
-            title: We could not find the environment you are looking for
-            status: 404
-            detail: We could not find the environment you are looking for
-            type: https://api.postman.com/problems/notFound
+            environments:
+            - id: 5daabc50-8451-43f6-922d-96b403b4f28e
+              name: Test Environment
+              createdAt: '2020-09-23T14:31:18.000Z'
+              updatedAt: '2020-12-04T14:13:40.000Z'
+              owner: '12345678'
+              uid: 12345678-5daabc50-8451-43f6-922d-96b403b4f28e
+              isPublic: false
+            - id: 7d786cc8-142b-4d62-b5a5-872afc37ad16
+              name: Environment Scanner
+              createdAt: '2020-02-04T19:34:23.000Z'
+              updatedAt: '2020-08-12T13:34:06.000Z'
+              owner: '12345678'
+              uid: 12345678-7d786cc8-142b-4d62-b5a5-872afc37ad16
+              isPublic: false
     getEnvironment:
       description: Successful Response
       content:
@@ -764,112 +659,6 @@ components:
                 enabled: true
                 type: default
               isPublic: false
-    pullEnvironment:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              environment:
-                type: object
-                description: Information about the merged environment.
-                properties:
-                  uid:
-                    type: string
-                    format: uid
-                    description: The merged environment's unique ID.
-                    example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-          example:
-            environment:
-              uid: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
-    deleteEnvironment:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              environment:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The deleted environment's ID.
-                    example: 4dfb28a4-9a6c-4ce4-b31a-17c26a8b2cce
-                  uid:
-                    type: string
-                    format: uid
-                    description: The deleted environment's unique ID.
-                    example: 12345678-4dfb28a4-9a6c-4ce4-b31a-17c26a8b2cce
-          example:
-            environment:
-              id: 5daabc50-8451-43f6-922d-96b403b4f28e
-              uid: 1234567-5daabc50-8451-43f6-922d-96b403b4f28e
-    environments400ErrorMalformedRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    example: malformedRequestError
-                  message:
-                    type: string
-                    example: Found 1 errors with the supplied environment.
-                  details:
-                    type: array
-                    items:
-                      type: string
-                      example: ': must have required property ''environment'''
-          example:
-            error:
-              name: malformedRequestError
-              message: Found 1 errors with the supplied environment.
-              details:
-              - ': must have required property ''environment'''
-    common403Error:
-      description: Forbidden
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/common403Error'
-          example:
-            value:
-              type: https://api.postman.com/problems/forbidden
-              title: Forbidden
-              detail: Forbidden
-              status: 403
-    environmentForks400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                description: The type of error.
-                example: https://api.postman.com/problems/bad-request
-              title:
-                type: string
-                description: The title of the error message.
-                example: The environment Id is not a forked environment.
-              detail:
-                type: object
-                description: Details about the error message.
-                example: {}
-          examples:
-            environmentNotForked:
-              value:
-                type: https://api.postman.com/problems/bad-request
-                title: The environment Id is not a forked environment.
-                detail: {}
     instanceNotFoundEnvironment:
       description: Instance Not Found
       content:
@@ -892,7 +681,96 @@ components:
             error:
               name: instanceNotFoundError
               message: We could not find the environment you are looking for
+    environmentForks404Error:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                description: A short summary of the error.
+                example: Not Found
+              status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 404
+              detail:
+                type: string
+                description: Details about the occurrence of the error.
+                example: We could not find the environment you are looking for
+              type:
+                type: string
+                format: uri
+                description: The error type.
+                example: https://api.postman.com/problems/notFound
+          example:
+            title: We could not find the environment you are looking for
+            status: 404
+            detail: We could not find the environment you are looking for
+            type: https://api.postman.com/problems/notFound
+    common401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
   parameters:
+    sortByCreatedAt:
+      name: sort
+      in: query
+      description: Sort the results by the date and time of creation.
+      schema:
+        type: string
+        enum:
+        - createdAt
+        example: createdAt
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of rows to return in the response.
+      schema:
+        $ref: '#/components/schemas/limit'
+    workspaceQuery:
+      name: workspace
+      in: query
+      description: The workspace's ID.
+      schema:
+        $ref: '#/components/schemas/workspaceId'
+    environmentId:
+      name: environmentId
+      in: path
+      required: true
+      description: The environment's ID.
+      schema:
+        type: string
+        example: 5daabc50-8451-43f6-922d-96b403b4f28e
     workspaceIdQueryTrue:
       name: workspaceId
       in: query
@@ -906,6 +784,12 @@ components:
       description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
       schema:
         $ref: '#/components/schemas/cursor'
+    directionQuery:
+      name: direction
+      in: query
+      description: Sort results in ascending (`asc`) or descending (`desc`) order.
+      schema:
+        $ref: '#/components/schemas/ascDesc'
     environmentUid:
       name: environmentId
       in: path
@@ -915,41 +799,6 @@ components:
         type: string
         format: uid
         example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-    sortByCreatedAt:
-      name: sort
-      in: query
-      description: Sort the results by the date and time of creation.
-      schema:
-        type: string
-        enum:
-        - createdAt
-        example: createdAt
-    environmentId:
-      name: environmentId
-      in: path
-      required: true
-      description: The environment's ID.
-      schema:
-        type: string
-        example: 5daabc50-8451-43f6-922d-96b403b4f28e
-    workspaceQuery:
-      name: workspace
-      in: query
-      description: The workspace's ID.
-      schema:
-        $ref: '#/components/schemas/workspaceId'
-    directionQuery:
-      name: direction
-      in: query
-      description: Sort results in ascending (`asc`) or descending (`desc`) order.
-      schema:
-        $ref: '#/components/schemas/ascDesc'
-    limit:
-      name: limit
-      in: query
-      description: The maximum number of rows to return in the response.
-      schema:
-        $ref: '#/components/schemas/limit'
   schemas:
     limit:
       type: integer
@@ -958,9 +807,6 @@ components:
     workspaceId:
       type: string
       example: 1f0df51a-8658-4ee8-a2a1-d2567dfa09a9
-    cursor:
-      type: string
-      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
     common403Error:
       title: Forbidden
       type: object
@@ -989,6 +835,160 @@ components:
       - asc
       - desc
       example: asc
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
+  requestBodies:
+    mergeEnvironmentFork:
+      content:
+        application/json:
+          schema:
+            required:
+            - source
+            type: object
+            properties:
+              source:
+                type: string
+                format: uid
+                description: The source environment's unique ID to merge data from.
+                example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+              deleteSource:
+                type: boolean
+                default: false
+                description: If true, the forked environment will be deleted.
+                example: false
+          example:
+            source: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+            deleteSource: false
+    pullEnvironment:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              source:
+                type: string
+                format: uid
+                description: The source environment's unique ID to pull data from.
+                example: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+          example:
+            source: 12345678-d9c7dc8f-904e-4bba-99b5-4d490aae1957
+    updateEnvironment:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              environment:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The environment's name.
+                    example: Test Environment
+                  values:
+                    type: array
+                    description: Information about the environment's variables.
+                    items:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                          description: If true, the variable is enabled.
+                          example: true
+                        key:
+                          type: string
+                          description: The variable's name.
+                          example: apiKey
+                        value:
+                          type: string
+                          description: The variable's value.
+                          example: PMAK-XXX
+                        type:
+                          type: string
+                          description: The variable type.
+                          enum:
+                          - secret
+                          - default
+                          - any
+                          example: secret
+          example:
+            environment:
+              name: Test A Environment
+              values:
+              - key: variable_a
+                value: The variable_a value.
+                enabled: false
+                type: default
+    forkEnvironment:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - forkName
+            properties:
+              forkName:
+                type: string
+                description: The forked environment's label.
+                example: My fork
+          examples:
+            fork:
+              value:
+                forkName: My fork
+    createEnvironment:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              environment:
+                type: object
+                required:
+                - name
+                properties:
+                  name:
+                    type: string
+                    description: The environment's name.
+                    example: Test Environment
+                  values:
+                    type: array
+                    description: Information about the environment's variables.
+                    items:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                          description: If true, the variable is enabled.
+                          example: true
+                        key:
+                          type: string
+                          description: The variable's name.
+                          example: collectionId
+                        value:
+                          type: string
+                          description: The variable's value.
+                          example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+                        type:
+                          type: string
+                          description: The variable type.
+                          enum:
+                          - secret
+                          - default
+                          - any
+                          example: default
+          example:
+            environment:
+              name: Test Environment
+              values:
+              - key: collectionId
+                value: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+                enabled: true
+                type: default
+              - key: variable_1
+                value: The variable_1 value.
+                enabled: false
+                type: default
   securitySchemes:
     PostmanApiKey:
       type: apiKey

@@ -62,23 +62,34 @@ paths:
       - Passive DNS by IP
 components:
   schemas:
-    intel_schemas-api-response-common:
+    intel_start_end_params:
       properties:
-        errors:
-          $ref: '#/components/schemas/intel_messages'
-        messages:
-          $ref: '#/components/schemas/intel_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
+        end:
+          description: Defaults to the current date.
+          example: '2021-04-30'
+          format: date
+          type: string
+        start:
+          description: Defaults to 30 days before the end parameter value.
+          example: '2021-04-01'
+          format: date
+          type: string
       type: object
+    intel_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     intel_components-schemas-single_response:
       allOf:
       - $ref: '#/components/schemas/intel_api-response-single'
@@ -91,10 +102,6 @@ components:
       maxLength: 32
       readOnly: true
       type: string
-    intel_api-response-single:
-      allOf:
-      - $ref: '#/components/schemas/intel_schemas-api-response-common'
-      type: object
     intel_passive-dns-by-ip:
       properties:
         count:
@@ -127,6 +134,23 @@ components:
                 type: string
             type: object
           type: array
+    intel_schemas-api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/intel_messages'
+        messages:
+          $ref: '#/components/schemas/intel_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     intel_api-response-common-failure:
       properties:
         errors:
@@ -158,33 +182,9 @@ components:
       - messages
       - result
       type: object
-    intel_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    intel_start_end_params:
-      properties:
-        end:
-          description: Defaults to the current date.
-          example: '2021-04-30'
-          format: date
-          type: string
-        start:
-          description: Defaults to 30 days before the end parameter value.
-          example: '2021-04-01'
-          format: date
-          type: string
+    intel_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/intel_schemas-api-response-common'
       type: object
   securitySchemes:
     api_email:

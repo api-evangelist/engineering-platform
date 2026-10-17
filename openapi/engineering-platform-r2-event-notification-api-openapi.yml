@@ -179,12 +179,6 @@ paths:
       - R2 Event Notification
 components:
   schemas:
-    mq_identifier:
-      description: Identifier.
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
     mq_detail:
       properties:
         queue:
@@ -199,45 +193,6 @@ components:
       required:
       - queue
       - rules
-      type: object
-    mq_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    mq_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/mq_messages'
-        messages:
-          $ref: '#/components/schemas/mq_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful.
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
       type: object
     mq_rule:
       properties:
@@ -260,10 +215,6 @@ components:
           type: string
       required:
       - actions
-      type: object
-    mq_config-detail:
-      additionalProperties:
-        $ref: '#/components/schemas/mq_detail'
       type: object
     mq_api-response-common-failure:
       properties:
@@ -296,6 +247,48 @@ components:
       - messages
       - result
       type: object
+    mq_r2-action:
+      enum:
+      - PutObject
+      - CopyObject
+      - DeleteObject
+      - CompleteMultipartUpload
+      - AbortMultipartUpload
+      type: string
+    mq_config-detail:
+      additionalProperties:
+        $ref: '#/components/schemas/mq_detail'
+      type: object
+    mq_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/mq_messages'
+        messages:
+          $ref: '#/components/schemas/mq_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful.
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    mq_identifier:
+      description: Identifier.
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     mq_bucket-config:
       additionalProperties:
         $ref: '#/components/schemas/mq_config-detail'
@@ -316,14 +309,21 @@ components:
               - CopyObject
               suffix: .mov
       type: object
-    mq_r2-action:
-      enum:
-      - PutObject
-      - CopyObject
-      - DeleteObject
-      - CompleteMultipartUpload
-      - AbortMultipartUpload
-      type: string
+    mq_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
   securitySchemes:
     api_email:
       in: header
