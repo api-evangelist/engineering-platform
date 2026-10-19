@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -295,23 +306,49 @@ paths:
         pro: false
 components:
   schemas:
-    magic_acl_modified_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_acl'
     magic_identifier:
       description: Identifier
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       readOnly: true
       type: string
-    magic_port:
-      example: 1
-      type: integer
-    magic_acl:
-      description: Bidirectional ACL policy for network traffic within a site.
+    magic_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    magic_cidr:
+      description: A valid CIDR notation representing an IP range.
+      example: 192.0.2.0/24
+      type: string
+    magic_acl_modified_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_acl'
+    magic_forward_locally:
+      description: The desired forwarding action for this ACL policy. If set to "false", the policy will forward traffic to Cloudflare. If set to "true", the policy will forward traffic locally on the Magic Connector. If not included in request, will default to false.
+      type: boolean
+    magic_acls_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/magic_acl'
+            type: array
+    magic_acl_update_request:
       properties:
         description:
           description: Description for the ACL.
@@ -319,8 +356,6 @@ components:
           type: string
         forward_locally:
           $ref: '#/components/schemas/magic_forward_locally'
-        id:
-          $ref: '#/components/schemas/magic_identifier'
         lan_1:
           $ref: '#/components/schemas/magic_lan-acl-configuration'
         lan_2:
@@ -339,6 +374,49 @@ components:
             type: string
           type: array
       type: object
+    magic_acl_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_acl'
+    magic_acl_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_acl'
+    magic_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic_messages'
+        messages:
+          $ref: '#/components/schemas/magic_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic_acl-subnet:
+      oneOf:
+      - $ref: '#/components/schemas/magic_ip-address'
+      - $ref: '#/components/schemas/magic_cidr'
+    magic_port:
+      example: 1
+      type: integer
     magic_api-response-common-failure:
       properties:
         errors:
@@ -370,12 +448,6 @@ components:
       - messages
       - result
       type: object
-    magic_acl_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_acl'
     magic_api-response-single:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-common'
@@ -389,43 +461,34 @@ components:
               - string
               - 'null'
       type: object
-    magic_acl_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_acl'
-    magic_acls_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/magic_acl'
-            type: array
-    magic_api-response-common:
+    magic_acl:
+      description: Bidirectional ACL policy for network traffic within a site.
       properties:
-        errors:
-          $ref: '#/components/schemas/magic_messages'
-        messages:
-          $ref: '#/components/schemas/magic_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
+        description:
+          description: Description for the ACL.
+          example: Allows local traffic between PIN pads and cash register.
+          type: string
+        forward_locally:
+          $ref: '#/components/schemas/magic_forward_locally'
+        id:
+          $ref: '#/components/schemas/magic_identifier'
+        lan_1:
+          $ref: '#/components/schemas/magic_lan-acl-configuration'
+        lan_2:
+          $ref: '#/components/schemas/magic_lan-acl-configuration'
+        name:
+          description: The name of the ACL.
+          example: PIN Pad - Cash Register
+          type: string
+        protocols:
+          items:
+            description: Array of allowed communication protocols between configured LANs. If no protocols are provided, all protocols are allowed.
+            enum:
+            - tcp
+            - udp
+            - icmp
+            type: string
+          type: array
       type: object
     magic_lan-acl-configuration:
       properties:
@@ -448,51 +511,6 @@ components:
       required:
       - lan_id
       type: object
-    magic_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    magic_acl_update_request:
-      properties:
-        description:
-          description: Description for the ACL.
-          example: Allows local traffic between PIN pads and cash register.
-          type: string
-        forward_locally:
-          $ref: '#/components/schemas/magic_forward_locally'
-        lan_1:
-          $ref: '#/components/schemas/magic_lan-acl-configuration'
-        lan_2:
-          $ref: '#/components/schemas/magic_lan-acl-configuration'
-        name:
-          description: The name of the ACL.
-          example: PIN Pad - Cash Register
-          type: string
-        protocols:
-          items:
-            description: Array of allowed communication protocols between configured LANs. If no protocols are provided, all protocols are allowed.
-            enum:
-            - tcp
-            - udp
-            - icmp
-            type: string
-          type: array
-      type: object
-    magic_acl-subnet:
-      oneOf:
-      - $ref: '#/components/schemas/magic_ip-address'
-      - $ref: '#/components/schemas/magic_cidr'
     magic_acls_add_single_request:
       description: Bidirectional ACL policy for local network traffic within a site.
       properties:
@@ -524,16 +542,9 @@ components:
       - lan_1
       - lan_2
       type: object
-    magic_forward_locally:
-      description: The desired forwarding action for this ACL policy. If set to "false", the policy will forward traffic to Cloudflare. If set to "true", the policy will forward traffic locally on the Magic Connector. If not included in request, will default to false.
-      type: boolean
     magic_ip-address:
       description: A valid IPv4 address.
       example: 192.0.2.1
-      type: string
-    magic_cidr:
-      description: A valid CIDR notation representing an IP range.
-      example: 192.0.2.0/24
       type: string
   securitySchemes:
     api_email:

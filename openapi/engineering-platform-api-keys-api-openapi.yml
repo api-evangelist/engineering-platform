@@ -458,12 +458,6 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    ListOfString:
-      type: array
-      items:
-        $ref: '#/components/schemas/String'
-    Boolean:
-      type: boolean
     StageKey:
       type: object
       properties:
@@ -476,7 +470,35 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The stage name associated with the stage key.
       description: A reference to a unique stage identified in the format <code>{restApiId}/{stage}</code>.
+    ListOfString:
+      type: array
+      items:
+        $ref: '#/components/schemas/String'
+    MapOfStringToString:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    ConflictException: {}
+    ApiKeys:
+      type: object
+      properties:
+        warnings:
+          allOf:
+          - $ref: '#/components/schemas/ListOfString'
+          - description: A list of warning messages logged during the import of API keys when the <code>failOnWarnings</code> option is set to true.
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfApiKey'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of API keys as represented by an ApiKeys resource.
+    LimitExceededException: {}
     TooManyRequestsException: {}
+    BadRequestException: {}
+    NotFoundException: {}
     PatchOperation:
       type: object
       properties:
@@ -499,9 +521,11 @@ components:
       description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
     String:
       type: string
-    UnauthorizedException: {}
-    NotFoundException: {}
-    LimitExceededException: {}
+    Timestamp:
+      type: string
+      format: date-time
+    Boolean:
+      type: boolean
     Op:
       type: string
       enum:
@@ -511,8 +535,6 @@ components:
       - move
       - copy
       - test
-    BadRequestException: {}
-    ConflictException: {}
     ApiKey:
       type: object
       properties:
@@ -557,54 +579,20 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: A resource that can be distributed to callers for executing Method resources that require an API key. API keys can be mapped to any Stage on any RestApi, which indicates that the callers with the API key can make requests to that stage.
-    MapOfStringToString:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/String'
     ListOfApiKey:
       type: array
       items:
         $ref: '#/components/schemas/ApiKey'
-    ApiKeys:
-      type: object
-      properties:
-        warnings:
-          allOf:
-          - $ref: '#/components/schemas/ListOfString'
-          - description: A list of warning messages logged during the import of API keys when the <code>failOnWarnings</code> option is set to true.
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfApiKey'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of API keys as represented by an ApiKeys resource.
-    Timestamp:
-      type: string
-      format: date-time
+    UnauthorizedException: {}
   parameters:
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-SignedHeaders:
       name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
       in: header
       schema:
         type: string
@@ -615,14 +603,26 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Date:
-      name: X-Amz-Date
+    X-Amz-Credential:
+      name: X-Amz-Credential
       in: header
       schema:
         type: string
       required: false
-    X-Amz-Credential:
-      name: X-Amz-Credential
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
       in: header
       schema:
         type: string

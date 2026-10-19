@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -230,41 +241,23 @@ paths:
       - 'IP Prefixes: Read'
 components:
   schemas:
-    addressing_service_name:
-      description: Name of a service running on the Cloudflare network
-      example: Magic Transit
+    addressing_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       type: string
+    addressing_create_binding_request:
+      properties:
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        service_id:
+          $ref: '#/components/schemas/addressing_service_identifier'
+      type: object
     addressing_service_identifier:
       description: Identifier
       example: 2db684ee7ca04e159946fd05b99e1bcd
       maxLength: 32
       type: string
-    addressing_service_binding:
-      properties:
-        cidr:
-          $ref: '#/components/schemas/addressing_cidr'
-        id:
-          $ref: '#/components/schemas/addressing_identifier'
-        provisioning:
-          $ref: '#/components/schemas/addressing_provisioning'
-        service_id:
-          $ref: '#/components/schemas/addressing_service_identifier'
-        service_name:
-          $ref: '#/components/schemas/addressing_service_name'
-      type: object
-    addressing_provisioning:
-      description: Status of a Service Binding's deployment to the Cloudflare network
-      properties:
-        state:
-          description: 'When a binding has been deployed to a majority of Cloudflare datacenters, the binding will become active and can be used with its associated service.
-
-            '
-          enum:
-          - provisioning
-          - active
-          example: provisioning
-          type: string
-      type: object
     addressing_api-response-common-failure:
       properties:
         errors:
@@ -296,33 +289,6 @@ components:
       - messages
       - result
       type: object
-    addressing_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    addressing_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    addressing_create_binding_request:
-      properties:
-        cidr:
-          $ref: '#/components/schemas/addressing_cidr'
-        service_id:
-          $ref: '#/components/schemas/addressing_service_identifier'
-      type: object
     addressing_api-response-common:
       properties:
         errors:
@@ -340,10 +306,55 @@ components:
       - errors
       - messages
       type: object
+    addressing_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    addressing_service_binding:
+      properties:
+        cidr:
+          $ref: '#/components/schemas/addressing_cidr'
+        id:
+          $ref: '#/components/schemas/addressing_identifier'
+        provisioning:
+          $ref: '#/components/schemas/addressing_provisioning'
+        service_id:
+          $ref: '#/components/schemas/addressing_service_identifier'
+        service_name:
+          $ref: '#/components/schemas/addressing_service_name'
+      type: object
+    addressing_service_name:
+      description: Name of a service running on the Cloudflare network
+      example: Magic Transit
+      type: string
     addressing_cidr:
       description: IP Prefix in Classless Inter-Domain Routing format.
       example: 192.0.2.0/24
       type: string
+    addressing_provisioning:
+      description: Status of a Service Binding's deployment to the Cloudflare network
+      properties:
+        state:
+          description: 'When a binding has been deployed to a majority of Cloudflare datacenters, the binding will become active and can be used with its associated service.
+
+            '
+          enum:
+          - provisioning
+          - active
+          example: provisioning
+          type: string
+      type: object
   securitySchemes:
     api_email:
       in: header

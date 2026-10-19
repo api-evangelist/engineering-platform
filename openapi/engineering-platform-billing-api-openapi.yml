@@ -5,8 +5,9 @@ info:
   - x-github-plan differs across the merged source definitions and was not carried
   - x-github-release differs across the merged source definitions and was not carried
   version: '1.0'
-  description: 'Operations tagged Billing across 2 of this provider''s published API definitions: github-openapi-original.yml, postman-openapi-original.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Billing across 3 of this provider''s published API definitions: engineering-platform-openapi.json, github-openapi-original.yml, postman-openapi-original.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://online.visualstudio.com
 - url: '{protocol}://{hostname}/api/v3'
   variables:
     hostname:
@@ -19,8 +20,348 @@ servers:
 - url: https://api.eu.postman.com
 tags:
 - name: Billing
-  description: Monitor charges and usage from Actions and Packages.
 paths:
+  /api/v1/Billing/ensure_plan:
+    put:
+      tags:
+      - Billing
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/EnsurePlanBody'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnsurePlanBody'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/EnsurePlanBody'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/EnsurePlanBody'
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Server Error
+      security:
+      - Bearer: []
+      summary: Replace api billing ensure plan
+      x-summary-source: derived
+      operationId: putApiV1BillingEnsurePlan
+      x-operation-id-source: derived
+    servers:
+    - url: https://online.visualstudio.com
+  /api/v1/Billing:
+    get:
+      tags:
+      - Billing
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScopedSecretResultBody'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScopedSecretResultBody'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScopedSecretResultBody'
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      security:
+      - Bearer: []
+      summary: Get api billing
+      x-summary-source: derived
+      operationId: getApiV1Billing
+      x-operation-id-source: derived
+    servers:
+    - url: https://online.visualstudio.com
+  /api/v1/GenevaActions/Billing/{environmentId}:
+    get:
+      tags:
+      - Billing
+      parameters:
+      - name: environmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: startTime
+        in: query
+        schema:
+          type: string
+      - name: endTime
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/BillSummary'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillSummary'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/BillSummary'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      security:
+      - Bearer: []
+      summary: Get api geneva actions billing by environment id
+      x-summary-source: derived
+      operationId: getApiV1GenevaActionsBillingByEnvironmentId
+      x-operation-id-source: derived
+    servers:
+    - url: https://online.visualstudio.com
+  /api/v1/GenevaActions/Billing/resend:
+    post:
+      tags:
+      - Billing
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/ReplayBillRequestBody'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplayBillRequestBody'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ReplayBillRequestBody'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ReplayBillRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/BillSummary'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillSummary'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/BillSummary'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      security:
+      - Bearer: []
+      summary: Create api geneva actions billing resend
+      x-summary-source: derived
+      operationId: postApiV1GenevaActionsBillingResend
+      x-operation-id-source: derived
+    servers:
+    - url: https://online.visualstudio.com
+  /api/v1/GenevaActions/Billing/{environmentId}/state-changes:
+    post:
+      tags:
+      - Billing
+      parameters:
+      - name: environmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/CreateEnvironmentStateChangeBody'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEnvironmentStateChangeBody'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateEnvironmentStateChangeBody'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateEnvironmentStateChangeBody'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/EnvironmentStateChange'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentStateChange'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentStateChange'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      security:
+      - Bearer: []
+      summary: Create api geneva actions billing by environment id state changes
+      x-summary-source: derived
+      operationId: postApiV1GenevaActionsBillingByEnvironmentIdStateChanges
+      x-operation-id-source: derived
+    get:
+      tags:
+      - Billing
+      parameters:
+      - name: environmentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/EnvironmentStateChange'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentStateChange'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentStateChange'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      security:
+      - Bearer: []
+      summary: Get api geneva actions billing by environment id state changes
+      x-summary-source: derived
+      operationId: getApiV1GenevaActionsBillingByEnvironmentIdStateChanges
+      x-operation-id-source: derived
+    servers:
+    - url: https://online.visualstudio.com
   /enterprises/{enterprise}/settings/billing/advanced-security:
     get:
       summary: APIs.io Engineering Platform Get GitHub Advanced Security active committers for…
@@ -167,21 +508,395 @@ paths:
     - url: https://api.eu.postman.com
 components:
   schemas:
-    advanced-security-active-committers:
+    EnsurePlanBody:
+      required:
+      - name
       type: object
       properties:
-        total_advanced_security_committers:
-          type: integer
-          example: 25
-        total_count:
-          type: integer
-          example: 2
-        repositories:
-          type: array
+        name:
+          type: string
+        location:
+          $ref: '#/components/schemas/AzureLocation'
+      additionalProperties: false
+    BillSummary:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+        sessionToken:
+          type:
+          - string
+          - 'null'
+        partitionKey:
+          type:
+          - string
+          - 'null'
+        environmentId:
+          type:
+          - string
+          - 'null'
+        billGenerationTime:
+          type: string
+          format: date-time
+        plan:
+          $ref: '#/components/schemas/VsoPlanInfo'
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        usage:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: number
+            format: double
+          deprecated: true
+        usageDetail:
+          type:
+          - array
+          - 'null'
           items:
-            $ref: '#/components/schemas/advanced-security-active-committers-repository'
-      required:
-      - repositories
+            $ref: '#/components/schemas/EnvironmentUsage'
+        location:
+          $ref: '#/components/schemas/AzureLocation'
+      additionalProperties: false
+    StorageUsageDetail:
+      type: object
+      properties:
+        usage:
+          type: number
+          format: double
+        size:
+          type: integer
+          format: int32
+        sizeInKB:
+          type: integer
+          format: int64
+        sku:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    ComputeUsageDetail:
+      type: object
+      properties:
+        usage:
+          type: number
+          format: double
+        sku:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    EnvironmentBillingInfo:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        userId:
+          type:
+          - string
+          - 'null'
+        sku:
+          $ref: '#/components/schemas/Sku'
+      additionalProperties: false
+    CloudEnvironmentState:
+      enum:
+      - 0 (None)
+      - 1 (Created)
+      - 2 (Queued)
+      - 3 (Provisioning)
+      - 4 (Available)
+      - 5 (Awaiting)
+      - 6 (Unavailable)
+      - 7 (Deleted)
+      - 8 (Moved)
+      - 9 (Shutdown)
+      - 10 (Archived)
+      - 11 (Starting)
+      - 12 (ShuttingDown)
+      - 13 (Failed)
+      - 14 (Exporting)
+      - 15 (Updating)
+      - 16 (Rebuilding)
+      type: integer
+      format: int32
+    SecretFilterType:
+      enum:
+      - 0 (None)
+      - 1 (GitRepo)
+      - 2 (CodespaceName)
+      type: integer
+      format: int32
+    Sku:
+      type: object
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+        tier:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    SecretFilterBody:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/SecretFilterType'
+        value:
+          maxLength: 200
+          minLength: 1
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    ScopedSecretResultBody:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        lastModified:
+          type: string
+          format: date-time
+        scope:
+          $ref: '#/components/schemas/SecretScope'
+        secretName:
+          type:
+          - string
+          - 'null'
+        type:
+          $ref: '#/components/schemas/SecretType'
+        notes:
+          type:
+          - string
+          - 'null'
+        filters:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/SecretFilterBody'
+      additionalProperties: false
+    AzureLocation:
+      enum:
+      - 0 (None)
+      - 101 (EastAsia)
+      - 102 (SouthEastAsia)
+      - 201 (AustraliaCentral)
+      - 202 (AustraliaCentral2)
+      - 203 (AustraliaEast)
+      - 205 (AustraliaSouthEast)
+      - 301 (BrazilSouth)
+      - 401 (CanadaCentral)
+      - 402 (CanadaEast)
+      - 501 (NorthEurope)
+      - 502 (WestEurope)
+      - 601 (FranceCentral)
+      - 602 (FranceSouth)
+      - 701 (CentralIndia)
+      - 702 (SouthIndia)
+      - 703 (WestIndia)
+      - 801 (JapanEast)
+      - 802 (JapanWest)
+      - 901 (KoreaCentral)
+      - 902 (KoreaSouth)
+      - 1001 (SouthAfricaNorth)
+      - 1002 (SouthAfricaWest)
+      - 1201 (UaeCentral)
+      - 1202 (UaeNorth)
+      - 1401 (UkSouth)
+      - 1402 (UkWest)
+      - 1501 (CentralUs)
+      - 1502 (EastUs)
+      - 1503 (EastUs2)
+      - 1504 (NorthCentralUs)
+      - 1505 (SouthCentralUs)
+      - 1506 (WestCentralUs)
+      - 1507 (WestUs)
+      - 1508 (WestUs2)
+      - 1509 (WestUs3)
+      - 1601 (CentralUsEuap)
+      - 1602 (EastUs2Euap)
+      - 1701 (SwitzerlandNorth)
+      - 1702 (SwitzerlandWest)
+      - 1801 (GermanyNorth)
+      - 1802 (GermanyWestCentral)
+      - 1901 (NorwayWest)
+      - 1902 (NorwayEast)
+      type: integer
+      format: int32
+    SecretType:
+      enum:
+      - 0 (None)
+      - 1 (EnvironmentVariable)
+      - 2 (ContainerRegistry)
+      - 3 (HostSetupEnvironmentVariable)
+      type: integer
+      format: int32
+    EnvironmentStateChange:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+        sessionToken:
+          type:
+          - string
+          - 'null'
+        partitionKey:
+          type:
+          - string
+          - 'null'
+        time:
+          type: string
+          format: date-time
+        environment:
+          $ref: '#/components/schemas/EnvironmentBillingInfo'
+        oldValue:
+          $ref: '#/components/schemas/CloudEnvironmentState'
+        newValue:
+          $ref: '#/components/schemas/CloudEnvironmentState'
+      additionalProperties: false
+    EnvironmentUsage:
+      type: object
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+        endState:
+          $ref: '#/components/schemas/CloudEnvironmentState'
+        resourceUsage:
+          $ref: '#/components/schemas/ResourceUsageDetail'
+        sku:
+          $ref: '#/components/schemas/Sku'
+      additionalProperties: false
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type:
+          - string
+          - 'null'
+        title:
+          type:
+          - string
+          - 'null'
+        status:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        detail:
+          type:
+          - string
+          - 'null'
+        instance:
+          type:
+          - string
+          - 'null'
+      additionalProperties: {}
+    ResourceUsageDetail:
+      type: object
+      properties:
+        compute:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ComputeUsageDetail'
+        storage:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/StorageUsageDetail'
+      additionalProperties: false
+    ReplayBillRequestBody:
+      type: object
+      properties:
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+      additionalProperties: false
+    VsoPlanInfo:
+      type: object
+      properties:
+        subscription:
+          type:
+          - string
+          - 'null'
+        resourceGroup:
+          type:
+          - string
+          - 'null'
+        providerNamespace:
+          type:
+          - string
+          - 'null'
+        name:
+          type:
+          - string
+          - 'null'
+        location:
+          $ref: '#/components/schemas/AzureLocation'
+        resourceId:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+      additionalProperties: false
+    SecretScope:
+      enum:
+      - 0 (None)
+      - 1 (Plan)
+      - 2 (User)
+      type: integer
+      format: int32
+    CreateEnvironmentStateChangeBody:
+      type: object
+      properties:
+        time:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        oldValue:
+          $ref: '#/components/schemas/CloudEnvironmentState'
+        newValue:
+          $ref: '#/components/schemas/CloudEnvironmentState'
+      additionalProperties: false
+    basic-error:
+      title: Basic Error
+      description: Basic Error
+      type: object
+      properties:
+        message:
+          type: string
+        documentation_url:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
     advanced-security-active-committers-repository:
       type: object
       properties:
@@ -210,28 +925,21 @@ components:
       required:
       - user_login
       - last_pushed_date
-    basic-error:
-      title: Basic Error
-      description: Basic Error
+    advanced-security-active-committers:
       type: object
       properties:
-        message:
-          type: string
-        documentation_url:
-          type: string
-        url:
-          type: string
-        status:
-          type: string
-    getAccountInvoices:
-      type: object
-      required:
-      - data
-      properties:
-        data:
+        total_advanced_security_committers:
+          type: integer
+          example: 25
+        total_count:
+          type: integer
+          example: 2
+        repositories:
           type: array
           items:
-            $ref: '#/components/schemas/invoiceData'
+            $ref: '#/components/schemas/advanced-security-active-committers-repository'
+      required:
+      - repositories
     invoiceData:
       title: Account Invoice
       type: object
@@ -275,30 +983,8 @@ components:
                   format: url
                   description: A URL where you can download the invoice in PDF and view details.
                   example: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
-    invoicesForbidden403Error:
-      title: Forbidden
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/forbidden
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Forbidden
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: You are not authorized to perform this action
-    invoicesNoTeam400Error:
-      title: Bad Request
+    invoiceMissingStatus400Error:
+      title: Missing Status
       type: object
       properties:
         type:
@@ -318,7 +1004,7 @@ components:
         detail:
           type: string
           description: Details about the occurrence of the error.
-          example: You must be part of a team
+          example: Please provide a valid status to fetch invoices
     invoicesAccountInfo:
       title: Account Information
       type: object
@@ -390,8 +1076,8 @@ components:
               type: integer
               description: The number of unbilled slots if [auto-flex billing](https://learning.postman.com/auto-flex-policy/) is available.
               example: 0
-    invoiceMissingStatus400Error:
-      title: Missing Status
+    invoicesNoTeam400Error:
+      title: Bad Request
       type: object
       properties:
         type:
@@ -411,7 +1097,38 @@ components:
         detail:
           type: string
           description: Details about the occurrence of the error.
-          example: Please provide a valid status to fetch invoices
+          example: You must be part of a team
+    getAccountInvoices:
+      type: object
+      required:
+      - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/invoiceData'
+    invoicesForbidden403Error:
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Forbidden
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: You are not authorized to perform this action
   parameters:
     org:
       name: org
@@ -427,13 +1144,6 @@ components:
       schema:
         type: integer
         default: 1
-    per-page:
-      name: per_page
-      description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
-      in: query
-      schema:
-        type: integer
-        default: 30
     enterprise:
       name: enterprise
       description: The slug version of the enterprise name. You can also substitute this value with the enterprise id.
@@ -441,6 +1151,13 @@ components:
       required: true
       schema:
         type: string
+    per-page:
+      name: per_page
+      description: The number of results per page (max 100). For more information, see "[Using pagination in the REST API](https://docs.github.com/enterprise-server@3.9/rest/using-the-rest-api/using-pagination-in-the-rest-api)."
+      in: query
+      schema:
+        type: integer
+        default: 30
     billingAccountId:
       name: accountId
       in: path
@@ -466,6 +1183,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/basic-error'
+    invoicesForbidden403Error:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoicesForbidden403Error'
+          example:
+            type: https://api.postman.com/problems/forbidden
+            title: Forbidden
+            status: 403
+            detail: You are not authorized to perform this action
     getAccountInvoices:
       description: Successful Response
       content:
@@ -483,17 +1211,6 @@ components:
               links:
                 web:
                   href: https://pay.postman.com/invoices/pay?invoice_public_id=inv_7UDSYBJPGQU93N7M
-    invoiceMissingStatus400Error:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/invoiceMissingStatus400Error'
-          example:
-            type: https://api.postman.com/problems/bad-request
-            title: Malformed request
-            status: 400
-            detail: Please provide a valid status to fetch invoices
     invoicesNoTeam400Error:
       description: Bad Request
       content:
@@ -505,6 +1222,56 @@ components:
             title: Malformed request
             status: 400
             detail: You must be part of a team
+    invoiceMissingStatus400Error:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoiceMissingStatus400Error'
+          example:
+            type: https://api.postman.com/problems/bad-request
+            title: Malformed request
+            status: 400
+            detail: Please provide a valid status to fetch invoices
+    getAccounts:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/invoicesAccountInfo'
+          example:
+            billingEmail: taylor.lee@example.com
+            id: 372691
+            salesChannel: SELF_SERVE
+            slots:
+              available: 8
+              consumed: 2
+              total: 10
+              unbilled: 0
+            state: PAID
+            teamId: 380691
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
     unauthorizedError:
       description: Unauthorized
       content:
@@ -535,56 +1302,6 @@ components:
             title: Unauthorized
             detail: An API key must be provided in the request header or query string
             status: 401
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    getAccounts:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/invoicesAccountInfo'
-          example:
-            billingEmail: taylor.lee@example.com
-            id: 372691
-            salesChannel: SELF_SERVE
-            slots:
-              available: 8
-              consumed: 2
-              total: 10
-              unbilled: 0
-            state: PAID
-            teamId: 380691
-    invoicesForbidden403Error:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/invoicesForbidden403Error'
-          example:
-            type: https://api.postman.com/problems/forbidden
-            title: Forbidden
-            status: 403
-            detail: You are not authorized to perform this action
   examples:
     advanced-security-active-committers:
       value:
@@ -604,6 +1321,11 @@ components:
           - user_login: octokitten
             last_pushed_date: '2021-10-26'
   securitySchemes:
+    Bearer:
+      type: http
+      description: 'JWT auth token for the user. Example: eyJ2...'
+      scheme: bearer
+      bearerFormat: JWT
     PostmanApiKey:
       type: apiKey
       in: header
@@ -617,6 +1339,7 @@ externalDocs:
   description: GitHub Enterprise Developer Docs
   url: https://docs.github.com/enterprise-server@3.9/rest/
 x-refined-from:
+- engineering-platform-openapi.json
 - github-openapi-original.yml
 - postman-openapi-original.yml
 x-hasEquivalentPaths: true

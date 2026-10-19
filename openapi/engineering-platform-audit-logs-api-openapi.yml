@@ -438,49 +438,21 @@ paths:
     - url: https://api.eu.postman.com
 components:
   schemas:
-    aaa_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/aaa_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          $ref: '#/components/schemas/aaa_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    aaa_audit_logs_response_collection:
-      oneOf:
-      - properties:
-          errors:
-            $ref: '#/components/schemas/aaa_messages'
-          messages:
-            $ref: '#/components/schemas/aaa_messages'
-          result:
-            items:
-              $ref: '#/components/schemas/aaa_audit-logs'
-            type: array
-          success:
-            example: true
-            type: boolean
-      - $ref: '#/components/schemas/aaa_api-response-common'
-    aaa_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
+    aaa_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     aaa_audit-logs:
       properties:
         action:
@@ -564,6 +536,34 @@ components:
           format: date-time
           type: string
       type: object
+    aaa_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/aaa_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          $ref: '#/components/schemas/aaa_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    aaa_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     aaa_api-response-common:
       properties:
         errors:
@@ -581,25 +581,29 @@ components:
       - errors
       - messages
       type: object
-    aaa_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    aaa_audit_logs_response_collection:
+      oneOf:
+      - properties:
+          errors:
+            $ref: '#/components/schemas/aaa_messages'
+          messages:
+            $ref: '#/components/schemas/aaa_messages'
+          result:
+            items:
+              $ref: '#/components/schemas/aaa_audit-logs'
+            type: array
+          success:
+            example: true
+            type: boolean
+      - $ref: '#/components/schemas/aaa_api-response-common'
     untilDateQuery:
       type: string
       format: date
       example: '2022-09-15'
+    sinceDateQuery:
+      type: string
+      format: date
+      example: '2022-08-30'
     ascDescDefaultDesc:
       type: string
       default: desc
@@ -607,6 +611,9 @@ components:
       - asc
       - desc
       example: desc
+    cursor:
+      type: string
+      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
     getAuditLogs:
       title: Successful Response
       type: object
@@ -705,13 +712,6 @@ components:
                     type: object
                     description: Additional information about the performed action.
                     additionalProperties: true
-    sinceDateQuery:
-      type: string
-      format: date
-      example: '2022-08-30'
-    cursor:
-      type: string
-      example: RnJpIEZlYiAyNCAyMDIzIDEzOjI0OjA5IEdNVCswMDAwIChDb29yZGluYXRlZCBVbml2ZXJzYWwgVGltZSk=
     auditLogsLimitQuery:
       type: integer
       maximum: 300
@@ -723,30 +723,30 @@ components:
       description: The maximum number of audit events to return at once.
       schema:
         $ref: '#/components/schemas/auditLogsLimitQuery'
-    cursor:
-      name: cursor
-      in: query
-      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
-      schema:
-        $ref: '#/components/schemas/cursor'
     auditLogsSinceQuery:
       name: since
       in: query
       description: Return logs created after the given time, in `YYYY-MM-DD` format.
       schema:
         $ref: '#/components/schemas/sinceDateQuery'
-    auditLogsOrderBy:
-      name: order_by
-      in: query
-      description: Return the records in ascending (`asc`) or descending (`desc`) order.
-      schema:
-        $ref: '#/components/schemas/ascDescDefaultDesc'
     auditLogsUntilQuery:
       name: until
       in: query
       description: Return logs created before the given time, in `YYYY-MM-DD` format.
       schema:
         $ref: '#/components/schemas/untilDateQuery'
+    auditLogsOrderBy:
+      name: order_by
+      in: query
+      description: Return the records in ascending (`asc`) or descending (`desc`) order.
+      schema:
+        $ref: '#/components/schemas/ascDescDefaultDesc'
+    cursor:
+      name: cursor
+      in: query
+      description: The pointer to the first record of the set of paginated results. To view the next response, use the `nextCursor` value for this parameter.
+      schema:
+        $ref: '#/components/schemas/cursor'
   examples:
     getAuditLogs:
       value:
@@ -794,28 +794,6 @@ components:
               name: Test-Team
               id: 1234
   responses:
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
     getAuditLogs:
       description: Successful Response
       content:
@@ -855,6 +833,28 @@ components:
             title: Unauthorized
             detail: Unauthorized
             status: 401
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
   securitySchemes:
     api_email:
       in: header

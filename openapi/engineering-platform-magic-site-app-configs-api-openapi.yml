@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -187,6 +198,40 @@ paths:
         pro: false
 components:
   schemas:
+    magic_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    magic_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    magic_app_priority:
+      description: Priority of traffic. 0 is default, anything greater is prioritized. (Currently only 0 and 1 are supported)
+      maximum: 1
+      minimum: 0
+      type: integer
+    magic_app_configs_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_apps-response-object'
+      - properties:
+          result:
+            items:
+              $ref: '#/components/schemas/magic_app_config'
+            type: array
     magic_app_config:
       allOf:
       - properties:
@@ -220,40 +265,6 @@ components:
       description: Magic account app ID.
       example: ac60d3d0435248289d446cedd870bcf4
       type: string
-    magic_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    magic_app_config_add_single_request:
-      allOf:
-      - oneOf:
-        - properties:
-            account_app_id:
-              $ref: '#/components/schemas/magic_account_app_id'
-          required:
-          - account_app_id
-          title: Account App
-        - properties:
-            managed_app_id:
-              $ref: '#/components/schemas/magic_managed_app_id'
-          required:
-          - managed_app_id
-          title: Managed App
-      - anyOf:
-        - required:
-          - breakout
-          title: Breakout
-        - required:
-          - priority
-          title: Prioritize
-      - properties:
-          breakout:
-            $ref: '#/components/schemas/magic_app_breakout'
-          priority:
-            $ref: '#/components/schemas/magic_app_priority'
-      type: object
     magic_api-response-common-failure:
       properties:
         errors:
@@ -285,10 +296,59 @@ components:
       - messages
       - result
       type: object
+    magic_app_config_add_single_request:
+      allOf:
+      - oneOf:
+        - properties:
+            account_app_id:
+              $ref: '#/components/schemas/magic_account_app_id'
+          required:
+          - account_app_id
+          title: Account App
+        - properties:
+            managed_app_id:
+              $ref: '#/components/schemas/magic_managed_app_id'
+          required:
+          - managed_app_id
+          title: Managed App
+      - anyOf:
+        - required:
+          - breakout
+          title: Breakout
+        - required:
+          - priority
+          title: Prioritize
+      - properties:
+          breakout:
+            $ref: '#/components/schemas/magic_app_breakout'
+          priority:
+            $ref: '#/components/schemas/magic_app_priority'
+      type: object
     magic_managed_app_id:
       description: Managed app ID.
       example: cloudflare
       type: string
+    magic_app_config_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_apps-response-object'
+      - properties:
+          result:
+            $ref: '#/components/schemas/magic_app_config'
+    magic_app_config_update_request:
+      properties:
+        account_app_id:
+          $ref: '#/components/schemas/magic_account_app_id'
+        breakout:
+          $ref: '#/components/schemas/magic_app_breakout'
+        managed_app_id:
+          $ref: '#/components/schemas/magic_managed_app_id'
+        priority:
+          $ref: '#/components/schemas/magic_app_priority'
+      type: object
+    magic_app_breakout:
+      description: Whether to breakout traffic to the app's endpoints directly. Null preserves default behavior.
+      example: true
+      type: boolean
     magic_apps-response-object:
       properties:
         errors:
@@ -311,55 +371,6 @@ components:
       - messages
       - result
       type: object
-    magic_app_priority:
-      description: Priority of traffic. 0 is default, anything greater is prioritized. (Currently only 0 and 1 are supported)
-      maximum: 1
-      minimum: 0
-      type: integer
-    magic_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    magic_app_config_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_apps-response-object'
-      - properties:
-          result:
-            $ref: '#/components/schemas/magic_app_config'
-    magic_app_config_update_request:
-      properties:
-        account_app_id:
-          $ref: '#/components/schemas/magic_account_app_id'
-        breakout:
-          $ref: '#/components/schemas/magic_app_breakout'
-        managed_app_id:
-          $ref: '#/components/schemas/magic_managed_app_id'
-        priority:
-          $ref: '#/components/schemas/magic_app_priority'
-      type: object
-    magic_app_breakout:
-      description: Whether to breakout traffic to the app's endpoints directly. Null preserves default behavior.
-      example: true
-      type: boolean
-    magic_app_configs_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_apps-response-object'
-      - properties:
-          result:
-            items:
-              $ref: '#/components/schemas/magic_app_config'
-            type: array
   securitySchemes:
     api_email:
       in: header

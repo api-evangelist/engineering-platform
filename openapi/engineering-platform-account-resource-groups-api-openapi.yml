@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -253,10 +264,41 @@ paths:
         pro: true
 components:
   schemas:
-    iam_scope_key:
-      description: This is a combination of pre-defined resource name and identifier (like Account ID etc.)
-      example: com.cloudflare.api.account.eb78d65290b24279ba6f44721b3ea3c4
+    iam_api-response-single-id:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-common'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/iam_common_components-schemas-identifier'
+            required:
+            - id
+            type:
+            - object
+            - 'null'
+      type: object
+    iam_scope_object_key:
+      description: This is a combination of pre-defined resource name and identifier (like Zone ID etc.)
+      example: com.cloudflare.api.account.zone.23f8d65290b24279ba6f44721b3eaad5
       readOnly: true
+    iam_create_resource_group:
+      properties:
+        meta:
+          description: Attributes associated to the resource group.
+          example:
+            editable: 'false'
+          type: object
+        name:
+          description: Name of the resource group.
+          example: NameOfTheResourceGroup
+          readOnly: true
+          type: string
+        scope:
+          $ref: '#/components/schemas/iam_create-scope'
+      required:
+      - scope
+      type: object
     iam_messages:
       example: []
       items:
@@ -272,12 +314,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    iam_common_components-schemas-identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
     iam_create_resource_group_scope_scope_object:
       description: A scope object represents any resource that can have actions applied against invite.
       properties:
@@ -285,6 +321,63 @@ components:
           $ref: '#/components/schemas/iam_create_resource_group_scope_scope_object_key'
       required:
       - key
+      type: object
+    iam_resource_groups:
+      description: A list of resource groups that the policy applies to.
+      items:
+        $ref: '#/components/schemas/iam_resource_group'
+      type: array
+    iam_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/iam_messages'
+        messages:
+          $ref: '#/components/schemas/iam_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    iam_result_info:
+      properties:
+        count:
+          description: Total number of results for the requested service
+          example: 1
+          type: number
+        page:
+          description: Current page within paginated list of results
+          example: 1
+          type: number
+        per_page:
+          description: Number of results per page of results
+          example: 20
+          type: number
+        total_count:
+          description: Total results available without any search parameters
+          example: 2000
+          type: number
+      type: object
+    iam_created_resource_group_response:
+      description: A group of scoped resources.
+      properties:
+        id:
+          description: Identifier of the group.
+          example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
+          readOnly: true
+          type: string
+        meta:
+          description: Attributes associated to the resource group.
+          example:
+            editable: 'false'
+          type: object
+        scope:
+          $ref: '#/components/schemas/iam_create-scope'
       type: object
     iam_create-scope:
       description: A scope is a combination of scope objects which provides additional context.
@@ -299,18 +392,6 @@ components:
       required:
       - key
       - objects
-      type: object
-    iam_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/iam_result_info'
       type: object
     iam_account_identifier:
       description: Account identifier tag.
@@ -349,6 +430,67 @@ components:
       - messages
       - result
       type: object
+    iam_common_components-schemas-identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    iam_resource_group_components-schemas-identifier:
+      description: Resource Group identifier tag.
+      example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
+      maxLength: 32
+      readOnly: true
+      type: string
+    iam_collection_resource_groups_response:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-collection'
+      - properties:
+          result:
+            $ref: '#/components/schemas/iam_resource_groups'
+        type: object
+      title: List of Resource groups
+    iam_scope_object:
+      description: A scope object represents any resource that can have actions applied against invite.
+      properties:
+        key:
+          $ref: '#/components/schemas/iam_scope_object_key'
+      required:
+      - key
+      type: object
+    iam_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/iam_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/iam_result_info'
+      type: object
+    iam_scope:
+      description: A scope is a combination of scope objects which provides additional context.
+      properties:
+        key:
+          $ref: '#/components/schemas/iam_scope_key'
+        objects:
+          description: A list of scope objects for additional context.
+          items:
+            $ref: '#/components/schemas/iam_scope_object'
+          type: array
+      required:
+      - key
+      - objects
+      type: object
+    iam_create_resource_group_scope_scope_key:
+      description: This is a combination of pre-defined resource name and identifier (like Account ID etc.)
+      example: com.cloudflare.api.account.eb78d65290b24279ba6f44721b3ea3c4
+    iam_scope_key:
+      description: This is a combination of pre-defined resource name and identifier (like Account ID etc.)
+      example: com.cloudflare.api.account.eb78d65290b24279ba6f44721b3ea3c4
+      readOnly: true
     iam_resource_group:
       description: A group of scoped resources.
       properties:
@@ -381,140 +523,9 @@ components:
       - id
       - scope
       type: object
-    iam_create_resource_group:
-      properties:
-        meta:
-          description: Attributes associated to the resource group.
-          example:
-            editable: 'false'
-          type: object
-        name:
-          description: Name of the resource group.
-          example: NameOfTheResourceGroup
-          readOnly: true
-          type: string
-        scope:
-          $ref: '#/components/schemas/iam_create-scope'
-      required:
-      - scope
-      type: object
-    iam_api-response-single-id:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-common'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/iam_common_components-schemas-identifier'
-            required:
-            - id
-            type:
-            - object
-            - 'null'
-      type: object
-    iam_create_resource_group_scope_scope_key:
-      description: This is a combination of pre-defined resource name and identifier (like Account ID etc.)
-      example: com.cloudflare.api.account.eb78d65290b24279ba6f44721b3ea3c4
-    iam_scope:
-      description: A scope is a combination of scope objects which provides additional context.
-      properties:
-        key:
-          $ref: '#/components/schemas/iam_scope_key'
-        objects:
-          description: A list of scope objects for additional context.
-          items:
-            $ref: '#/components/schemas/iam_scope_object'
-          type: array
-      required:
-      - key
-      - objects
-      type: object
     iam_create_resource_group_scope_scope_object_key:
       description: This is a combination of pre-defined resource name and identifier (like Zone ID etc.)
       example: com.cloudflare.api.account.zone.23f8d65290b24279ba6f44721b3eaad5
-    iam_scope_object:
-      description: A scope object represents any resource that can have actions applied against invite.
-      properties:
-        key:
-          $ref: '#/components/schemas/iam_scope_object_key'
-      required:
-      - key
-      type: object
-    iam_scope_object_key:
-      description: This is a combination of pre-defined resource name and identifier (like Zone ID etc.)
-      example: com.cloudflare.api.account.zone.23f8d65290b24279ba6f44721b3eaad5
-      readOnly: true
-    iam_created_resource_group_response:
-      description: A group of scoped resources.
-      properties:
-        id:
-          description: Identifier of the group.
-          example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
-          readOnly: true
-          type: string
-        meta:
-          description: Attributes associated to the resource group.
-          example:
-            editable: 'false'
-          type: object
-        scope:
-          $ref: '#/components/schemas/iam_create-scope'
-      type: object
-    iam_collection_resource_groups_response:
-      allOf:
-      - $ref: '#/components/schemas/iam_api-response-collection'
-      - properties:
-          result:
-            $ref: '#/components/schemas/iam_resource_groups'
-        type: object
-      title: List of Resource groups
-    iam_result_info:
-      properties:
-        count:
-          description: Total number of results for the requested service
-          example: 1
-          type: number
-        page:
-          description: Current page within paginated list of results
-          example: 1
-          type: number
-        per_page:
-          description: Number of results per page of results
-          example: 20
-          type: number
-        total_count:
-          description: Total results available without any search parameters
-          example: 2000
-          type: number
-      type: object
-    iam_resource_groups:
-      description: A list of resource groups that the policy applies to.
-      items:
-        $ref: '#/components/schemas/iam_resource_group'
-      type: array
-    iam_resource_group_components-schemas-identifier:
-      description: Resource Group identifier tag.
-      example: 6d7f2f5f5b1d4a0e9081fdc98d432fd1
-      maxLength: 32
-      readOnly: true
-      type: string
-    iam_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/iam_messages'
-        messages:
-          $ref: '#/components/schemas/iam_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
   securitySchemes:
     api_email:
       in: header

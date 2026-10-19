@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -143,23 +154,26 @@ components:
       - messages
       - result
       type: object
-    workers_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/workers_messages'
-        messages:
-          $ref: '#/components/schemas/workers_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     workers_script_identifier:
       example: 8ee82b3a2c0f42928b8f14dae4a97121
       maxLength: 32
@@ -205,26 +219,43 @@ components:
       maxLength: 36
       readOnly: true
       type: string
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    workers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+    workers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers_messages'
+        messages:
+          $ref: '#/components/schemas/workers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers_version-item-short:
+      properties:
+        id:
+          example: 18f97339-c287-4872-9bdd-e2135c07ec12
+          readOnly: true
+          type: string
+        metadata:
+          example:
+            author_email: user@example.com
+            author_id: 408cbcdfd4dda4617efef40b04d168a1
+            created_on: '2022-11-08T17:19:29.176266Z'
+            modified_on: '2022-11-08T17:19:29.176266Z'
+            source: api
+          readOnly: true
+          type: object
+        number:
+          example: 1
+          readOnly: true
+          type: number
+      type: object
     workers_deployments-list-response:
       allOf:
       - $ref: '#/components/schemas/workers_api-response-common'
@@ -276,26 +307,6 @@ components:
                       usage_model: bundled
                 type: object
             type: object
-    workers_version-item-short:
-      properties:
-        id:
-          example: 18f97339-c287-4872-9bdd-e2135c07ec12
-          readOnly: true
-          type: string
-        metadata:
-          example:
-            author_email: user@example.com
-            author_id: 408cbcdfd4dda4617efef40b04d168a1
-            created_on: '2022-11-08T17:19:29.176266Z'
-            modified_on: '2022-11-08T17:19:29.176266Z'
-            source: api
-          readOnly: true
-          type: object
-        number:
-          example: 1
-          readOnly: true
-          type: number
-      type: object
   securitySchemes:
     api_email:
       in: header

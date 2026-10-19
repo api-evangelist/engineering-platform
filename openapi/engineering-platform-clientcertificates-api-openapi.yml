@@ -408,26 +408,14 @@ paths:
       x-summary-source: derived
 components:
   parameters:
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-SignedHeaders:
       name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
       in: header
       schema:
         type: string
@@ -438,22 +426,52 @@ components:
       schema:
         type: string
       required: false
-    X-Amz-Date:
-      name: X-Amz-Date
-      in: header
-      schema:
-        type: string
-      required: false
     X-Amz-Credential:
       name: X-Amz-Credential
       in: header
       schema:
         type: string
       required: false
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
+      in: header
+      schema:
+        type: string
+      required: false
   schemas:
+    MapOfStringToString:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/String'
+    ClientCertificates:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfClientCertificate'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents a collection of ClientCertificate resources.
+    ConflictException: {}
+    LimitExceededException: {}
+    BadRequestException: {}
     TooManyRequestsException: {}
-    String:
-      type: string
+    NotFoundException: {}
     PatchOperation:
       type: object
       properties:
@@ -474,36 +492,6 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
       description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
-    UnauthorizedException: {}
-    NotFoundException: {}
-    LimitExceededException: {}
-    ListOfClientCertificate:
-      type: array
-      items:
-        $ref: '#/components/schemas/ClientCertificate'
-    ClientCertificates:
-      type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfClientCertificate'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents a collection of ClientCertificate resources.
-    Op:
-      type: string
-      enum:
-      - add
-      - remove
-      - replace
-      - move
-      - copy
-      - test
-    BadRequestException: {}
-    ConflictException: {}
     ClientCertificate:
       type: object
       properties:
@@ -532,13 +520,25 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: Represents a client certificate used to configure client-side SSL authentication while sending requests to the integration endpoint.
-    MapOfStringToString:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/String'
+    ListOfClientCertificate:
+      type: array
+      items:
+        $ref: '#/components/schemas/ClientCertificate'
+    String:
+      type: string
     Timestamp:
       type: string
       format: date-time
+    Op:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      - move
+      - copy
+      - test
+    UnauthorizedException: {}
   securitySchemes:
     hmac:
       type: apiKey

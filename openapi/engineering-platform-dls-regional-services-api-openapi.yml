@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -53,6 +64,23 @@ paths:
       - DNS Read
 components:
   schemas:
+    dls_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/dls_messages'
+        messages:
+          $ref: '#/components/schemas/dls_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
     dls_region_key:
       description: Identifying key for the region
       example: ca
@@ -107,6 +135,24 @@ components:
       - messages
       - result
       type: object
+    dls_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/dls_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+          result_info:
+            $ref: '#/components/schemas/dls_result_info'
+      type: object
+    dls_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
     dls_messages:
       example: []
       items:
@@ -122,41 +168,6 @@ components:
         type: object
         uniqueItems: true
       type: array
-    dls_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    dls_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/dls_messages'
-        messages:
-          $ref: '#/components/schemas/dls_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    dls_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/dls_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-          result_info:
-            $ref: '#/components/schemas/dls_result_info'
-      type: object
   parameters:
     dls_account_id:
       in: path

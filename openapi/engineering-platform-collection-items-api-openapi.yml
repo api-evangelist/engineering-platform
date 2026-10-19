@@ -1,7 +1,45 @@
 openapi: 3.2.0
 info:
   title: Postman Collection Items API
-  description: The Postman API enables you to programmatically access data stored in your Postman account.
+  description: 'The Postman API enables you to programmatically access data stored in your Postman account. > Certain endpoints may be unavailable depending on your region and/or Postman plan. For a comprehensive set of examples of requests and responses, see the **Postman API** collection. ## Getting started
+
+
+    You can get started with the Postman API by creating a copy of this definition in your workspace. ### EU users
+
+
+    For users in the EU with **Enterprise** plans, the Postman API uses the `http://api.eu.postman.com` subdomain. This is available in the definition''s list of servers. You can change this by selecting the `http://api.eu.postman.com` subdomain in the **Server** dropdown list below. ## About the Postman API
+
+
+    - You must use a valid API Key to send requests to the API endpoints. - The API has rate and usage limits. - The API only responds to HTTPS-secured communications. Any requests sent via HTTP return an HTTP `301` redirect to the corresponding HTTPS resources. - The API returns requests responses in JSON format. When an API request returns an error, it is sent in the JSON response as an error key. - The request method (verb) determines the nature of action you intend to perform. A request made using the `GET` method implies that you want to fetch something from Postman. The `POST` method implies you want to save something new to Postman. - For all requests, API calls respond with their corresponding HTTP status codes. In the Postman client, the status code also provides help text that details the possible meaning of the response code. - When calling the API Builder endpoints, you must send an `Accept` header with the `application/vnd.api.v10+json` value. ### IDs and UIDs
+
+
+    All items in Postman, such as collections, workspaces, and APIs, have IDs and UIDs:
+
+
+    - An ID is the unique ID assigned to a Postman item. For example, `ec29121c-5203-409f-9e84-e83ffc10f226`. - The UID is the **full** ID of a Postman item. This value is the item''s unique ID concatenated with the user ID. For example, in the `12345678-ec29121c-5203-409f-9e84-e83ffc10f226` UID:
+
+    - `12345678` is the user''s ID. - `ec29121c-5203-409f-9e84-e83ffc10f226` is the item''s ID. ### Enum values
+
+
+    Any documented enum values should be considered partial lists and may change over time. ### 403 response for unavailable features
+
+
+    Depending on your region and/or Postman plan, some endpoints will return an HTTP `403 Forbidden` response with the "This feature isn''t available in your region." detail. ### 503 response
+
+
+    An HTTP `503 Service Unavailable` response from our servers indicates there is an unexpected spike in API access traffic. The server is usually operational within the next five minutes. If the outage persists or you receive any other form of an HTTP `5XX` error, contact support. ## Authentication
+
+
+    Postman uses API keys for authentication. The API key tells the API server that the request came from you. Everything that you have access to in Postman is accessible with your API key. You can generate a Postman API key in the **API keys** section of your Postman account settings. You must include an API key in each request to the Postman API with the `X-API-Key` request header. In Postman, you can store your API key as a vault secret or an environment variable. The Postman API collection will use it to make API calls. ### SCIM authentication
+
+
+    While all other endpoints in this collection require a Postman API key, the SCIM endpoints require a SCIM API key. ### Authentication error response
+
+
+    If an API key is missing, malformed, or invalid, you will receive an HTTP `401 Unauthorized` response code. ## Rate and usage limits
+
+
+    API access rate limits apply at a per-user basis in unit time. The limit is **300 requests per minute**. Postman Monitors, the GET `/collections`, and the GET `/workspaces` endpoint have a rate limit of **10 calls in 10 seconds**. Depending on your plan, you may also have usage limits.'
   version: '1.0'
   termsOfService: https://www.postman.com/legal/terms/
   contact:
@@ -297,9 +335,318 @@ paths:
         '500':
           $ref: '#/components/responses/common500Error'
 components:
+  schemas:
+    booleanQuery:
+      type: boolean
+      example: true
+    collectionFolderId:
+      type: string
+      example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+    collectionRequestId:
+      type: string
+      example: c82dd02c-4870-4907-8fcb-593a876cf05b
   responses:
-    collectionFolder400Error:
-      description: Bad Request
+    deleteCollectionRequest:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              model_id:
+                type: string
+                description: The request's ID.
+                example: c82dd02c-4870-4907-8fcb-593a876cf05b
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              data:
+                type: object
+                description: The request's information.
+                properties:
+                  id:
+                    type: string
+                    description: The request's ID.
+                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
+                  owner:
+                    type: string
+                    description: The user ID of the request's owner.
+                    example: '12345678'
+              revision:
+                type: number
+                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                example: 24995158577
+          example:
+            model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
+            meta:
+              model: request
+              action: destroy
+            data:
+              id: c82dd02c-4870-4907-8fcb-593a876cf05b
+              owner: '12345678'
+            revision: 24995158577
+    getCollectionResponse:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                description: Information about the response. For a complete list of properties, refer to the **Response** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
+                additionalProperties: true
+                properties:
+                  id:
+                    type: string
+                    description: The response's ID.
+                    example: cc364734-7dfd-4bfc-897d-be763dcdbb07
+                  request:
+                    type: string
+                    description: The ID of the request that the response belongs to.
+                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
+                  name:
+                    type: string
+                    description: The response's name.
+                    example: Test Folder
+                  owner:
+                    type: string
+                    description: The user ID of the response's owner.
+                    example: '12345678'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The response's creation date and time.
+                    example: '2022-08-29T16:49:19.964Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the response was last updated.
+                    example: '2022-08-29T16:49:19.964Z'
+                  lastRevision:
+                    type: integer
+                    format: int64
+                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                    example: 24994132707
+                  lastUpdatedBy:
+                    type: string
+                    description: The user ID of the user that last updated the response.
+                    example: '12345678'
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              model_id:
+                type: string
+                description: The response's ID.
+                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+          example:
+            model_id: cc364734-7dfd-4bfc-897d-be763dcdbb07
+            meta:
+              model: response
+              populate: false
+              changeset: false
+              action: find
+            data:
+              owner: '12345678'
+              lastUpdatedBy: '12345678'
+              lastRevision: 32457792182
+              request: c82dd02c-4870-4907-8fcb-593a876cf05b
+              id: cc364734-7dfd-4bfc-897d-be763dcdbb07
+              name: Successful GET Response
+              status: null
+              responseCode:
+                code: 200
+                name: OK
+              time: null
+              headers:
+              - key: Content-Type
+                name: Content-Type
+                value: application/json
+                description: ''
+                type: text
+              cookies: null
+              mime: null
+              text: "{\n    \"title\": \"Not Found\",\n    \"detail\": \"Requested API does not exist\",\n    \"type\": \"about:blank\"\n}"
+              language: json
+              rawDataType: null
+              requestObject: '{"data":null,"dataMode":"raw","dataOptions":{"raw":{"language":"json"}},"headerData":[{"key":"Accept","value":"application/vnd.example.v1+json","description":"","type":"text","enabled":true}],"method":"GET","pathVariableData":[],"queryParams":[{"key":"id","value":"test-api","equals":true,"description":null,"enabled":true}],"url":"http://api.getpostman.com/v1/request?id=test-api","headers":"Accept: application/vnd.example.v1+json\n","pathVariables":{},"protocolProfileBehavior":{"disableBodyPruning":true},"rawModeData":"","graphqlModeData":{}}'
+              createdAt: '2023-09-07T14:39:52.000Z'
+              updatedAt: '2023-09-07T14:41:08.000Z'
+    deleteCollectionResponse:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              model_id:
+                type: string
+                description: The response's ID.
+                example: cc364734-7dfd-4bfc-897d-be763dcdbb07
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              data:
+                type: object
+                description: The response's information.
+                properties:
+                  id:
+                    type: string
+                    description: The response's ID.
+                    example: cc364734-7dfd-4bfc-897d-be763dcdbb07
+                  owner:
+                    type: string
+                    description: The user ID of the request's owner.
+                    example: '12345678'
+              revision:
+                type: number
+                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                example: 24997417224
+          example:
+            model_id: cc364734-7dfd-4bfc-897d-be763dcdbb07
+            meta:
+              model: response
+              action: destroy
+            data:
+              id: cc364734-7dfd-4bfc-897d-be763dcdbb07
+              owner: '12345678'
+            revision: 24997417224
+    deleteCollectionFolder:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                description: The folder's information.
+                properties:
+                  id:
+                    type: string
+                    description: The folder's ID.
+                    example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+                  owner:
+                    type: string
+                    description: The user ID of the folder's owner.
+                    example: '12345678'
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              model_id:
+                type: string
+                description: The folder's ID.
+                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              revision:
+                type: number
+                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                example: 24994562696
+          example:
+            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+            meta:
+              model: folder
+              action: destroy
+            data:
+              id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              owner: '12345678'
+            revision: 24994562696
+    getCollectionFolder:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              model_id:
+                type: string
+                description: The folder's ID.
+                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              data:
+                type: object
+                description: Information about the folder. For a complete list of properties, refer to the **Folders** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
+                additionalProperties: true
+                properties:
+                  id:
+                    type: string
+                    description: The folder's ID.
+                    example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+                  name:
+                    type: string
+                    description: The folder's name.
+                    example: Test Folder
+                  description:
+                    type: string
+                    description: The folder's description.
+                    example: This is a test collection folder.
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The folder's creation date and time.
+                    example: '2022-08-29T16:49:19.964Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the folder was last updated.
+                    example: '2022-08-29T16:49:19.964Z'
+                  owner:
+                    type: string
+                    description: The user ID of the folder's owner.
+                    example: '12345678'
+                  lastUpdatedBy:
+                    type: string
+                    description: The user ID of the user that last updated the folder.
+                    example: '12345678'
+                  lastRevision:
+                    type: integer
+                    format: int64
+                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                    example: 24994132707
+                  collection:
+                    type: string
+                    description: The collection ID that the folder belongs to.
+                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+          example:
+            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+            meta:
+              model: folder
+              populate: false
+              changeset: false
+              action: find
+            data:
+              owner: '12345678'
+              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+              folder: null
+              id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              name: Test Folder
+              description: This is a test collection folder.
+              variables: null
+              auth:
+                type: apikey
+                apikey:
+                - key: value
+                  value: XXX
+                - key: key
+                  value: x-api-key
+              events: null
+              order:
+              - 81b49e05-0b87-4ca4-ac8c-091aaedafea3
+              - 929acf24-4234-45e1-59cf-dc2b27ea7603
+              - 3cfc2ac8-00a9-47d2-415d-049773f23268
+              folders_order:
+              - 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              - 5c341de9-5751-461f-b7bd-af86bbae740c
+              createdAt: '2022-08-29T16:49:19.964Z'
+              updatedAt: '2022-08-29T16:49:19.964Z'
+    collectionFolder404Error:
+      description: Not Found
       content:
         application/problem+json:
           schema:
@@ -311,11 +658,14 @@ components:
                   name:
                     type: string
                     description: The error name.
-                    example: instanceFoundError
+                    example: instanceNotFoundError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: We could not find the folder you are looking for
                   details:
                     type: object
                     description: Information about the error.
-                    additionalProperties: true
                     properties:
                       model:
                         type: string
@@ -329,18 +679,382 @@ components:
                         type: string
                         description: The folder's ID.
                         example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-                  message:
-                    type: string
-                    description: The error message.
-                    example: This folder already exists in the database.
           example:
             error:
               name: instanceNotFoundError
+              message: We could not find the folder you are looking for
               details:
                 model: folder
                 owner: '12345678'
                 model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              message: We could not find the folder you are looking for
+    updateCollectionRequest:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                additionalProperties: true
+                description: Information about the updated request. For a complete list of properties, refer to the **Request** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
+                properties:
+                  id:
+                    type: string
+                    description: The request's ID.
+                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
+                  name:
+                    type: string
+                    description: The request's name.
+                    example: Example GET request
+                  description:
+                    type: string
+                    description: The request's description.
+                    example: This is an example GET request.
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The request's creation date and time.
+                    example: '2022-08-29T16:49:19.964Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the request was last updated.
+                    example: '2022-08-29T16:49:19.964Z'
+                  owner:
+                    type: string
+                    description: The user ID of the request's owner.
+                    example: '12345678'
+                  lastUpdatedBy:
+                    type: string
+                    description: The user ID of the user that last updated the request.
+                    example: '12345678'
+                  lastRevision:
+                    type: integer
+                    format: int64
+                    example: 24994863800
+                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              model_id:
+                type: string
+                description: The request's ID.
+                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              revision:
+                type: number
+                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                example: 24994954828
+          example:
+            model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
+            meta:
+              model: request
+              action: update
+            data:
+              id: c82dd02c-4870-4907-8fcb-593a876cf05b
+              name: Example POST Request
+              dataMode: raw
+              data: null
+              auth: noauth
+              events: null
+              rawModeData: "{\n    \"field\": \"Value\"\n}"
+              descriptionFormat: null
+              description: This is an example POST request.
+              variables: null
+              headers: null
+              method: POST
+              pathVariables: null
+              url: https://postman-echo.com/post
+              preRequestScript: null
+              tests: null
+              currentHelper: null
+              helperAttributes: null
+              queryParams: []
+              headerData: []
+              pathVariableData: []
+              protocolProfileBehavior: null
+              dataDisabled: false
+              responses_order: []
+              createdAt: '2023-09-01T07:59:25.000Z'
+              updatedAt: '2023-09-08T12:30:29.000Z'
+              owner: '12345678'
+              lastUpdatedBy: '12345678'
+              lastRevision: 32473087936
+              folder: null
+              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+              dataOptions:
+                raw:
+                  language: json
+            revision: 32473098909
+    createCollectionRequest:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                additionalProperties: true
+                description: Information about the created request. For a complete list of properties, refer to the **Request** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
+                properties:
+                  id:
+                    type: string
+                    description: The request's ID.
+                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
+                  name:
+                    type: string
+                    description: The request's name.
+                    example: Test Request
+                  owner:
+                    type: string
+                    description: The user ID of the request's owner.
+                    example: '12345678'
+                  folder:
+                    type:
+                    - string
+                    - 'null'
+                    description: Information about the request's parent folder.
+                    example: null
+                  responses:
+                    type: array
+                    description: A list of the request's responses.
+                    items:
+                      type: string
+                    example: []
+                  collection:
+                    type: string
+                    description: The collection ID that the request belongs to.
+                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+                  responses_order:
+                    type: array
+                    description: A list of response IDs and their order in the folder.
+                    items:
+                      type: string
+                    uniqueItems: true
+                    example: []
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The requeset's creation date and time.
+                    example: '2022-08-29T16:35:38.831Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the request was last updated.
+                    example: '2022-08-29T16:35:38.831Z'
+                  lastUpdatedBy:
+                    type: string
+                    description: The user ID of the user that last updated the folder.
+                    example: '12345678'
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              model_id:
+                type: string
+                description: The request's ID.
+                example: c82dd02c-4870-4907-8fcb-593a876cf05b
+              revision:
+                type: number
+                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                example: 26531992398
+          example:
+            model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
+            meta:
+              model: request
+              action: import
+            data:
+              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+              method: GET
+              headers:
+              - key: Host
+                value: postman-echo.com
+              - key: user-agent
+                value: curl/7.88.1
+              - key: accept
+                value: '*/*'
+              - key: content-type
+                value: application/json
+              dataMode: raw
+              url: https://postman-echo.com/get?param=value
+              name: Example GET Request
+              description: This is an example GET request.
+              owner: '12345678'
+              folder: null
+              responses_order: []
+              id: c82dd02c-4870-4907-8fcb-593a876cf05b
+              lastUpdatedBy: '12345678'
+              queryParams:
+              - key: id
+                value: '{{id}}'
+                equals: true
+                description: Optional. The user's ID.
+                enabled: true
+              headerData: []
+              createdAt: '2023-09-07T13:33:17.912Z'
+              updatedAt: '2023-09-07T13:33:17.912Z'
+              rawModeData: null
+              dataOptions:
+                raw:
+                  language: json
+              responses: []
+            revision: 32456338071
+    createCollectionResponse:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                additionalProperties: true
+                description: Information about the response. For a complete list of properties, refer to the **Response** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
+                properties:
+                  id:
+                    type: string
+                    description: The response's ID.
+                    example: 43e1277f-6079-4feb-9316-c8ec24605092
+                  owner:
+                    type: string
+                    description: The user ID of the response's owner.
+                    example: '12345678'
+                  request:
+                    type: string
+                    description: The request ID of the response's associated request.
+                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the response was created.
+                    example: '2022-08-19T15:06:18.940Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the response was last updated.
+                    example: '2022-08-19T15:06:18.940Z'
+                  lastUpdatedBy:
+                    type: string
+                    description: The user ID of the user who last updated the response.
+                    example: '12345678'
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              model_id:
+                type: string
+                description: The response's ID.
+                example: 43e1277f-6079-4feb-9316-c8ec24605092
+              revision:
+                type: number
+                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                example: 26532286083
+          example:
+            data:
+              id: 43e1277f-6079-4feb-9316-c8ec24605092
+              owner: '12345678'
+              request: c82dd02c-4870-4907-8fcb-593a876cf05b
+              createdAt: '2022-08-29T16:58:15.523Z'
+              updatedAt: '2022-08-29T16:58:15.523Z'
+              lastUpdatedBy: '12345678'
+            meta:
+              model: response
+              action: create
+            model_id: 43e1277f-6079-4feb-9316-c8ec24605092
+            revision: 26532286083
+    updateCollectionFolder:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                additionalProperties: true
+                description: The folder's updated information, including the updated properties. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
+                properties:
+                  id:
+                    type: string
+                    description: The folder's ID.
+                    example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+                  name:
+                    type: string
+                    description: The folder's name.
+                    example: Test Folder
+                  description:
+                    type: string
+                    description: The folder's description.
+                    example: This is a test collection folder.
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The folder's creation date and time.
+                    example: '2022-08-29T16:49:19.964Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the folder was last updated.
+                    example: '2022-08-29T16:49:19.964Z'
+                  owner:
+                    type: string
+                    description: The user ID of the folder's owner.
+                    example: '12345678'
+                  lastUpdatedBy:
+                    type: string
+                    description: The user ID of the user that last updated the folder.
+                    example: '12345678'
+                  lastRevision:
+                    type: integer
+                    format: int64
+                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                    example: 24977100955
+                  collection:
+                    type: string
+                    description: The collection ID that the folder belongs to.
+                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+                  folder:
+                    type:
+                    - string
+                    - 'null'
+                    description: Information about the folder.
+                    example: null
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              model_id:
+                type: string
+                description: The folder's ID.
+                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              revision:
+                type: number
+                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
+                example: 24994132707
+          example:
+            data:
+              id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              auth: null
+              name: Test Folder
+              order: []
+              owner: '12345678'
+              events: null
+              folder: null
+              createdAt: '2022-08-29T16:49:19.964Z'
+              updatedAt: '2022-08-29T16:49:19.964Z'
+              variables: null
+              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+              description: This is a test folder.
+              lastRevision: 24977100955
+              folders_order: []
+              lastUpdatedBy: '12345678'
+            meta:
+              model: folder
+              action: update
+            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+            revision: 24977103385
     createCollectionFolder:
       description: Successful Response
       content:
@@ -492,203 +1206,6 @@ components:
                 model: folder
                 model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
                 owner: '12345678'
-    collectionRequest401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: Unauthorized
-                  details:
-                    type: object
-                    description: Information about the error.
-                    properties:
-                      model:
-                        type: string
-                        description: The resource name.
-                        example: request
-                      owner:
-                        type: string
-                        description: The user ID of the request's owner.
-                        example: '12345678'
-                      model_id:
-                        type: string
-                        description: The request's ID.
-                        example: c82dd02c-4870-4907-8fcb-593a876cf05b
-                  message:
-                    type: string
-                    description: The error message.
-                    example: Unauthorized
-          example:
-            error:
-              name: Unauthorized
-              details:
-                model: request
-                owner: '12345678'
-                model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
-              message: Unauthorized
-    common500Error:
-      description: Internal Server Error
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/internal-server-error
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Internal Server Error
-              detail:
-                type: string
-                description: Information about the error.
-                example: Internal Server Error
-          example:
-            type: https://api.postman.com/problems/internal-server-error
-            title: Internal Server Error
-            detail: Internal Server Error
-    updateCollectionFolder:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                additionalProperties: true
-                description: The folder's updated information, including the updated properties. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
-                properties:
-                  id:
-                    type: string
-                    description: The folder's ID.
-                    example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-                  name:
-                    type: string
-                    description: The folder's name.
-                    example: Test Folder
-                  description:
-                    type: string
-                    description: The folder's description.
-                    example: This is a test collection folder.
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The folder's creation date and time.
-                    example: '2022-08-29T16:49:19.964Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the folder was last updated.
-                    example: '2022-08-29T16:49:19.964Z'
-                  owner:
-                    type: string
-                    description: The user ID of the folder's owner.
-                    example: '12345678'
-                  lastUpdatedBy:
-                    type: string
-                    description: The user ID of the user that last updated the folder.
-                    example: '12345678'
-                  lastRevision:
-                    type: integer
-                    format: int64
-                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                    example: 24977100955
-                  collection:
-                    type: string
-                    description: The collection ID that the folder belongs to.
-                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-                  folder:
-                    type:
-                    - string
-                    - 'null'
-                    description: Information about the folder.
-                    example: null
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              model_id:
-                type: string
-                description: The folder's ID.
-                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              revision:
-                type: number
-                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                example: 24994132707
-          example:
-            data:
-              id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              auth: null
-              name: Test Folder
-              order: []
-              owner: '12345678'
-              events: null
-              folder: null
-              createdAt: '2022-08-29T16:49:19.964Z'
-              updatedAt: '2022-08-29T16:49:19.964Z'
-              variables: null
-              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-              description: This is a test folder.
-              lastRevision: 24977100955
-              folders_order: []
-              lastUpdatedBy: '12345678'
-            meta:
-              model: folder
-              action: update
-            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-            revision: 24977103385
-    deleteCollectionFolder:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                description: The folder's information.
-                properties:
-                  id:
-                    type: string
-                    description: The folder's ID.
-                    example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-                  owner:
-                    type: string
-                    description: The user ID of the folder's owner.
-                    example: '12345678'
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              model_id:
-                type: string
-                description: The folder's ID.
-                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              revision:
-                type: number
-                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                example: 24994562696
-          example:
-            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-            meta:
-              model: folder
-              action: destroy
-            data:
-              id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              owner: '12345678'
-            revision: 24994562696
     collectionRequest400Error:
       description: Bad Request
       content:
@@ -732,94 +1249,90 @@ components:
                 owner: '12345678'
                 model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
               message: This request already exists in the database.
-    getCollectionResponse:
-      description: Successful Response
+    collectionRequest401Error:
+      description: Unauthorized
       content:
-        application/json:
+        application/problem+json:
           schema:
             type: object
             properties:
-              data:
+              error:
                 type: object
-                description: Information about the response. For a complete list of properties, refer to the **Response** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
-                additionalProperties: true
                 properties:
-                  id:
-                    type: string
-                    description: The response's ID.
-                    example: cc364734-7dfd-4bfc-897d-be763dcdbb07
-                  request:
-                    type: string
-                    description: The ID of the request that the response belongs to.
-                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
                   name:
                     type: string
-                    description: The response's name.
-                    example: Test Folder
-                  owner:
+                    description: The error name.
+                    example: Unauthorized
+                  details:
+                    type: object
+                    description: Information about the error.
+                    properties:
+                      model:
+                        type: string
+                        description: The resource name.
+                        example: request
+                      owner:
+                        type: string
+                        description: The user ID of the request's owner.
+                        example: '12345678'
+                      model_id:
+                        type: string
+                        description: The request's ID.
+                        example: c82dd02c-4870-4907-8fcb-593a876cf05b
+                  message:
                     type: string
-                    description: The user ID of the response's owner.
-                    example: '12345678'
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The response's creation date and time.
-                    example: '2022-08-29T16:49:19.964Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the response was last updated.
-                    example: '2022-08-29T16:49:19.964Z'
-                  lastRevision:
-                    type: integer
-                    format: int64
-                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                    example: 24994132707
-                  lastUpdatedBy:
-                    type: string
-                    description: The user ID of the user that last updated the response.
-                    example: '12345678'
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              model_id:
-                type: string
-                description: The response's ID.
-                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+                    description: The error message.
+                    example: Unauthorized
           example:
-            model_id: cc364734-7dfd-4bfc-897d-be763dcdbb07
-            meta:
-              model: response
-              populate: false
-              changeset: false
-              action: find
-            data:
-              owner: '12345678'
-              lastUpdatedBy: '12345678'
-              lastRevision: 32457792182
-              request: c82dd02c-4870-4907-8fcb-593a876cf05b
-              id: cc364734-7dfd-4bfc-897d-be763dcdbb07
-              name: Successful GET Response
-              status: null
-              responseCode:
-                code: 200
-                name: OK
-              time: null
-              headers:
-              - key: Content-Type
-                name: Content-Type
-                value: application/json
-                description: ''
-                type: text
-              cookies: null
-              mime: null
-              text: "{\n    \"title\": \"Not Found\",\n    \"detail\": \"Requested API does not exist\",\n    \"type\": \"about:blank\"\n}"
-              language: json
-              rawDataType: null
-              requestObject: '{"data":null,"dataMode":"raw","dataOptions":{"raw":{"language":"json"}},"headerData":[{"key":"Accept","value":"application/vnd.example.v1+json","description":"","type":"text","enabled":true}],"method":"GET","pathVariableData":[],"queryParams":[{"key":"id","value":"test-api","equals":true,"description":null,"enabled":true}],"url":"http://api.getpostman.com/v1/request?id=test-api","headers":"Accept: application/vnd.example.v1+json\n","pathVariables":{},"protocolProfileBehavior":{"disableBodyPruning":true},"rawModeData":"","graphqlModeData":{}}'
-              createdAt: '2023-09-07T14:39:52.000Z'
-              updatedAt: '2023-09-07T14:41:08.000Z'
+            error:
+              name: Unauthorized
+              details:
+                model: request
+                owner: '12345678'
+                model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
+              message: Unauthorized
+    collectionResponse404Error:
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: instanceNotFoundError
+                  details:
+                    type: object
+                    description: Information about the error.
+                    properties:
+                      model:
+                        type: string
+                        description: The resource name.
+                        example: response
+                      owner:
+                        type: string
+                        description: The user ID of the response's owner.
+                        example: '12345678'
+                      model_id:
+                        type: string
+                        description: The response's ID.
+                        example: 7978bfb8-fb89-42ac-8d48-cd547d96463e
+                  message:
+                    type: string
+                    description: The error message.
+                    example: We could not find the response you are looking for
+          example:
+            error:
+              name: instanceNotFoundError
+              message: We could not find the response you are looking for
+              details:
+                model: response
+                model_id: 7978bfb8-fb89-42ac-8d48-cd547d96463e
+                owner: '12345678'
     collectionResponse400Error:
       description: Bad Request
       content:
@@ -863,7 +1376,7 @@ components:
                 model: response
                 model_id: 7978bfb8-fb89-42ac-8d48-cd547d96463e
                 owner: '12345678'
-    createCollectionRequest:
+    updateCollectionResponse:
       description: Successful Response
       content:
         application/json:
@@ -872,202 +1385,125 @@ components:
             properties:
               data:
                 type: object
+                description: Information about the updated response. For a complete list of response properties, refer to the **Response** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
                 additionalProperties: true
-                description: Information about the created request. For a complete list of properties, refer to the **Request** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
                 properties:
                   id:
                     type: string
-                    description: The request's ID.
+                    description: The response's ID.
                     example: c82dd02c-4870-4907-8fcb-593a876cf05b
                   name:
                     type: string
-                    description: The request's name.
-                    example: Test Request
-                  owner:
-                    type: string
-                    description: The user ID of the request's owner.
-                    example: '12345678'
-                  folder:
-                    type:
-                    - string
-                    - 'null'
-                    description: Information about the request's parent folder.
-                    example: null
-                  responses:
-                    type: array
-                    description: A list of the request's responses.
-                    items:
-                      type: string
-                    example: []
-                  collection:
-                    type: string
-                    description: The collection ID that the request belongs to.
-                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-                  responses_order:
-                    type: array
-                    description: A list of response IDs and their order in the folder.
-                    items:
-                      type: string
-                    uniqueItems: true
-                    example: []
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The requeset's creation date and time.
-                    example: '2022-08-29T16:35:38.831Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the request was last updated.
-                    example: '2022-08-29T16:35:38.831Z'
-                  lastUpdatedBy:
-                    type: string
-                    description: The user ID of the user that last updated the folder.
-                    example: '12345678'
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              model_id:
-                type: string
-                description: The request's ID.
-                example: c82dd02c-4870-4907-8fcb-593a876cf05b
-              revision:
-                type: number
-                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                example: 26531992398
-          example:
-            model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
-            meta:
-              model: request
-              action: import
-            data:
-              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-              method: GET
-              headers:
-              - key: Host
-                value: postman-echo.com
-              - key: user-agent
-                value: curl/7.88.1
-              - key: accept
-                value: '*/*'
-              - key: content-type
-                value: application/json
-              dataMode: raw
-              url: https://postman-echo.com/get?param=value
-              name: Example GET Request
-              description: This is an example GET request.
-              owner: '12345678'
-              folder: null
-              responses_order: []
-              id: c82dd02c-4870-4907-8fcb-593a876cf05b
-              lastUpdatedBy: '12345678'
-              queryParams:
-              - key: id
-                value: '{{id}}'
-                equals: true
-                description: Optional. The user's ID.
-                enabled: true
-              headerData: []
-              createdAt: '2023-09-07T13:33:17.912Z'
-              updatedAt: '2023-09-07T13:33:17.912Z'
-              rawModeData: null
-              dataOptions:
-                raw:
-                  language: json
-              responses: []
-            revision: 32456338071
-    getCollectionFolder:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              model_id:
-                type: string
-                description: The folder's ID.
-                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              data:
-                type: object
-                description: Information about the folder. For a complete list of properties, refer to the **Folders** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
-                additionalProperties: true
-                properties:
-                  id:
-                    type: string
-                    description: The folder's ID.
-                    example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-                  name:
-                    type: string
-                    description: The folder's name.
+                    description: The response's name.
                     example: Test Folder
-                  description:
+                  owner:
                     type: string
-                    description: The folder's description.
-                    example: This is a test collection folder.
+                    description: The user ID of the response's owner.
+                    example: '12345678'
                   createdAt:
                     type: string
                     format: date-time
-                    description: The folder's creation date and time.
+                    description: The response's creation date and time.
                     example: '2022-08-29T16:49:19.964Z'
                   updatedAt:
                     type: string
                     format: date-time
-                    description: The date and time at which the folder was last updated.
+                    description: The date and time at which the response was last updated.
                     example: '2022-08-29T16:49:19.964Z'
-                  owner:
-                    type: string
-                    description: The user ID of the folder's owner.
-                    example: '12345678'
-                  lastUpdatedBy:
-                    type: string
-                    description: The user ID of the user that last updated the folder.
-                    example: '12345678'
                   lastRevision:
                     type: integer
                     format: int64
                     description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
                     example: 24994132707
-                  collection:
+                  lastUpdatedBy:
                     type: string
-                    description: The collection ID that the folder belongs to.
-                    example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
+                    description: The user ID of the user that last updated the response.
+                    example: '12345678'
+              meta:
+                type: object
+                description: A Postman-specific response that contains information about the internal performed operation.
+                additionalProperties: true
+              model_id:
+                type: string
+                description: The response's ID.
+                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
           example:
-            model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+            model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
             meta:
-              model: folder
-              populate: false
-              changeset: false
-              action: find
+              model: response
+              action: update
             data:
+              id: c82dd02c-4870-4907-8fcb-593a876cf05b
+              name: Example Response
+              status: null
+              responseCode:
+                name: OK
+                code: 200
+              time: '50'
+              headers:
+              - value: Fri, 01 Sep 2023 07:36:18 GMT
+                key: Date
+              - value: application/json; charset=utf-8
+                key: Content-Type
+              - value: '607'
+                key: Content-Length
+              - value: keep-alive
+                key: Connection
+              cookies: null
+              mime: null
+              text: "{\n    \"args\": {},\n    \"data\": {\n        \"field\": \"Value\"\n    },\n    \"files\": {},\n    \"form\": {},\n    \"headers\": {\n        \"x-forwarded-proto\": \"https\",\n        \"x-forwarded-port\": \"443\",\n        \"host\": \"postman-echo.com\",\n        \"x-amzn-trace-id\": \"Root=1-64f9cd12-62f18f3a048796d345508073\",\n        \"content-length\": \"24\",\n        \"content-type\": \"application/json\",\n        \"x-api-key\": \"xxx\",\n        \"user-agent\": \"PostmanRuntime/7.32.3\",\n        \"accept\": \"*/*\",\n        \"postman-token\": \"XXX\",\n        \"accept-encoding\": \"gzip, deflate, br\"\n    },\n    \"json\": {\n        \"field\": \"Value\"\n    },\n    \"url\": \"https://postman-echo.com/post\"\n}"
+              language: json
+              rawDataType: null
+              requestObject: '{"data":null,"dataMode":"raw","dataOptions":{"raw":{"language":"json"}},"headerData":[],"method":"POST","pathVariableData":[],"queryParams":[],"url":"https://postman-echo.com/post","headers":"","pathVariables":{},"protocolProfileBehavior":{"disableBodyPruning":true},"rawModeData":"{\n    \"field\": \"Value\"\n}","graphqlModeData":{}}'
+              createdAt: '2023-09-01T09:29:54.000Z'
+              updatedAt: '2023-09-08T12:37:33.000Z'
               owner: '12345678'
-              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-              folder: null
-              id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              name: Test Folder
-              description: This is a test collection folder.
-              variables: null
-              auth:
-                type: apikey
-                apikey:
-                - key: value
-                  value: XXX
-                - key: key
-                  value: x-api-key
-              events: null
-              order:
-              - 81b49e05-0b87-4ca4-ac8c-091aaedafea3
-              - 929acf24-4234-45e1-59cf-dc2b27ea7603
-              - 3cfc2ac8-00a9-47d2-415d-049773f23268
-              folders_order:
-              - 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              - 5c341de9-5751-461f-b7bd-af86bbae740c
-              createdAt: '2022-08-29T16:49:19.964Z'
-              updatedAt: '2022-08-29T16:49:19.964Z'
+              lastUpdatedBy: '12345678'
+              lastRevision: 32368133468
+              request: c82dd02c-4870-4907-8fcb-593a876cf05b
+            revision: 32473225008
+    collectionResponse401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: Unauthorized
+                  details:
+                    type: object
+                    description: Information about the error.
+                    properties:
+                      model:
+                        type: string
+                        description: The resource name.
+                        example: response
+                      owner:
+                        type: string
+                        description: The user ID of the response's owner.
+                        example: '12345678'
+                      model_id:
+                        type: string
+                        description: The response's ID.
+                        example: 7978bfb8-fb89-42ac-8d48-cd547d96463e
+                  message:
+                    type: string
+                    description: The error message.
+                    example: Unauthorized
+          example:
+            error:
+              name: Unauthorized
+              details:
+                model: response
+                owner: '12345678'
+                model_id: 7978bfb8-fb89-42ac-8d48-cd547d96463e
+              message: Unauthorized
     getCollectionRequest:
       description: Successful Response
       content:
@@ -1164,274 +1600,8 @@ components:
               responses_order: []
               createdAt: '2023-08-22T12:52:01.000Z'
               updatedAt: '2023-08-22T12:52:11.000Z'
-    deleteCollectionResponse:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              model_id:
-                type: string
-                description: The response's ID.
-                example: cc364734-7dfd-4bfc-897d-be763dcdbb07
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              data:
-                type: object
-                description: The response's information.
-                properties:
-                  id:
-                    type: string
-                    description: The response's ID.
-                    example: cc364734-7dfd-4bfc-897d-be763dcdbb07
-                  owner:
-                    type: string
-                    description: The user ID of the request's owner.
-                    example: '12345678'
-              revision:
-                type: number
-                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                example: 24997417224
-          example:
-            model_id: cc364734-7dfd-4bfc-897d-be763dcdbb07
-            meta:
-              model: response
-              action: destroy
-            data:
-              id: cc364734-7dfd-4bfc-897d-be763dcdbb07
-              owner: '12345678'
-            revision: 24997417224
-    updateCollectionResponse:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                description: Information about the updated response. For a complete list of response properties, refer to the **Response** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
-                additionalProperties: true
-                properties:
-                  id:
-                    type: string
-                    description: The response's ID.
-                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
-                  name:
-                    type: string
-                    description: The response's name.
-                    example: Test Folder
-                  owner:
-                    type: string
-                    description: The user ID of the response's owner.
-                    example: '12345678'
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The response's creation date and time.
-                    example: '2022-08-29T16:49:19.964Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the response was last updated.
-                    example: '2022-08-29T16:49:19.964Z'
-                  lastRevision:
-                    type: integer
-                    format: int64
-                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                    example: 24994132707
-                  lastUpdatedBy:
-                    type: string
-                    description: The user ID of the user that last updated the response.
-                    example: '12345678'
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              model_id:
-                type: string
-                description: The response's ID.
-                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-          example:
-            model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
-            meta:
-              model: response
-              action: update
-            data:
-              id: c82dd02c-4870-4907-8fcb-593a876cf05b
-              name: Example Response
-              status: null
-              responseCode:
-                name: OK
-                code: 200
-              time: '50'
-              headers:
-              - value: Fri, 01 Sep 2023 07:36:18 GMT
-                key: Date
-              - value: application/json; charset=utf-8
-                key: Content-Type
-              - value: '607'
-                key: Content-Length
-              - value: keep-alive
-                key: Connection
-              cookies: null
-              mime: null
-              text: "{\n    \"args\": {},\n    \"data\": {\n        \"field\": \"Value\"\n    },\n    \"files\": {},\n    \"form\": {},\n    \"headers\": {\n        \"x-forwarded-proto\": \"https\",\n        \"x-forwarded-port\": \"443\",\n        \"host\": \"postman-echo.com\",\n        \"x-amzn-trace-id\": \"Root=1-64f9cd12-62f18f3a048796d345508073\",\n        \"content-length\": \"24\",\n        \"content-type\": \"application/json\",\n        \"x-api-key\": \"xxx\",\n        \"user-agent\": \"PostmanRuntime/7.32.3\",\n        \"accept\": \"*/*\",\n        \"postman-token\": \"XXX\",\n        \"accept-encoding\": \"gzip, deflate, br\"\n    },\n    \"json\": {\n        \"field\": \"Value\"\n    },\n    \"url\": \"https://postman-echo.com/post\"\n}"
-              language: json
-              rawDataType: null
-              requestObject: '{"data":null,"dataMode":"raw","dataOptions":{"raw":{"language":"json"}},"headerData":[],"method":"POST","pathVariableData":[],"queryParams":[],"url":"https://postman-echo.com/post","headers":"","pathVariables":{},"protocolProfileBehavior":{"disableBodyPruning":true},"rawModeData":"{\n    \"field\": \"Value\"\n}","graphqlModeData":{}}'
-              createdAt: '2023-09-01T09:29:54.000Z'
-              updatedAt: '2023-09-08T12:37:33.000Z'
-              owner: '12345678'
-              lastUpdatedBy: '12345678'
-              lastRevision: 32368133468
-              request: c82dd02c-4870-4907-8fcb-593a876cf05b
-            revision: 32473225008
-    updateCollectionRequest:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                additionalProperties: true
-                description: Information about the updated request. For a complete list of properties, refer to the **Request** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
-                properties:
-                  id:
-                    type: string
-                    description: The request's ID.
-                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
-                  name:
-                    type: string
-                    description: The request's name.
-                    example: Example GET request
-                  description:
-                    type: string
-                    description: The request's description.
-                    example: This is an example GET request.
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The request's creation date and time.
-                    example: '2022-08-29T16:49:19.964Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the request was last updated.
-                    example: '2022-08-29T16:49:19.964Z'
-                  owner:
-                    type: string
-                    description: The user ID of the request's owner.
-                    example: '12345678'
-                  lastUpdatedBy:
-                    type: string
-                    description: The user ID of the user that last updated the request.
-                    example: '12345678'
-                  lastRevision:
-                    type: integer
-                    format: int64
-                    example: 24994863800
-                    description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              model_id:
-                type: string
-                description: The request's ID.
-                example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-              revision:
-                type: number
-                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                example: 24994954828
-          example:
-            model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
-            meta:
-              model: request
-              action: update
-            data:
-              id: c82dd02c-4870-4907-8fcb-593a876cf05b
-              name: Example POST Request
-              dataMode: raw
-              data: null
-              auth: noauth
-              events: null
-              rawModeData: "{\n    \"field\": \"Value\"\n}"
-              descriptionFormat: null
-              description: This is an example POST request.
-              variables: null
-              headers: null
-              method: POST
-              pathVariables: null
-              url: https://postman-echo.com/post
-              preRequestScript: null
-              tests: null
-              currentHelper: null
-              helperAttributes: null
-              queryParams: []
-              headerData: []
-              pathVariableData: []
-              protocolProfileBehavior: null
-              dataDisabled: false
-              responses_order: []
-              createdAt: '2023-09-01T07:59:25.000Z'
-              updatedAt: '2023-09-08T12:30:29.000Z'
-              owner: '12345678'
-              lastUpdatedBy: '12345678'
-              lastRevision: 32473087936
-              folder: null
-              collection: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-              dataOptions:
-                raw:
-                  language: json
-            revision: 32473098909
-    deleteCollectionRequest:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              model_id:
-                type: string
-                description: The request's ID.
-                example: c82dd02c-4870-4907-8fcb-593a876cf05b
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              data:
-                type: object
-                description: The request's information.
-                properties:
-                  id:
-                    type: string
-                    description: The request's ID.
-                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
-                  owner:
-                    type: string
-                    description: The user ID of the request's owner.
-                    example: '12345678'
-              revision:
-                type: number
-                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                example: 24995158577
-          example:
-            model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
-            meta:
-              model: request
-              action: destroy
-            data:
-              id: c82dd02c-4870-4907-8fcb-593a876cf05b
-              owner: '12345678'
-            revision: 24995158577
-    collectionResponse401Error:
-      description: Unauthorized
+    collectionFolder400Error:
+      description: Bad Request
       content:
         application/problem+json:
           schema:
@@ -1443,35 +1613,60 @@ components:
                   name:
                     type: string
                     description: The error name.
-                    example: Unauthorized
+                    example: instanceFoundError
                   details:
                     type: object
                     description: Information about the error.
+                    additionalProperties: true
                     properties:
                       model:
                         type: string
                         description: The resource name.
-                        example: response
+                        example: folder
                       owner:
                         type: string
-                        description: The user ID of the response's owner.
+                        description: The user ID of the folder's owner.
                         example: '12345678'
                       model_id:
                         type: string
-                        description: The response's ID.
-                        example: 7978bfb8-fb89-42ac-8d48-cd547d96463e
+                        description: The folder's ID.
+                        example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
                   message:
                     type: string
                     description: The error message.
-                    example: Unauthorized
+                    example: This folder already exists in the database.
           example:
             error:
-              name: Unauthorized
+              name: instanceNotFoundError
               details:
-                model: response
+                model: folder
                 owner: '12345678'
-                model_id: 7978bfb8-fb89-42ac-8d48-cd547d96463e
-              message: Unauthorized
+                model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+              message: We could not find the folder you are looking for
+    common500Error:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/internal-server-error
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Internal Server Error
+              detail:
+                type: string
+                description: Information about the error.
+                example: Internal Server Error
+          example:
+            type: https://api.postman.com/problems/internal-server-error
+            title: Internal Server Error
+            detail: Internal Server Error
     collectionRequest404Error:
       description: Not Found
       content:
@@ -1514,172 +1709,7 @@ components:
                 owner: '12345678'
                 model_id: c82dd02c-4870-4907-8fcb-593a876cf05b
               message: We could not find the request you are looking for
-    collectionResponse404Error:
-      description: Not Found
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: instanceNotFoundError
-                  details:
-                    type: object
-                    description: Information about the error.
-                    properties:
-                      model:
-                        type: string
-                        description: The resource name.
-                        example: response
-                      owner:
-                        type: string
-                        description: The user ID of the response's owner.
-                        example: '12345678'
-                      model_id:
-                        type: string
-                        description: The response's ID.
-                        example: 7978bfb8-fb89-42ac-8d48-cd547d96463e
-                  message:
-                    type: string
-                    description: The error message.
-                    example: We could not find the response you are looking for
-          example:
-            error:
-              name: instanceNotFoundError
-              message: We could not find the response you are looking for
-              details:
-                model: response
-                model_id: 7978bfb8-fb89-42ac-8d48-cd547d96463e
-                owner: '12345678'
-    collectionFolder404Error:
-      description: Not Found
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: instanceNotFoundError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: We could not find the folder you are looking for
-                  details:
-                    type: object
-                    description: Information about the error.
-                    properties:
-                      model:
-                        type: string
-                        description: The resource name.
-                        example: folder
-                      owner:
-                        type: string
-                        description: The user ID of the folder's owner.
-                        example: '12345678'
-                      model_id:
-                        type: string
-                        description: The folder's ID.
-                        example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-          example:
-            error:
-              name: instanceNotFoundError
-              message: We could not find the folder you are looking for
-              details:
-                model: folder
-                owner: '12345678'
-                model_id: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-    createCollectionResponse:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                additionalProperties: true
-                description: Information about the response. For a complete list of properties, refer to the **Response** entry in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v2.1.0/draft-07/docs/index.html).
-                properties:
-                  id:
-                    type: string
-                    description: The response's ID.
-                    example: 43e1277f-6079-4feb-9316-c8ec24605092
-                  owner:
-                    type: string
-                    description: The user ID of the response's owner.
-                    example: '12345678'
-                  request:
-                    type: string
-                    description: The request ID of the response's associated request.
-                    example: c82dd02c-4870-4907-8fcb-593a876cf05b
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the response was created.
-                    example: '2022-08-19T15:06:18.940Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the response was last updated.
-                    example: '2022-08-19T15:06:18.940Z'
-                  lastUpdatedBy:
-                    type: string
-                    description: The user ID of the user who last updated the response.
-                    example: '12345678'
-              meta:
-                type: object
-                description: A Postman-specific response that contains information about the internal performed operation.
-                additionalProperties: true
-              model_id:
-                type: string
-                description: The response's ID.
-                example: 43e1277f-6079-4feb-9316-c8ec24605092
-              revision:
-                type: number
-                description: An internal revision ID. Its value increments each time the resource changes. You can use this ID to track whether there were changes since the last time you fetched the resource.
-                example: 26532286083
-          example:
-            data:
-              id: 43e1277f-6079-4feb-9316-c8ec24605092
-              owner: '12345678'
-              request: c82dd02c-4870-4907-8fcb-593a876cf05b
-              createdAt: '2022-08-29T16:58:15.523Z'
-              updatedAt: '2022-08-29T16:58:15.523Z'
-              lastUpdatedBy: '12345678'
-            meta:
-              model: response
-              action: create
-            model_id: 43e1277f-6079-4feb-9316-c8ec24605092
-            revision: 26532286083
   parameters:
-    collectionItemsUidFormatQuery:
-      name: uid
-      in: query
-      description: If true, returns all IDs in UID format (`userId`-`id`).
-      schema:
-        $ref: '#/components/schemas/booleanQuery'
-    collectionRequestFolderIdQuery:
-      name: folderId
-      in: query
-      description: The folder ID in which to create the request. By default, the system will create the request at the collection level.
-      schema:
-        $ref: '#/components/schemas/collectionFolderId'
-    collectionItemsPopulateQuery:
-      name: populate
-      in: query
-      description: If true, returns all of the collection item's contents.
-      schema:
-        $ref: '#/components/schemas/booleanQuery'
     collectionResponseId:
       name: responseId
       in: path
@@ -1688,20 +1718,30 @@ components:
       schema:
         type: string
         example: cc364734-7dfd-4bfc-897d-be763dcdbb07
-    collectionFolderId:
+    collectionRequestFolderIdQuery:
       name: folderId
-      in: path
-      required: true
-      description: The folder's ID.
+      in: query
+      description: The folder ID in which to create the request. By default, the system will create the request at the collection level.
       schema:
         $ref: '#/components/schemas/collectionFolderId'
-    collectionResponseParentRequestId:
-      name: requestId
+    collectionItemsUidFormatQuery:
+      name: uid
       in: query
-      required: true
-      description: The parent request's ID.
+      description: If true, returns all IDs in UID format (`userId`-`id`).
       schema:
-        $ref: '#/components/schemas/collectionRequestId'
+        $ref: '#/components/schemas/booleanQuery'
+    collectionItemsPopulateQuery:
+      name: populate
+      in: query
+      description: If true, returns all of the collection item's contents.
+      schema:
+        $ref: '#/components/schemas/booleanQuery'
+    collectionItemsIdQuery:
+      name: ids
+      in: query
+      description: If true, returns only properties that contain ID values in the response.
+      schema:
+        $ref: '#/components/schemas/booleanQuery'
     collectionId:
       name: collectionId
       in: path
@@ -1710,12 +1750,13 @@ components:
       schema:
         type: string
         example: 12ece9e1-2abf-4edc-8e34-de66e74114d2
-    collectionItemsIdQuery:
-      name: ids
-      in: query
-      description: If true, returns only properties that contain ID values in the response.
+    collectionFolderId:
+      name: folderId
+      in: path
+      required: true
+      description: The folder's ID.
       schema:
-        $ref: '#/components/schemas/booleanQuery'
+        $ref: '#/components/schemas/collectionFolderId'
     collectionRequestId:
       name: requestId
       in: path
@@ -1723,7 +1764,80 @@ components:
       description: The request's ID.
       schema:
         $ref: '#/components/schemas/collectionRequestId'
+    collectionResponseParentRequestId:
+      name: requestId
+      in: query
+      required: true
+      description: The parent request's ID.
+      schema:
+        $ref: '#/components/schemas/collectionRequestId'
   requestBodies:
+    updateCollectionRequest:
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: true
+            description: The request properties to update. For a complete list of properties, refer to the **Request** property in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
+            properties:
+              name:
+                type: string
+                description: The request's name.
+                example: Example GET request
+              method:
+                type: string
+                description: The request's method.
+                enum:
+                - GET
+                - PUT
+                - POST
+                - PATCH
+                - DELETE
+                - COPY
+                - HEAD
+                - OPTIONS
+                - LINK
+                - UNLINK
+                - PURGE
+                - LOCK
+                - UNLOCK
+                - PROPFIND
+                - VIEW
+                example: GET
+          example:
+            oauth: noauth
+            currentHelper: null
+            helperAttributes: null
+            owner: '12345678'
+            lastUpdatedBy: '12345678'
+            lastRevision: 32368133476
+            folder: null
+            collection: c05fb60e-bb28-4e7b-9cf7-55ada6ab320c
+            name: Example POST Request
+            dataMode: raw
+            data: null
+            events: null
+            rawModeData: "{\n    \"field\": \"Value\"\n}"
+            descriptionFormat: null
+            description: This is an example POST request.
+            variables: null
+            headers: null
+            method: POST
+            pathVariables: null
+            url: https://postman-echo.com/post
+            preRequestScript: null
+            tests: null
+            queryParams: []
+            headerData: []
+            pathVariableData: []
+            protocolProfileBehavior: null
+            dataDisabled: false
+            responses_order: []
+            createdAt: '2023-09-01T07:59:25.000Z'
+            updatedAt: '2023-09-01T09:29:54.000Z'
+            dataOptions:
+              raw:
+                language: json
     updateCollectionResponse:
       content:
         application/json:
@@ -1795,34 +1909,6 @@ components:
           example:
             name: Test Folder
             description: This is a test folder.
-    createCollectionFolder:
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties: true
-            description: 'Information about the collection folder. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
-
-
-              **Note:**
-
-
-              It is recommended that you pass the `name` property in the request body. If you do not, the system uses a null value. As a result, this creates a folder with a blank name.
-
-              '
-            properties:
-              name:
-                type: string
-                example: Test Folder
-                description: The folder's name. It is recommended that you pass the `name` property in the request body. If you do not, the system uses a null value. As a result, this creates a folder with a blank name.
-              folder:
-                type: string
-                format: uid
-                description: The ID of a folder in which to create the folder.
-                example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-          example:
-            name: Test Folder
-            description: This is a test collection folder.
     createCollectionResponse:
       content:
         application/json:
@@ -1864,6 +1950,34 @@ components:
             dataOptions:
               raw:
                 language: json
+    createCollectionFolder:
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: true
+            description: 'Information about the collection folder. For a complete list of properties, refer to the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
+
+
+              **Note:**
+
+
+              It is recommended that you pass the `name` property in the request body. If you do not, the system uses a null value. As a result, this creates a folder with a blank name.
+
+              '
+            properties:
+              name:
+                type: string
+                example: Test Folder
+                description: The folder's name. It is recommended that you pass the `name` property in the request body. If you do not, the system uses a null value. As a result, this creates a folder with a blank name.
+              folder:
+                type: string
+                format: uid
+                description: The ID of a folder in which to create the folder.
+                example: 12345678-65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
+          example:
+            name: Test Folder
+            description: This is a test collection folder.
     createCollectionRequest:
       content:
         application/json:
@@ -1909,82 +2023,6 @@ components:
             dataOptions:
               raw:
                 language: json
-    updateCollectionRequest:
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties: true
-            description: The request properties to update. For a complete list of properties, refer to the **Request** property in the [Postman Collection Format documentation](https://schema.postman.com/collection/json/v1.0.0/draft-07/collection.json).
-            properties:
-              name:
-                type: string
-                description: The request's name.
-                example: Example GET request
-              method:
-                type: string
-                description: The request's method.
-                enum:
-                - GET
-                - PUT
-                - POST
-                - PATCH
-                - DELETE
-                - COPY
-                - HEAD
-                - OPTIONS
-                - LINK
-                - UNLINK
-                - PURGE
-                - LOCK
-                - UNLOCK
-                - PROPFIND
-                - VIEW
-                example: GET
-          example:
-            oauth: noauth
-            currentHelper: null
-            helperAttributes: null
-            owner: '12345678'
-            lastUpdatedBy: '12345678'
-            lastRevision: 32368133476
-            folder: null
-            collection: c05fb60e-bb28-4e7b-9cf7-55ada6ab320c
-            name: Example POST Request
-            dataMode: raw
-            data: null
-            events: null
-            rawModeData: "{\n    \"field\": \"Value\"\n}"
-            descriptionFormat: null
-            description: This is an example POST request.
-            variables: null
-            headers: null
-            method: POST
-            pathVariables: null
-            url: https://postman-echo.com/post
-            preRequestScript: null
-            tests: null
-            queryParams: []
-            headerData: []
-            pathVariableData: []
-            protocolProfileBehavior: null
-            dataDisabled: false
-            responses_order: []
-            createdAt: '2023-09-01T07:59:25.000Z'
-            updatedAt: '2023-09-01T09:29:54.000Z'
-            dataOptions:
-              raw:
-                language: json
-  schemas:
-    collectionFolderId:
-      type: string
-      example: 65a99e60-8e0a-4b6e-b79c-7d8264cc5caa
-    collectionRequestId:
-      type: string
-      example: c82dd02c-4870-4907-8fcb-593a876cf05b
-    booleanQuery:
-      type: boolean
-      example: true
   securitySchemes:
     PostmanApiKey:
       type: apiKey

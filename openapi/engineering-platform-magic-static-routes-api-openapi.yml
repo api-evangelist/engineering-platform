@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -322,18 +333,14 @@ paths:
         pro: false
 components:
   schemas:
-    magic_description:
-      description: An optional human provided description of the static route.
-      example: New route for new prefix 203.0.113.1
-      type: string
     magic_colo_region:
       description: Scope colo region.
       example: APAC
       type: string
-    magic_modified_on:
-      description: When the route was last modified.
-      example: '2017-06-14T05:20:00Z'
-      format: date-time
+    magic_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       readOnly: true
       type: string
     magic_messages:
@@ -351,20 +358,47 @@ components:
         type: object
         uniqueItems: true
       type: array
-    magic_colo_names:
-      description: List of colo names for the ECMP scope.
+    magic_route_delete_id:
+      allOf:
+      - properties:
+          id:
+            $ref: '#/components/schemas/magic_identifier'
+        required:
+        - id
+    magic_colo_regions:
+      description: List of colo regions for the ECMP scope.
       items:
-        $ref: '#/components/schemas/magic_colo_name'
+        $ref: '#/components/schemas/magic_colo_region'
       type: array
-    magic_route_delete_many_request:
+    magic_route_modified_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              modified:
+                example: true
+                type: boolean
+              modified_route:
+                $ref: '#/components/schemas/magic_route'
+            type: object
+    magic_scope:
+      description: Used only for ECMP routes.
       properties:
-        routes:
-          items:
-            $ref: '#/components/schemas/magic_route_delete_id'
-          type: array
-      required:
-      - routes
+        colo_names:
+          $ref: '#/components/schemas/magic_colo_names'
+        colo_regions:
+          $ref: '#/components/schemas/magic_colo_regions'
       type: object
+    magic_route_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              route:
+                $ref: '#/components/schemas/magic_route'
+            type: object
     magic_route_add_single_request:
       properties:
         description:
@@ -384,106 +418,6 @@ components:
       - nexthop
       - priority
       type: object
-    magic_colo_regions:
-      description: List of colo regions for the ECMP scope.
-      items:
-        $ref: '#/components/schemas/magic_colo_region'
-      type: array
-    magic_multiple_route_delete_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              deleted:
-                example: true
-                type: boolean
-              deleted_routes:
-                items:
-                  $ref: '#/components/schemas/magic_route'
-                type: array
-    magic_route_modified_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              modified:
-                example: true
-                type: boolean
-              modified_route:
-                $ref: '#/components/schemas/magic_route'
-            type: object
-    magic_prefix:
-      description: IP Prefix in Classless Inter-Domain Routing format.
-      example: 192.0.2.0/24
-      type: string
-    magic_route_update_single_request:
-      allOf:
-      - properties:
-          id:
-            $ref: '#/components/schemas/magic_identifier'
-        required:
-        - id
-      - $ref: '#/components/schemas/magic_route_add_single_request'
-    magic_route_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              route:
-                $ref: '#/components/schemas/magic_route'
-            type: object
-    magic_multiple_route_modified_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              modified:
-                example: true
-                type: boolean
-              modified_routes:
-                items:
-                  $ref: '#/components/schemas/magic_route'
-                type: array
-    magic_colo_name:
-      description: Scope colo name.
-      example: den01
-      type: string
-    magic_scope:
-      description: Used only for ECMP routes.
-      properties:
-        colo_names:
-          $ref: '#/components/schemas/magic_colo_names'
-        colo_regions:
-          $ref: '#/components/schemas/magic_colo_regions'
-      type: object
-    magic_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/magic_messages'
-        messages:
-          $ref: '#/components/schemas/magic_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     magic_route_update_many_request:
       properties:
         routes:
@@ -493,43 +427,33 @@ components:
       required:
       - routes
       type: object
-    magic_weight:
-      description: Optional weight of the ECMP scope - if provided.
-      type: integer
+    magic_prefix:
+      description: IP Prefix in Classless Inter-Domain Routing format.
+      example: 192.0.2.0/24
+      type: string
+    magic_colo_name:
+      description: Scope colo name.
+      example: den01
+      type: string
     magic_created_on:
       description: When the route was created.
       example: '2017-06-14T00:00:00Z'
       format: date-time
       readOnly: true
       type: string
-    magic_nexthop:
-      description: The next-hop IP Address for the static route.
-      example: 203.0.113.1
-      type: string
-    magic_route_deleted_response:
+    magic_priority:
+      description: Priority of the static route.
+      type: integer
+    magic_routes_collection_response:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-single'
       - properties:
           result:
             properties:
-              deleted:
-                example: true
-                type: boolean
-              deleted_route:
-                $ref: '#/components/schemas/magic_route'
-            type: object
-    magic_route_update_request:
-      allOf:
-      - $ref: '#/components/schemas/magic_route_add_single_request'
-    magic_priority:
-      description: Priority of the static route.
-      type: integer
-    magic_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
+              routes:
+                items:
+                  $ref: '#/components/schemas/magic_route'
+                type: array
     magic_api-response-common-failure:
       properties:
         errors:
@@ -574,23 +498,41 @@ components:
               - string
               - 'null'
       type: object
-    magic_routes_collection_response:
+    magic_weight:
+      description: Optional weight of the ECMP scope - if provided.
+      type: integer
+    magic_route_delete_many_request:
+      properties:
+        routes:
+          items:
+            $ref: '#/components/schemas/magic_route_delete_id'
+          type: array
+      required:
+      - routes
+      type: object
+    magic_route_deleted_response:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-single'
       - properties:
           result:
             properties:
-              routes:
-                items:
-                  $ref: '#/components/schemas/magic_route'
-                type: array
-    magic_route_delete_id:
+              deleted:
+                example: true
+                type: boolean
+              deleted_route:
+                $ref: '#/components/schemas/magic_route'
+            type: object
+    magic_route_update_request:
+      allOf:
+      - $ref: '#/components/schemas/magic_route_add_single_request'
+    magic_route_update_single_request:
       allOf:
       - properties:
           id:
             $ref: '#/components/schemas/magic_identifier'
         required:
         - id
+      - $ref: '#/components/schemas/magic_route_add_single_request'
     magic_route:
       properties:
         created_on:
@@ -616,6 +558,75 @@ components:
       - nexthop
       - priority
       type: object
+    magic_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic_messages'
+        messages:
+          $ref: '#/components/schemas/magic_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic_description:
+      description: An optional human provided description of the static route.
+      example: New route for new prefix 203.0.113.1
+      type: string
+    magic_multiple_route_modified_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              modified:
+                example: true
+                type: boolean
+              modified_routes:
+                items:
+                  $ref: '#/components/schemas/magic_route'
+                type: array
+    magic_modified_on:
+      description: When the route was last modified.
+      example: '2017-06-14T05:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    magic_nexthop:
+      description: The next-hop IP Address for the static route.
+      example: 203.0.113.1
+      type: string
+    magic_multiple_route_delete_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              deleted:
+                example: true
+                type: boolean
+              deleted_routes:
+                items:
+                  $ref: '#/components/schemas/magic_route'
+                type: array
+    magic_colo_names:
+      description: List of colo names for the ECMP scope.
+      items:
+        $ref: '#/components/schemas/magic_colo_name'
+      type: array
   securitySchemes:
     api_email:
       in: header

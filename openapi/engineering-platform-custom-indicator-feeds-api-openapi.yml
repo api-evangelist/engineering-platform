@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -368,6 +379,66 @@ paths:
       - Custom Indicator Feeds
 components:
   schemas:
+    custom-indicator-feeds_update_feed_response:
+      allOf:
+      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/custom-indicator-feeds_update_feed'
+    custom-indicator-feeds_permissions_request:
+      properties:
+        account_tag:
+          description: The Cloudflare account tag of the account to change permissions on
+          example: 823f45f16fd2f7e21e1e054aga4d2859
+          type: string
+        feed_id:
+          description: The ID of the feed to add/remove permissions on
+          example: 1
+          type: integer
+    custom-indicator-feeds_feed_id:
+      description: Indicator feed ID
+      example: 12
+      type: integer
+    custom-indicator-feeds_indicator_feed_response:
+      allOf:
+      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-common'
+      - properties:
+          result:
+            example:
+            - created_on: '2023-05-12T12:21:56.777653Z'
+              description: user specified description 1
+              id: 1
+              modified_on: '2023-06-18T03:13:34.123321Z'
+              name: user_specified_name_1
+            - created_on: '2023-05-21T21:43:52.867525Z'
+              description: User specified description 2
+              id: 2
+              modified_on: '2023-06-28T18:46:18.764425Z'
+              name: user_specified_name_2
+            items:
+              $ref: '#/components/schemas/custom-indicator-feeds_indicator_feed_item'
+            type: array
+    custom-indicator-feeds_id:
+      description: The unique identifier for the indicator feed
+      type: integer
+    custom-indicator-feeds_provider_id:
+      description: The unique identifier for the provider
+      type: string
+    custom-indicator-feeds_create_feed_response:
+      allOf:
+      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/custom-indicator-feeds_indicator_feed_item'
+    custom-indicator-feeds_name:
+      description: The name of the indicator feed
+      type: string
+    custom-indicator-feeds_indicator_feed_metadata_response:
+      allOf:
+      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/custom-indicator-feeds_indicator_feed_metadata'
     custom-indicator-feeds_is_public:
       description: Whether the indicator feed is exposed to customers
       type: boolean
@@ -375,65 +446,43 @@ components:
       allOf:
       - $ref: '#/components/schemas/custom-indicator-feeds_api-response-common'
       type: object
-    custom-indicator-feeds_permissions_update:
+    custom-indicator-feeds_api-response-common:
       properties:
+        errors:
+          $ref: '#/components/schemas/custom-indicator-feeds_messages'
+        messages:
+          $ref: '#/components/schemas/custom-indicator-feeds_messages'
         success:
-          description: Whether the update succeeded or not
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
           type: boolean
-    custom-indicator-feeds_indicator_feed_item:
-      example:
-        created_on: '2023-05-12T12:21:56.777653Z'
-        description: example feed description
-        id: 1
-        is_attributable: false
-        is_downloadable: false
-        is_public: false
-        modified_on: '2023-06-18T03:13:34.123321Z'
-        name: example_feed_1
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    custom-indicator-feeds_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    custom-indicator-feeds_update_feed:
       properties:
-        created_on:
-          description: The date and time when the data entry was created
-          format: date-time
+        file_id:
+          description: Feed id
+          example: 1
+          type: integer
+        filename:
+          description: Name of the file unified in our system
+          example: snapshot_file.unified
           type: string
-        description:
-          $ref: '#/components/schemas/custom-indicator-feeds_description'
-        id:
-          $ref: '#/components/schemas/custom-indicator-feeds_id'
-        is_attributable:
-          $ref: '#/components/schemas/custom-indicator-feeds_is_attributable'
-        is_downloadable:
-          $ref: '#/components/schemas/custom-indicator-feeds_is_downloadable'
-        is_public:
-          $ref: '#/components/schemas/custom-indicator-feeds_is_public'
-        modified_on:
-          description: The date and time when the data entry was last modified
-          format: date-time
+        status:
+          description: Current status of upload, should be unified
+          example: unified
           type: string
-        name:
-          $ref: '#/components/schemas/custom-indicator-feeds_name'
-    custom-indicator-feeds_permissions_response:
-      allOf:
-      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/custom-indicator-feeds_permissions_update'
-    custom-indicator-feeds_is_downloadable:
-      description: Whether the indicator feed can be downloaded
-      type: boolean
-    custom-indicator-feeds_permission_list_item:
-      properties:
-        description:
-          $ref: '#/components/schemas/custom-indicator-feeds_description'
-        id:
-          $ref: '#/components/schemas/custom-indicator-feeds_id'
-        is_attributable:
-          $ref: '#/components/schemas/custom-indicator-feeds_is_attributable'
-        is_downloadable:
-          $ref: '#/components/schemas/custom-indicator-feeds_is_downloadable'
-        is_public:
-          $ref: '#/components/schemas/custom-indicator-feeds_is_public'
-        name:
-          $ref: '#/components/schemas/custom-indicator-feeds_name'
     custom-indicator-feeds_permission_list_item_response:
       allOf:
       - $ref: '#/components/schemas/custom-indicator-feeds_api-response-common'
@@ -455,52 +504,12 @@ components:
             items:
               $ref: '#/components/schemas/custom-indicator-feeds_permission_list_item'
             type: array
-    custom-indicator-feeds_provider_name:
-      description: The provider of the indicator feed
-      type: string
-    custom-indicator-feeds_description:
-      description: The description of the example test
-      type: string
-    custom-indicator-feeds_update_feed:
-      properties:
-        file_id:
-          description: Feed id
-          example: 1
-          type: integer
-        filename:
-          description: Name of the file unified in our system
-          example: snapshot_file.unified
-          type: string
-        status:
-          description: Current status of upload, should be unified
-          example: unified
-          type: string
-    custom-indicator-feeds_update_feed_response:
+    custom-indicator-feeds_permissions_response:
       allOf:
       - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
       - properties:
           result:
-            $ref: '#/components/schemas/custom-indicator-feeds_update_feed'
-    custom-indicator-feeds_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/custom-indicator-feeds_messages'
-        messages:
-          $ref: '#/components/schemas/custom-indicator-feeds_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    custom-indicator-feeds_provider_id:
-      description: The unique identifier for the provider
-      type: string
+            $ref: '#/components/schemas/custom-indicator-feeds_permissions_update'
     custom-indicator-feeds_create_feed:
       example:
         description: example feed description
@@ -510,6 +519,23 @@ components:
           $ref: '#/components/schemas/custom-indicator-feeds_description'
         name:
           $ref: '#/components/schemas/custom-indicator-feeds_name'
+    custom-indicator-feeds_permission_list_item:
+      properties:
+        description:
+          $ref: '#/components/schemas/custom-indicator-feeds_description'
+        id:
+          $ref: '#/components/schemas/custom-indicator-feeds_id'
+        is_attributable:
+          $ref: '#/components/schemas/custom-indicator-feeds_is_attributable'
+        is_downloadable:
+          $ref: '#/components/schemas/custom-indicator-feeds_is_downloadable'
+        is_public:
+          $ref: '#/components/schemas/custom-indicator-feeds_is_public'
+        name:
+          $ref: '#/components/schemas/custom-indicator-feeds_name'
+    custom-indicator-feeds_provider_name:
+      description: The provider of the indicator feed
+      type: string
     custom-indicator-feeds_update_public_field_request:
       properties:
         description:
@@ -535,19 +561,38 @@ components:
     custom-indicator-feeds_is_attributable:
       description: Whether the indicator feed can be attributed to a provider
       type: boolean
-    custom-indicator-feeds_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
+    custom-indicator-feeds_update_public_field_response:
+      allOf:
+      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/custom-indicator-feeds_indicator_feed_item'
+    custom-indicator-feeds_description:
+      description: The description of the example test
       type: string
-    custom-indicator-feeds_id:
-      description: The unique identifier for the indicator feed
-      type: integer
-    custom-indicator-feeds_feed_id:
-      description: Indicator feed ID
-      example: 12
-      type: integer
+    custom-indicator-feeds_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    custom-indicator-feeds_permissions_update:
+      properties:
+        success:
+          description: Whether the update succeeded or not
+          type: boolean
+    custom-indicator-feeds_is_downloadable:
+      description: Whether the indicator feed can be downloaded
+      type: boolean
     custom-indicator-feeds_api_response_common_failure:
       properties:
         errors:
@@ -579,12 +624,37 @@ components:
       - messages
       - result
       type: object
-    custom-indicator-feeds_update_public_field_response:
-      allOf:
-      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/custom-indicator-feeds_indicator_feed_item'
+    custom-indicator-feeds_indicator_feed_item:
+      example:
+        created_on: '2023-05-12T12:21:56.777653Z'
+        description: example feed description
+        id: 1
+        is_attributable: false
+        is_downloadable: false
+        is_public: false
+        modified_on: '2023-06-18T03:13:34.123321Z'
+        name: example_feed_1
+      properties:
+        created_on:
+          description: The date and time when the data entry was created
+          format: date-time
+          type: string
+        description:
+          $ref: '#/components/schemas/custom-indicator-feeds_description'
+        id:
+          $ref: '#/components/schemas/custom-indicator-feeds_id'
+        is_attributable:
+          $ref: '#/components/schemas/custom-indicator-feeds_is_attributable'
+        is_downloadable:
+          $ref: '#/components/schemas/custom-indicator-feeds_is_downloadable'
+        is_public:
+          $ref: '#/components/schemas/custom-indicator-feeds_is_public'
+        modified_on:
+          description: The date and time when the data entry was last modified
+          format: date-time
+          type: string
+        name:
+          $ref: '#/components/schemas/custom-indicator-feeds_name'
     custom-indicator-feeds_indicator_feed_metadata:
       example:
         created_on: '2023-05-12T12:21:56.777653Z'
@@ -631,65 +701,6 @@ components:
           $ref: '#/components/schemas/custom-indicator-feeds_provider_id'
         provider_name:
           $ref: '#/components/schemas/custom-indicator-feeds_provider_name'
-    custom-indicator-feeds_create_feed_response:
-      allOf:
-      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/custom-indicator-feeds_indicator_feed_item'
-    custom-indicator-feeds_indicator_feed_metadata_response:
-      allOf:
-      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/custom-indicator-feeds_indicator_feed_metadata'
-    custom-indicator-feeds_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    custom-indicator-feeds_indicator_feed_response:
-      allOf:
-      - $ref: '#/components/schemas/custom-indicator-feeds_api-response-common'
-      - properties:
-          result:
-            example:
-            - created_on: '2023-05-12T12:21:56.777653Z'
-              description: user specified description 1
-              id: 1
-              modified_on: '2023-06-18T03:13:34.123321Z'
-              name: user_specified_name_1
-            - created_on: '2023-05-21T21:43:52.867525Z'
-              description: User specified description 2
-              id: 2
-              modified_on: '2023-06-28T18:46:18.764425Z'
-              name: user_specified_name_2
-            items:
-              $ref: '#/components/schemas/custom-indicator-feeds_indicator_feed_item'
-            type: array
-    custom-indicator-feeds_permissions_request:
-      properties:
-        account_tag:
-          description: The Cloudflare account tag of the account to change permissions on
-          example: 823f45f16fd2f7e21e1e054aga4d2859
-          type: string
-        feed_id:
-          description: The ID of the feed to add/remove permissions on
-          example: 1
-          type: integer
-    custom-indicator-feeds_name:
-      description: The name of the indicator feed
-      type: string
   securitySchemes:
     api_email:
       in: header

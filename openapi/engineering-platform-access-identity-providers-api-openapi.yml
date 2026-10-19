@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -192,15 +203,6 @@ paths:
       - 'Access: Organizations, Identity Providers, and Groups Write'
 components:
   schemas:
-    access_yandex:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            $ref: '#/components/schemas/access_generic-oauth-config'
-        type: object
-      title: Yandex
-      type: object
     access_response_collection:
       allOf:
       - $ref: '#/components/schemas/access_api-response-collection'
@@ -224,6 +226,38 @@ components:
             type: array
         type: object
       type: object
+    access_onelogin:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+            - properties:
+                onelogin_account:
+                  description: Your OneLogin account url
+                  example: https://mycompany.onelogin.com
+                  type: string
+              type: object
+        type: object
+      title: OneLogin
+      type: object
+    access_onetimepin:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            type: object
+          type:
+            enum:
+            - onetimepin
+      title: One Time Pin
+      type: object
+    access_components-schemas-name:
+      description: The name of the identity provider, shown to users on the login page.
+      example: Widget Corps IDP
+      type: string
     access_google-apps:
       allOf:
       - $ref: '#/components/schemas/access_identity-provider'
@@ -241,7 +275,51 @@ components:
         type: object
       title: Google Workspace
       type: object
-    access_onelogin:
+    access_components-schemas-single_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            $ref: '#/components/schemas/access_identity-providers'
+    access_identity-providers:
+      anyOf:
+      - $ref: '#/components/schemas/access_azureAD'
+      - $ref: '#/components/schemas/access_centrify'
+      - $ref: '#/components/schemas/access_facebook'
+      - $ref: '#/components/schemas/access_github'
+      - $ref: '#/components/schemas/access_google'
+      - $ref: '#/components/schemas/access_google-apps'
+      - $ref: '#/components/schemas/access_linkedin'
+      - $ref: '#/components/schemas/access_oidc'
+      - $ref: '#/components/schemas/access_okta'
+      - $ref: '#/components/schemas/access_onelogin'
+      - $ref: '#/components/schemas/access_pingone'
+      - $ref: '#/components/schemas/access_saml'
+      - $ref: '#/components/schemas/access_yandex'
+      - $ref: '#/components/schemas/access_onetimepin'
+    access_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/access_messages'
+        messages:
+          $ref: '#/components/schemas/access_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    access_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    access_centrify:
       allOf:
       - $ref: '#/components/schemas/access_identity-provider'
       - properties:
@@ -250,13 +328,21 @@ components:
             - $ref: '#/components/schemas/access_generic-oauth-config'
             - $ref: '#/components/schemas/access_custom-claims-support'
             - properties:
-                onelogin_account:
-                  description: Your OneLogin account url
-                  example: https://mycompany.onelogin.com
+                centrify_account:
+                  description: Your centrify account url
+                  example: https://abc123.my.centrify.com/
+                  type: string
+                centrify_app_id:
+                  description: Your centrify app id
+                  example: exampleapp
                   type: string
               type: object
         type: object
-      title: OneLogin
+      title: Centrify
+      type: object
+    access_api-response-single:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-common'
       type: object
     access_result_info:
       properties:
@@ -277,46 +363,14 @@ components:
           example: 2000
           type: number
       type: object
-    access_uuid:
-      description: UUID
-      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
-      maxLength: 36
-      type: string
-    access_okta:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-            - properties:
-                authorization_server_id:
-                  description: Your okta authorization server id
-                  example: aus9o8wzkhckw9TLa0h7z
-                  type: string
-                okta_account:
-                  description: Your okta account url
-                  example: https://dev-abc123.oktapreview.com
-                  type: string
-              type: object
-        type: object
-      title: Okta
-      type: object
-    access_components-schemas-single_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            $ref: '#/components/schemas/access_identity-providers'
-    access_facebook:
+    access_github:
       allOf:
       - $ref: '#/components/schemas/access_identity-provider'
       - properties:
           config:
             $ref: '#/components/schemas/access_generic-oauth-config'
         type: object
-      title: Facebook
+      title: GitHub
       type: object
     access_azureAD:
       allOf:
@@ -348,20 +402,78 @@ components:
         type: object
       title: Azure AD
       type: object
-    access_generic-oauth-config:
-      properties:
-        client_id:
-          description: Your OAuth Client ID
-          example: <your client id>
-          type: string
-        client_secret:
-          description: Your OAuth Client Secret
-          example: <your client secret>
-          type: string
+    access_id_response:
+      allOf:
+      - $ref: '#/components/schemas/access_api-response-single'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/access_uuid'
+            type: object
+    access_yandex:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            $ref: '#/components/schemas/access_generic-oauth-config'
+        type: object
+      title: Yandex
       type: object
-    access_api-response-single:
+    access_pingone:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+            - properties:
+                ping_env_id:
+                  description: Your PingOne environment identifier
+                  example: 342b5660-0c32-4936-a5a4-ce21fae57b0a
+                  type: string
+              type: object
+        type: object
+      title: PingOne
+      type: object
+    access_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    access_api-response-collection:
       allOf:
       - $ref: '#/components/schemas/access_api-response-common'
+      - properties:
+          result_info:
+            $ref: '#/components/schemas/access_result_info'
+      type: object
+    access_custom-claims-support:
+      properties:
+        claims:
+          description: Custom claims
+          example:
+          - email_verified
+          - preferred_username
+          - custom_claim_name
+          items:
+            type: string
+          type: array
+        email_claim_name:
+          description: The claim name for email in the id_token response.
+          example: custom_claim_name
+          type: string
       type: object
     access_oidc:
       allOf:
@@ -397,51 +509,6 @@ components:
         type: object
       title: Generic OAuth
       type: object
-    access_identity-providers:
-      anyOf:
-      - $ref: '#/components/schemas/access_azureAD'
-      - $ref: '#/components/schemas/access_centrify'
-      - $ref: '#/components/schemas/access_facebook'
-      - $ref: '#/components/schemas/access_github'
-      - $ref: '#/components/schemas/access_google'
-      - $ref: '#/components/schemas/access_google-apps'
-      - $ref: '#/components/schemas/access_linkedin'
-      - $ref: '#/components/schemas/access_oidc'
-      - $ref: '#/components/schemas/access_okta'
-      - $ref: '#/components/schemas/access_onelogin'
-      - $ref: '#/components/schemas/access_pingone'
-      - $ref: '#/components/schemas/access_saml'
-      - $ref: '#/components/schemas/access_yandex'
-      - $ref: '#/components/schemas/access_onetimepin'
-    access_id_response:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-single'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/access_uuid'
-            type: object
-    access_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    access_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     access_identity-provider:
       properties:
         config:
@@ -494,37 +561,6 @@ components:
       - type
       - config
       type: object
-    access_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/access_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/access_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
     access_saml:
       allOf:
       - $ref: '#/components/schemas/access_identity-provider'
@@ -576,36 +612,20 @@ components:
         type: object
       title: Generic SAML
       type: object
-    access_github:
+    access_facebook:
       allOf:
       - $ref: '#/components/schemas/access_identity-provider'
       - properties:
           config:
             $ref: '#/components/schemas/access_generic-oauth-config'
         type: object
-      title: GitHub
+      title: Facebook
       type: object
-    access_centrify:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-            - properties:
-                centrify_account:
-                  description: Your centrify account url
-                  example: https://abc123.my.centrify.com/
-                  type: string
-                centrify_app_id:
-                  description: Your centrify app id
-                  example: exampleapp
-                  type: string
-              type: object
-        type: object
-      title: Centrify
-      type: object
+    access_uuid:
+      description: UUID
+      example: f174e90a-fafe-4643-bbbc-4a0ed4fc8415
+      maxLength: 36
+      type: string
     access_linkedin:
       allOf:
       - $ref: '#/components/schemas/access_identity-provider'
@@ -615,77 +635,47 @@ components:
         type: object
       title: LinkedIn
       type: object
-    access_components-schemas-name:
-      description: The name of the identity provider, shown to users on the login page.
-      example: Widget Corps IDP
-      type: string
-    access_custom-claims-support:
+    access_generic-oauth-config:
       properties:
-        claims:
-          description: Custom claims
-          example:
-          - email_verified
-          - preferred_username
-          - custom_claim_name
-          items:
-            type: string
-          type: array
-        email_claim_name:
-          description: The claim name for email in the id_token response.
-          example: custom_claim_name
+        client_id:
+          description: Your OAuth Client ID
+          example: <your client id>
+          type: string
+        client_secret:
+          description: Your OAuth Client Secret
+          example: <your client secret>
           type: string
       type: object
-    access_api-response-common:
+    access_api-response-common-failure:
       properties:
         errors:
-          $ref: '#/components/schemas/access_messages'
+          allOf:
+          - $ref: '#/components/schemas/access_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
         messages:
-          $ref: '#/components/schemas/access_messages'
+          allOf:
+          - $ref: '#/components/schemas/access_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
         success:
           description: Whether the API call was successful
           enum:
-          - true
-          example: true
+          - false
+          example: false
           type: boolean
       required:
       - success
       - errors
       - messages
-      type: object
-    access_pingone:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            allOf:
-            - $ref: '#/components/schemas/access_generic-oauth-config'
-            - $ref: '#/components/schemas/access_custom-claims-support'
-            - properties:
-                ping_env_id:
-                  description: Your PingOne environment identifier
-                  example: 342b5660-0c32-4936-a5a4-ce21fae57b0a
-                  type: string
-              type: object
-        type: object
-      title: PingOne
-      type: object
-    access_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/access_api-response-common'
-      - properties:
-          result_info:
-            $ref: '#/components/schemas/access_result_info'
-      type: object
-    access_onetimepin:
-      allOf:
-      - $ref: '#/components/schemas/access_identity-provider'
-      - properties:
-          config:
-            type: object
-          type:
-            enum:
-            - onetimepin
-      title: One Time Pin
+      - result
       type: object
     access_google:
       allOf:
@@ -697,6 +687,27 @@ components:
             - $ref: '#/components/schemas/access_custom-claims-support'
         type: object
       title: Google
+      type: object
+    access_okta:
+      allOf:
+      - $ref: '#/components/schemas/access_identity-provider'
+      - properties:
+          config:
+            allOf:
+            - $ref: '#/components/schemas/access_generic-oauth-config'
+            - $ref: '#/components/schemas/access_custom-claims-support'
+            - properties:
+                authorization_server_id:
+                  description: Your okta authorization server id
+                  example: aus9o8wzkhckw9TLa0h7z
+                  type: string
+                okta_account:
+                  description: Your okta account url
+                  example: https://dev-abc123.oktapreview.com
+                  type: string
+              type: object
+        type: object
+      title: Okta
       type: object
   securitySchemes:
     api_email:

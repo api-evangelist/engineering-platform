@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -168,9 +179,65 @@ paths:
       - DLP Settings
 components:
   schemas:
+    dlp_RegexValidationQuery:
+      properties:
+        max_match_bytes:
+          description: 'Maximum number of bytes that the regular expression can match.
+
+
+            If this is `null` then there is no limit on the length. Patterns can use
+
+            `*` and `+`. Otherwise repeats should use a range `{m,n}` to restrict
+
+            patterns to the length. If this field is missing, then a default length
+
+            limit is used.
+
+
+            Note that the length is specified in bytes. Since regular expressions
+
+            use UTF-8 the pattern `.` can match up to 4 bytes. Hence `.{1,256}`
+
+            has a maximum length of 1024 bytes.'
+          format: int32
+          minimum: 0
+          type:
+          - integer
+          - 'null'
+        regex:
+          type: string
+      required:
+      - regex
+      type: object
+    dlp_PayloadLogSetting:
+      properties:
+        public_key:
+          type:
+          - string
+          - 'null'
+        updated_at:
+          format: date-time
+          type: string
+      required:
+      - updated_at
+      type: object
+    dlp_RegexValidationResult:
+      properties:
+        valid:
+          type: boolean
+      required:
+      - valid
+      type: object
     dlp_api-response-single:
       allOf:
       - $ref: '#/components/schemas/dlp_api-response-common'
+      type: object
+    dlp_PayloadLogSettingUpdate:
+      properties:
+        public_key:
+          type:
+          - string
+          - 'null'
       type: object
     dlp_api-response-common:
       properties:
@@ -189,6 +256,21 @@ components:
       - errors
       - messages
       type: object
+    dlp_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
     dlp_api-response-common-failure:
       properties:
         errors:
@@ -220,58 +302,6 @@ components:
       - messages
       - result
       type: object
-    dlp_PayloadLogSettingUpdate:
-      properties:
-        public_key:
-          type:
-          - string
-          - 'null'
-      type: object
-    dlp_RegexValidationQuery:
-      properties:
-        max_match_bytes:
-          description: 'Maximum number of bytes that the regular expression can match.
-
-
-            If this is `null` then there is no limit on the length. Patterns can use
-
-            `*` and `+`. Otherwise repeats should use a range `{m,n}` to restrict
-
-            patterns to the length. If this field is missing, then a default length
-
-            limit is used.
-
-
-            Note that the length is specified in bytes. Since regular expressions
-
-            use UTF-8 the pattern `.` can match up to 4 bytes. Hence `.{1,256}`
-
-            has a maximum length of 1024 bytes.'
-          format: int32
-          minimum: 0
-          type:
-          - integer
-          - 'null'
-        regex:
-          type: string
-      required:
-      - regex
-      type: object
-    dlp_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
     dlp_Limits:
       properties:
         max_dataset_cells:
@@ -280,25 +310,6 @@ components:
           type: integer
       required:
       - max_dataset_cells
-      type: object
-    dlp_PayloadLogSetting:
-      properties:
-        public_key:
-          type:
-          - string
-          - 'null'
-        updated_at:
-          format: date-time
-          type: string
-      required:
-      - updated_at
-      type: object
-    dlp_RegexValidationResult:
-      properties:
-        valid:
-          type: boolean
-      required:
-      - valid
       type: object
   securitySchemes:
     api_email:

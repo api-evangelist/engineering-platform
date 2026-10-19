@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -348,83 +359,6 @@ paths:
         pro: true
 components:
   schemas:
-    zones_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    zones_type:
-      default: full
-      description: 'A full zone implies that DNS is hosted with Cloudflare. A partial zone is
-
-        typically a partner-hosted zone or a CNAME setup.
-
-        '
-      enum:
-      - full
-      - partial
-      - secondary
-      example: full
-      type: string
-    zones_name:
-      description: The domain name
-      example: example.com
-      maxLength: 253
-      pattern: ^([a-zA-Z0-9][\-a-zA-Z0-9]*\.)+[\-a-zA-Z0-9]{2,20}$
-      type: string
-    zones_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/zones_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/zones_messages'
-          example: []
-        result:
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    zones_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    zones_paused:
-      default: false
-      description: 'Indicates whether the zone is only using Cloudflare DNS services. A
-
-        true value means the zone will not receive security or performance
-
-        benefits.
-
-        '
-      readOnly: true
-      type: boolean
     zones_zone:
       properties:
         account:
@@ -597,6 +531,91 @@ components:
       - modified_on
       - activated_on
       type: object
+    zones_type:
+      default: full
+      description: 'A full zone implies that DNS is hosted with Cloudflare. A partial zone is
+
+        typically a partner-hosted zone or a CNAME setup.
+
+        '
+      enum:
+      - full
+      - partial
+      - secondary
+      example: full
+      type: string
+    zones_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/zones_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/zones_messages'
+          example: []
+        result:
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    zones_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
+    zones_api-response-single-id:
+      allOf:
+      - $ref: '#/components/schemas/zones_api-response-common'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/zones_identifier'
+            required:
+            - id
+            type:
+            - object
+            - 'null'
+      type: object
+    zones_paused:
+      default: false
+      description: 'Indicates whether the zone is only using Cloudflare DNS services. A
+
+        true value means the zone will not receive security or performance
+
+        benefits.
+
+        '
+      readOnly: true
+      type: boolean
+    zones_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
     zones_result_info:
       properties:
         count:
@@ -631,20 +650,6 @@ components:
       - errors
       - messages
       type: object
-    zones_api-response-single-id:
-      allOf:
-      - $ref: '#/components/schemas/zones_api-response-common'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/zones_identifier'
-            required:
-            - id
-            type:
-            - object
-            - 'null'
-      type: object
     zones_vanity_name_servers:
       description: 'An array of domains used for custom name servers. This is only
 
@@ -657,6 +662,12 @@ components:
         maxLength: 253
         type: string
       type: array
+    zones_name:
+      description: The domain name
+      example: example.com
+      maxLength: 253
+      pattern: ^([a-zA-Z0-9][\-a-zA-Z0-9]*\.)+[\-a-zA-Z0-9]{2,20}$
+      type: string
   securitySchemes:
     api_email:
       in: header

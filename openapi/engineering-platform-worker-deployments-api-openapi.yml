@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -111,33 +122,50 @@ components:
       example: bcf48806-b317-4351-9ee7-36e7d557d4de
       maxLength: 36
       type: string
-    workers_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/workers_messages'
-        messages:
-          $ref: '#/components/schemas/workers_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    workers_schemas-deployments-single-response:
-      allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            allOf:
-            - $ref: '#/components/schemas/workers_deployments-base'
-            - oneOf:
-              - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
+    workers_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
         type: object
+        uniqueItems: true
+      type: array
+    workers_schemas-deployment_identifier:
+      example: dc78f0bc-05c5-46b7-bb4e-137f55930378
+      maxLength: 36
+      type: string
+    workers_deployments-strategy-percentage:
+      properties:
+        strategy:
+          enum:
+          - percentage
+          type: string
+        versions:
+          items:
+            properties:
+              percentage:
+                example: 100
+                maximum: 100
+                minimum: 0.01
+                type: number
+              version_id:
+                $ref: '#/components/schemas/workers_schemas-version_identifier'
+            required:
+            - version_id
+            - percentage
+            type: object
+          type: array
+      required:
+      - strategy
+      - versions
+      type: object
     workers_api-response-common-failure:
       properties:
         errors:
@@ -169,50 +197,11 @@ components:
       - messages
       - result
       type: object
-    workers_schemas-deployment_identifier:
-      example: dc78f0bc-05c5-46b7-bb4e-137f55930378
-      maxLength: 36
-      type: string
-    workers_schemas-script_name:
-      description: Name of the script.
-      example: this-is_my_script-01
-      pattern: ^[a-z0-9_][a-z0-9-_]*$
-      type: string
-    workers_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      type: string
-    workers_schemas-deployments-list-response:
+    workers_deployments-create-body:
       allOf:
-      - $ref: '#/components/schemas/workers_api-response-common'
-      - properties:
-          result:
-            properties:
-              deployments:
-                items:
-                  allOf:
-                  - $ref: '#/components/schemas/workers_deployments-base'
-                  - oneOf:
-                    - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
-                type: array
-            type: object
-        type: object
-    workers_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
+      - $ref: '#/components/schemas/workers_deployments-base'
+      - oneOf:
+        - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
     workers_deployments-base:
       properties:
         annotations:
@@ -242,36 +231,58 @@ components:
         strategy:
           type: string
       type: object
-    workers_deployments-strategy-percentage:
-      properties:
-        strategy:
-          enum:
-          - percentage
-          type: string
-        versions:
-          items:
-            properties:
-              percentage:
-                example: 100
-                maximum: 100
-                minimum: 0.01
-                type: number
-              version_id:
-                $ref: '#/components/schemas/workers_schemas-version_identifier'
-            required:
-            - version_id
-            - percentage
-            type: object
-          type: array
-      required:
-      - strategy
-      - versions
-      type: object
-    workers_deployments-create-body:
+    workers_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      type: string
+    workers_schemas-deployments-single-response:
       allOf:
-      - $ref: '#/components/schemas/workers_deployments-base'
-      - oneOf:
-        - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            allOf:
+            - $ref: '#/components/schemas/workers_deployments-base'
+            - oneOf:
+              - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
+        type: object
+    workers_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/workers_messages'
+        messages:
+          $ref: '#/components/schemas/workers_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    workers_schemas-deployments-list-response:
+      allOf:
+      - $ref: '#/components/schemas/workers_api-response-common'
+      - properties:
+          result:
+            properties:
+              deployments:
+                items:
+                  allOf:
+                  - $ref: '#/components/schemas/workers_deployments-base'
+                  - oneOf:
+                    - $ref: '#/components/schemas/workers_deployments-strategy-percentage'
+                type: array
+            type: object
+        type: object
+    workers_schemas-script_name:
+      description: Name of the script.
+      example: this-is_my_script-01
+      pattern: ^[a-z0-9_][a-z0-9-_]*$
+      type: string
   securitySchemes:
     api_email:
       in: header

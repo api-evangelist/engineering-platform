@@ -1,0 +1,100 @@
+openapi: 3.2.0
+info:
+  title: VSOnline Agents API
+  description: Public APIs for managing VS Codespaces
+  version: v1
+servers:
+- url: https://online.visualstudio.com
+security:
+- Bearer: []
+tags:
+- name: Agents
+paths:
+  /api/v1/Agents/{family}:
+    get:
+      tags:
+      - Agents
+      parameters:
+      - name: family
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/AgentResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/AgentResponse'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      summary: Get api agents by family
+      x-summary-source: derived
+      operationId: getApiV1AgentsByFamily
+      x-operation-id-source: derived
+components:
+  schemas:
+    AgentResponse:
+      type: object
+      properties:
+        name:
+          type:
+          - string
+          - 'null'
+        assetUri:
+          type:
+          - string
+          - 'null'
+        family:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type:
+          - string
+          - 'null'
+        title:
+          type:
+          - string
+          - 'null'
+        status:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        detail:
+          type:
+          - string
+          - 'null'
+        instance:
+          type:
+          - string
+          - 'null'
+      additionalProperties: {}
+  securitySchemes:
+    Bearer:
+      type: http
+      description: 'JWT auth token for the user. Example: eyJ2...'
+      scheme: bearer
+      bearerFormat: JWT

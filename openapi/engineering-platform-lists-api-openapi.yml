@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -549,148 +560,19 @@ paths:
         pro: true
 components:
   schemas:
-    lists_item_id:
-      description: The unique ID of the item in the List.
-      example: 34b12448945f11eaa1b71c4d701ab86e
-      type: string
-    lists_lists-async-response:
+    lists_bulk-operation-response-collection:
       allOf:
       - $ref: '#/components/schemas/lists_api-response-collection'
       - properties:
           result:
-            properties:
-              operation_id:
-                $ref: '#/components/schemas/lists_operation_id'
-            type: object
+            $ref: '#/components/schemas/lists_operation'
         type: object
-    lists_items:
-      items:
-        $ref: '#/components/schemas/lists_item'
-      type: array
     lists_list_id:
       description: The unique ID of the list.
       example: 2c0fc9fa937b11eaa1b71c4d701ab86e
       maxLength: 32
       minLength: 32
       readOnly: true
-      type: string
-    lists_items-update-request-collection:
-      items:
-        allOf:
-        - properties:
-            asn:
-              $ref: '#/components/schemas/lists_item_asn'
-            comment:
-              $ref: '#/components/schemas/lists_item_comment'
-            hostname:
-              $ref: '#/components/schemas/lists_item_hostname'
-            ip:
-              $ref: '#/components/schemas/lists_item_ip'
-            redirect:
-              $ref: '#/components/schemas/lists_item_redirect'
-          type: object
-      type: array
-    lists_item_asn:
-      description: A non-negative 32 bit integer
-      example: 5567
-      type: integer
-    lists_api-response-common-failure:
-      properties:
-        errors:
-          allOf:
-          - $ref: '#/components/schemas/lists_messages'
-          example:
-          - code: 7003
-            message: No route for the URI
-          minLength: 1
-        messages:
-          allOf:
-          - $ref: '#/components/schemas/lists_messages'
-          example: []
-        result:
-          enum:
-          - null
-          type:
-          - object
-          - 'null'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - false
-          example: false
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    lists_kind:
-      description: The type of the list. Each type supports specific list items (IP addresses, ASNs, hostnames or redirects).
-      enum:
-      - ip
-      - redirect
-      - hostname
-      - asn
-      example: ip
-    lists_item_comment:
-      description: An informative summary of the list item.
-      example: Private IP address
-      type: string
-    lists_num_items:
-      description: The number of items in the list.
-      example: 10
-      type: number
-    lists_messages:
-      example: []
-      items:
-        properties:
-          code:
-            minimum: 1000
-            type: integer
-          message:
-            type: string
-        required:
-        - code
-        - message
-        type: object
-        uniqueItems: true
-      type: array
-    lists_name:
-      description: An informative name for the list. Use this name in filter and rule expressions.
-      example: list1
-      maxLength: 50
-      pattern: ^[a-zA-Z0-9_]+$
-      type: string
-    lists_items-list-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/lists_api-response-collection'
-      - properties:
-          result:
-            $ref: '#/components/schemas/lists_items'
-          result_info:
-            properties:
-              cursors:
-                properties:
-                  after:
-                    example: yyy
-                    type: string
-                  before:
-                    example: xxx
-                    type: string
-                type: object
-            type: object
-        type: object
-    lists_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    lists_description:
-      description: An informative summary of the list.
-      example: This is a note
-      maxLength: 500
       type: string
     lists_operation:
       properties:
@@ -720,61 +602,24 @@ components:
       - id
       - status
       type: object
-    lists_item-response-collection:
+    lists_lists-async-response:
       allOf:
       - $ref: '#/components/schemas/lists_api-response-collection'
       - properties:
           result:
-            $ref: '#/components/schemas/lists_item'
+            properties:
+              operation_id:
+                $ref: '#/components/schemas/lists_operation_id'
+            type: object
         type: object
-    lists_item_ip:
-      description: An IPv4 address, an IPv4 CIDR, or an IPv6 CIDR. IPv6 CIDRs are limited to a maximum of /64.
-      example: 10.0.0.1
+    lists_modified_on:
+      description: The RFC 3339 timestamp of when the list was last modified.
+      example: '2020-01-10T14:00:00Z'
       type: string
     lists_operation_id:
       description: The unique operation ID of the asynchronous action.
       example: 4da8780eeb215e6cb7f48dd981c4ea02
       readOnly: true
-      type: string
-    lists_item_redirect:
-      description: The definition of the redirect.
-      properties:
-        include_subdomains:
-          default: false
-          type: boolean
-        preserve_path_suffix:
-          default: false
-          type: boolean
-        preserve_query_string:
-          default: false
-          type: boolean
-        source_url:
-          example: example.com/arch
-          type: string
-        status_code:
-          default: 301
-          enum:
-          - 301
-          - 302
-          - 307
-          - 308
-          type: integer
-        subpath_matching:
-          default: false
-          type: boolean
-        target_url:
-          example: https://archlinux.org/
-          type: string
-      required:
-      - source_url
-      - target_url
-    lists_created_on:
-      description: The RFC 3339 timestamp of when the list was created.
-      example: '2020-01-01T08:00:00Z'
-      type: string
-    lists_modified_on:
-      description: The RFC 3339 timestamp of when the list was last modified.
-      example: '2020-01-10T14:00:00Z'
       type: string
     lists_item:
       example:
@@ -812,29 +657,10 @@ components:
         redirect:
           $ref: '#/components/schemas/lists_item_redirect'
       type: object
-    lists_num_referencing_filters:
-      description: The number of [filters](/operations/filters-list-filters) referencing the list.
-      example: 2
-      type: number
-    lists_list-delete-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/lists_api-response-collection'
-      - properties:
-          result:
-            properties:
-              id:
-                $ref: '#/components/schemas/lists_item_id'
-            type: object
-        type: object
-      type: object
-    lists_list-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/lists_api-response-collection'
-      - properties:
-          result:
-            $ref: '#/components/schemas/lists_list'
-        type: object
-      type: object
+    lists_item_asn:
+      description: A non-negative 32 bit integer
+      example: 5567
+      type: integer
     lists_api-response-common:
       properties:
         errors:
@@ -858,6 +684,102 @@ components:
       - messages
       - result
       type: object
+    lists_api-response-common-failure:
+      properties:
+        errors:
+          allOf:
+          - $ref: '#/components/schemas/lists_messages'
+          example:
+          - code: 7003
+            message: No route for the URI
+          minLength: 1
+        messages:
+          allOf:
+          - $ref: '#/components/schemas/lists_messages'
+          example: []
+        result:
+          enum:
+          - null
+          type:
+          - object
+          - 'null'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - false
+          example: false
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    lists_num_referencing_filters:
+      description: The number of [filters](/operations/filters-list-filters) referencing the list.
+      example: 2
+      type: number
+    lists_list-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/lists_api-response-collection'
+      - properties:
+          result:
+            $ref: '#/components/schemas/lists_list'
+        type: object
+      type: object
+    lists_items-list-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/lists_api-response-collection'
+      - properties:
+          result:
+            $ref: '#/components/schemas/lists_items'
+          result_info:
+            properties:
+              cursors:
+                properties:
+                  after:
+                    example: yyy
+                    type: string
+                  before:
+                    example: xxx
+                    type: string
+                type: object
+            type: object
+        type: object
+    lists_kind:
+      description: The type of the list. Each type supports specific list items (IP addresses, ASNs, hostnames or redirects).
+      enum:
+      - ip
+      - redirect
+      - hostname
+      - asn
+      example: ip
+    lists_list-delete-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/lists_api-response-collection'
+      - properties:
+          result:
+            properties:
+              id:
+                $ref: '#/components/schemas/lists_item_id'
+            type: object
+        type: object
+      type: object
+    lists_description:
+      description: An informative summary of the list.
+      example: This is a note
+      maxLength: 500
+      type: string
+    lists_name:
+      description: An informative name for the list. Use this name in filter and rule expressions.
+      example: list1
+      maxLength: 50
+      pattern: ^[a-zA-Z0-9_]+$
+      type: string
+    lists_items:
+      items:
+        $ref: '#/components/schemas/lists_item'
+      type: array
     lists_item_hostname:
       description: Valid characters for hostnames are ASCII(7) letters from a to z, the digits from 0 to 9, wildcards (*), and the hyphen (-).
       properties:
@@ -866,23 +788,36 @@ components:
           type: string
       required:
       - url_hostname
-    lists_bulk-operation-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/lists_api-response-collection'
-      - properties:
-          result:
-            $ref: '#/components/schemas/lists_operation'
-        type: object
-    lists_api-response-collection:
-      allOf:
-      - $ref: '#/components/schemas/lists_api-response-common'
-      - properties:
-          result:
-            items: {}
-            type:
-            - array
-            - 'null'
-      type: object
+    lists_item_comment:
+      description: An informative summary of the list item.
+      example: Private IP address
+      type: string
+    lists_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
+      readOnly: true
+      type: string
+    lists_created_on:
+      description: The RFC 3339 timestamp of when the list was created.
+      example: '2020-01-01T08:00:00Z'
+      type: string
+    lists_items-update-request-collection:
+      items:
+        allOf:
+        - properties:
+            asn:
+              $ref: '#/components/schemas/lists_item_asn'
+            comment:
+              $ref: '#/components/schemas/lists_item_comment'
+            hostname:
+              $ref: '#/components/schemas/lists_item_hostname'
+            ip:
+              $ref: '#/components/schemas/lists_item_ip'
+            redirect:
+              $ref: '#/components/schemas/lists_item_redirect'
+          type: object
+      type: array
     lists_lists-response-collection:
       allOf:
       - $ref: '#/components/schemas/lists_api-response-collection'
@@ -902,6 +837,45 @@ components:
             type: array
         type: object
       type: object
+    lists_item_redirect:
+      description: The definition of the redirect.
+      properties:
+        include_subdomains:
+          default: false
+          type: boolean
+        preserve_path_suffix:
+          default: false
+          type: boolean
+        preserve_query_string:
+          default: false
+          type: boolean
+        source_url:
+          example: example.com/arch
+          type: string
+        status_code:
+          default: 301
+          enum:
+          - 301
+          - 302
+          - 307
+          - 308
+          type: integer
+        subpath_matching:
+          default: false
+          type: boolean
+        target_url:
+          example: https://archlinux.org/
+          type: string
+      required:
+      - source_url
+      - target_url
+    lists_item-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/lists_api-response-collection'
+      - properties:
+          result:
+            $ref: '#/components/schemas/lists_item'
+        type: object
     lists_list:
       properties:
         created_on:
@@ -921,6 +895,43 @@ components:
         num_referencing_filters:
           $ref: '#/components/schemas/lists_num_referencing_filters'
       type: object
+    lists_api-response-collection:
+      allOf:
+      - $ref: '#/components/schemas/lists_api-response-common'
+      - properties:
+          result:
+            items: {}
+            type:
+            - array
+            - 'null'
+      type: object
+    lists_item_ip:
+      description: An IPv4 address, an IPv4 CIDR, or an IPv6 CIDR. IPv6 CIDRs are limited to a maximum of /64.
+      example: 10.0.0.1
+      type: string
+    lists_item_id:
+      description: The unique ID of the item in the List.
+      example: 34b12448945f11eaa1b71c4d701ab86e
+      type: string
+    lists_num_items:
+      description: The number of items in the list.
+      example: 10
+      type: number
+    lists_messages:
+      example: []
+      items:
+        properties:
+          code:
+            minimum: 1000
+            type: integer
+          message:
+            type: string
+        required:
+        - code
+        - message
+        type: object
+        uniqueItems: true
+      type: array
   securitySchemes:
     api_email:
       in: header

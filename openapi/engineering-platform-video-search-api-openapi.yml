@@ -1610,24 +1610,72 @@ paths:
               headers: {}
 components:
   schemas:
-    Answer:
+    Videos:
+      required:
+      - value
       properties:
-        followUpQueries:
+        nextOffset:
+          type: integer
+          format: int32
+          readOnly: true
+        pivotSuggestions:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/PivotSuggestions'
+        queryExpansions:
           type: array
           readOnly: true
           items:
             $ref: '#/components/schemas/Query'
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    Identifiable:
-      properties:
-        id:
+        scenario:
           type: string
-          description: A String identifier.
           readOnly: true
-      description: Defines the identity of a resource.
+          enum:
+          - List
+          - SingleDominantVideo
+          x-ms-enum:
+            modelAsString: false
+            name: VideoQueryScenario
+        value:
+          type: array
+          description: A list of video objects that are relevant to the query.
+          items:
+            $ref: '#/components/schemas/VideoObject'
+      description: Defines a video answer.
       allOf:
-      - $ref: '#/components/schemas/ResponseBase'
+      - $ref: '#/components/schemas/SearchResultsAnswer'
+    Response:
+      properties:
+        webSearchUrl:
+          type: string
+          description: The URL To Bing's search result for this item.
+          readOnly: true
+      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
+      allOf:
+      - $ref: '#/components/schemas/Identifiable'
+    Query:
+      required:
+      - text
+      type: object
+      properties:
+        displayText:
+          type: string
+          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
+          readOnly: true
+        searchLink:
+          type: string
+          readOnly: true
+        text:
+          type: string
+          description: The query string. Use this string as the query term in a new search request.
+        thumbnail:
+          $ref: '#/components/schemas/ImageObject'
+        webSearchUrl:
+          type: string
+          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
+          readOnly: true
+      description: Defines a search query.
     Error:
       required:
       - code
@@ -1683,15 +1731,6 @@ components:
           description: The parameter's value in the request that was not valid.
           readOnly: true
       description: Defines the error that occurred.
-    ResponseBase:
-      required:
-      - _type
-      type: object
-      properties:
-        _type:
-          type: string
-      discriminator:
-        propertyName: _type
     MediaObject:
       properties:
         contentUrl:
@@ -1726,6 +1765,45 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Query'
+    Answer:
+      properties:
+        followUpQueries:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Query'
+      allOf:
+      - $ref: '#/components/schemas/Response'
+    ResponseBase:
+      required:
+      - _type
+      type: object
+      properties:
+        _type:
+          type: string
+      discriminator:
+        propertyName: _type
+    Identifiable:
+      properties:
+        id:
+          type: string
+          description: A String identifier.
+          readOnly: true
+      description: Defines the identity of a resource.
+      allOf:
+      - $ref: '#/components/schemas/ResponseBase'
+    ErrorResponse:
+      required:
+      - errors
+      properties:
+        errors:
+          type: array
+          description: A list of errors that describe the reasons why the request failed.
+          items:
+            $ref: '#/components/schemas/Error'
+      description: The top-level response that represents a failed request.
+      allOf:
+      - $ref: '#/components/schemas/Response'
     Thing:
       properties:
         alternateName:
@@ -1751,6 +1829,35 @@ components:
           readOnly: true
       allOf:
       - $ref: '#/components/schemas/Response'
+    CreativeWork:
+      properties:
+        provider:
+          type: array
+          description: The source of the creative work.
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Thing'
+        text:
+          type: string
+          readOnly: true
+        thumbnailUrl:
+          type: string
+          description: The URL to a thumbnail of the item.
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Thing'
+    SearchResultsAnswer:
+      properties:
+        isFamilyFriendly:
+          type: boolean
+          readOnly: true
+        totalEstimatedMatches:
+          type: integer
+          description: The estimated number of webpages that are relevant to the query. Use this number along with the count and offset query parameters to page the results.
+          format: int64
+          readOnly: true
+      allOf:
+      - $ref: '#/components/schemas/Answer'
     VideoObject:
       properties:
         allowHttpsEmbed:
@@ -1790,113 +1897,6 @@ components:
       description: Defines an image
       allOf:
       - $ref: '#/components/schemas/MediaObject'
-    SearchResultsAnswer:
-      properties:
-        isFamilyFriendly:
-          type: boolean
-          readOnly: true
-        totalEstimatedMatches:
-          type: integer
-          description: The estimated number of webpages that are relevant to the query. Use this number along with the count and offset query parameters to page the results.
-          format: int64
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Answer'
-    Query:
-      required:
-      - text
-      type: object
-      properties:
-        displayText:
-          type: string
-          description: The display version of the query term. This version of the query term may contain special characters that highlight the search term found in the query string. The string contains the highlighting characters only if the query enabled hit highlighting
-          readOnly: true
-        searchLink:
-          type: string
-          readOnly: true
-        text:
-          type: string
-          description: The query string. Use this string as the query term in a new search request.
-        thumbnail:
-          $ref: '#/components/schemas/ImageObject'
-        webSearchUrl:
-          type: string
-          description: The URL that takes the user to the Bing search results page for the query.Only related search results include this field.
-          readOnly: true
-      description: Defines a search query.
-    Videos:
-      required:
-      - value
-      properties:
-        nextOffset:
-          type: integer
-          format: int32
-          readOnly: true
-        pivotSuggestions:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/PivotSuggestions'
-        queryExpansions:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Query'
-        scenario:
-          type: string
-          readOnly: true
-          enum:
-          - List
-          - SingleDominantVideo
-          x-ms-enum:
-            modelAsString: false
-            name: VideoQueryScenario
-        value:
-          type: array
-          description: A list of video objects that are relevant to the query.
-          items:
-            $ref: '#/components/schemas/VideoObject'
-      description: Defines a video answer.
-      allOf:
-      - $ref: '#/components/schemas/SearchResultsAnswer'
-    ErrorResponse:
-      required:
-      - errors
-      properties:
-        errors:
-          type: array
-          description: A list of errors that describe the reasons why the request failed.
-          items:
-            $ref: '#/components/schemas/Error'
-      description: The top-level response that represents a failed request.
-      allOf:
-      - $ref: '#/components/schemas/Response'
-    Response:
-      properties:
-        webSearchUrl:
-          type: string
-          description: The URL To Bing's search result for this item.
-          readOnly: true
-      description: Defines a response. All schemas that could be returned at the root of a response should inherit from this
-      allOf:
-      - $ref: '#/components/schemas/Identifiable'
-    CreativeWork:
-      properties:
-        provider:
-          type: array
-          description: The source of the creative work.
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Thing'
-        text:
-          type: string
-          readOnly: true
-        thumbnailUrl:
-          type: string
-          description: The URL to a thumbnail of the item.
-          readOnly: true
-      allOf:
-      - $ref: '#/components/schemas/Thing'
   securitySchemes:
     apiKeyHeader:
       type: apiKey

@@ -1,7 +1,45 @@
 openapi: 3.2.0
 info:
   title: Postman Private API Network API
-  description: The Postman API enables you to programmatically access data stored in your Postman account.
+  description: 'The Postman API enables you to programmatically access data stored in your Postman account. > Certain endpoints may be unavailable depending on your region and/or Postman plan. For a comprehensive set of examples of requests and responses, see the **Postman API** collection. ## Getting started
+
+
+    You can get started with the Postman API by creating a copy of this definition in your workspace. ### EU users
+
+
+    For users in the EU with **Enterprise** plans, the Postman API uses the `http://api.eu.postman.com` subdomain. This is available in the definition''s list of servers. You can change this by selecting the `http://api.eu.postman.com` subdomain in the **Server** dropdown list below. ## About the Postman API
+
+
+    - You must use a valid API Key to send requests to the API endpoints. - The API has rate and usage limits. - The API only responds to HTTPS-secured communications. Any requests sent via HTTP return an HTTP `301` redirect to the corresponding HTTPS resources. - The API returns requests responses in JSON format. When an API request returns an error, it is sent in the JSON response as an error key. - The request method (verb) determines the nature of action you intend to perform. A request made using the `GET` method implies that you want to fetch something from Postman. The `POST` method implies you want to save something new to Postman. - For all requests, API calls respond with their corresponding HTTP status codes. In the Postman client, the status code also provides help text that details the possible meaning of the response code. - When calling the API Builder endpoints, you must send an `Accept` header with the `application/vnd.api.v10+json` value. ### IDs and UIDs
+
+
+    All items in Postman, such as collections, workspaces, and APIs, have IDs and UIDs:
+
+
+    - An ID is the unique ID assigned to a Postman item. For example, `ec29121c-5203-409f-9e84-e83ffc10f226`. - The UID is the **full** ID of a Postman item. This value is the item''s unique ID concatenated with the user ID. For example, in the `12345678-ec29121c-5203-409f-9e84-e83ffc10f226` UID:
+
+    - `12345678` is the user''s ID. - `ec29121c-5203-409f-9e84-e83ffc10f226` is the item''s ID. ### Enum values
+
+
+    Any documented enum values should be considered partial lists and may change over time. ### 403 response for unavailable features
+
+
+    Depending on your region and/or Postman plan, some endpoints will return an HTTP `403 Forbidden` response with the "This feature isn''t available in your region." detail. ### 503 response
+
+
+    An HTTP `503 Service Unavailable` response from our servers indicates there is an unexpected spike in API access traffic. The server is usually operational within the next five minutes. If the outage persists or you receive any other form of an HTTP `5XX` error, contact support. ## Authentication
+
+
+    Postman uses API keys for authentication. The API key tells the API server that the request came from you. Everything that you have access to in Postman is accessible with your API key. You can generate a Postman API key in the **API keys** section of your Postman account settings. You must include an API key in each request to the Postman API with the `X-API-Key` request header. In Postman, you can store your API key as a vault secret or an environment variable. The Postman API collection will use it to make API calls. ### SCIM authentication
+
+
+    While all other endpoints in this collection require a Postman API key, the SCIM endpoints require a SCIM API key. ### Authentication error response
+
+
+    If an API key is missing, malformed, or invalid, you will receive an HTTP `401 Unauthorized` response code. ## Rate and usage limits
+
+
+    API access rate limits apply at a per-user basis in unit time. The limit is **300 requests per minute**. Postman Monitors, the GET `/collections`, and the GET `/workspaces` endpoint have a rate limit of **10 calls in 10 seconds**. Depending on your plan, you may also have usage limits.'
   version: '1.0'
   termsOfService: https://www.postman.com/legal/terms/
   contact:
@@ -191,7 +229,919 @@ paths:
         '500':
           $ref: '#/components/responses/common500ErrorServerError'
 components:
+  responses:
+    pan400ErrorInvalidParams:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/pan400ErrorInvalidParams'
+          example:
+            name: invalidParamsError
+            message: Status type can only be denied or approved.
+    pan400ErrorInvalidQueryParams:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/pan400ErrorInvalidQueryParams'
+          example:
+            name: invalidParamsError
+            message: The specified request does not exist.
+    common500ErrorServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The error name.
+                    example: serverError
+                  message:
+                    type: string
+                    description: The error message.
+                    example: An error has occurred on the server.
+          example:
+            error:
+              name: serverError
+              message: An error has occurred on the server.
+    common403Error:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/common403Error'
+          example:
+            value:
+              type: https://api.postman.com/problems/forbidden
+              title: Forbidden
+              detail: Forbidden
+              status: 403
+    getPanElementsAndFolders:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getPanElementsAndFolders'
+          example:
+            elements:
+            - addedAt: '2021-11-29T06:31:24.000Z'
+              addedBy: 12345678
+              createdBy: 12345678
+              createdAt: '2020-06-01T08:32:31.000Z'
+              updatedBy: 12345678
+              updatedAt: '2021-11-29T06:31:24.000Z'
+              type: api
+              id: 5360b75f-447e-467c-9299-12fd6c92450d
+              parentFolderId: 1
+              name: Billing API
+              summary: Payments and Account Services API
+              description: The payments and account services API.
+              href: https://api.getpostman.com/apis/5360b75f-447e-467c-9299-12fd6c92450d
+            - addedAt: '2021-11-29T06:31:26.000Z'
+              addedBy: 12345678
+              createdBy: 12345678
+              createdAt: '2020-06-01T13:59:34.000Z'
+              updatedBy: 12345678
+              updatedAt: '2021-11-29T06:31:26.000Z'
+              type: api
+              id: 41f6dc6d-d8ab-45c6-8506-74a25acf5d5f
+              parentFolderId: 2
+              name: Reporting API
+              summary: The reporting API.
+              description: ''
+              href: https://api.getpostman.com/apis/41f6dc6d-d8ab-45c6-8506-74a25acf5d5f
+            folders:
+            - id: 1
+              parentFolderId: 0
+              updatedAt: '2021-11-29T06:31:24.000Z'
+              updatedBy: 12345678
+              createdBy: 12345678
+              createdAt: '2020-06-01T08:32:31.000Z'
+              name: Billing
+              description: The Billing API.
+              type: folder
+            - id: 2
+              parentFolderId: 0
+              updatedAt: '2022-10-17T11:54:51.000Z'
+              updatedBy: 12345678
+              createdBy: 12345678
+              createdAt: '2021-03-05T06:27:24.000Z'
+              name: Reporting
+              description: ''
+              type: folder
+            meta:
+              limit: 1000
+              offset: 0
+              totalCount: 2
+    panFolder400ErrorNotEmpty:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/panFolder400ErrorNotEmpty'
+          example:
+            name: folderNotEmptyError
+            message: You need to empty this folder before deleting it.
+    respondPanElementAddRequest:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/respondPanElementAddRequestResponse'
+          example:
+            request:
+            - id: 2
+              createdAt: '2022-06-09T14:48:45.000Z'
+              createdBy: 12345678
+              message: Please add this to the network
+              status: denied
+              element:
+                type: api
+                id: 5360b75f-447e-467c-9299-12fd3c92450d
+                name: Test API
+                summary: This is a test API
+              response:
+                createdAt: '2022-06-09T14:48:45.000Z'
+                createdBy: 87654321
+                message: Please fix the API issues first
+    getAllPanAddElementRequests:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getAllPanAddElementRequests'
+          example:
+            requests:
+            - id: 1
+              createdBy: 87654321
+              createdAt: '2020-06-01T08:32:31.000Z'
+              status: pending
+              element:
+                type: api
+                id: 360b75f-447e-467c-9299-12fd3c92450d
+                name: Test api
+                summary: Test api summary
+            - id: 2
+              createdBy: 12345678
+              createdAt: '2022-06-09T14:48:45.000Z'
+              message: Please approve this collection
+              status: denied
+              element:
+                type: collection
+                id: 5360b75f-447e-467c-9299-12fd3c92450d
+                name: Test Collection
+                summary: This is a test collection.
+              response:
+                createdAt: '2020-06-01T08:32:31.000Z'
+                createdBy: 2272
+                message: Too many errors, please fix and resubmit
+            meta:
+              limit: 10
+              offset: 5
+              totalCount: 100
+    updatePanElementOrFolder:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/panElementCreated'
+            - $ref: '#/components/schemas/panFolderCreated'
+          examples:
+            Update Collection:
+              value:
+                addedAt: '2022-12-07T18:22:15.000Z'
+                addedBy: 12345678
+                createdBy: 12345678
+                createdAt: '2022-12-07T18:22:15.000Z'
+                updatedBy: 12345678
+                updatedAt: '2022-12-07T18:22:15.000Z'
+                type: collection
+                id: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+                name: Billing API Collection
+                summary: null
+                description: ''
+                href: https://api.getpostman.com/collections/12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+                parentFolderId: 1
+            Update Folder:
+              value:
+                id: 1
+                parentFolderId: 0
+                updatedAt: '2022-12-07T20:27:06.000Z'
+                updatedBy: 12345678
+                createdBy: 12345678
+                createdAt: '2022-12-07T17:04:23.000Z'
+                name: Billing
+                description: The Billing API.
+                type: folder
+    postPanElementOrFolder:
+      description: Created
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/panElementCreated'
+            - $ref: '#/components/schemas/panFolderCreated'
+          examples:
+            Add a Collection:
+              value:
+                addedAt: '2022-12-07T18:22:15.000Z'
+                addedBy: 12345678
+                createdBy: 12345678
+                createdAt: '2022-12-07T18:22:15.000Z'
+                updatedBy: 12345678
+                updatedAt: '2022-12-07T18:22:15.000Z'
+                type: collection
+                id: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+                name: Billing API Collection
+                summary: The Billing API collection.
+                description: ''
+                href: https://api.getpostman.com/collections/12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+            Create a Folder:
+              value:
+                id: 1
+                parentFolderId: 0
+                updatedAt: '2022-12-07T18:00:39.000Z'
+                updatedBy: 12345678
+                createdBy: 12345678
+                createdAt: '2022-12-07T18:00:39.000Z'
+                name: Billing
+                description: The Billing API.
+                type: folder
+    deletePanElementOrFolder:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/deletePanElementOrFolder'
+          examples:
+            Remove an API:
+              value:
+                api:
+                  id: 5360b75f-447e-467c-9299-12fd6c92450d
+            Delete a Folder:
+              value:
+                folder:
+                  id: '1'
+    instanceNotFoundElementFolder:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/instanceNotFoundElementFolder'
+          example:
+            error:
+              name: instanceNotFoundError
+              message: The specified API does not exist.
+    common401Error:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                format: uri-reference
+                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+                example: https://api.postman.com/problems/unauthorized
+              title:
+                type: string
+                description: A short summary of the problem.
+                example: Unauthorized
+              detail:
+                type: string
+                description: Information about the error.
+                example: Unauthorized
+              status:
+                type: integer
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 401
+          example:
+            type: https://api.postman.com/problems/unauthorized
+            title: Unauthorized
+            detail: Unauthorized
+            status: 401
+  parameters:
+    panRequestedBy:
+      name: requestedBy
+      in: query
+      description: Return a user's element requests by their user ID.
+      schema:
+        type: integer
+        example: 12345678
+    sortCreatedUpdatedAt:
+      name: sort
+      in: query
+      description: Sort the results by the given value. If you use this query parameter, you must also use the `direction` parameter.
+      schema:
+        type: string
+        enum:
+        - createdAt
+        - updatedAt
+        example: updatedAt
+    panRequestId:
+      name: requestId
+      in: path
+      required: true
+      description: The element request's ID.
+      schema:
+        type: integer
+        example: 232
+    elementId:
+      name: elementId
+      in: path
+      required: true
+      description: The element's ID or UUID. For Postman Collections you must pass the collection's UID (`userId`-`collectionId`) value.
+      schema:
+        type: string
+        example: 5360b75f-447e-467c-9299-12fd6c92450d
+    panElementDescription:
+      name: description
+      in: query
+      description: Return only elements whose description includes the given value. Matching is not case-sensitive.
+      schema:
+        type: string
+        example: payments
+    panSummary:
+      name: summary
+      in: query
+      description: Return only elements whose summary includes the given value. Matching is not case-sensitive.
+      schema:
+        type: string
+        example: payments
+    panElementName:
+      name: name
+      in: query
+      description: Return only elements whose name includes the given value. Matching is not case-sensitive.
+      schema:
+        type: string
+        example: billing
+    direction:
+      name: direction
+      in: query
+      description: Sort in ascending (`asc`) or descending (`desc`) order. Matching is not case-sensitive. If you use this query parameter, you must also use the `sort` parameter.
+      schema:
+        $ref: '#/components/schemas/ascDesc'
+    panAddedBy:
+      name: addedBy
+      in: query
+      description: Return only elements published by the given user ID.
+      schema:
+        type: integer
+        example: 12345678
+    since:
+      name: since
+      in: query
+      description: Return only results created since the given time, in [ISO 8601](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) format. This value cannot be later than the `until` value.
+      schema:
+        $ref: '#/components/schemas/sinceDateTime'
+    offset:
+      name: offset
+      in: query
+      description: The zero-based offset of the first item to return.
+      schema:
+        type: integer
+        default: 0
+        example: 5
+    until:
+      name: until
+      in: query
+      description: Return only results created until this given time, in [ISO 8601](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) format. This value cannot be earlier than the `since` value.
+      schema:
+        $ref: '#/components/schemas/untilDateTime'
+    createdBy:
+      name: createdBy
+      in: query
+      description: Return only results created by the given user ID.
+      schema:
+        type: integer
+        example: 12345678
+    elementTypeQuery:
+      name: type
+      in: query
+      description: Filter by the element type.
+      schema:
+        type: string
+        enum:
+        - api
+        - folder
+        - collection
+        - workspace
+        example: api
+    panParentFolderId:
+      name: parentFolderId
+      in: query
+      description: Return the folders and elements in a specific folder. If this value is `0`, then the endpoint only returns the root folder's elements.
+      schema:
+        type: integer
+        example: 1
+        default: 0
+    elementType:
+      name: elementType
+      in: path
+      required: true
+      description: The element type.
+      schema:
+        type: string
+        enum:
+        - api
+        - folder
+        - collection
+        - workspace
+        example: api
+    panRequestStatus:
+      name: status
+      in: query
+      description: Filter by the request status.
+      schema:
+        type: string
+        enum:
+        - pending
+        - denied
+        example: pending
+    limitDefault1000:
+      name: limit
+      in: query
+      description: The maximum number of elements to return. If the value exceeds the maximum value of `1000`, then the system uses the `1000` value.
+      schema:
+        type: integer
+        default: 1000
+        example: 10
   schemas:
+    updatePanWorkspace:
+      title: Update Workspace
+      type: object
+      properties:
+        workspace:
+          type: object
+          properties:
+            parentFolderId:
+              type: integer
+              description: The workspace's new parent folder ID.
+              example: 1
+    getAllPanAddElementRequests:
+      title: Successful Response
+      type: object
+      properties:
+        requests:
+          description: Information about the requests to add elements to the Private API Network.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: The request's ID.
+                example: 2
+              createdAt:
+                type: string
+                format: date-time
+                description: The date and time at which the request was created.
+                example: '2022-06-09T14:48:45.000Z'
+              createdBy:
+                type: integer
+                description: The ID of the user who created the request.
+                example: 12345678
+              message:
+                type: string
+                description: The user's optional message included in the request.
+                example: Please approve this collection
+              status:
+                type: string
+                description: The request's status.
+                enum:
+                - pending
+                - denied
+                example: denied
+              element:
+                type: object
+                description: Information about the requested element.
+                properties:
+                  id:
+                    type: string
+                    description: The element's ID.
+                    example: 5360b75f-447e-467c-9299-12fd3c92450d
+                  type:
+                    type: string
+                    description: The element type.
+                    enum:
+                    - api
+                    - workspace
+                    - collection
+                    example: collection
+                  name:
+                    type: string
+                    description: The element's name.
+                    example: Test Collection
+                  summary:
+                    type:
+                    - string
+                    - 'null'
+                    description: If applicable, the element's short summary.
+                    example: null
+              response:
+                description: Information about the response to the request. This object only returns when the network manager denied a request with a message.
+                type: object
+                properties:
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the network manager denied the request.
+                    example: '2020-06-01T08:32:31.000Z'
+                  createdBy:
+                    type: integer
+                    description: The network manager's user ID.
+                    example: 2272
+                  message:
+                    type: string
+                    description: The network manager's request response message.
+                    example: Too many errors, please fix and resubmit
+        meta:
+          type: object
+          description: The response's non-standard meta information.
+          properties:
+            limit:
+              type: integer
+              description: The maximum number of items returned.
+              example: 10
+            offset:
+              type: integer
+              description: The zero-based offset of the first item returned.
+              example: 5
+            totalCount:
+              type: integer
+              description: The total count of items found.
+              example: 100
+    respondPanElementAddRequestResponse:
+      title: Successful Response
+      type: object
+      properties:
+        request:
+          type: array
+          description: Information about the Private API Network request.
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: The request's ID.
+                example: 2
+              createdAt:
+                type: string
+                format: date-time
+                description: The date and time at which the request was created.
+                example: '2022-06-09T14:48:45.000Z'
+              createdBy:
+                type: integer
+                description: The ID of the user who created the request.
+                example: 12345678
+              message:
+                type: string
+                description: The user's optional message included in the request.
+                example: Please add this element to the network
+              response:
+                description: Information about the response to the element's request. This object only returns when the network manager denied a request with a message.
+                type: object
+                properties:
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the network manager denied the request.
+                    example: '2020-06-01T08:32:31.000Z'
+                  createdBy:
+                    type: integer
+                    description: The network manager's user ID.
+                    example: 87654321
+                  message:
+                    type: string
+                    description: The network manager's request response message.
+                    example: Please fix the API issues first
+              element:
+                description: Information about the requested element.
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The element's ID.
+                    example: 5360b75f-447e-467c-9299-12fd3c92450d
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The date and time at which the element was approved and added to the Private API Network.
+                    example: '2022-09-28T13:48:09.000Z'
+                  createdBy:
+                    type: integer
+                    description: The user ID of the user who requested to add the element to the Private API Network.
+                    example: 12345678
+                  type:
+                    type: string
+                    description: The element type.
+                    enum:
+                    - api
+                    - workspace
+                    - collection
+                    example: api
+                  name:
+                    type: string
+                    description: The element's name.
+                    example: Test API
+                  summary:
+                    type:
+                    - string
+                    - 'null'
+                    description: If applicable, the element's short summary.
+                    example: This is a test API
+              status:
+                type: string
+                description: The request's status.
+                enum:
+                - approved
+                - denied
+                example: denied
+    pan400ErrorInvalidQueryParams:
+      title: Bad Request
+      type: object
+      properties:
+        name:
+          type: string
+          description: The error name.
+          example: invalidParamsError
+        message:
+          type: string
+          description: The error message.
+          example: The specified request does not exist.
+    panElementCreated:
+      title: Element Created
+      description: Information about the Private API Network element.
+      type: object
+      properties:
+        addedAt:
+          type: string
+          format: date-time
+          description: The date and time at which the element was added.
+          example: '2022-06-09T14:48:45.000Z'
+        addedBy:
+          type: integer
+          description: The user who added the element.
+          example: 12345678
+        createdBy:
+          type: integer
+          description: The user who created the element.
+          example: 12345678
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time at which the element was created.
+          example: '2021-10-11T09:39:33.000Z'
+        updatedBy:
+          type: integer
+          description: The user who last updated the element.
+          example: 12345678
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date and time at which the element was last updated.
+          example: '2022-12-07T17:54:33.000Z'
+        type:
+          type: string
+          description: The element's type.
+          example: api
+        id:
+          type: string
+          description: The element's ID or UID.
+          example: 5360b75f-447e-467c-9299-12fd6c92450d
+        name:
+          type: string
+          description: The element's name.
+          example: Billing API
+        summary:
+          type:
+          - string
+          - 'null'
+          description: The element's summary.
+          example: The payments and account services API.
+        description:
+          type: string
+          description: The element's description.
+          example: ''
+        href:
+          type: string
+          format: url
+          description: The element's Postman URL.
+          example: https://api.getpostman.com/collections/12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+        parentFolderId:
+          type: integer
+          description: The parent folder's ID.
+          example: 1
+        environments:
+          type: array
+          description: A list of the element's environments.
+          items:
+            type: string
+            example: 120403-c6cf0fe2-c637-4d30-a640-ed64ec6d0ddb
+    panCreateFolder:
+      title: Add Folder
+      type: object
+      properties:
+        folder:
+          type: object
+          required:
+          - name
+          properties:
+            name:
+              type: string
+              description: The folder's name.
+              example: Billing
+            description:
+              type: string
+              description: The folder's description.
+              example: The Billing API.
+            parentFolderId:
+              type: integer
+              default: 0
+              description: The folder's parent folder ID. This value defaults to `0`. To create a folder at the root level, omit this property.
+              example: 0
+    respondPanElementAddRequestBody:
+      type: object
+      required:
+      - status
+      properties:
+        response:
+          type: object
+          description: The response to the user's request.
+          properties:
+            message:
+              type: string
+              description: A message that details why the user's request was denied.
+              example: The requested collection has a lot of governance violations. Please fix them.
+        status:
+          type: string
+          description: The request's status.
+          enum:
+          - denied
+          - approved
+          example: denied
+    updatePanFolder:
+      title: Update Folder
+      type: object
+      properties:
+        folder:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The folder's new name.
+              example: Billing
+            description:
+              type: string
+              description: The folder's updated description.
+              example: The Billing API.
+            parentFolderId:
+              type: integer
+              description: The folder's new parent folder ID.
+              example: 0
+    updatePanApi:
+      title: Update API
+      type: object
+      properties:
+        api:
+          type: object
+          properties:
+            parentFolderId:
+              type: integer
+              description: The API's new parent folder ID.
+              example: 1
+    panCreateWorkspace:
+      title: Add Workspace
+      type: object
+      properties:
+        workspace:
+          type: object
+          required:
+          - id
+          - parentFolderId
+          properties:
+            id:
+              type: string
+              description: The workspace's ID.
+              example: 5360b75f-447e-467c-9299-12fd6c92450d
+            parentFolderId:
+              type: integer
+              description: The workspace's parent folder ID.
+              example: 1
+    pan400ErrorInvalidParams:
+      title: Bad Request
+      type: object
+      properties:
+        name:
+          type: string
+          description: The error name.
+          example: invalidParamsError
+        message:
+          type: string
+          description: The error message.
+          example: Status type can only be denied or approved.
+    deletePanElementOrFolder:
+      title: Successful Response
+      type: object
+      properties:
+        elementType:
+          type: object
+          description: The Private API Network element type. The name of the object is the element `api`, `collection`, `workspace`, or `folder` type.
+          properties:
+            id:
+              type: string
+              description: The element's ID.
+              example: 5360b75f-447e-467c-9299-12fd6c92450d
+    updatePanCollection:
+      title: Update Collection
+      type: object
+      properties:
+        collection:
+          type: object
+          properties:
+            parentFolderId:
+              type: integer
+              description: The collection's new parent folder ID.
+              example: 1
+            environments:
+              type: object
+              description: The collection's updated environments.
+              properties:
+                $add:
+                  type: array
+                  items:
+                    type: string
+                    description: The ID of environment to add to the collection.
+                    example: 92133-622c084d-4f48-470b-826e-18af3c65c775
+                $remove:
+                  type: array
+                  items:
+                    type: string
+                    description: The ID of environment to remove from the collection.
+                    example: 92637-612c7311-4557-470b-826e-18af35682568
+    panCreateCollection:
+      title: Add Collection
+      type: object
+      properties:
+        collection:
+          type: object
+          required:
+          - id
+          - parentFolderId
+          properties:
+            id:
+              type: string
+              description: The collection's ID.
+              example: 5360b75f-447e-467c-9299-12fd6c92450d
+            parentFolderId:
+              type: integer
+              description: The collection's parent folder ID.
+              example: 1
+            environments:
+              type: array
+              description: A list of environment UIDs (`userId`-`environmentId``) to add to the collection.
+              items:
+                type: string
+                format: uid
+                description: An environment's UID.
+                example: 12345678-622c084d-4f48-470b-826e-18af3c65c775
+    ascDesc:
+      type: string
+      enum:
+      - asc
+      - desc
+      example: asc
+    panCreateApi:
+      title: Add API
+      type: object
+      properties:
+        api:
+          type: object
+          required:
+          - id
+          - parentFolderId
+          properties:
+            id:
+              type: string
+              description: The API's ID.
+              example: 5360b75f-447e-467c-9299-12fd6c92450d
+            parentFolderId:
+              type: integer
+              description: The API's parent folder ID.
+              example: 1
+    sinceDateTime:
+      type: string
+      format: date-time
+      example: '2022-06-01T00:00:00.000Z'
     getPanElementsAndFolders:
       title: Successful Response
       type: object
@@ -318,329 +1268,6 @@ components:
               type: integer
               example: 2
               description: The total count of the `elements` and `folders` items.
-    respondPanElementAddRequestResponse:
-      title: Successful Response
-      type: object
-      properties:
-        request:
-          type: array
-          description: Information about the Private API Network request.
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                description: The request's ID.
-                example: 2
-              createdAt:
-                type: string
-                format: date-time
-                description: The date and time at which the request was created.
-                example: '2022-06-09T14:48:45.000Z'
-              createdBy:
-                type: integer
-                description: The ID of the user who created the request.
-                example: 12345678
-              message:
-                type: string
-                description: The user's optional message included in the request.
-                example: Please add this element to the network
-              response:
-                description: Information about the response to the element's request. This object only returns when the network manager denied a request with a message.
-                type: object
-                properties:
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the network manager denied the request.
-                    example: '2020-06-01T08:32:31.000Z'
-                  createdBy:
-                    type: integer
-                    description: The network manager's user ID.
-                    example: 87654321
-                  message:
-                    type: string
-                    description: The network manager's request response message.
-                    example: Please fix the API issues first
-              element:
-                description: Information about the requested element.
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The element's ID.
-                    example: 5360b75f-447e-467c-9299-12fd3c92450d
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the element was approved and added to the Private API Network.
-                    example: '2022-09-28T13:48:09.000Z'
-                  createdBy:
-                    type: integer
-                    description: The user ID of the user who requested to add the element to the Private API Network.
-                    example: 12345678
-                  type:
-                    type: string
-                    description: The element type.
-                    enum:
-                    - api
-                    - workspace
-                    - collection
-                    example: api
-                  name:
-                    type: string
-                    description: The element's name.
-                    example: Test API
-                  summary:
-                    type:
-                    - string
-                    - 'null'
-                    description: If applicable, the element's short summary.
-                    example: This is a test API
-              status:
-                type: string
-                description: The request's status.
-                enum:
-                - approved
-                - denied
-                example: denied
-    panCreateFolder:
-      title: Add Folder
-      type: object
-      properties:
-        folder:
-          type: object
-          required:
-          - name
-          properties:
-            name:
-              type: string
-              description: The folder's name.
-              example: Billing
-            description:
-              type: string
-              description: The folder's description.
-              example: The Billing API.
-            parentFolderId:
-              type: integer
-              default: 0
-              description: The folder's parent folder ID. This value defaults to `0`. To create a folder at the root level, omit this property.
-              example: 0
-    updatePanApi:
-      title: Update API
-      type: object
-      properties:
-        api:
-          type: object
-          properties:
-            parentFolderId:
-              type: integer
-              description: The API's new parent folder ID.
-              example: 1
-    sinceDateTime:
-      type: string
-      format: date-time
-      example: '2022-06-01T00:00:00.000Z'
-    getAllPanAddElementRequests:
-      title: Successful Response
-      type: object
-      properties:
-        requests:
-          description: Information about the requests to add elements to the Private API Network.
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                description: The request's ID.
-                example: 2
-              createdAt:
-                type: string
-                format: date-time
-                description: The date and time at which the request was created.
-                example: '2022-06-09T14:48:45.000Z'
-              createdBy:
-                type: integer
-                description: The ID of the user who created the request.
-                example: 12345678
-              message:
-                type: string
-                description: The user's optional message included in the request.
-                example: Please approve this collection
-              status:
-                type: string
-                description: The request's status.
-                enum:
-                - pending
-                - denied
-                example: denied
-              element:
-                type: object
-                description: Information about the requested element.
-                properties:
-                  id:
-                    type: string
-                    description: The element's ID.
-                    example: 5360b75f-447e-467c-9299-12fd3c92450d
-                  type:
-                    type: string
-                    description: The element type.
-                    enum:
-                    - api
-                    - workspace
-                    - collection
-                    example: collection
-                  name:
-                    type: string
-                    description: The element's name.
-                    example: Test Collection
-                  summary:
-                    type:
-                    - string
-                    - 'null'
-                    description: If applicable, the element's short summary.
-                    example: null
-              response:
-                description: Information about the response to the request. This object only returns when the network manager denied a request with a message.
-                type: object
-                properties:
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The date and time at which the network manager denied the request.
-                    example: '2020-06-01T08:32:31.000Z'
-                  createdBy:
-                    type: integer
-                    description: The network manager's user ID.
-                    example: 2272
-                  message:
-                    type: string
-                    description: The network manager's request response message.
-                    example: Too many errors, please fix and resubmit
-        meta:
-          type: object
-          description: The response's non-standard meta information.
-          properties:
-            limit:
-              type: integer
-              description: The maximum number of items returned.
-              example: 10
-            offset:
-              type: integer
-              description: The zero-based offset of the first item returned.
-              example: 5
-            totalCount:
-              type: integer
-              description: The total count of items found.
-              example: 100
-    pan400ErrorInvalidParams:
-      title: Bad Request
-      type: object
-      properties:
-        name:
-          type: string
-          description: The error name.
-          example: invalidParamsError
-        message:
-          type: string
-          description: The error message.
-          example: Status type can only be denied or approved.
-    panCreateCollection:
-      title: Add Collection
-      type: object
-      properties:
-        collection:
-          type: object
-          required:
-          - id
-          - parentFolderId
-          properties:
-            id:
-              type: string
-              description: The collection's ID.
-              example: 5360b75f-447e-467c-9299-12fd6c92450d
-            parentFolderId:
-              type: integer
-              description: The collection's parent folder ID.
-              example: 1
-            environments:
-              type: array
-              description: A list of environment UIDs (`userId`-`environmentId``) to add to the collection.
-              items:
-                type: string
-                format: uid
-                description: An environment's UID.
-                example: 12345678-622c084d-4f48-470b-826e-18af3c65c775
-    panElementCreated:
-      title: Element Created
-      description: Information about the Private API Network element.
-      type: object
-      properties:
-        addedAt:
-          type: string
-          format: date-time
-          description: The date and time at which the element was added.
-          example: '2022-06-09T14:48:45.000Z'
-        addedBy:
-          type: integer
-          description: The user who added the element.
-          example: 12345678
-        createdBy:
-          type: integer
-          description: The user who created the element.
-          example: 12345678
-        createdAt:
-          type: string
-          format: date-time
-          description: The date and time at which the element was created.
-          example: '2021-10-11T09:39:33.000Z'
-        updatedBy:
-          type: integer
-          description: The user who last updated the element.
-          example: 12345678
-        updatedAt:
-          type: string
-          format: date-time
-          description: The date and time at which the element was last updated.
-          example: '2022-12-07T17:54:33.000Z'
-        type:
-          type: string
-          description: The element's type.
-          example: api
-        id:
-          type: string
-          description: The element's ID or UID.
-          example: 5360b75f-447e-467c-9299-12fd6c92450d
-        name:
-          type: string
-          description: The element's name.
-          example: Billing API
-        summary:
-          type:
-          - string
-          - 'null'
-          description: The element's summary.
-          example: The payments and account services API.
-        description:
-          type: string
-          description: The element's description.
-          example: ''
-        href:
-          type: string
-          format: url
-          description: The element's Postman URL.
-          example: https://api.getpostman.com/collections/12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-        parentFolderId:
-          type: integer
-          description: The parent folder's ID.
-          example: 1
-        environments:
-          type: array
-          description: A list of the element's environments.
-          items:
-            type: string
-            example: 120403-c6cf0fe2-c637-4d30-a640-ed64ec6d0ddb
     instanceNotFoundElementFolder:
       title: Not Found
       type: object
@@ -656,145 +1283,18 @@ components:
               type: string
               description: The error message.
               example: The specified API does not exist.
-    panCreateWorkspace:
-      title: Add Workspace
+    panFolder400ErrorNotEmpty:
+      title: Folder Not Empty
       type: object
       properties:
-        workspace:
-          type: object
-          required:
-          - id
-          - parentFolderId
-          properties:
-            id:
-              type: string
-              description: The workspace's ID.
-              example: 5360b75f-447e-467c-9299-12fd6c92450d
-            parentFolderId:
-              type: integer
-              description: The workspace's parent folder ID.
-              example: 1
-    updatePanCollection:
-      title: Update Collection
-      type: object
-      properties:
-        collection:
-          type: object
-          properties:
-            parentFolderId:
-              type: integer
-              description: The collection's new parent folder ID.
-              example: 1
-            environments:
-              type: object
-              description: The collection's updated environments.
-              properties:
-                $add:
-                  type: array
-                  items:
-                    type: string
-                    description: The ID of environment to add to the collection.
-                    example: 92133-622c084d-4f48-470b-826e-18af3c65c775
-                $remove:
-                  type: array
-                  items:
-                    type: string
-                    description: The ID of environment to remove from the collection.
-                    example: 92637-612c7311-4557-470b-826e-18af35682568
-    deletePanElementOrFolder:
-      title: Successful Response
-      type: object
-      properties:
-        elementType:
-          type: object
-          description: The Private API Network element type. The name of the object is the element `api`, `collection`, `workspace`, or `folder` type.
-          properties:
-            id:
-              type: string
-              description: The element's ID.
-              example: 5360b75f-447e-467c-9299-12fd6c92450d
-    updatePanWorkspace:
-      title: Update Workspace
-      type: object
-      properties:
-        workspace:
-          type: object
-          properties:
-            parentFolderId:
-              type: integer
-              description: The workspace's new parent folder ID.
-              example: 1
-    untilDateTime:
-      type: string
-      format: date-time
-      example: '2022-06-15T00:00:00.000Z'
-    common403Error:
-      title: Forbidden
-      type: object
-      properties:
-        type:
+        name:
           type: string
-          format: uri-reference
-          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-          example: https://api.postman.com/problems/forbidden
-        title:
+          description: The error name.
+          example: instanceNotFoundError
+        message:
           type: string
-          description: A short summary of the problem.
-          example: Forbidden
-        detail:
-          type: string
-          description: Information about the error.
-          example: Forbidden
-        status:
-          type: integer
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
-    respondPanElementAddRequestBody:
-      type: object
-      required:
-      - status
-      properties:
-        response:
-          type: object
-          description: The response to the user's request.
-          properties:
-            message:
-              type: string
-              description: A message that details why the user's request was denied.
-              example: The requested collection has a lot of governance violations. Please fix them.
-        status:
-          type: string
-          description: The request's status.
-          enum:
-          - denied
-          - approved
-          example: denied
-    ascDesc:
-      type: string
-      enum:
-      - asc
-      - desc
-      example: asc
-    updatePanFolder:
-      title: Update Folder
-      type: object
-      properties:
-        folder:
-          type: object
-          properties:
-            name:
-              type: string
-              description: The folder's new name.
-              example: Billing
-            description:
-              type: string
-              description: The folder's updated description.
-              example: The Billing API.
-            parentFolderId:
-              type: integer
-              description: The folder's new parent folder ID.
-              example: 0
+          description: The error message.
+          example: You need to empty this folder before deleting it.
     panFolderCreated:
       title: Folder Created
       type: object
@@ -838,495 +1338,54 @@ components:
           type: string
           description: The folder's type. This is always the `folder` value.
           example: folder
-    panFolder400ErrorNotEmpty:
-      title: Folder Not Empty
-      type: object
-      properties:
-        name:
-          type: string
-          description: The error name.
-          example: instanceNotFoundError
-        message:
-          type: string
-          description: The error message.
-          example: You need to empty this folder before deleting it.
-    pan400ErrorInvalidQueryParams:
-      title: Bad Request
-      type: object
-      properties:
-        name:
-          type: string
-          description: The error name.
-          example: invalidParamsError
-        message:
-          type: string
-          description: The error message.
-          example: The specified request does not exist.
-    panCreateApi:
-      title: Add API
-      type: object
-      properties:
-        api:
-          type: object
-          required:
-          - id
-          - parentFolderId
-          properties:
-            id:
-              type: string
-              description: The API's ID.
-              example: 5360b75f-447e-467c-9299-12fd6c92450d
-            parentFolderId:
-              type: integer
-              description: The API's parent folder ID.
-              example: 1
-  responses:
-    updatePanElementOrFolder:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            oneOf:
-            - $ref: '#/components/schemas/panElementCreated'
-            - $ref: '#/components/schemas/panFolderCreated'
-          examples:
-            Update Collection:
-              value:
-                addedAt: '2022-12-07T18:22:15.000Z'
-                addedBy: 12345678
-                createdBy: 12345678
-                createdAt: '2022-12-07T18:22:15.000Z'
-                updatedBy: 12345678
-                updatedAt: '2022-12-07T18:22:15.000Z'
-                type: collection
-                id: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-                name: Billing API Collection
-                summary: null
-                description: ''
-                href: https://api.getpostman.com/collections/12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-                parentFolderId: 1
-            Update Folder:
-              value:
-                id: 1
-                parentFolderId: 0
-                updatedAt: '2022-12-07T20:27:06.000Z'
-                updatedBy: 12345678
-                createdBy: 12345678
-                createdAt: '2022-12-07T17:04:23.000Z'
-                name: Billing
-                description: The Billing API.
-                type: folder
-    panFolder400ErrorNotEmpty:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/panFolder400ErrorNotEmpty'
-          example:
-            name: folderNotEmptyError
-            message: You need to empty this folder before deleting it.
-    pan400ErrorInvalidParams:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/pan400ErrorInvalidParams'
-          example:
-            name: invalidParamsError
-            message: Status type can only be denied or approved.
     common403Error:
-      description: Forbidden
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/common403Error'
-          example:
-            value:
-              type: https://api.postman.com/problems/forbidden
-              title: Forbidden
-              detail: Forbidden
-              status: 403
-    deletePanElementOrFolder:
-      description: Successful Response
+      title: Forbidden
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
+          example: https://api.postman.com/problems/forbidden
+        title:
+          type: string
+          description: A short summary of the problem.
+          example: Forbidden
+        detail:
+          type: string
+          description: Information about the error.
+          example: Forbidden
+        status:
+          type: integer
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+    untilDateTime:
+      type: string
+      format: date-time
+      example: '2022-06-15T00:00:00.000Z'
+  requestBodies:
+    updatePanElementOrFolder:
+      required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/deletePanElementOrFolder'
+            anyOf:
+            - $ref: '#/components/schemas/updatePanApi'
+            - $ref: '#/components/schemas/updatePanCollection'
+            - $ref: '#/components/schemas/updatePanWorkspace'
+            - $ref: '#/components/schemas/updatePanFolder'
           examples:
-            Remove an API:
+            Update a Collection:
               value:
-                api:
-                  id: 5360b75f-447e-467c-9299-12fd6c92450d
-            Delete a Folder:
+                collection:
+                  parentFolderId: 1
+            Update a Folder:
               value:
                 folder:
-                  id: '1'
-    common500ErrorServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: object
-                properties:
-                  name:
-                    type: string
-                    description: The error name.
-                    example: serverError
-                  message:
-                    type: string
-                    description: The error message.
-                    example: An error has occurred on the server.
-          example:
-            error:
-              name: serverError
-              message: An error has occurred on the server.
-    pan400ErrorInvalidQueryParams:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/pan400ErrorInvalidQueryParams'
-          example:
-            name: invalidParamsError
-            message: The specified request does not exist.
-    getAllPanAddElementRequests:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/getAllPanAddElementRequests'
-          example:
-            requests:
-            - id: 1
-              createdBy: 87654321
-              createdAt: '2020-06-01T08:32:31.000Z'
-              status: pending
-              element:
-                type: api
-                id: 360b75f-447e-467c-9299-12fd3c92450d
-                name: Test api
-                summary: Test api summary
-            - id: 2
-              createdBy: 12345678
-              createdAt: '2022-06-09T14:48:45.000Z'
-              message: Please approve this collection
-              status: denied
-              element:
-                type: collection
-                id: 5360b75f-447e-467c-9299-12fd3c92450d
-                name: Test Collection
-                summary: This is a test collection.
-              response:
-                createdAt: '2020-06-01T08:32:31.000Z'
-                createdBy: 2272
-                message: Too many errors, please fix and resubmit
-            meta:
-              limit: 10
-              offset: 5
-              totalCount: 100
-    respondPanElementAddRequest:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/respondPanElementAddRequestResponse'
-          example:
-            request:
-            - id: 2
-              createdAt: '2022-06-09T14:48:45.000Z'
-              createdBy: 12345678
-              message: Please add this to the network
-              status: denied
-              element:
-                type: api
-                id: 5360b75f-447e-467c-9299-12fd3c92450d
-                name: Test API
-                summary: This is a test API
-              response:
-                createdAt: '2022-06-09T14:48:45.000Z'
-                createdBy: 87654321
-                message: Please fix the API issues first
-    postPanElementOrFolder:
-      description: Created
-      content:
-        application/json:
-          schema:
-            oneOf:
-            - $ref: '#/components/schemas/panElementCreated'
-            - $ref: '#/components/schemas/panFolderCreated'
-          examples:
-            Add a Collection:
-              value:
-                addedAt: '2022-12-07T18:22:15.000Z'
-                addedBy: 12345678
-                createdBy: 12345678
-                createdAt: '2022-12-07T18:22:15.000Z'
-                updatedBy: 12345678
-                updatedAt: '2022-12-07T18:22:15.000Z'
-                type: collection
-                id: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-                name: Billing API Collection
-                summary: The Billing API collection.
-                description: ''
-                href: https://api.getpostman.com/collections/12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-            Create a Folder:
-              value:
-                id: 1
-                parentFolderId: 0
-                updatedAt: '2022-12-07T18:00:39.000Z'
-                updatedBy: 12345678
-                createdBy: 12345678
-                createdAt: '2022-12-07T18:00:39.000Z'
-                name: Billing
-                description: The Billing API.
-                type: folder
-    instanceNotFoundElementFolder:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/instanceNotFoundElementFolder'
-          example:
-            error:
-              name: instanceNotFoundError
-              message: The specified API does not exist.
-    getPanElementsAndFolders:
-      description: Successful Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/getPanElementsAndFolders'
-          example:
-            elements:
-            - addedAt: '2021-11-29T06:31:24.000Z'
-              addedBy: 12345678
-              createdBy: 12345678
-              createdAt: '2020-06-01T08:32:31.000Z'
-              updatedBy: 12345678
-              updatedAt: '2021-11-29T06:31:24.000Z'
-              type: api
-              id: 5360b75f-447e-467c-9299-12fd6c92450d
-              parentFolderId: 1
-              name: Billing API
-              summary: Payments and Account Services API
-              description: The payments and account services API.
-              href: https://api.getpostman.com/apis/5360b75f-447e-467c-9299-12fd6c92450d
-            - addedAt: '2021-11-29T06:31:26.000Z'
-              addedBy: 12345678
-              createdBy: 12345678
-              createdAt: '2020-06-01T13:59:34.000Z'
-              updatedBy: 12345678
-              updatedAt: '2021-11-29T06:31:26.000Z'
-              type: api
-              id: 41f6dc6d-d8ab-45c6-8506-74a25acf5d5f
-              parentFolderId: 2
-              name: Reporting API
-              summary: The reporting API.
-              description: ''
-              href: https://api.getpostman.com/apis/41f6dc6d-d8ab-45c6-8506-74a25acf5d5f
-            folders:
-            - id: 1
-              parentFolderId: 0
-              updatedAt: '2021-11-29T06:31:24.000Z'
-              updatedBy: 12345678
-              createdBy: 12345678
-              createdAt: '2020-06-01T08:32:31.000Z'
-              name: Billing
-              description: The Billing API.
-              type: folder
-            - id: 2
-              parentFolderId: 0
-              updatedAt: '2022-10-17T11:54:51.000Z'
-              updatedBy: 12345678
-              createdBy: 12345678
-              createdAt: '2021-03-05T06:27:24.000Z'
-              name: Reporting
-              description: ''
-              type: folder
-            meta:
-              limit: 1000
-              offset: 0
-              totalCount: 2
-    common401Error:
-      description: Unauthorized
-      content:
-        application/problem+json:
-          schema:
-            type: object
-            properties:
-              type:
-                type: string
-                format: uri-reference
-                description: The [URI reference](https://www.rfc-editor.org/rfc/rfc3986) that identifies the type of problem.
-                example: https://api.postman.com/problems/unauthorized
-              title:
-                type: string
-                description: A short summary of the problem.
-                example: Unauthorized
-              detail:
-                type: string
-                description: Information about the error.
-                example: Unauthorized
-              status:
-                type: integer
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 401
-          example:
-            type: https://api.postman.com/problems/unauthorized
-            title: Unauthorized
-            detail: Unauthorized
-            status: 401
-  parameters:
-    panElementName:
-      name: name
-      in: query
-      description: Return only elements whose name includes the given value. Matching is not case-sensitive.
-      schema:
-        type: string
-        example: billing
-    until:
-      name: until
-      in: query
-      description: Return only results created until this given time, in [ISO 8601](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) format. This value cannot be earlier than the `since` value.
-      schema:
-        $ref: '#/components/schemas/untilDateTime'
-    elementId:
-      name: elementId
-      in: path
-      required: true
-      description: The element's ID or UUID. For Postman Collections you must pass the collection's UID (`userId`-`collectionId`) value.
-      schema:
-        type: string
-        example: 5360b75f-447e-467c-9299-12fd6c92450d
-    elementType:
-      name: elementType
-      in: path
-      required: true
-      description: The element type.
-      schema:
-        type: string
-        enum:
-        - api
-        - folder
-        - collection
-        - workspace
-        example: api
-    panRequestedBy:
-      name: requestedBy
-      in: query
-      description: Return a user's element requests by their user ID.
-      schema:
-        type: integer
-        example: 12345678
-    since:
-      name: since
-      in: query
-      description: Return only results created since the given time, in [ISO 8601](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) format. This value cannot be later than the `until` value.
-      schema:
-        $ref: '#/components/schemas/sinceDateTime'
-    panElementDescription:
-      name: description
-      in: query
-      description: Return only elements whose description includes the given value. Matching is not case-sensitive.
-      schema:
-        type: string
-        example: payments
-    elementTypeQuery:
-      name: type
-      in: query
-      description: Filter by the element type.
-      schema:
-        type: string
-        enum:
-        - api
-        - folder
-        - collection
-        - workspace
-        example: api
-    panSummary:
-      name: summary
-      in: query
-      description: Return only elements whose summary includes the given value. Matching is not case-sensitive.
-      schema:
-        type: string
-        example: payments
-    offset:
-      name: offset
-      in: query
-      description: The zero-based offset of the first item to return.
-      schema:
-        type: integer
-        default: 0
-        example: 5
-    limitDefault1000:
-      name: limit
-      in: query
-      description: The maximum number of elements to return. If the value exceeds the maximum value of `1000`, then the system uses the `1000` value.
-      schema:
-        type: integer
-        default: 1000
-        example: 10
-    createdBy:
-      name: createdBy
-      in: query
-      description: Return only results created by the given user ID.
-      schema:
-        type: integer
-        example: 12345678
-    panRequestId:
-      name: requestId
-      in: path
-      required: true
-      description: The element request's ID.
-      schema:
-        type: integer
-        example: 232
-    panAddedBy:
-      name: addedBy
-      in: query
-      description: Return only elements published by the given user ID.
-      schema:
-        type: integer
-        example: 12345678
-    direction:
-      name: direction
-      in: query
-      description: Sort in ascending (`asc`) or descending (`desc`) order. Matching is not case-sensitive. If you use this query parameter, you must also use the `sort` parameter.
-      schema:
-        $ref: '#/components/schemas/ascDesc'
-    panRequestStatus:
-      name: status
-      in: query
-      description: Filter by the request status.
-      schema:
-        type: string
-        enum:
-        - pending
-        - denied
-        example: pending
-    panParentFolderId:
-      name: parentFolderId
-      in: query
-      description: Return the folders and elements in a specific folder. If this value is `0`, then the endpoint only returns the root folder's elements.
-      schema:
-        type: integer
-        example: 1
-        default: 0
-    sortCreatedUpdatedAt:
-      name: sort
-      in: query
-      description: Sort the results by the given value. If you use this query parameter, you must also use the `direction` parameter.
-      schema:
-        type: string
-        enum:
-        - createdAt
-        - updatedAt
-        example: updatedAt
-  requestBodies:
+                  name: Billing
+                  description: The Billing API.
+                  parentFolderId: 0
     postPanElementOrFolder:
       required: true
       content:
@@ -1344,27 +1403,6 @@ components:
                   id: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
                   parentFolderId: 1
             Create a Folder:
-              value:
-                folder:
-                  name: Billing
-                  description: The Billing API.
-                  parentFolderId: 0
-    updatePanElementOrFolder:
-      required: true
-      content:
-        application/json:
-          schema:
-            anyOf:
-            - $ref: '#/components/schemas/updatePanApi'
-            - $ref: '#/components/schemas/updatePanCollection'
-            - $ref: '#/components/schemas/updatePanWorkspace'
-            - $ref: '#/components/schemas/updatePanFolder'
-          examples:
-            Update a Collection:
-              value:
-                collection:
-                  parentFolderId: 1
-            Update a Folder:
               value:
                 folder:
                   name: Billing

@@ -883,25 +883,95 @@ paths:
       summary: Update usage
       x-summary-source: derived
 components:
+  parameters:
+    X-Amz-SignedHeaders:
+      name: X-Amz-SignedHeaders
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Security-Token:
+      name: X-Amz-Security-Token
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Content-Sha256:
+      name: X-Amz-Content-Sha256
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Credential:
+      name: X-Amz-Credential
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Algorithm:
+      name: X-Amz-Algorithm
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Signature:
+      name: X-Amz-Signature
+      in: header
+      schema:
+        type: string
+      required: false
+    X-Amz-Date:
+      name: X-Amz-Date
+      in: header
+      schema:
+        type: string
+      required: false
   schemas:
-    QuotaPeriodType:
-      type: string
-      enum:
-      - DAY
-      - WEEK
-      - MONTH
-    ListOfUsagePlanKey:
-      type: array
-      items:
-        $ref: '#/components/schemas/UsagePlanKey'
-    MapOfKeyUsages:
+    MapOfStringToString:
       type: object
       additionalProperties:
-        $ref: '#/components/schemas/ListOfUsage'
-    MapOfApiStageThrottleSettings:
+        $ref: '#/components/schemas/String'
+    ConflictException: {}
+    LimitExceededException: {}
+    QuotaSettings:
       type: object
-      additionalProperties:
-        $ref: '#/components/schemas/ThrottleSettings'
+      properties:
+        limit:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          - description: The target maximum number of requests that can be made in a given time period.
+        offset:
+          allOf:
+          - $ref: '#/components/schemas/Integer'
+          - description: The number of requests subtracted from the given limit in the initial time period.
+        period:
+          allOf:
+          - $ref: '#/components/schemas/QuotaPeriodType'
+          - description: The time period in which the limit applies. Valid values are "DAY", "WEEK" or "MONTH".
+      description: Quotas configured for a usage plan.
+    TooManyRequestsException: {}
+    BadRequestException: {}
+    NotFoundException: {}
+    PatchOperation:
+      type: object
+      properties:
+        op:
+          allOf:
+          - $ref: '#/components/schemas/Op'
+          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
+        path:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
+        value:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
+        from:
+          allOf:
+          - $ref: '#/components/schemas/String'
+          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
+      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
     Usage:
       type: object
       properties:
@@ -926,40 +996,10 @@ components:
               name: values
             description: 'The usage data, as daily logs of used and remaining quotas, over the specified time interval indexed over the API keys in a usage plan. For example, <code>{..., "values" : { "{api_key}" : [ [0, 100], [10, 90], [100, 10]]}</code>, where <code>{api_key}</code> stands for an API key value and the daily log entry is of the format <code>[used quota, remaining quota]</code>.'
       description: Represents the usage data of a usage plan.
-    String:
-      type: string
-    PatchOperation:
-      type: object
-      properties:
-        op:
-          allOf:
-          - $ref: '#/components/schemas/Op'
-          - description: An update operation to be performed with this PATCH request. The valid value can be add, remove, replace or copy. Not all valid operations are supported for a given resource. Support of the operations depends on specific operational contexts. Attempts to apply an unsupported operation on a resource will return an error message..
-        path:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The op operation''s target, as identified by a JSON Pointer value that references a location within the targeted resource. For example, if the target resource has an updateable property of {"name":"value"}, the path for this property is /name. If the name property value is a JSON object (e.g., {"name": {"child/name": "child-value"}}), the path for the child/name property will be /name/child~1name. Any slash ("/") character appearing in path names must be escaped with "~1", as shown in the example above. Each op operation can have only one path associated with it.'
-        value:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: 'The new target value of the update operation. It is applicable for the add or replace operation. When using AWS CLI to update a property of a JSON value, enclose the JSON object with a pair of single quotes in a Linux shell, e.g., ''{"a": ...}''.'
-        from:
-          allOf:
-          - $ref: '#/components/schemas/String'
-          - description: The copy update operation's source as identified by a JSON-Pointer value referencing the location within the targeted resource to copy the value from. For example, to promote a canary deployment, you copy the canary deployment ID to the affiliated deployment ID by calling a PATCH request on a Stage resource with "op":"copy", "from":"/canarySettings/deploymentId" and "path":"/deploymentId".
-      description: For more information about supported patch operations, see <a href="https://docs.aws.amazon.com/apigateway/latest/api/patch-operations.html">Patch Operations</a>.
-    TooManyRequestsException: {}
-    UnauthorizedException: {}
-    ListOfUsage:
+    ListOfUsagePlanKey:
       type: array
       items:
-        $ref: '#/components/schemas/ListOfLong'
-    ListOfLong:
-      type: array
-      items:
-        $ref: '#/components/schemas/Long'
-    Long:
-      type: integer
+        $ref: '#/components/schemas/UsagePlanKey'
     UsagePlans:
       type: object
       properties:
@@ -972,19 +1012,10 @@ components:
               name: item
             description: The current page of elements from this collection.
       description: Represents a collection of usage plans for an AWS account.
-    UsagePlanKeys:
+    MapOfApiStageThrottleSettings:
       type: object
-      properties:
-        position:
-          $ref: '#/components/schemas/String'
-        items:
-          allOf:
-          - $ref: '#/components/schemas/ListOfUsagePlanKey'
-          - xml:
-              name: item
-            description: The current page of elements from this collection.
-      description: Represents the collection of usage plan keys added to usage plans for the associated API keys and, possibly, other types of keys.
-    NotFoundException: {}
+      additionalProperties:
+        $ref: '#/components/schemas/ThrottleSettings'
     UsagePlanKey:
       type: object
       properties:
@@ -1005,19 +1036,6 @@ components:
           - $ref: '#/components/schemas/String'
           - description: The name of a usage plan key.
       description: Represents a usage plan key to identify a plan customer.
-    ThrottleSettings:
-      type: object
-      properties:
-        burstLimit:
-          allOf:
-          - $ref: '#/components/schemas/Integer'
-          - description: The API target request burst rate limit. This allows more requests through for a period of time than the target rate limit.
-        rateLimit:
-          allOf:
-          - $ref: '#/components/schemas/Double'
-          - description: The API target request rate limit.
-      description: ' The API request rate limits.'
-    LimitExceededException: {}
     ApiStage:
       type: object
       properties:
@@ -1034,15 +1052,51 @@ components:
           - $ref: '#/components/schemas/MapOfApiStageThrottleSettings'
           - description: Map containing method level throttling information for API stage in a usage plan.
       description: API stage name of the associated API stage in a usage plan.
-    Op:
+    QuotaPeriodType:
       type: string
       enum:
-      - add
-      - remove
-      - replace
-      - move
-      - copy
-      - test
+      - DAY
+      - WEEK
+      - MONTH
+    ListOfLong:
+      type: array
+      items:
+        $ref: '#/components/schemas/Long'
+    String:
+      type: string
+    Double:
+      type: number
+      format: double
+    ListOfUsagePlan:
+      type: array
+      items:
+        $ref: '#/components/schemas/UsagePlan'
+    MapOfKeyUsages:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ListOfUsage'
+    ListOfUsage:
+      type: array
+      items:
+        $ref: '#/components/schemas/ListOfLong'
+    ListOfApiStage:
+      type: array
+      items:
+        $ref: '#/components/schemas/ApiStage'
+    UsagePlanKeys:
+      type: object
+      properties:
+        position:
+          $ref: '#/components/schemas/String'
+        items:
+          allOf:
+          - $ref: '#/components/schemas/ListOfUsagePlanKey'
+          - xml:
+              name: item
+            description: The current page of elements from this collection.
+      description: Represents the collection of usage plan keys added to usage plans for the associated API keys and, possibly, other types of keys.
+    Long:
+      type: integer
     UsagePlan:
       type: object
       properties:
@@ -1079,84 +1133,30 @@ components:
           - $ref: '#/components/schemas/MapOfStringToString'
           - description: The collection of tags. Each tag element is associated with a given resource.
       description: Represents a usage plan used to specify who can assess associated API stages. Optionally, target request rate and quota limits can be set. In some cases clients can exceed the targets that you set. Don't rely on usage plans to control costs. Consider using <a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">Amazon Web Services Budgets</a> to monitor costs and <a href="https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html">WAF</a> to manage API requests.
-    BadRequestException: {}
-    ConflictException: {}
-    QuotaSettings:
+    ThrottleSettings:
       type: object
       properties:
-        limit:
+        burstLimit:
           allOf:
           - $ref: '#/components/schemas/Integer'
-          - description: The target maximum number of requests that can be made in a given time period.
-        offset:
+          - description: The API target request burst rate limit. This allows more requests through for a period of time than the target rate limit.
+        rateLimit:
           allOf:
-          - $ref: '#/components/schemas/Integer'
-          - description: The number of requests subtracted from the given limit in the initial time period.
-        period:
-          allOf:
-          - $ref: '#/components/schemas/QuotaPeriodType'
-          - description: The time period in which the limit applies. Valid values are "DAY", "WEEK" or "MONTH".
-      description: Quotas configured for a usage plan.
+          - $ref: '#/components/schemas/Double'
+          - description: The API target request rate limit.
+      description: ' The API request rate limits.'
+    Op:
+      type: string
+      enum:
+      - add
+      - remove
+      - replace
+      - move
+      - copy
+      - test
+    UnauthorizedException: {}
     Integer:
       type: integer
-    MapOfStringToString:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/String'
-    ListOfUsagePlan:
-      type: array
-      items:
-        $ref: '#/components/schemas/UsagePlan'
-    ListOfApiStage:
-      type: array
-      items:
-        $ref: '#/components/schemas/ApiStage'
-    Double:
-      type: number
-      format: double
-  parameters:
-    X-Amz-Security-Token:
-      name: X-Amz-Security-Token
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Signature:
-      name: X-Amz-Signature
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Algorithm:
-      name: X-Amz-Algorithm
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-SignedHeaders:
-      name: X-Amz-SignedHeaders
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Date:
-      name: X-Amz-Date
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Content-Sha256:
-      name: X-Amz-Content-Sha256
-      in: header
-      schema:
-        type: string
-      required: false
-    X-Amz-Credential:
-      name: X-Amz-Credential
-      in: header
-      schema:
-        type: string
-      required: false
   securitySchemes:
     hmac:
       type: apiKey

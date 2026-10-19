@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -121,13 +132,29 @@ components:
       example: 023e105f4ecef8ad9ca31a8372d0c353
       maxLength: 32
       type: string
-    stream_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/stream_api-response-single'
-      - properties:
-          result:
-            example: ok
-            type: string
+    stream_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/stream_messages'
+        messages:
+          $ref: '#/components/schemas/stream_messages'
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      type: object
+    stream_webhook_request:
+      properties:
+        notificationUrl:
+          $ref: '#/components/schemas/stream_notificationUrl'
+      required:
+      - notificationUrl
     stream_messages:
       example: []
       items:
@@ -143,12 +170,18 @@ components:
         type: object
         uniqueItems: true
       type: array
-    stream_webhook_response_single:
+    stream_deleted_response:
       allOf:
       - $ref: '#/components/schemas/stream_api-response-single'
       - properties:
           result:
-            type: object
+            example: ok
+            type: string
+    stream_notificationUrl:
+      description: The URL where webhooks will be sent.
+      example: https://example.com
+      format: uri
+      type: string
     stream_api-response-common-failure:
       properties:
         errors:
@@ -180,38 +213,16 @@ components:
       - messages
       - result
       type: object
-    stream_notificationUrl:
-      description: The URL where webhooks will be sent.
-      example: https://example.com
-      format: uri
-      type: string
     stream_api-response-single:
       allOf:
       - $ref: '#/components/schemas/stream_api-response-common'
       type: object
-    stream_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/stream_messages'
-        messages:
-          $ref: '#/components/schemas/stream_messages'
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      type: object
-    stream_webhook_request:
-      properties:
-        notificationUrl:
-          $ref: '#/components/schemas/stream_notificationUrl'
-      required:
-      - notificationUrl
+    stream_webhook_response_single:
+      allOf:
+      - $ref: '#/components/schemas/stream_api-response-single'
+      - properties:
+          result:
+            type: object
   securitySchemes:
     api_email:
       in: header

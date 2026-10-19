@@ -1,7 +1,45 @@
 openapi: 3.2.0
 info:
   title: Postman Pull Requests API
-  description: The Postman API enables you to programmatically access data stored in your Postman account.
+  description: 'The Postman API enables you to programmatically access data stored in your Postman account. > Certain endpoints may be unavailable depending on your region and/or Postman plan. For a comprehensive set of examples of requests and responses, see the **Postman API** collection. ## Getting started
+
+
+    You can get started with the Postman API by creating a copy of this definition in your workspace. ### EU users
+
+
+    For users in the EU with **Enterprise** plans, the Postman API uses the `http://api.eu.postman.com` subdomain. This is available in the definition''s list of servers. You can change this by selecting the `http://api.eu.postman.com` subdomain in the **Server** dropdown list below. ## About the Postman API
+
+
+    - You must use a valid API Key to send requests to the API endpoints. - The API has rate and usage limits. - The API only responds to HTTPS-secured communications. Any requests sent via HTTP return an HTTP `301` redirect to the corresponding HTTPS resources. - The API returns requests responses in JSON format. When an API request returns an error, it is sent in the JSON response as an error key. - The request method (verb) determines the nature of action you intend to perform. A request made using the `GET` method implies that you want to fetch something from Postman. The `POST` method implies you want to save something new to Postman. - For all requests, API calls respond with their corresponding HTTP status codes. In the Postman client, the status code also provides help text that details the possible meaning of the response code. - When calling the API Builder endpoints, you must send an `Accept` header with the `application/vnd.api.v10+json` value. ### IDs and UIDs
+
+
+    All items in Postman, such as collections, workspaces, and APIs, have IDs and UIDs:
+
+
+    - An ID is the unique ID assigned to a Postman item. For example, `ec29121c-5203-409f-9e84-e83ffc10f226`. - The UID is the **full** ID of a Postman item. This value is the item''s unique ID concatenated with the user ID. For example, in the `12345678-ec29121c-5203-409f-9e84-e83ffc10f226` UID:
+
+    - `12345678` is the user''s ID. - `ec29121c-5203-409f-9e84-e83ffc10f226` is the item''s ID. ### Enum values
+
+
+    Any documented enum values should be considered partial lists and may change over time. ### 403 response for unavailable features
+
+
+    Depending on your region and/or Postman plan, some endpoints will return an HTTP `403 Forbidden` response with the "This feature isn''t available in your region." detail. ### 503 response
+
+
+    An HTTP `503 Service Unavailable` response from our servers indicates there is an unexpected spike in API access traffic. The server is usually operational within the next five minutes. If the outage persists or you receive any other form of an HTTP `5XX` error, contact support. ## Authentication
+
+
+    Postman uses API keys for authentication. The API key tells the API server that the request came from you. Everything that you have access to in Postman is accessible with your API key. You can generate a Postman API key in the **API keys** section of your Postman account settings. You must include an API key in each request to the Postman API with the `X-API-Key` request header. In Postman, you can store your API key as a vault secret or an environment variable. The Postman API collection will use it to make API calls. ### SCIM authentication
+
+
+    While all other endpoints in this collection require a Postman API key, the SCIM endpoints require a SCIM API key. ### Authentication error response
+
+
+    If an API key is missing, malformed, or invalid, you will receive an HTTP `401 Unauthorized` response code. ## Rate and usage limits
+
+
+    API access rate limits apply at a per-user basis in unit time. The limit is **300 requests per minute**. Postman Monitors, the GET `/collections`, and the GET `/workspaces` endpoint have a rate limit of **10 calls in 10 seconds**. Depending on your plan, you may also have usage limits.'
   version: '1.0'
   termsOfService: https://www.postman.com/legal/terms/
   contact:
@@ -128,72 +166,6 @@ paths:
           $ref: '#/components/responses/common500ErrorServerError'
 components:
   schemas:
-    pullRequest400ErrorDuplicate:
-      title: Pull Request Already Exists
-      type: object
-      properties:
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: A pull request for this source and destination already exists.
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 400
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Duplicate pull request
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/bad-request
-    pullRequest403ErrorNoViewerAccessCollections:
-      title: No Viewer Permissions
-      type: object
-      properties:
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: You and all reviewers need Viewer access on both source and destination collections.
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Forbidden
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/forbidden
-    pullRequest403ErrorRolePermissionsCollection:
-      title: No Role Permissions
-      type: object
-      properties:
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: You need Viewer role on both source and destination collections to view pull requests. Please contact collection editors to grant additional access to you.
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Forbidden
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/forbidden
     pullRequestReview400ErrorActionNotAllowed:
       title: Action Not Allowed
       type: object
@@ -216,6 +188,50 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 400
+    pullRequest403ErrorForbidden:
+      title: Forbidden
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: You do not have enough permissions to perform this action.
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Forbidden
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/forbidden
+    pullRequest403ErrorNoViewerAccessCollections:
+      title: No Viewer Permissions
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: You and all reviewers need Viewer access on both source and destination collections.
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Forbidden
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/forbidden
     pullRequestReview400ErrorInvalidAction:
       title: Invalid Action
       type: object
@@ -238,6 +254,28 @@ components:
           format: http-status-code
           description: The error's HTTP status code.
           example: 400
+    pullRequest400ErrorDuplicate:
+      title: Pull Request Already Exists
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: A pull request for this source and destination already exists.
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 400
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Duplicate pull request
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/bad-request
     forkCollection400ErrorBadForkRelation:
       title: Invalid Fork Source
       type: object
@@ -260,6 +298,77 @@ components:
           type: string
           description: Information about the error.
           example: Fork relation not found
+    pullRequest403ErrorRolePermissionsCollection:
+      title: No Role Permissions
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Details about the occurrence of the error.
+          example: You need Viewer role on both source and destination collections to view pull requests. Please contact collection editors to grant additional access to you.
+        status:
+          type: number
+          format: http-status-code
+          description: The error's HTTP status code.
+          example: 403
+        title:
+          type: string
+          description: A short summary of the error.
+          example: Forbidden
+        type:
+          type: string
+          format: uri
+          description: The error type.
+          example: https://api.postman.com/problems/forbidden
+    pullRequestUpdated:
+      title: Updated Pull Request Payload
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: The date and time at which the pull request was created.
+          example: '2024-02-20T09:58:57.000Z'
+        createdBy:
+          type: string
+          description: The ID of the user who created the pull request.
+          example: '12345678'
+        description:
+          type: string
+          description: The pull request's description.
+          example: Updated description of the pull request.
+        destinationId:
+          type: string
+          description: The pull request's merge destination ID.
+          example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+        forkType:
+          type: string
+          description: The type of forked element.
+          example: collection
+        id:
+          type: string
+          description: The pull request's ID.
+          example: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+        sourceId:
+          type: string
+          description: The unique ID of the source element.
+          example: 87654321-3b79068c-dbe5-41d5-a826-51be4bf646ef
+        status:
+          type: string
+          description: The pull request's status.
+          enum:
+          - open
+          - approved
+          - declined
+          - merged
+          example: open
+        title:
+          type: string
+          description: The pull request's title.
+          example: Updated PR title
+        updatedAt:
+          type: string
+          description: The date and time at which the pull request was updated.
+          example: '2024-02-20T09:58:57.000Z'
     pullRequestGet:
       title: Pull Request Payload
       type: object
@@ -388,78 +497,31 @@ components:
 
                   '
                 example: declined
-    pullRequestUpdated:
-      title: Updated Pull Request Payload
-      type: object
-      properties:
-        createdAt:
-          type: string
-          description: The date and time at which the pull request was created.
-          example: '2024-02-20T09:58:57.000Z'
-        createdBy:
-          type: string
-          description: The ID of the user who created the pull request.
-          example: '12345678'
-        description:
-          type: string
-          description: The pull request's description.
-          example: Updated description of the pull request.
-        destinationId:
-          type: string
-          description: The pull request's merge destination ID.
-          example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
-        forkType:
-          type: string
-          description: The type of forked element.
-          example: collection
-        id:
-          type: string
-          description: The pull request's ID.
-          example: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-        sourceId:
-          type: string
-          description: The unique ID of the source element.
-          example: 87654321-3b79068c-dbe5-41d5-a826-51be4bf646ef
-        status:
-          type: string
-          description: The pull request's status.
-          enum:
-          - open
-          - approved
-          - declined
-          - merged
-          example: open
-        title:
-          type: string
-          description: The pull request's title.
-          example: Updated PR title
-        updatedAt:
-          type: string
-          description: The date and time at which the pull request was updated.
-          example: '2024-02-20T09:58:57.000Z'
-    pullRequest403ErrorForbidden:
-      title: Forbidden
-      type: object
-      properties:
-        detail:
-          type: string
-          description: Details about the occurrence of the error.
-          example: You do not have enough permissions to perform this action.
-        status:
-          type: number
-          format: http-status-code
-          description: The error's HTTP status code.
-          example: 403
-        title:
-          type: string
-          description: A short summary of the error.
-          example: Forbidden
-        type:
-          type: string
-          format: uri
-          description: The error type.
-          example: https://api.postman.com/problems/forbidden
+  parameters:
+    pullRequestId:
+      name: pullRequestId
+      in: path
+      required: true
+      description: The pull request's ID.
+      schema:
+        type: string
+        example: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+    collectionUid:
+      name: collectionId
+      in: path
+      required: true
+      description: The collection's unique ID.
+      schema:
+        type: string
+        format: uid
+        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
   examples:
+    pullRequestReview400ErrorInvalidAction:
+      value:
+        type: https://api.postman.com/problems/bad-request
+        title: Value must be one of "approve", "unapprove", "decline", "merge"
+        detail: 'POST request body for ''/pull-requests/4e1a6609-1a29-4037-a411-89ecc14c6cd8/tasks'' failed to validate schema. Location: /properties/action/enum'
+        status: 400
     forkCollection400ErrorBadForkRelation:
       value:
         type: https://api.postman.com/problems/bad-request
@@ -472,12 +534,6 @@ components:
         title: Bad Request
         detail: Given action on current pull request is not allowed
         status: 400
-    pullRequestReview400ErrorInvalidAction:
-      value:
-        type: https://api.postman.com/problems/bad-request
-        title: Value must be one of "approve", "unapprove", "decline", "merge"
-        detail: 'POST request body for ''/pull-requests/4e1a6609-1a29-4037-a411-89ecc14c6cd8/tasks'' failed to validate schema. Location: /properties/action/enum'
-        status: 400
     pullRequest400ErrorDuplicate:
       value:
         detail: A pull request for this source and destination already exists.
@@ -485,36 +541,6 @@ components:
         title: Duplicate pull request
         type: https://api.postman.com/problems/bad-request
   responses:
-    pullRequest409ErrorConflict:
-      description: Conflict
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              detail:
-                type: string
-                description: Details about the occurrence of the error.
-                example: You cannot modify a pull request which is already merged or declined.
-              status:
-                type: number
-                format: http-status-code
-                description: The error's HTTP status code.
-                example: 409
-              title:
-                type: string
-                description: A short summary of the error.
-                example: Conflict
-              type:
-                type: string
-                format: uri
-                description: The error type.
-                example: https://api.postman.com/problems/conflict
-          example:
-            detail: You cannot modify a pull request which is already merged or declined.
-            status: 409
-            title: Conflict
-            type: https://api.postman.com/problems/conflict
     getPullRequest:
       description: Successful Response
       content:
@@ -546,86 +572,36 @@ components:
             reviewers:
             - id: '12345678'
               status: declined
-    pullRequestReview200OK:
-      description: Successful Response
+    pullRequest409ErrorConflict:
+      description: Conflict
       content:
         application/json:
           schema:
             type: object
             properties:
-              id:
+              detail:
                 type: string
-                description: The pull request's ID.
-                example: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-              reviewedBy:
-                type: object
-                description: Information about the user who reviewed the pull request review.
-                properties:
-                  id:
-                    type: number
-                    description: The user's ID.
-                    example: 12345678
-                  name:
-                    type: string
-                    description: The user's name.
-                    example: Taylor Lee
-                  username:
-                    type: string
-                    description: The user's username.
-                    example: taylor-lee
+                description: Details about the occurrence of the error.
+                example: You cannot modify a pull request which is already merged or declined.
               status:
+                type: number
+                format: http-status-code
+                description: The error's HTTP status code.
+                example: 409
+              title:
                 type: string
-                description: 'The pull request''s current review status:
-
-                  - `open` — The pull request is still open.
-
-                  - `approved` — The pull request was approved by its reviewers.
-
-                  - `declined` — The pull request was not approved by its reviewers.
-
-                  '
-                example: approved
-              updatedAt:
+                description: A short summary of the error.
+                example: Conflict
+              type:
                 type: string
-                description: The date and time at which the pull request was updated.
-                example: '2024-02-21T08:19:09.000Z'
-          examples:
-            Approved:
-              value:
-                id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-                reviewedBy:
-                  id: 12345678
-                  name: Taylor Lee
-                  username: taylor-lee
-                status: approved
-                updatedAt: '2024-02-21T08:19:09.000Z'
-            Merged:
-              value:
-                id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-                reviewedBy:
-                  id: 12345678
-                  name: Taylor Lee
-                  username: taylor-lee
-                status: merged
-                updatedAt: '2024-02-21T08:19:09.000Z'
-            Declined:
-              value:
-                id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-                reviewedBy:
-                  id: 12345678
-                  name: Taylor Lee
-                  username: taylor-lee
-                status: declined
-                updatedAt: '2024-02-21T08:19:09.000Z'
-            Unpproved:
-              value:
-                id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-                reviewedBy:
-                  id: 12345678
-                  name: Taylor Lee
-                  username: taylor-lee
-                status: open
-                updatedAt: '2024-02-21T08:19:09.000Z'
+                format: uri
+                description: The error type.
+                example: https://api.postman.com/problems/conflict
+          example:
+            detail: You cannot modify a pull request which is already merged or declined.
+            status: 409
+            title: Conflict
+            type: https://api.postman.com/problems/conflict
     common500ErrorServerError:
       description: Internal Server Error
       content:
@@ -648,59 +624,17 @@ components:
             error:
               name: serverError
               message: An error has occurred on the server.
-    pullRequestCreated:
-      description: Successful Response
+    pullRequest403ErrorRolePermissionsCollection:
+      description: Forbidden
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              createdAt:
-                type: string
-                description: The date and time at which the pull request was created.
-                example: '2024-02-20T09:55:46.000Z'
-              createdBy:
-                type: string
-                description: The ID of the user who created the pull request.
-                example: '12345678'
-              description:
-                type: string
-                description: The pull request's description.
-                example: This is a test pull request.
-              destinationId:
-                type: string
-                description: The pull request's merge destination ID.
-                example: 12345678-ec548788-unftw-rgn8-83b8-0b59798648e4
-              id:
-                type: string
-                description: The pull request's ID.
-                example: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-              sourceId:
-                type: string
-                description: The pull request's source (parent) ID.
-                example: 87654321-3b79068c-dbe5-41d5-a826-51be4bf646ef
-              status:
-                type: string
-                description: The pull request's current status.
-                example: open
-              title:
-                type: string
-                description: The pull request's title.
-                example: Test PR
-              updatedAt:
-                type: string
-                description: The date and time at which the pull request was updated.
-                example: '2024-02-20T09:58:57.000Z'
+            $ref: '#/components/schemas/pullRequest403ErrorRolePermissionsCollection'
           example:
-            id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-            title: Test PR
-            status: open
-            sourceId: 87654321-3b79068c-dbe5-41d5-a826-51be4bf646ef
-            createdAt: '2024-02-20T09:55:46.000Z'
-            createdBy: '12345678'
-            updatedAt: '2024-02-20T09:58:57.000Z'
-            description: This is a test pull request.
-            destinationId: 12345678-ec548788-unftw-rgn8-83b8-0b59798648e4
+            detail: You need Viewer role on both source and destination collections to view pull requests. Please contact collection editors to grant additional access to you.
+            status: 403
+            title: Forbidden
+            type: https://api.postman.com/problems/forbidden
     getCollectionPullRequests:
       description: Successful Response
       content:
@@ -804,28 +738,6 @@ components:
               title: Declined PR
               updatedBy: '12345678'
               updatedAt: '2024-02-20T09:58:38.000Z'
-    pullRequest403ErrorNoViewerAccessCollections:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/pullRequest403ErrorNoViewerAccessCollections'
-          example:
-            detail: You and all reviewers need Viewer access on both source and destination collections.
-            status: 403
-            title: Forbidden
-            type: https://api.postman.com/problems/forbidden
-    pullRequest403ErrorRolePermissionsCollection:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/pullRequest403ErrorRolePermissionsCollection'
-          example:
-            detail: You need Viewer role on both source and destination collections to view pull requests. Please contact collection editors to grant additional access to you.
-            status: 403
-            title: Forbidden
-            type: https://api.postman.com/problems/forbidden
     pullRequestUpdate:
       description: Successful Response
       content:
@@ -843,6 +755,139 @@ components:
             status: open
             title: Updated PR title
             updatedAt: '2024-02-20T09:58:57.000Z'
+    pullRequestReview200OK:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The pull request's ID.
+                example: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+              reviewedBy:
+                type: object
+                description: Information about the user who reviewed the pull request review.
+                properties:
+                  id:
+                    type: number
+                    description: The user's ID.
+                    example: 12345678
+                  name:
+                    type: string
+                    description: The user's name.
+                    example: Taylor Lee
+                  username:
+                    type: string
+                    description: The user's username.
+                    example: taylor-lee
+              status:
+                type: string
+                description: 'The pull request''s current review status:
+
+                  - `open` — The pull request is still open.
+
+                  - `approved` — The pull request was approved by its reviewers.
+
+                  - `declined` — The pull request was not approved by its reviewers.
+
+                  '
+                example: approved
+              updatedAt:
+                type: string
+                description: The date and time at which the pull request was updated.
+                example: '2024-02-21T08:19:09.000Z'
+          examples:
+            Approved:
+              value:
+                id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+                reviewedBy:
+                  id: 12345678
+                  name: Taylor Lee
+                  username: taylor-lee
+                status: approved
+                updatedAt: '2024-02-21T08:19:09.000Z'
+            Merged:
+              value:
+                id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+                reviewedBy:
+                  id: 12345678
+                  name: Taylor Lee
+                  username: taylor-lee
+                status: merged
+                updatedAt: '2024-02-21T08:19:09.000Z'
+            Declined:
+              value:
+                id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+                reviewedBy:
+                  id: 12345678
+                  name: Taylor Lee
+                  username: taylor-lee
+                status: declined
+                updatedAt: '2024-02-21T08:19:09.000Z'
+            Unpproved:
+              value:
+                id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+                reviewedBy:
+                  id: 12345678
+                  name: Taylor Lee
+                  username: taylor-lee
+                status: open
+                updatedAt: '2024-02-21T08:19:09.000Z'
+    pullRequestCreated:
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              createdAt:
+                type: string
+                description: The date and time at which the pull request was created.
+                example: '2024-02-20T09:55:46.000Z'
+              createdBy:
+                type: string
+                description: The ID of the user who created the pull request.
+                example: '12345678'
+              description:
+                type: string
+                description: The pull request's description.
+                example: This is a test pull request.
+              destinationId:
+                type: string
+                description: The pull request's merge destination ID.
+                example: 12345678-ec548788-unftw-rgn8-83b8-0b59798648e4
+              id:
+                type: string
+                description: The pull request's ID.
+                example: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+              sourceId:
+                type: string
+                description: The pull request's source (parent) ID.
+                example: 87654321-3b79068c-dbe5-41d5-a826-51be4bf646ef
+              status:
+                type: string
+                description: The pull request's current status.
+                example: open
+              title:
+                type: string
+                description: The pull request's title.
+                example: Test PR
+              updatedAt:
+                type: string
+                description: The date and time at which the pull request was updated.
+                example: '2024-02-20T09:58:57.000Z'
+          example:
+            id: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
+            title: Test PR
+            status: open
+            sourceId: 87654321-3b79068c-dbe5-41d5-a826-51be4bf646ef
+            createdAt: '2024-02-20T09:55:46.000Z'
+            createdBy: '12345678'
+            updatedAt: '2024-02-20T09:58:57.000Z'
+            description: This is a test pull request.
+            destinationId: 12345678-ec548788-unftw-rgn8-83b8-0b59798648e4
     pullRequest403ErrorForbidden:
       description: Forbidden
       content:
@@ -854,24 +899,17 @@ components:
             status: 403
             title: Forbidden
             type: https://api.postman.com/problems/forbidden
-  parameters:
-    pullRequestId:
-      name: pullRequestId
-      in: path
-      required: true
-      description: The pull request's ID.
-      schema:
-        type: string
-        example: 4e1a6609-1a29-4037-a411-89ecc14c6cd8
-    collectionUid:
-      name: collectionId
-      in: path
-      required: true
-      description: The collection's unique ID.
-      schema:
-        type: string
-        format: uid
-        example: 12345678-12ece9e1-2abf-4edc-8e34-de66e74114d2
+    pullRequest403ErrorNoViewerAccessCollections:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/pullRequest403ErrorNoViewerAccessCollections'
+          example:
+            detail: You and all reviewers need Viewer access on both source and destination collections.
+            status: 403
+            title: Forbidden
+            type: https://api.postman.com/problems/forbidden
   requestBodies:
     pullRequestReview:
       content:
@@ -918,6 +956,36 @@ components:
             Unapprove:
               value:
                 action: unapprove
+    pullRequestUpdate:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - reviewers
+            - title
+            properties:
+              title:
+                type: string
+                description: The pull request's updated title.
+                example: Updated PR title
+              description:
+                type: string
+                description: The updated pull request description.
+                example: Updated description of the pull request.
+              reviewers:
+                type: array
+                description: An updated list of the pull request's assigned reviewers. This replaces all existing users assigned to the pull request with those you pass in the request body.
+                items:
+                  type: string
+                  description: The reviewer's user ID.
+                  example: '12345678'
+          example:
+            description: Updated description of the pull request.
+            reviewers:
+            - '12345678'
+            - '87654321'
+            title: Updated PR title
     pullRequestCreate:
       content:
         application/json:
@@ -956,36 +1024,6 @@ components:
             - '87654321'
             - '56781234'
             destinationId: 12345678-ec548788-unftw-rgn8-83b8-0b59798648e4
-    pullRequestUpdate:
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-            - reviewers
-            - title
-            properties:
-              title:
-                type: string
-                description: The pull request's updated title.
-                example: Updated PR title
-              description:
-                type: string
-                description: The updated pull request description.
-                example: Updated description of the pull request.
-              reviewers:
-                type: array
-                description: An updated list of the pull request's assigned reviewers. This replaces all existing users assigned to the pull request with those you pass in the request body.
-                items:
-                  type: string
-                  description: The reviewer's user ID.
-                  example: '12345678'
-          example:
-            description: Updated description of the pull request.
-            reviewers:
-            - '12345678'
-            - '87654321'
-            title: Updated PR title
   securitySchemes:
     PostmanApiKey:
       type: apiKey

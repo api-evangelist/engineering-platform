@@ -1,6 +1,17 @@
 openapi: 3.2.0
 info:
-  description: To get started using Cloudflare's products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+  description: 'To get started using Cloudflare''s products and services via the API, refer to how to interact with Cloudflare, which covers using tools like Terraform and the official SDKs to maintain your Cloudflare resources.
+
+
+    Using the Cloudflare API requires authentication so that Cloudflare knows who is making requests and what permissions you have. Create an API token to grant access to the API to perform actions.
+
+
+    To create an API token, from the Cloudflare dashboard, go to My Profile > API Tokens and select Create Token. For more information on how to create and troubleshoot API tokens, refer to
+
+    our API fundamentals.
+
+
+    Totally new to Cloudflare? Start here.'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -265,16 +276,51 @@ paths:
         pro: false
 components:
   schemas:
-    magic_tunnels_collection_response:
+    magic_tunnel_modified_response:
       allOf:
       - $ref: '#/components/schemas/magic_api-response-single'
       - properties:
           result:
             properties:
-              gre_tunnels:
-                items:
-                  $ref: '#/components/schemas/magic_gre-tunnel'
-                type: array
+              modified:
+                example: true
+                type: boolean
+              modified_gre_tunnel:
+                $ref: '#/components/schemas/magic_gre-tunnel'
+            type: object
+    magic_tunnel_deleted_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              deleted:
+                example: true
+                type: boolean
+              deleted_gre_tunnel:
+                $ref: '#/components/schemas/magic_gre-tunnel'
+            type: object
+    magic_schemas-identifier:
+      description: Tunnel identifier tag.
+      example: c4a7362d577a6c3019a474fd6f485821
+      maxLength: 32
+      readOnly: true
+      type: string
+    magic_mtu:
+      default: 1476
+      description: Maximum Transmission Unit (MTU) in bytes for the GRE tunnel. The minimum value is 576.
+      type: integer
+    magic_tunnel_update_request:
+      allOf:
+      - $ref: '#/components/schemas/magic_tunnel_add_single_request'
+    magic_schemas-description:
+      description: An optional description of the GRE tunnel.
+      example: Tunnel for ISP X
+      type: string
+    magic_cloudflare_gre_endpoint:
+      description: The IP address assigned to the Cloudflare side of the GRE tunnel.
+      example: 203.0.113.1
+      type: string
     magic_messages:
       example: []
       items:
@@ -290,105 +336,12 @@ components:
         type: object
         uniqueItems: true
       type: array
-    magic_cloudflare_gre_endpoint:
-      description: The IP address assigned to the Cloudflare side of the GRE tunnel.
-      example: 203.0.113.1
-      type: string
-    magic_schemas-description:
-      description: An optional description of the GRE tunnel.
-      example: Tunnel for ISP X
-      type: string
-    magic_schemas-modified_on:
-      description: The date and time the tunnel was last modified.
-      example: '2017-06-14T05:20:00Z'
-      format: date-time
+    magic_identifier:
+      description: Identifier
+      example: 023e105f4ecef8ad9ca31a8372d0c353
+      maxLength: 32
       readOnly: true
       type: string
-    magic_ttl:
-      default: 64
-      description: Time To Live (TTL) in number of hops of the GRE tunnel.
-      type: integer
-    magic_tunnel_add_single_request:
-      properties:
-        cloudflare_gre_endpoint:
-          $ref: '#/components/schemas/magic_cloudflare_gre_endpoint'
-        customer_gre_endpoint:
-          $ref: '#/components/schemas/magic_customer_gre_endpoint'
-        description:
-          $ref: '#/components/schemas/magic_schemas-description'
-        health_check:
-          $ref: '#/components/schemas/magic_health_check'
-        interface_address:
-          $ref: '#/components/schemas/magic_interface_address'
-        mtu:
-          $ref: '#/components/schemas/magic_mtu'
-        name:
-          $ref: '#/components/schemas/magic_name'
-        ttl:
-          $ref: '#/components/schemas/magic_ttl'
-      required:
-      - name
-      - customer_gre_endpoint
-      - cloudflare_gre_endpoint
-      - interface_address
-      type: object
-    magic_interface_address:
-      description: 'A 31-bit prefix (/31 in CIDR notation) supporting two hosts, one for each side of the tunnel. Select the subnet from the following private IP space: 10.0.0.0–10.255.255.255, 172.16.0.0–172.31.255.255, 192.168.0.0–192.168.255.255.'
-      example: 192.0.2.0/31
-      type: string
-    magic_modified_tunnels_collection_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              modified:
-                example: true
-                type: boolean
-              modified_gre_tunnels:
-                items:
-                  $ref: '#/components/schemas/magic_gre-tunnel'
-                type: array
-    magic_name:
-      description: The name of the tunnel. The name cannot contain spaces or special characters, must be 15 characters or less, and cannot share a name with another GRE tunnel.
-      example: GRE_1
-      type: string
-    magic_api-response-common:
-      properties:
-        errors:
-          $ref: '#/components/schemas/magic_messages'
-        messages:
-          $ref: '#/components/schemas/magic_messages'
-        result:
-          anyOf:
-          - type: object
-          - items: {}
-            type: array
-          - type: string
-        success:
-          description: Whether the API call was successful
-          enum:
-          - true
-          example: true
-          type: boolean
-      required:
-      - success
-      - errors
-      - messages
-      - result
-      type: object
-    magic_tunnel_update_request:
-      allOf:
-      - $ref: '#/components/schemas/magic_tunnel_add_single_request'
-    magic_tunnel_single_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              gre_tunnel:
-                $ref: '#/components/schemas/magic_gre-tunnel'
-            type: object
     magic_gre-tunnel:
       properties:
         cloudflare_gre_endpoint:
@@ -423,70 +376,9 @@ components:
       description: The IP address assigned to the customer side of the GRE tunnel.
       example: 203.0.113.1
       type: string
-    magic_health_check:
-      properties:
-        direction:
-          default: unidirectional
-          description: The direction of the flow of the healthcheck. Either unidirectional, where the probe comes to you via the tunnel and the result comes back to Cloudflare via the open Internet, or bidirectional where both the probe and result come and go via the tunnel. Note in the case of bidirecitonal healthchecks, the target field in health_check is ignored as the interface_address is used to send traffic into the tunnel.
-          enum:
-          - unidirectional
-          - bidirectional
-          example: bidirectional
-          type: string
-        enabled:
-          default: true
-          description: Determines whether to run healthchecks for a tunnel.
-          example: true
-          type: boolean
-        rate:
-          default: mid
-          description: How frequent the health check is run. The default value is `mid`.
-          enum:
-          - low
-          - mid
-          - high
-          example: low
-          type: string
-        target:
-          description: The destination address in a request type health check. After the healthcheck is decapsulated at the customer end of the tunnel, the ICMP echo will be forwarded to this address. This field defaults to `customer_gre_endpoint address`. This field is ignored for bidirectional healthchecks as the interface_address (not assigned to the Cloudflare side of the tunnel) is used as the target.
-          example: 203.0.113.1
-          type: string
-        type:
-          default: reply
-          description: The type of healthcheck to run, reply or request. The default value is `reply`.
-          enum:
-          - reply
-          - request
-          example: request
-          type: string
-      type: object
-    magic_tunnel_modified_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              modified:
-                example: true
-                type: boolean
-              modified_gre_tunnel:
-                $ref: '#/components/schemas/magic_gre-tunnel'
-            type: object
-    magic_tunnel_deleted_response:
-      allOf:
-      - $ref: '#/components/schemas/magic_api-response-single'
-      - properties:
-          result:
-            properties:
-              deleted:
-                example: true
-                type: boolean
-              deleted_gre_tunnel:
-                $ref: '#/components/schemas/magic_gre-tunnel'
-            type: object
-    magic_mtu:
-      default: 1476
-      description: Maximum Transmission Unit (MTU) in bytes for the GRE tunnel. The minimum value is 576.
+    magic_ttl:
+      default: 64
+      description: Time To Live (TTL) in number of hops of the GRE tunnel.
       type: integer
     magic_schemas-created_on:
       description: The date and time the tunnel was created.
@@ -494,17 +386,9 @@ components:
       format: date-time
       readOnly: true
       type: string
-    magic_identifier:
-      description: Identifier
-      example: 023e105f4ecef8ad9ca31a8372d0c353
-      maxLength: 32
-      readOnly: true
-      type: string
-    magic_schemas-identifier:
-      description: Tunnel identifier tag.
-      example: c4a7362d577a6c3019a474fd6f485821
-      maxLength: 32
-      readOnly: true
+    magic_name:
+      description: The name of the tunnel. The name cannot contain spaces or special characters, must be 15 characters or less, and cannot share a name with another GRE tunnel.
+      example: GRE_1
       type: string
     magic_api-response-common-failure:
       properties:
@@ -550,6 +434,133 @@ components:
               - string
               - 'null'
       type: object
+    magic_tunnels_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              gre_tunnels:
+                items:
+                  $ref: '#/components/schemas/magic_gre-tunnel'
+                type: array
+    magic_interface_address:
+      description: 'A 31-bit prefix (/31 in CIDR notation) supporting two hosts, one for each side of the tunnel. Select the subnet from the following private IP space: 10.0.0.0–10.255.255.255, 172.16.0.0–172.31.255.255, 192.168.0.0–192.168.255.255.'
+      example: 192.0.2.0/31
+      type: string
+    magic_schemas-modified_on:
+      description: The date and time the tunnel was last modified.
+      example: '2017-06-14T05:20:00Z'
+      format: date-time
+      readOnly: true
+      type: string
+    magic_tunnel_single_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              gre_tunnel:
+                $ref: '#/components/schemas/magic_gre-tunnel'
+            type: object
+    magic_tunnel_add_single_request:
+      properties:
+        cloudflare_gre_endpoint:
+          $ref: '#/components/schemas/magic_cloudflare_gre_endpoint'
+        customer_gre_endpoint:
+          $ref: '#/components/schemas/magic_customer_gre_endpoint'
+        description:
+          $ref: '#/components/schemas/magic_schemas-description'
+        health_check:
+          $ref: '#/components/schemas/magic_health_check'
+        interface_address:
+          $ref: '#/components/schemas/magic_interface_address'
+        mtu:
+          $ref: '#/components/schemas/magic_mtu'
+        name:
+          $ref: '#/components/schemas/magic_name'
+        ttl:
+          $ref: '#/components/schemas/magic_ttl'
+      required:
+      - name
+      - customer_gre_endpoint
+      - cloudflare_gre_endpoint
+      - interface_address
+      type: object
+    magic_api-response-common:
+      properties:
+        errors:
+          $ref: '#/components/schemas/magic_messages'
+        messages:
+          $ref: '#/components/schemas/magic_messages'
+        result:
+          anyOf:
+          - type: object
+          - items: {}
+            type: array
+          - type: string
+        success:
+          description: Whether the API call was successful
+          enum:
+          - true
+          example: true
+          type: boolean
+      required:
+      - success
+      - errors
+      - messages
+      - result
+      type: object
+    magic_health_check:
+      properties:
+        direction:
+          default: unidirectional
+          description: The direction of the flow of the healthcheck. Either unidirectional, where the probe comes to you via the tunnel and the result comes back to Cloudflare via the open Internet, or bidirectional where both the probe and result come and go via the tunnel. Note in the case of bidirecitonal healthchecks, the target field in health_check is ignored as the interface_address is used to send traffic into the tunnel.
+          enum:
+          - unidirectional
+          - bidirectional
+          example: bidirectional
+          type: string
+        enabled:
+          default: true
+          description: Determines whether to run healthchecks for a tunnel.
+          example: true
+          type: boolean
+        rate:
+          default: mid
+          description: How frequent the health check is run. The default value is `mid`.
+          enum:
+          - low
+          - mid
+          - high
+          example: low
+          type: string
+        target:
+          description: The destination address in a request type health check. After the healthcheck is decapsulated at the customer end of the tunnel, the ICMP echo will be forwarded to this address. This field defaults to `customer_gre_endpoint address`. This field is ignored for bidirectional healthchecks as the interface_address (not assigned to the Cloudflare side of the tunnel) is used as the target.
+          example: 203.0.113.1
+          type: string
+        type:
+          default: reply
+          description: The type of healthcheck to run, reply or request. The default value is `reply`.
+          enum:
+          - reply
+          - request
+          example: request
+          type: string
+      type: object
+    magic_modified_tunnels_collection_response:
+      allOf:
+      - $ref: '#/components/schemas/magic_api-response-single'
+      - properties:
+          result:
+            properties:
+              modified:
+                example: true
+                type: boolean
+              modified_gre_tunnels:
+                items:
+                  $ref: '#/components/schemas/magic_gre-tunnel'
+                type: array
   securitySchemes:
     api_email:
       in: header
